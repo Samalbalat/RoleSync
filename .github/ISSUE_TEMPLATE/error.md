@@ -1,6 +1,6 @@
 ---
 name: Reporte de Error
-about: Informme de error
+about: Informe de error
 title: "[ERROR] "
 labels: error
 assignees: ''
