@@ -11,4 +11,4 @@ jobs:
         uses: actions/checkout@main
 
       - name: Run Codacy Analysis CLI
-        uses: codacy/codacy-analysis-cli-action@master
+        uses: codacy/codacy-analysis-cli-action@4e7bbaa7737d59e3e9751fc7c0ab0213c5f007b0
