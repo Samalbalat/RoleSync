@@ -5,44 +5,44 @@ title: "[ERROR] "
 labels: bug
 assignees: ''
 body: 
--type: textarea
-id: description
-attributes:
-    label: Descripción general
-    placeholder: Escribe una descripción clara del error
-validations:
-    required: true
--type: textarea
-id: expected
-attributes:
-    label: Comportamiento esperado
-    placeholder: Describe claramente qué esperabas que ocurriera.
-validations:
-    required: true
--type: textarea
-id: reproduction
-attributes:
-    label: Método de reproducción
-    placeholder: Lista los pasos a seguir para reproducir el error
-    value: |
-    1.
-    2.
-    3.
-validations:
-    required: true
--type: textarea
-id: environment
-attributes:
-    label: Entorno
-    placeholder: Indica sistema operativo, navegador, versión de programas y demás datos relevantes al error
-    value: |
-     - Sistema operativo: [por ejemplo, Windows, MacOS]
-     - Navegador: [por ejemplo, Chrome, Safari]
-     - Versión: [por ejemplo, 22]
-validations:
-    required: true
--type: textarea
-id: additional
-attributes:
-    label: Información adicional
-    placeholder: Si procede, añade aquí información adicional que no proceda a categorías anteriores
+    - type: textarea
+      id: description
+      attributes:
+        label: Descripción general
+        placeholder: Escribe una descripción clara del error
+      validations:
+        required: true
+    - type: textarea
+      id: expected
+      attributes:
+        label: Comportamiento esperado
+        placeholder: Describe claramente qué esperabas que ocurriera.
+      validations:
+        required: true
+    - type: textarea
+      id: reproduction
+      attributes:
+        label: Método de reproducción
+        placeholder: Lista los pasos a seguir para reproducir el error
+        value: |
+        1.
+        2.
+        3.
+      validations:
+        required: true
+    - type: textarea
+      id: environment
+      attributes:
+        label: Entorno
+        placeholder: Indica sistema operativo, navegador, versión de programas y demás datos relevantes al error
+        value: |
+        - Sistema operativo: [por ejemplo, Windows, MacOS]
+        - Navegador: [por ejemplo, Chrome, Safari]
+        - Versión: [por ejemplo, 22]
+      validations:
+        required: true
+    - type: textarea
+      id: additional
+      attributes:
+        label: Información adicional
+        placeholder: Si procede, añade aquí información adicional que no proceda a categorías anteriores
