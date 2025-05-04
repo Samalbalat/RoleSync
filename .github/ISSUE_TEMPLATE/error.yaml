@@ -3,7 +3,6 @@ name: Reporte de Error
 about: Esta plantilla se utiliza para crear reportes de errores que se generen en el código
 title: "[ERROR] "
 labels: bug
-assignees: ''
 body: 
     - type: textarea
       id: description
@@ -25,9 +24,9 @@ body:
         label: Método de reproducción
         placeholder: Lista los pasos a seguir para reproducir el error
         value: |
-        1.
-        2.
-        3.
+          1.
+          2.
+          3.
       validations:
         required: true
     - type: textarea

@@ -3,7 +3,6 @@ name: Feature Request
 about: Esta plantilla se utiliza para crear peticiones de nuevas funcionalidades
 title: "[FEAT] "
 labels: enhancement
-assignees: ''
 body: 
     - type: textarea
       id: description
