@@ -1,6 +1,5 @@
----
 name: Feature Request
-about: Esta plantilla se utiliza para crear peticiones de nuevas funcionalidades
+description: Esta plantilla se utiliza para crear peticiones de nuevas funcionalidades
 title: "[FEAT] "
 labels: enhancement
 body: 
