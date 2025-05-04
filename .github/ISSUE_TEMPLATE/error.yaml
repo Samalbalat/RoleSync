@@ -1,6 +1,5 @@
----
 name: Reporte de Error
-about: Esta plantilla se utiliza para crear reportes de errores que se generen en el código
+description: Esta plantilla se utiliza para crear reportes de errores que se generen en el código
 title: "[ERROR] "
 labels: bug
 body: 
