@@ -1,0 +1,22 @@
+name: Testing suite request
+description: Esta plantilla se utiliza para crear peticiones de cobertura
+title: "[TEST] "
+labels: enhancement
+body: 
+    - type: textarea
+      id: description
+      attributes:
+        label: Descripción general
+        placeholder: Escribe una descripción clara del tipo de tests que se espera implementar
+      validations:
+        required: true
+    - type: textarea
+      id: documentation
+      attributes:
+        label: Documentación útil
+        placeholder: Si procede, añade aquí la documentación de utilidad de cara a completar este ítem
+    - type: textarea
+      id: additional
+      attributes:
+        label: Información adicional
+        placeholder: Si procede, añade aquí información adicional que no proceda a categorías anteriores
