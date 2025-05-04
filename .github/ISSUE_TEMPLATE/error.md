@@ -1,32 +1,48 @@
 ---
 name: Reporte de Error
-about: Informe de error
+about: Esta plantilla se utiliza para crear reportes de errores que se generen en el código
 title: "[ERROR] "
-labels: error
+labels: bug
 assignees: ''
-
----
-
-**Describe el error**
-Una descripción clara y concisa de lo que ocurrió.
-
-**Cómo reproducirlo**
-Pasos para reproducir el error:
-1. Ve a '...'
-2. Haz clic en '...'
-3. Desplázate hasta '...'
-4. Observa el error
-
-**Comportamiento esperado**
-Describe claramente qué esperabas que ocurriera.
-
-**Capturas de pantalla**
-Si aplica, agrega capturas de pantalla que ayuden a explicar el problema.
-
-**Entorno:**
- - Sistema operativo: [por ejemplo, Windows, MacOS]
- - Navegador: [por ejemplo, Chrome, Safari]
- - Versión: [por ejemplo, 22]
-
-**Información adicional**
-Agrega cualquier otro contexto relevante sobre el problema aquí.
+body: 
+-type: textarea
+id: description
+attributes:
+    label: Descripción general
+    placeholder: Escribe una descripción clara del error
+validations:
+    required: true
+-type: textarea
+id: expected
+attributes:
+    label: Comportamiento esperado
+    placeholder: Describe claramente qué esperabas que ocurriera.
+validations:
+    required: true
+-type: textarea
+id: reproduction
+attributes:
+    label: Método de reproducción
+    placeholder: Lista los pasos a seguir para reproducir el error
+    value: |
+    1.
+    2.
+    3.
+validations:
+    required: true
+-type: textarea
+id: environment
+attributes:
+    label: Entorno
+    placeholder: Indica sistema operativo, navegador, versión de programas y demás datos relevantes al error
+    value: |
+     - Sistema operativo: [por ejemplo, Windows, MacOS]
+     - Navegador: [por ejemplo, Chrome, Safari]
+     - Versión: [por ejemplo, 22]
+validations:
+    required: true
+-type: textarea
+id: additional
+attributes:
+    label: Información adicional
+    placeholder: Si procede, añade aquí información adicional que no proceda a categorías anteriores

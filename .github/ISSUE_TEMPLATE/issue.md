@@ -1,0 +1,24 @@
+---
+name: Feature Request
+about: Esta plantilla se utiliza para crear peticiones de nuevas funcionalidades
+title: "[FEAT] "
+labels: enhancement
+assignees: ''
+body: 
+-type: textarea
+id: description
+attributes:
+    label: Descripción general
+    placeholder: Escribe una descripción clara del propósito de la issue
+validations:
+    required: true
+-type: textarea
+id: documentation
+attributes:
+    label: Documentación útil
+    placeholder: Si procede, añade aquí la documentación de utilidad de cara a completar este ítem
+-type: textarea
+id: additional
+attributes:
+    label: Información adicional
+    placeholder: Si procede, añade aquí información adicional que no proceda a categorías anteriores
