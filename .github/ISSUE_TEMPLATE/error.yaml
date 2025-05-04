@@ -34,9 +34,9 @@ body:
         label: Entorno
         placeholder: Indica sistema operativo, navegador, versión de programas y demás datos relevantes al error
         value: |
-        - Sistema operativo: [por ejemplo, Windows, MacOS]
-        - Navegador: [por ejemplo, Chrome, Safari]
-        - Versión: [por ejemplo, 22]
+            - Sistema operativo: [por ejemplo, Windows, MacOS]
+            - Navegador: [por ejemplo, Chrome, Safari]
+            - Versión: [por ejemplo, 22]
       validations:
         required: true
     - type: textarea
