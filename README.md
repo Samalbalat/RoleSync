@@ -1,4 +1,5 @@
 # RoleSync
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/bcbf6c4efeb34c26922f12e2b272f23f)](https://app.codacy.com/gh/Samalbalat/RoleSync/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 Pretendemos crear una aplicación que facilite la coordinación para los juegos de rol de mesa y la comunicación para el rol realizado en escrito
 
@@ -9,3 +10,5 @@ Adicionalmente esto es un Projecto Spring, la versión que usaremos es la últim
 Recomendamos el uso de VSCode ya que utilizaremos ese IDE para trabajar por su alta compatibilidad con Spring Boot, Spring Framework y Spring Web
 Las dependencias necesarias, como JUnit o Mockito serán gestionadas por Maven
 Se necesitará tener instalado Git, al igual que MySQL dado que será lo que utilizaremos paa la conexión de la base de Datos
+
+
