@@ -6,6 +6,17 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 export default [
   { ignores: ['dist'] },
   {
+    extends: [
+      'eslint-config-prettier',
+      'plugin:react/recommended',
+      'plugin:react/jsx-runtime',
+      'standard'
+    ],
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
     files: ['**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2020,
