@@ -2,21 +2,12 @@ import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import prettier from 'eslint-config-prettier/flat';
 
 export default [
   { ignores: ['dist'] },
+
   {
-    extends: [
-      'eslint-config-prettier',
-      'plugin:react/recommended',
-      'plugin:react/jsx-runtime',
-      'standard'
-    ],
-    settings: {
-      react: {
-        version: 'detect',
-      },
-    },
     files: ['**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2020,
@@ -30,6 +21,12 @@ export default [
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
+      'prettier': prettier
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
     },
     rules: {
       ...js.configs.recommended.rules,

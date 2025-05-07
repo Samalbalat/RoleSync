@@ -10,8 +10,7 @@ export default defineConfig({
     tailwindcss(),
     eslintPlugin({
       cache: false,
-      include: ['./src//*.js', './src//*.jsx'],
-      exclude: [],
+      include: ['./src//*.js', './src//*.jsx']
     }),
   ],
 })
