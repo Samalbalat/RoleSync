@@ -34,3 +34,6 @@ build/
 
 ### SQL ###
 *.sql
+
+### Security ###
+secrets.properties
