@@ -13,8 +13,6 @@ export const listarCampanas = () => {
 						<th className='py-2 px-4 border-b'>ID</th>
 						<th className='py-2 px-4 border-b'>Nombre</th>
 						<th className='py-2 px-4 border-b'>Descripción</th>
-						<th className='py-2 px-4 border-b'>Fecha de Inicio</th>
-						<th className='py-2 px-4 border-b'>Fecha de Fin</th>
 					</tr>
 				</thead>
 				<tbody>{/* Aquí se pueden mapear las campañas */}</tbody>
