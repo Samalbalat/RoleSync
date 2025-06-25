@@ -14,7 +14,7 @@ export default function NavbarDefault() {
 
 	return (
 		<Navbar
-			className='w-full !max-w-none px-0 pb-0 pt-2 lg:px-8 lg:py-4 bg-gray-900 border-0 rounded-none'
+			className='fixed top-0 left-0 z-50 w-full !max-w-none px-0 pb-0 pt-2 lg:px-8 lg:py-4 bg-gray-900 border-0 rounded-none'
 			style={{ margin: 0 }}
 		>
 			<div className='container mx-auto flex items-center justify-between text-white'>
@@ -89,7 +89,7 @@ export default function NavbarDefault() {
 				open={openNav}
 			>
 				<div className='container mx-auto'>
-					<div className='h-6'></div>
+					<div className='h-6 '></div>
 					<div className=''>{navList}</div>
 					<div className='flex items-center gap-x-1 pb-3 px-1'>
 						<Button fullWidth variant='text' size='sm' className=''>

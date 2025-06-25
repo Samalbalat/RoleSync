@@ -10,7 +10,7 @@ function App() {
 
 	React.useEffect(() => {
 		const handleResize = () => {
-			setisMobileSize(window.innerWidth <= 960);
+			setisMobileSize(window.innerWidth <= 1060);
 		};
 		handleResize(); // Para establecer el estado inicial correctamente
 		window.addEventListener('resize', handleResize);
@@ -21,16 +21,25 @@ function App() {
 		<div className='min-h-screen flex flex-col'>
 			<BrowserRouter>
 				<Navbar />
-				<div className='flex flex-1 pt-4'>
+				<div className='flex flex-1 mt-20'>
 					{!isMobileSize && (
 						<div className='fixed left-4'>
 							<Sidebar />
 						</div>
 					)}
-					<main className={`flex-grow p-6 ${!isMobileSize ? 'ml-80' : ''}`}>
+					<main
+						className={`flex-grow p-6 pt-0 ${!isMobileSize ? 'ml-72' : ''}`}
+					>
 						<Routes>
-							<Route exact path='/' element={<ListarCampanas />} />
-							<Route path='/listarcampanas' element={<ListarCampanas />} />
+							<Route
+								exact
+								path='/'
+								element={<ListarCampanas isMobileSize={isMobileSize} />}
+							/>
+							<Route
+								path='/listarcampanas'
+								element={<ListarCampanas isMobileSize={isMobileSize} />}
+							/>
 						</Routes>
 					</main>
 				</div>
