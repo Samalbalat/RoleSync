@@ -1,6 +1,6 @@
-name: Feature Request
+name: Backend Request
 description: Esta plantilla se utiliza para crear peticiones de nuevas funcionalidades
-title: "[FEAT] "
+title: "[FEAT-B] "
 labels: enhancement
 body: 
     - type: textarea
