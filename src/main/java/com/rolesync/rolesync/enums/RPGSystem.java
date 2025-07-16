@@ -1,6 +1,6 @@
 package com.rolesync.rolesync.enums;
 
-public enum Sistema {
+public enum RPGSystem {
     DungeonsAndDragons("D&D"),
     Pathfinder("PF"),
     Starfinder("SF"),
@@ -18,18 +18,19 @@ public enum Sistema {
     Numenera("Numenera"),
     TheOneRing("TOR"),
     StarWarsRoleplayingGame("SWRPG")
-    // Otros sistemas pueden ser añadidos aquí
+    // More can be added as needed
     ;
 
-    // Cada sistema tiene un código asociado
-    private final String codigo;
-
-    Sistema(String codigo) {
-        this.codigo = codigo;
+    // Each enum constant has a code associated with it
+    // This code can be used for serialization or other purposes
+    private final String code;
+    
+    RPGSystem(String code) {
+        this.code = code;
     }
 
-    public String getCodigo() {
-        return codigo;
+    public String getcode() {
+        return code;
     }    
     
 }

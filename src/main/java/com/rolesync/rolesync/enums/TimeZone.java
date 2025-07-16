@@ -1,6 +1,6 @@
 package com.rolesync.rolesync.enums;
 
-public enum Horario {
+public enum TimeZone {
     GMTE0("GMT+0"),
     GMTE1("GMT+1"),GMTE2("GMT+2"),
     GMTE3("GMT+3"),GMTE4("GMT+4"),
@@ -15,15 +15,16 @@ public enum Horario {
     GMTW9("GMT-9"),GMTW10("GMT-10"),
     GMTW11("GMT-11"),GMTW12("GMT-12");
 
-    // Cada horario tiene un código asociado
-    private final String codigo;
+    // Each enum constant has a code associated with it
+    // This code can be used for serialization or other purposes
+    private final String code;
 
-    Horario(String codigo) {
-        this.codigo = codigo;
+    TimeZone(String code) {
+        this.code = code;
     }
 
-    public String getCodigo() {
-        return codigo;
+    public String getcode() {
+        return code;
     }
 
     

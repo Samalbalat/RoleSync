@@ -8,25 +8,25 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.rolesync.rolesync.entities.Campanya;
-import com.rolesync.rolesync.entities.CampanyaMesa;
-import com.rolesync.rolesync.entities.Perfil;
-import com.rolesync.rolesync.enums.Comunicacion;
-import com.rolesync.rolesync.enums.DiaSemana;
-import com.rolesync.rolesync.enums.Horario;
-import com.rolesync.rolesync.enums.Idioma;
-import com.rolesync.rolesync.enums.Sistema;
-import com.rolesync.rolesync.repositories.CampanyaRepository;
-import com.rolesync.rolesync.repositories.PerfilRepository;
+import com.rolesync.rolesync.entities.Campaign;
+import com.rolesync.rolesync.entities.TabletopCampaign;
+import com.rolesync.rolesync.entities.Profile;
+import com.rolesync.rolesync.enums.Communication;
+import com.rolesync.rolesync.enums.WeekDay;
+import com.rolesync.rolesync.enums.TimeZone;
+import com.rolesync.rolesync.enums.Language;
+import com.rolesync.rolesync.enums.RPGSystem;
+import com.rolesync.rolesync.repositories.CampaignRepository;
+import com.rolesync.rolesync.repositories.ProfileRepository;
 
 @SpringBootApplication
 public class RolesyncApplication implements CommandLineRunner {
 
 	@Autowired
-	private CampanyaRepository campanyaRepository;
+	private CampaignRepository campanyaRepository;
 
 	@Autowired
-	private PerfilRepository perfilRepository;
+	private ProfileRepository perfilRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(RolesyncApplication.class, args);
@@ -37,32 +37,32 @@ public class RolesyncApplication implements CommandLineRunner {
 		String nombre = "Campaña de Prueba";
 		String tematica = "Tecnología";
 		String descripcion = "Esta es una campaña de prueba para verificar la funcionalidad del sistema.";
-		// Aquí se puede crear un objeto Perfil para el propietario si es necesario
-		Perfil propietario = new Perfil("Juan Pérez", "juanpe@gmail.com", 667896543);
+		// Aquí se puede crear un objeto Profile para el propietario si es necesario
+		Profile propietario = new Profile("Juan Pérez", "juanpe@gmail.com", 667896543);
 		perfilRepository.save(propietario);
 
-		Set<Idioma> idiomas = Set.of(Idioma.Español, Idioma.Japonés);
-		Set<Comunicacion> comunicacion = Set.of(Comunicacion.Discord, Comunicacion.Facebook);
-		Horario horario = Horario.GMTE3;
+		Set<Language> idiomas = Set.of(Language.Spanish, Language.Japanese);
+		Set<Communication> comunicacion = Set.of(Communication.Discord, Communication.Facebook);
+		TimeZone horario = TimeZone.GMTE3;
 		String imagen = "https://example.com/imagen-campanya.jpg";
-		Campanya campanya = new Campanya(nombre, tematica, descripcion, propietario, Set.of(propietario), comunicacion, idiomas, horario, imagen);
+		Campaign campanya = new Campaign(nombre, tematica, descripcion, propietario, Set.of(propietario), comunicacion, idiomas, horario, imagen);
 		campanyaRepository.save(campanya);
 
-		Perfil propietario2 = new Perfil("Olga Pérez", "olgpe@gmail.com", 667896542);
-		propietario2.setCampanyasMiembro(Set.of(campanya));
+		Profile propietario2 = new Profile("Olga Pérez", "olgpe@gmail.com", 667896542);
+		propietario2.setMemberOf(Set.of(campanya));
 		perfilRepository.save(propietario2);
 
-		// Crear una CampanyaMesa como ejemplo
-		Sistema sistema = Sistema.CallOfCthulhu;
-		DiaSemana diaSemana = DiaSemana.LUNES;
+		// Crear una TabletopCampaign como ejemplo
+		RPGSystem sistema = RPGSystem.CallOfCthulhu;
+		WeekDay diaSemana = WeekDay.MONDAY;
 		Double duracion = 2.0; // Duración en horas
-		CampanyaMesa campanyaMesa = new CampanyaMesa(nombre, tematica, descripcion, propietario2, Set.of(propietario2), comunicacion, idiomas, horario, imagen, sistema, diaSemana, descripcion, duracion, "Madrid");
+		TabletopCampaign campanyaMesa = new TabletopCampaign(nombre, tematica, descripcion, propietario2, Set.of(propietario2), comunicacion, idiomas, horario, imagen, sistema, diaSemana, descripcion, duracion);
 		campanyaRepository.save(campanyaMesa);
 
-		List<Campanya> campanyas = (List<Campanya>) campanyaRepository.findAll();
+		List<Campaign> campanyas = (List<Campaign>) campanyaRepository.findAll();
 		System.out.println("List of campaigns:");
-		for (Campanya c : campanyas) {
-			System.out.println("ID: " + c.getId() + ", Name: " + c.getNombre() + ", Description: " + c.getDescripcion());
+		for (Campaign c : campanyas) {
+			System.out.println("ID: " + c.getId() + ", Name: " + c.getName() + ", Description: " + c.getDescription());
 		}
 		System.out.println("Total campaigns: " + campanyas.size());
 		System.out.println("Application started successfully!");

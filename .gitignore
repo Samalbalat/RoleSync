@@ -34,3 +34,6 @@ build/
 
 ### SQL ###
 *.sql
+
+### Sensitive Data ###
+src/main/resources/application-prod.properties
