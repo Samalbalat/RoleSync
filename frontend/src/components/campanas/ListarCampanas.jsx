@@ -9,7 +9,9 @@ import {
 	Typography,
 	Select,
 	Option,
+	IconButton,
 } from '@material-tailwind/react';
+import { ArrowRightIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 import lista_campanas from '../../data/ejemplo_campañas';
 
 const FiltrosCampanas = () => {
@@ -138,20 +140,84 @@ export default function ListarCampanas({ isMobileSize, filterCollapsed }) {
 		isMobileSize: PropTypes.bool.isRequired,
 		filterCollapsed: PropTypes.bool.isRequired,
 	};
+
+	const [activePage, setActivePage] = useState(1);
+	const itemsPerPage = 6;
+	const totalPages = Math.ceil(lista_campanas.length / itemsPerPage);
+
+	const paginatedCampanas = lista_campanas.slice(
+		itemsPerPage * (activePage - 1),
+		itemsPerPage * activePage,
+	);
+
+	const getItemProps = index => ({
+		variant: activePage === index ? 'filled' : 'text',
+		color: 'gray',
+		onClick: () => setActivePage(index),
+	});
+
+	const next = () => {
+		if (activePage === totalPages) return;
+		setActivePage(activePage + 1);
+	};
+
+	const prev = () => {
+		if (activePage === 1) return;
+		setActivePage(activePage - 1);
+	};
+
+	const Pagination = () => (
+		<div className='flex items-center gap-4 justify-center mt-6'>
+			<Button
+				variant='text'
+				className='flex items-center gap-2'
+				onClick={prev}
+				disabled={activePage === 1}
+			>
+				<ArrowLeftIcon strokeWidth={2} className='h-4 w-4' /> Anterior
+			</Button>
+			<div className='flex items-center gap-2'>
+				{Array.from({ length: totalPages }, (_, i) => (
+					<IconButton key={i + 1} {...getItemProps(i + 1)}>
+						{i + 1}
+					</IconButton>
+				))}
+			</div>
+			<Button
+				variant='text'
+				className='flex items-center gap-2'
+				onClick={next}
+				disabled={activePage === totalPages}
+			>
+				Siguiente
+				<ArrowRightIcon strokeWidth={2} className='h-4 w-4' />
+			</Button>
+		</div>
+	);
+
 	return (
 		<>
 			{!isMobileSize ? (
 				<div className='flex flex-col md:flex-row gap-6'>
 					{!filterCollapsed ? (
 						<>
+							{/* Filtros */}
 							<div className='w-full md:w-1/4'>
 								<FiltrosCampanas />
 							</div>
 
-							<div className='w-full md:w-3/4 grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6'>
-								{lista_campanas.map(campana => (
-									<CardCampanaVertical key={campana.id} campana={campana} />
-								))}
+							{/* Campañas */}
+							<div className='w-full md:w-3/4 flex flex-col gap-6'>
+								<div className='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6'>
+									{paginatedCampanas.map(campana => (
+										<CardCampanaVertical key={campana.id} campana={campana} />
+									))}
+								</div>
+
+								{/* Paginación debajo */}
+								<div className='w-full'>
+									<Pagination />
+								</div>
 							</div>
 						</>
 					) : (
@@ -167,10 +233,16 @@ export default function ListarCampanas({ isMobileSize, filterCollapsed }) {
 										'linear-gradient(90deg, #f43f5e 0%, #3b82f6 100%)',
 								}}
 							/>
+
 							<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6'>
-								{lista_campanas.map(campana => (
+								{paginatedCampanas.map(campana => (
 									<CardCampanaVertical key={campana.id} campana={campana} />
 								))}
+							</div>
+
+							{/* Paginación debajo */}
+							<div className='w-full'>
+								<Pagination />
 							</div>
 						</div>
 					)}
@@ -187,9 +259,12 @@ export default function ListarCampanas({ isMobileSize, filterCollapsed }) {
 						}}
 					/>
 					<div className='grid gap-6'>
-						{lista_campanas.map(campana => (
+						{paginatedCampanas.map(campana => (
 							<CardCampanaHorizontal key={campana.id} campana={campana} />
 						))}
+					</div>
+					<div className='w-full mt-4'>
+						<Pagination />
 					</div>
 				</>
 			)}
