@@ -2,12 +2,12 @@ import {
 	Card,
 	CardHeader,
 	CardBody,
-	CardFooter,
 	Typography,
 	Rating,
+	CardFooter,
 } from '@material-tailwind/react';
 
-export default function CardCampanaVertical() {
+export default function CardCampanaHorizontal() {
 	return (
 		<Card className='mt-10'>
 			<CardHeader color='blue-gray' className='relative h-36'>
@@ -17,12 +17,19 @@ export default function CardCampanaVertical() {
 					className='w-full h-full object-cover'
 				/>
 			</CardHeader>
-			<CardBody>
-				<Typography variant='h6' color='blue-gray' className='mb-2'>
+			<CardBody className='pb-0'>
+				<Typography variant='h5' color='blue-gray' className='mb-2'>
 					Titulo de Campaña!!
 				</Typography>
-				<Typography variant='h7' color='blue-gray'>
+				<Typography variant='h6' color='blue-gray'>
 					D&D
+				</Typography>
+				<Typography color='gray' variant='small' className='mb-6 font-normal'>
+					<p className='line-clamp-4'>
+						Un antiguo dragón rojo aterroriza la región, quemando aldeas y
+						acumulando tesoros. Los héroes deberán unir fuerzas para encontrar
+						su guarida y derrotar a la bestia antes de que destruya el reino.
+					</p>
 				</Typography>
 			</CardBody>
 			<CardFooter className='pt-0'>

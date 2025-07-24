@@ -14,17 +14,23 @@ import CardCampanaVertical from './cardCampanaVertical';
 
 const FiltrosCampanas = () => {
 	return (
-		<Card className='w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5 bg-gray-300'>
-			<div className='mb-2'>
-				<Typography variant='h5' color='blue-gray'>
-					AQUI IRÁN LOS FILTROS
-				</Typography>
-				<br />
-				<Typography variant='h5' color='red'>
-					Solo ejemplo. Actualmente no funciona
-				</Typography>
-				<br />
-
+		<div className='w-full max-w-[20rem] px-2 py-4 flex flex-col items-center'>
+			<Typography
+				variant='h5'
+				color='blue-gray'
+				className='font-bold tracking-wide mb-1'
+			>
+				Aquí irán los filtros
+			</Typography>
+			<div className='w-12 border-b-2 border-red-400 mb-4' />
+			<Typography
+				variant='small'
+				color='red'
+				className='text-center font-semibold mb-6'
+			>
+				Solo ejemplo. Actualmente no funciona
+			</Typography>
+			<div className='w-full flex flex-col gap-5'>
 				<Checkbox
 					color='red'
 					label={
@@ -33,10 +39,7 @@ const FiltrosCampanas = () => {
 						</Typography>
 					}
 				/>
-				<br />
-				<br />
 				<Input color='red' label='Ejemplo Input' className='w-full' />
-				<br />
 				<Select color='blue' label='Ejemplo Desplegable' className='w-full'>
 					<Option>Opcion 1</Option>
 					<Option>Opcion 2</Option>
@@ -44,29 +47,33 @@ const FiltrosCampanas = () => {
 					<Option>Opcion 4</Option>
 					<Option>Opcion 5</Option>
 				</Select>
-				<br />
-				<div className='flex justify-center'>
-					<Button size='sm'>Filtrar</Button>
+				<div className='flex justify-center pt-2'>
+					<Button
+						size='sm'
+						color='red'
+						className='shadow-md hover:scale-105 transition-transform font-bold px-6 py-2'
+					>
+						Filtrar
+					</Button>
 				</div>
 			</div>
-		</Card>
+		</div>
 	);
 };
 
 const FiltrosCampanasMobile = () => {
 	const [open, setOpen] = useState(false);
 	return (
-		<Card className='w-full p-4 shadow-xl shadow-blue-gray-900/5 bg-gray-300'>
+		<div className='w-full px-2'>
 			<button
 				type='button'
-				className='flex items-center justify-between cursor-pointer w-full bg-transparent border-0 p-0 focus:outline-none'
+				className='flex items-center justify-between w-full py-2'
 				onClick={() => setOpen(!open)}
 				aria-expanded={open}
 			>
-				<Typography variant='h5' color='blue-gray'>
-					AQUI IRÁN LOS FILTROS
+				<Typography variant='h6' color='blue-gray' className='font-bold'>
+					Filtros
 				</Typography>
-
 				<span className={`transition-transform ${open ? 'rotate-180' : ''}`}>
 					<svg
 						xmlns='http://www.w3.org/2000/svg'
@@ -79,74 +86,117 @@ const FiltrosCampanasMobile = () => {
 						<path
 							strokeLinecap='round'
 							strokeLinejoin='round'
-							d='M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z'
+							d='M19 9l-7 7-7-7'
 						/>
 					</svg>
 				</span>
 			</button>
 			{open && (
-				<div className='mt-4'>
-					<Typography variant='h5' color='red'>
+				<div className='mt-2 flex flex-col items-center'>
+					<Typography
+						variant='small'
+						color='red'
+						className='text-center font-semibold mb-4'
+					>
 						Solo ejemplo. Actualmente no funciona
 					</Typography>
-					<br />
-
-					<Checkbox
-						color='red'
-						label={
-							<Typography color='blue-gray' className='flex font-medium'>
-								Ejemplo Checkbox
-							</Typography>
-						}
-					/>
-					<br />
-					<br />
-					<Input color='red' label='Ejemplo Input' className='w-full' />
-					<br />
-					<Select color='blue' label='Ejemplo Desplegable' className='w-full'>
-						<Option>Opcion 1</Option>
-						<Option>Opcion 2</Option>
-						<Option>Opcion 3</Option>
-						<Option>Opcion 4</Option>
-						<Option>Opcion 5</Option>
-					</Select>
-					<br />
-					<div className='flex justify-center'>
-						<Button size='sm'>Filtrar</Button>
+					<div className='w-full flex flex-col gap-4'>
+						<Checkbox
+							color='red'
+							label={
+								<Typography color='blue-gray' className='flex font-medium'>
+									Ejemplo Checkbox
+								</Typography>
+							}
+						/>
+						<Input color='red' label='Ejemplo Input' className='w-full' />
+						<Select color='blue' label='Ejemplo Desplegable' className='w-full'>
+							<Option>Opcion 1</Option>
+							<Option>Opcion 2</Option>
+							<Option>Opcion 3</Option>
+							<Option>Opcion 4</Option>
+							<Option>Opcion 5</Option>
+						</Select>
+						<div className='flex justify-center pt-2'>
+							<Button
+								size='md'
+								color='red'
+								className='shadow-md hover:scale-105 transition-transform font-bold px-8 py-3'
+							>
+								Filtrar
+							</Button>
+						</div>
 					</div>
 				</div>
 			)}
-		</Card>
+		</div>
 	);
 };
 
-export default function ListarCampanas({ isMobileSize }) {
+export default function ListarCampanas({ isMobileSize, filterCollapsed }) {
 	ListarCampanas.propTypes = {
 		isMobileSize: PropTypes.bool.isRequired,
+		filterCollapsed: PropTypes.bool.isRequired,
 	};
 	return (
 		<>
 			{!isMobileSize ? (
 				<div className='flex flex-col md:flex-row gap-6'>
-					<div className='w-full md:w-1/4'>
-						<FiltrosCampanas />
-					</div>
+					{!filterCollapsed ? (
+						<>
+							<div className='w-full md:w-1/4'>
+								<FiltrosCampanas />
+							</div>
 
-					<div className='w-full md:w-3/4'>
-						<CardCampanaHorizontal />
-						<CardCampanaHorizontal />
-						<CardCampanaHorizontal />
-						<CardCampanaHorizontal />
-					</div>
+							<div className='w-full md:w-3/4 grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6'>
+								<CardCampanaVertical />
+								<CardCampanaVertical />
+								<CardCampanaVertical />
+								<CardCampanaVertical />
+								<CardCampanaVertical />
+								<CardCampanaVertical />
+							</div>
+						</>
+					) : (
+						<div className='w-full flex flex-col gap-3'>
+							<div className='mt-3'>
+								<FiltrosCampanasMobile />
+							</div>
+
+							<div
+								className='w-full h-[2px] my-1'
+								style={{
+									background:
+										'linear-gradient(90deg, #f43f5e 0%, #3b82f6 100%)',
+								}}
+							/>
+							<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6'>
+								<CardCampanaVertical />
+								<CardCampanaVertical />
+								<CardCampanaVertical />
+								<CardCampanaVertical />
+								<CardCampanaVertical />
+								<CardCampanaVertical />
+							</div>
+						</div>
+					)}
 				</div>
 			) : (
 				<>
-					<div className='w-full mb-2'>
+					<div className='w-full'>
 						<FiltrosCampanasMobile />
 					</div>
-					<div className='grid grid-cols-2 gap-6'>
-						<CardCampanaVertical />
-						<CardCampanaVertical />
+					<div
+						className='w-full h-[2px] my-3'
+						style={{
+							background: 'linear-gradient(90deg, #f43f5e 0%, #3b82f6 100%)',
+						}}
+					/>
+					<div className='grid gap-6'>
+						<CardCampanaHorizontal />
+						<CardCampanaHorizontal />
+						<CardCampanaHorizontal />
+						<CardCampanaHorizontal />
 					</div>
 				</>
 			)}
