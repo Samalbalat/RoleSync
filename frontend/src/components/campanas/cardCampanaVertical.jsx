@@ -6,8 +6,14 @@ import {
 	Rating,
 	CardFooter,
 } from '@material-tailwind/react';
+import PropTypes from 'prop-types';
 
-export default function CardCampanaHorizontal() {
+export default function CardCampanaVertical({ campana }) {
+	const title = campana.title;
+	const theme = campana.tematica;
+	const sistem = campana.sistema;
+	const description = campana.descripcion;
+	const ratingValue = Math.round(campana.rate);
 	return (
 		<Card className='mt-10'>
 			<CardHeader color='blue-gray' className='relative h-36'>
@@ -19,22 +25,36 @@ export default function CardCampanaHorizontal() {
 			</CardHeader>
 			<CardBody className='pb-0'>
 				<Typography variant='h5' color='blue-gray' className='mb-2'>
-					Titulo de Campaña!!
+					{title}
 				</Typography>
 				<Typography variant='h6' color='blue-gray'>
-					D&D
+					{sistem}
 				</Typography>
-				<Typography color='gray' variant='small' className='mb-6 font-normal'>
-					<p className='line-clamp-4'>
-						Un antiguo dragón rojo aterroriza la región, quemando aldeas y
-						acumulando tesoros. Los héroes deberán unir fuerzas para encontrar
-						su guarida y derrotar a la bestia antes de que destruya el reino.
-					</p>
+				<Typography
+					variant='small'
+					color='gray'
+					className='mb-1 uppercase font-bold'
+				>
+					{theme}
 				</Typography>
+				<p className='mb-6 font-normal line-clamp-4 text-gray-700 text-sm'>
+					{description}
+				</p>
 			</CardBody>
 			<CardFooter className='pt-0'>
-				<Rating value={4} readonly />
+				<Rating value={ratingValue} readonly size='sm' />
 			</CardFooter>
 		</Card>
 	);
 }
+
+CardCampanaVertical.propTypes = {
+	campana: PropTypes.shape({
+		id: PropTypes.number.isRequired,
+		title: PropTypes.string.isRequired,
+		tematica: PropTypes.string.isRequired,
+		sistema: PropTypes.string.isRequired,
+		descripcion: PropTypes.string.isRequired,
+		rate: PropTypes.number.isRequired,
+	}).isRequired,
+};

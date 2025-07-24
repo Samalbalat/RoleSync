@@ -18,7 +18,7 @@ export default function NavbarDefault() {
 			style={{ margin: 0 }}
 		>
 			<div className='container mx-auto flex items-center justify-between text-gray-900'>
-				<div className='flex shrink-0 items-center'>
+				<div className='flex shrink-0 items-center ml-4'>
 					<img
 						alt='RolSync Logo'
 						src='https://i0.wp.com/www.dicegeeks.com/wp-content/uploads/2022/11/DnD-Symbol.png?fit=3840%2C2160&ssl=1'

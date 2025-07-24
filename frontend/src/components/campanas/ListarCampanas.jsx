@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import CardCampanaHorizontal from './cardCampanaHorizontal';
+import CardCampanaVertical from './cardCampanaVertical';
 import {
 	Button,
-	Card,
 	Checkbox,
 	Input,
 	Typography,
 	Select,
 	Option,
 } from '@material-tailwind/react';
-import CardCampanaVertical from './cardCampanaVertical';
+import lista_campanas from '../../data/ejemplo_campañas';
 
 const FiltrosCampanas = () => {
 	return (
@@ -149,12 +149,9 @@ export default function ListarCampanas({ isMobileSize, filterCollapsed }) {
 							</div>
 
 							<div className='w-full md:w-3/4 grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6'>
-								<CardCampanaVertical />
-								<CardCampanaVertical />
-								<CardCampanaVertical />
-								<CardCampanaVertical />
-								<CardCampanaVertical />
-								<CardCampanaVertical />
+								{lista_campanas.map(campana => (
+									<CardCampanaVertical key={campana.id} campana={campana} />
+								))}
 							</div>
 						</>
 					) : (
@@ -171,12 +168,9 @@ export default function ListarCampanas({ isMobileSize, filterCollapsed }) {
 								}}
 							/>
 							<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6'>
-								<CardCampanaVertical />
-								<CardCampanaVertical />
-								<CardCampanaVertical />
-								<CardCampanaVertical />
-								<CardCampanaVertical />
-								<CardCampanaVertical />
+								{lista_campanas.map(campana => (
+									<CardCampanaVertical key={campana.id} campana={campana} />
+								))}
 							</div>
 						</div>
 					)}
@@ -193,10 +187,9 @@ export default function ListarCampanas({ isMobileSize, filterCollapsed }) {
 						}}
 					/>
 					<div className='grid gap-6'>
-						<CardCampanaHorizontal />
-						<CardCampanaHorizontal />
-						<CardCampanaHorizontal />
-						<CardCampanaHorizontal />
+						{lista_campanas.map(campana => (
+							<CardCampanaHorizontal key={campana.id} campana={campana} />
+						))}
 					</div>
 				</>
 			)}

@@ -6,7 +6,14 @@ import {
 	Rating,
 } from '@material-tailwind/react';
 
-export default function CardCampanaHorizontal() {
+import PropTypes from 'prop-types';
+
+export default function CardCampanaHorizontal({ campana }) {
+	const title = campana.title;
+	const theme = campana.tematica;
+	const sistem = campana.sistema;
+	const description = campana.descripcion;
+	const ratingValue = Math.round(campana.rate);
 	return (
 		<Card className='w-full max-w-md flex-row mb-2 shadow-sm rounded-lg'>
 			<CardHeader
@@ -20,31 +27,37 @@ export default function CardCampanaHorizontal() {
 					className='h-full w-full object-cover rounded-l-lg'
 				/>
 			</CardHeader>
-			<CardBody className='relative p-3 flex flex-col justify-between'>
-				<div className='absolute top-2 right-2 z-10'>
-					<Rating value={4} readonly size='sm' />
-				</div>
+			<CardBody className='p-3 flex flex-col justify-between'>
+				<Typography variant='h5' color='blue-gray' className='mb-1 truncate'>
+					{title}
+				</Typography>
 				<Typography
 					variant='small'
 					color='gray'
 					className='mb-1 uppercase font-bold'
 				>
-					D&D
-				</Typography>
-				<Typography variant='h5' color='blue-gray' className='mb-1 truncate'>
-					Titulo de Campaña!!
+					{sistem}
 				</Typography>
 				<Typography variant='h6' color='gray' className='mb-1'>
-					Fantasia Medieval
+					{theme}
 				</Typography>
-				<Typography color='gray' variant='small' className='mb-6 font-normal'>
-					<p className='line-clamp-3'>
-						Un antiguo dragón rojo aterroriza la región, quemando aldeas y
-						acumulando tesoros. Los héroes deberán unir fuerzas para encontrar
-						su guarida y derrotar a la bestia antes de que destruya el reino.
-					</p>
-				</Typography>
+				<p className='mb-6 font-normal line-clamp-4 text-gray-700 text-sm'>
+					{description}
+				</p>
+				<div className='absolute bottom-2 right-2 z-10'>
+					<Rating value={ratingValue} readonly size='sm' />
+				</div>
 			</CardBody>
 		</Card>
 	);
 }
+CardCampanaHorizontal.propTypes = {
+	campana: PropTypes.shape({
+		id: PropTypes.number.isRequired,
+		title: PropTypes.string.isRequired,
+		tematica: PropTypes.string.isRequired,
+		sistema: PropTypes.string.isRequired,
+		descripcion: PropTypes.string.isRequired,
+		rate: PropTypes.number.isRequired,
+	}).isRequired,
+};
