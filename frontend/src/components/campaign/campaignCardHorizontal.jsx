@@ -8,7 +8,7 @@ import {
 
 import PropTypes from 'prop-types';
 
-export default function CardCampanaHorizontal({ campana }) {
+export default function CampaignCardHorizontal({ campana }) {
 	const title = campana.title;
 	const theme = campana.tematica;
 	const sistem = campana.sistema;
@@ -51,7 +51,7 @@ export default function CardCampanaHorizontal({ campana }) {
 		</Card>
 	);
 }
-CardCampanaHorizontal.propTypes = {
+CampaignCardHorizontal.propTypes = {
 	campana: PropTypes.shape({
 		id: PropTypes.number.isRequired,
 		title: PropTypes.string.isRequired,

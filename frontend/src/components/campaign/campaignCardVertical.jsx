@@ -8,7 +8,7 @@ import {
 } from '@material-tailwind/react';
 import PropTypes from 'prop-types';
 
-export default function CardCampanaVertical({ campana }) {
+export default function CampaignCardVertical({ campana }) {
 	const title = campana.title;
 	const theme = campana.tematica;
 	const sistem = campana.sistema;
@@ -48,7 +48,7 @@ export default function CardCampanaVertical({ campana }) {
 	);
 }
 
-CardCampanaVertical.propTypes = {
+CampaignCardVertical.propTypes = {
 	campana: PropTypes.shape({
 		id: PropTypes.number.isRequired,
 		title: PropTypes.string.isRequired,

@@ -1,7 +1,7 @@
 import React from 'react';
 import Footer from './components/Footer.jsx';
 import Navbar from './components/Navbar.jsx';
-import ListarCampanas from './components/campanas/ListarCampanas.jsx';
+import ListCampaigns from './components/campaign/ListCampaign.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Sidebar from './components/Sidebar.jsx';
 
@@ -38,16 +38,16 @@ function App() {
 								exact
 								path='/'
 								element={
-									<ListarCampanas
+									<ListCampaigns
 										isMobileSize={isMobileSize}
 										filterCollapsed={filterCollapsed}
 									/>
 								}
 							/>
 							<Route
-								path='/listarcampanas'
+								path='/list_campaigns'
 								element={
-									<ListarCampanas
+									<ListCampaigns
 										isMobileSize={isMobileSize}
 										filterCollapsed={filterCollapsed}
 									/>

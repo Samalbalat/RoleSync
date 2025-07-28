@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import CardCampanaHorizontal from './cardCampanaHorizontal';
-import CardCampanaVertical from './cardCampanaVertical';
+import CampaignCardHorizontal from './campaignCardHorizontal';
+import CampaignCardVertical from './campaignCardVertical';
 import {
 	Button,
 	Checkbox,
@@ -14,7 +14,7 @@ import {
 import { ArrowRightIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 import lista_campanas from '../../data/ejemplo_campañas';
 
-const FiltrosCampanas = () => {
+const CampaignFilter = () => {
 	return (
 		<div className='w-full max-w-[20rem] px-2 py-4 flex flex-col items-center'>
 			<Typography
@@ -63,7 +63,7 @@ const FiltrosCampanas = () => {
 	);
 };
 
-const FiltrosCampanasMobile = () => {
+const CampaignFilterMobile = () => {
 	const [open, setOpen] = useState(false);
 	return (
 		<div className='w-full px-2'>
@@ -135,8 +135,8 @@ const FiltrosCampanasMobile = () => {
 	);
 };
 
-export default function ListarCampanas({ isMobileSize, filterCollapsed }) {
-	ListarCampanas.propTypes = {
+export default function ListCampaigns({ isMobileSize, filterCollapsed }) {
+	ListCampaigns.propTypes = {
 		isMobileSize: PropTypes.bool.isRequired,
 		filterCollapsed: PropTypes.bool.isRequired,
 	};
@@ -203,14 +203,14 @@ export default function ListarCampanas({ isMobileSize, filterCollapsed }) {
 						<>
 							{/* Filtros */}
 							<div className='w-full md:w-1/4'>
-								<FiltrosCampanas />
+								<CampaignFilter />
 							</div>
 
 							{/* Campañas */}
 							<div className='w-full md:w-3/4 flex flex-col gap-6'>
 								<div className='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6'>
 									{paginatedCampanas.map(campana => (
-										<CardCampanaVertical key={campana.id} campana={campana} />
+										<CampaignCardVertical key={campana.id} campana={campana} />
 									))}
 								</div>
 
@@ -223,7 +223,7 @@ export default function ListarCampanas({ isMobileSize, filterCollapsed }) {
 					) : (
 						<div className='w-full flex flex-col gap-3'>
 							<div className='mt-3'>
-								<FiltrosCampanasMobile />
+								<CampaignFilterMobile />
 							</div>
 
 							<div
@@ -236,11 +236,9 @@ export default function ListarCampanas({ isMobileSize, filterCollapsed }) {
 
 							<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6'>
 								{paginatedCampanas.map(campana => (
-									<CardCampanaVertical key={campana.id} campana={campana} />
+									<CampaignCardVertical key={campana.id} campana={campana} />
 								))}
 							</div>
-
-							{/* Paginación debajo */}
 							<div className='w-full'>
 								<Pagination />
 							</div>
@@ -250,7 +248,7 @@ export default function ListarCampanas({ isMobileSize, filterCollapsed }) {
 			) : (
 				<>
 					<div className='w-full'>
-						<FiltrosCampanasMobile />
+						<CampaignFilterMobile />
 					</div>
 					<div
 						className='w-full h-[2px] my-3'
@@ -260,7 +258,7 @@ export default function ListarCampanas({ isMobileSize, filterCollapsed }) {
 					/>
 					<div className='grid gap-6'>
 						{paginatedCampanas.map(campana => (
-							<CardCampanaHorizontal key={campana.id} campana={campana} />
+							<CampaignCardHorizontal key={campana.id} campana={campana} />
 						))}
 					</div>
 					<div className='w-full mt-4'>
