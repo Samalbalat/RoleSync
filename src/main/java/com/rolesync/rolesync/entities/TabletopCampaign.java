@@ -19,10 +19,12 @@ import jakarta.persistence.Enumerated;
 public class TabletopCampaign extends Campaign {
 
     public TabletopCampaign() {
+        // Default constructor for JPA
     }
 
     public TabletopCampaign(String name, String theme, String description, Profile owner, Set<Profile> members,
-            Set<Communication> communications, Set<Language> languages, TimeZone timeZone, String image, RPGSystem RPGSystem,
+            Set<Communication> communications, Set<Language> languages, TimeZone timeZone, String image,
+            RPGSystem RPGSystem,
             WeekDay WeekDay, String frecuency, Double duration) {
         super(name, theme, description, owner, members, communications, languages, timeZone, image);
         this.RPGSystem = RPGSystem;
@@ -32,16 +34,19 @@ public class TabletopCampaign extends Campaign {
 
     }
 
-    // Atributos específicos de TabletopCampaign
-    // RPGSystem de la mesa (DnD, Pathfinder, etc.)
+    // This field represents the RPG system used in the tabletop campaign
     @Enumerated(EnumType.STRING)
     private RPGSystem RPGSystem;
-    // Día de la semana en que se juega
+
+    // This field represents the day of the week when the campaign sessions are held
     @Enumerated(EnumType.STRING)
     private WeekDay weekDay;
-    // Frecuency de las sesiones (semanal, quincenal, mensual, etc.)
+
+    // This field represents the frequency of the campaign sessions (e.g., weekly,
+    // bi-weekly)
     private String frecuency;
-    // Duración de cada sesión en horas
+
+    // This field represents the duration of each campaign session in hours
     private Double duration;
 
     public RPGSystem getRPGSystem() {

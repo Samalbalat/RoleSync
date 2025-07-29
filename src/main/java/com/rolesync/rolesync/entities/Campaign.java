@@ -2,6 +2,7 @@ package com.rolesync.rolesync.entities;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.rolesync.rolesync.enums.Communication;
 import com.rolesync.rolesync.enums.TimeZone;
 import com.rolesync.rolesync.enums.Language;
@@ -9,6 +10,7 @@ import com.rolesync.rolesync.enums.Language;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,50 +23,50 @@ import jakarta.persistence.ManyToOne;
 
 // This class represents a Campaign in the RoleSync application.
 // It serves as a base class for different types of campaigns, such as tabletop and written campaigns
-@Entity(name="campaign")
+@Entity(name = "campaign")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name="campaignType", 
-  discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name = "campaignType", discriminatorType = DiscriminatorType.STRING)
 public class Campaign {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //This field represents the name of the campaign
+    // This field represents the name of the campaign
     private String name;
 
-    //This field represents the theme of the campaign
+    // This field represents the theme of the campaign
     private String theme;
 
-    //This field represents the description of the campaign
+    // This field represents the description of the campaign
     private String description;
 
-    //This field represents the owner of the campaign
+    // This field represents the owner of the campaign
+    @JsonManagedReference
     @ManyToOne
-    @JoinColumn(name="profileId", nullable=false)
+    @JoinColumn(name = "profileId", nullable = false)
     private Profile owner;
-    
-    //This field represents the members of the campaign
+
+    // This field represents the members of the campaign
+    @JsonManagedReference
     @ManyToMany
-    @JoinTable(name = "campaignMembers", 
-    joinColumns = @JoinColumn(name = "campaignId"), 
-    inverseJoinColumns = @JoinColumn(name = "profileId"))
+    @JoinTable(name = "campaignMembers", joinColumns = @JoinColumn(name = "campaignId"), inverseJoinColumns = @JoinColumn(name = "profileId"))
     private Set<Profile> members;
-    
-    //This field represents the communications available for the campaign
+
+    // This field represents the communications available for the campaign
     private Set<Communication> communications;
 
-    //this field represents the languages available for the campaign
+    // This field represents the languages available for the campaign
     private Set<Language> languages;
 
-    //this field represents the time zone of the campaign
+    // This field represents the time zone of the campaign
     private TimeZone timeZone;
 
-    //this field represents the image associated with the campaign
+    // This field represents the image associated with the campaign
     private String image;
 
     public Campaign() {
+        // Default constructor for JPA
     }
 
     public Campaign(String name, String theme, String description, Profile owner, Set<Profile> members,

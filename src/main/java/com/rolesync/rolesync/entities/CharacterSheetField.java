@@ -7,21 +7,28 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
-@Entity(name="characterSheetField")
+// This class represents a field in a character sheet.
+// It can be used to store various types of data related to a character's attributes, skills, etc.
+@Entity(name = "characterSheetField")
 public class CharacterSheetField {
-    // This class represents a field in a character sheet.
-    // It can be used to store various types of data related to a character's attributes, skills, etc.
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name; // The name of the field
-    private String value; // The value of the field
-    
+    // This field represents the name of the character sheet field
+    private String name;
+
+    // This field represents the value of the character sheet field
+    private String value;
+
     @ManyToOne
-    @JoinColumn(name="characterSheetId", nullable=false)
+    @JoinColumn(name = "characterSheetId", nullable = false)
     private CharacterSheet sheet; // The character sheet this field belongs to
+
+    public CharacterSheetField() {
+        // Default constructor for JPA
+    }
 
     public CharacterSheetField(String name, String value) {
         this.name = name;

@@ -1,14 +1,15 @@
 package com.rolesync.rolesync.enums;
 
 public enum Communication {
-    Local("LO"),
-    InPerson("IP"),
-    Discord("DI"),
-    Twitter("TW"),
-    Whatsapp("W"),
-    Telegram("TG"),
-    Facebook("FB"),
-    Otro("OT");
+    LOCAL("LO"),
+    IN_PERSON("IP"),
+    DISCORD("DI"),
+    TWITTER("TW"),
+    WHATSAPP("W"),
+    TELEGRAM("TG"),
+    FACEBOOK("FB"),
+    ZOOM("ZO"),
+    OTHER("OT");
     // More can be added as needed
 
     // Each enum constant has a code associated with it
@@ -22,5 +23,5 @@ public enum Communication {
     public String getCode() {
         return code;
     }
-    
+
 }

@@ -1,36 +1,32 @@
 package com.rolesync.rolesync.enums;
 
 public enum RPGSystem {
-    DungeonsAndDragons("D&D"),
-    Pathfinder("PF"),
-    Starfinder("SF"),
-    WarhammerFantasyRoleplay("WFRP"),
-    Warhammer40kRoleplay("W40K"),
-    CallOfCthulhu("CoC"),
-    Shadowrun("SR"),
-    VampireTheMasquerade("VtM"),
+    DUNGEONS_AND_DRAGONS("D&D"),
+    PATHFINDER("PF"),
+    STARFINDER("SF"),
+    WARHAMMER_FANTASY_ROLEPLAY("WFRP"),
+    WARHAMMER_40K_ROLEPLAY("W40K"),
+    CALL_OF_CTHULHU("CoC"),
+    SHADOWRUN("SR"),
+    VAMPIRE_THE_MASQUERADE("VtM"),
     GURPS("GURPS"),
-    SavageWorlds("SW"),
-    Fiasco("Fiasco"),
-    DungeonWorld("DW"),
-    BladesInTheDark("BitD"),
-    MonsterOfTheWeek("MotW"),
-    Numenera("Numenera"),
-    TheOneRing("TOR"),
-    StarWarsRoleplayingGame("SWRPG")
+    SAVAGE_WORLDS("SW"),
+    FIASCO("Fiasco"),
+    DUNGEON_WORLD("DW"),
+    BLADES_IN_THE_DARK("BitD"),
+    MONSTER_OF_THE_WEEK("MotW"),
+    NUMENERA("Numenera"),
+    THE_ONE_RING("TOR"),
+    STAR_WARS_ROLEPLAYING_GAME("SWRPG");
     // More can be added as needed
-    ;
 
-    // Each enum constant has a code associated with it
-    // This code can be used for serialization or other purposes
     private final String code;
-    
+
     RPGSystem(String code) {
         this.code = code;
     }
 
-    public String getcode() {
+    public String getCode() {
         return code;
-    }    
-    
+    }
 }

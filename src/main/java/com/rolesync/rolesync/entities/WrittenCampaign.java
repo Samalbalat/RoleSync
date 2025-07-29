@@ -13,10 +13,15 @@ import jakarta.persistence.Entity;
 @Entity
 @DiscriminatorValue("W")
 public class WrittenCampaign extends Campaign {
-    
+
+    public WrittenCampaign() {
+        // Default constructor for JPA
+    }
+
     public WrittenCampaign(String name, String theme, String description, Profile owner, Set<Profile> members,
             Set<Communication> communications, Set<Language> languages, TimeZone timeZone, String image) {
 
         super(name, theme, description, owner, members, communications, languages, timeZone, image);
     }
+
 }

@@ -1,17 +1,17 @@
 package com.rolesync.rolesync.enums;
 
 public enum Language {
-    Spanish("SP"),
-    English("EN"),
-    French("FR"),
-    German("GE"),
-    Italian("IT"),
-    Portuguese("PT"),
-    Russian("RU"),
-    Chinese("CH"),
-    Japanese("JA"),
-    Corean("KO"),
-    Other("OT");
+    SPANISH("SP"),
+    ENGLISH("EN"),
+    FRENCH("FR"),
+    GERMAN("GE"),
+    ITALIAN("IT"),
+    PORTUGUESE("PT"),
+    RUSSIAN("RU"),
+    CHINESE("CH"),
+    JAPANESE("JA"),
+    KOREAN("KO"),
+    OTHER("OT");
 
     // Each enum constant has a code associated with it
     // This code can be used for serialization or other purposes

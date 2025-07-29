@@ -2,7 +2,10 @@ package com.rolesync.rolesync.entities;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,20 +26,27 @@ public class Profile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    //This field represents the name of the profile
     private String name;
 
+    //This field represents the email of the profile
     private String email;
 
+    //This field represents the phone number of the profile
     private Integer phone;
 
+    // This field represents the campaigns that the profile is a member of
+    @JsonBackReference
     @ManyToMany(mappedBy = "members")
     private Set<Campaign> memberOf;
-
+    
+    // This field represents the campaigns that the profile owns
+    @JsonBackReference
     @OneToMany(mappedBy = "owner")
     private Set<Campaign> ownerOf;
 
-    // Default constructor
     public Profile() {
+        // Default constructor for JPA
     }
 
     // Constructor with parameters
