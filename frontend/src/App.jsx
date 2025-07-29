@@ -4,15 +4,16 @@ import Navbar from './components/Navbar.jsx';
 import ListCampaigns from './components/campaign/ListCampaign.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Sidebar from './components/Sidebar.jsx';
+import CampaignDetail from './components/campaign/CampaignDetail.jsx';
 
 function App() {
 	const [isMobileSize, setisMobileSize] = React.useState(false);
-	const [filterCollapsed, setFilterCollapsed] = React.useState(false);
-
+	const [midSize, setMidSize] = React.useState(false);
+	const id_user = 1; // Simulación de ID de usuario
 	React.useEffect(() => {
 		const handleResize = () => {
 			setisMobileSize(window.innerWidth <= 720);
-			setFilterCollapsed(window.innerWidth <= 1150);
+			setMidSize(window.innerWidth <= 1150);
 		};
 		handleResize(); // Para establecer el estado inicial correctamente
 		window.addEventListener('resize', handleResize);
@@ -24,7 +25,9 @@ function App() {
 			<BrowserRouter>
 				<Navbar />
 
-				<div className='flex flex-1 mt-20 mx-auto'>
+				<div
+					className={`flex flex-1 mx-auto ${!isMobileSize ? 'mt-28' : 'mt-20'}`}
+				>
 					{!isMobileSize && (
 						<div className='fixed ml-6'>
 							<Sidebar />
@@ -40,7 +43,7 @@ function App() {
 								element={
 									<ListCampaigns
 										isMobileSize={isMobileSize}
-										filterCollapsed={filterCollapsed}
+										midSize={midSize}
 									/>
 								}
 							/>
@@ -49,7 +52,17 @@ function App() {
 								element={
 									<ListCampaigns
 										isMobileSize={isMobileSize}
-										filterCollapsed={filterCollapsed}
+										midSize={midSize}
+									/>
+								}
+							/>
+							<Route
+								path='/campaign/:id'
+								element={
+									<CampaignDetail
+										isMobileSize={isMobileSize}
+										midSize={midSize}
+										id_user={id_user}
 									/>
 								}
 							/>

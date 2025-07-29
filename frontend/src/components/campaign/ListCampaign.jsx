@@ -135,14 +135,14 @@ const CampaignFilterMobile = () => {
 	);
 };
 
-export default function ListCampaigns({ isMobileSize, filterCollapsed }) {
+export default function ListCampaigns({ isMobileSize, midSize }) {
 	ListCampaigns.propTypes = {
 		isMobileSize: PropTypes.bool.isRequired,
-		filterCollapsed: PropTypes.bool.isRequired,
+		midSize: PropTypes.bool.isRequired,
 	};
 
 	const [activePage, setActivePage] = useState(1);
-	const itemsPerPage = 6;
+	const itemsPerPage = 9;
 	const totalPages = Math.ceil(lista_campanas.length / itemsPerPage);
 
 	const paginatedCampanas = lista_campanas.slice(
@@ -199,14 +199,12 @@ export default function ListCampaigns({ isMobileSize, filterCollapsed }) {
 		<>
 			{!isMobileSize ? (
 				<div className='flex flex-col md:flex-row gap-6'>
-					{!filterCollapsed ? (
+					{!midSize ? (
 						<>
-							{/* Filtros */}
 							<div className='w-full md:w-1/4'>
 								<CampaignFilter />
 							</div>
 
-							{/* Campañas */}
 							<div className='w-full md:w-3/4 flex flex-col gap-6'>
 								<div className='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6'>
 									{paginatedCampanas.map(campana => (
@@ -214,7 +212,6 @@ export default function ListCampaigns({ isMobileSize, filterCollapsed }) {
 									))}
 								</div>
 
-								{/* Paginación debajo */}
 								<div className='w-full'>
 									<Pagination />
 								</div>

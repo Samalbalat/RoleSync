@@ -7,6 +7,7 @@ import {
 	CardFooter,
 } from '@material-tailwind/react';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 
 export default function CampaignCardVertical({ campana }) {
 	const title = campana.title;
@@ -14,11 +15,19 @@ export default function CampaignCardVertical({ campana }) {
 	const sistem = campana.sistema;
 	const description = campana.descripcion;
 	const ratingValue = Math.round(campana.rate);
+	const photo =
+		campana.photo ||
+		'https://www.svgrepo.com/show/508699/landscape-placeholder.svg';
+
+	const navigate = useNavigate();
 	return (
-		<Card className='mt-10'>
+		<Card
+			className='mt-10 cursor-pointer'
+			onClick={() => navigate(`/campaign/${campana.id}`)}
+		>
 			<CardHeader color='blue-gray' className='relative h-36'>
 				<img
-					src='https://lasetadelgoblin.com/wp-content/uploads/2021/09/2109.01-DnD-Intro-clases-900x600.png'
+					src={photo}
 					alt='card-image'
 					className='w-full h-full object-cover'
 				/>
@@ -56,5 +65,6 @@ CampaignCardVertical.propTypes = {
 		sistema: PropTypes.string.isRequired,
 		descripcion: PropTypes.string.isRequired,
 		rate: PropTypes.number.isRequired,
+		photo: PropTypes.string,
 	}).isRequired,
 };

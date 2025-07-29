@@ -7,6 +7,7 @@ import {
 } from '@material-tailwind/react';
 
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 
 export default function CampaignCardHorizontal({ campana }) {
 	const title = campana.title;
@@ -14,15 +15,23 @@ export default function CampaignCardHorizontal({ campana }) {
 	const sistem = campana.sistema;
 	const description = campana.descripcion;
 	const ratingValue = Math.round(campana.rate);
+	const photo =
+		campana.photo ||
+		'https://www.svgrepo.com/show/508699/landscape-placeholder.svg';
+
+	const navigate = useNavigate();
 	return (
-		<Card className='w-full max-w-md flex-row mb-2 shadow-sm rounded-lg'>
+		<Card
+			className='w-full max-w-md flex-row mb-2 shadow-sm rounded-lg cursor-pointer'
+			onClick={() => navigate(`/campaign/${campana.id}`)}
+		>
 			<CardHeader
 				shadow={false}
 				floated={false}
 				className='m-0 w-1/3 shrink-0 rounded-r-none p-0'
 			>
 				<img
-					src='https://lasetadelgoblin.com/wp-content/uploads/2021/09/2109.01-DnD-Intro-clases-900x600.png'
+					src={photo}
 					alt='card-image'
 					className='h-full w-full object-cover rounded-l-lg'
 				/>
@@ -59,5 +68,6 @@ CampaignCardHorizontal.propTypes = {
 		sistema: PropTypes.string.isRequired,
 		descripcion: PropTypes.string.isRequired,
 		rate: PropTypes.number.isRequired,
+		photo: PropTypes.string,
 	}).isRequired,
 };
