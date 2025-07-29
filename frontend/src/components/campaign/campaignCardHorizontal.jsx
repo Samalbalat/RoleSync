@@ -7,45 +7,43 @@ import {
 } from '@material-tailwind/react';
 
 import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
 
 export default function CampaignCardHorizontal({ campana }) {
-	const title = campana.title;
-	const theme = campana.tematica;
-	const sistem = campana.sistema;
-	const description = campana.descripcion;
-	const ratingValue = Math.round(campana.rate);
-	const photo =
-		campana.photo ||
+	const name = campana.name;
+	const theme = campana.theme;
+	const rpgsystem = campana.rpgsystem;
+	const description = campana.description;
+	const image =
+		campana.image ||
 		'https://www.svgrepo.com/show/508699/landscape-placeholder.svg';
 
-	const navigate = useNavigate();
+	{
+		/* const navigate = useNavigate();
+		onClick={() => navigate(`/campaign/${campana.id}`)} */
+	}
 	return (
-		<Card
-			className='w-full max-w-md flex-row mb-2 shadow-sm rounded-lg cursor-pointer'
-			onClick={() => navigate(`/campaign/${campana.id}`)}
-		>
+		<Card className='w-full max-w-md flex-row mb-2 shadow-sm rounded-lg cursor-pointer'>
 			<CardHeader
 				shadow={false}
 				floated={false}
 				className='m-0 w-1/3 shrink-0 rounded-r-none p-0'
 			>
 				<img
-					src={photo}
+					src={image}
 					alt='card-image'
 					className='h-full w-full object-cover rounded-l-lg'
 				/>
 			</CardHeader>
 			<CardBody className='p-3 flex flex-col justify-between'>
 				<Typography variant='h5' color='blue-gray' className='mb-1 truncate'>
-					{title}
+					{name}
 				</Typography>
 				<Typography
 					variant='small'
 					color='gray'
 					className='mb-1 uppercase font-bold'
 				>
-					{sistem}
+					{rpgsystem}
 				</Typography>
 				<Typography variant='h6' color='gray' className='mb-1'>
 					{theme}
@@ -54,7 +52,7 @@ export default function CampaignCardHorizontal({ campana }) {
 					{description}
 				</p>
 				<div className='absolute bottom-2 right-2 z-10'>
-					<Rating value={ratingValue} readonly size='sm' />
+					<Rating value={4} readonly size='sm' />
 				</div>
 			</CardBody>
 		</Card>
@@ -63,11 +61,11 @@ export default function CampaignCardHorizontal({ campana }) {
 CampaignCardHorizontal.propTypes = {
 	campana: PropTypes.shape({
 		id: PropTypes.number.isRequired,
-		title: PropTypes.string.isRequired,
-		tematica: PropTypes.string.isRequired,
-		sistema: PropTypes.string.isRequired,
-		descripcion: PropTypes.string.isRequired,
+		name: PropTypes.string.isRequired,
+		theme: PropTypes.string.isRequired,
+		rpgsystem: PropTypes.string.isRequired,
+		description: PropTypes.string.isRequired,
 		rate: PropTypes.number.isRequired,
-		photo: PropTypes.string,
+		image: PropTypes.string,
 	}).isRequired,
 };

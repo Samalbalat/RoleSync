@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import CampaignCardHorizontal from './campaignCardHorizontal';
 import CampaignCardVertical from './campaignCardVertical';
@@ -12,7 +12,7 @@ import {
 	IconButton,
 } from '@material-tailwind/react';
 import { ArrowRightIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
-import lista_campanas from '../../data/ejemplo_campañas';
+import CampaignService from '../../services/CampaignService';
 
 const CampaignFilter = () => {
 	return (
@@ -140,6 +140,17 @@ export default function ListCampaigns({ isMobileSize, midSize }) {
 		isMobileSize: PropTypes.bool.isRequired,
 		midSize: PropTypes.bool.isRequired,
 	};
+
+	const [lista_campanas, setLista_campanas] = useState([]);
+	useEffect(() => {
+		CampaignService.getAllCampaigns()
+			.then(response => {
+				setLista_campanas(response.data);
+			})
+			.catch(error => {
+				console.error('Error fetching campaigns:', error);
+			});
+	}, []);
 
 	const [activePage, setActivePage] = useState(1);
 	const itemsPerPage = 9;
