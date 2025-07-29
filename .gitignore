@@ -35,6 +35,8 @@ build/
 ### SQL ###
 *.sql
 
+### Sensitive Data ###
+src/main/resources/application-prod.properties
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
