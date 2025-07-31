@@ -9,7 +9,7 @@ import CampaignDetail from './components/campaign/CampaignDetail.jsx';
 function App() {
 	const [isMobileSize, setisMobileSize] = React.useState(false);
 	const [midSize, setMidSize] = React.useState(false);
-	const id_user = 1; // Simulación de ID de usuario
+	const user_email = 'gm@example.com'; // Simulación de email de usuario
 	React.useEffect(() => {
 		const handleResize = () => {
 			setisMobileSize(window.innerWidth <= 720);
@@ -62,7 +62,7 @@ function App() {
 									<CampaignDetail
 										isMobileSize={isMobileSize}
 										midSize={midSize}
-										id_user={id_user}
+										user_email={user_email}
 									/>
 								}
 							/>

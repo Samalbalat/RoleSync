@@ -9,30 +9,39 @@ import {
 } from '@material-tailwind/react';
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import lista_campanas from '../../data/ejemplo_campañas.jsx';
 import CampaignForum from '../forum/campaignForum.jsx';
+import CampaignService from '../../services/CampaignService';
+import parseRpgSystem from '../../data/RPGSystem.jsx';
 
-export default function CampaignDetail({ isMobileSize, midSize, id_user }) {
+export default function CampaignDetail({ isMobileSize, midSize, user_email }) {
 	const { id } = useParams();
-	const campaign = lista_campanas.find(c => c.id === parseInt(id));
-	const title = campaign.title;
-	const theme = campaign.tematica;
-	const sistem = campaign.sistema;
-	const description = campaign.descripcion;
-	const ratingValue = Math.round(campaign.rate);
-	const photo =
-		campaign.photo ||
+
+	const [campaign, setCampaign] = React.useState([]);
+	React.useEffect(() => {
+		CampaignService.getCampaignById(id)
+			.then(response => {
+				setCampaign(response.data);
+			})
+			.catch(error => {
+				console.error('Error fetching campaign:', error);
+			});
+	}, [id]);
+
+	const name = campaign.name;
+	const theme = campaign.theme;
+	const rpgsystem = parseRpgSystem(campaign.rpgsystem);
+	const description = campaign.description;
+	const image =
+		campaign.image ||
 		'https://www.svgrepo.com/show/508699/landscape-placeholder.svg';
-	const comunication = campaign.comunicacion;
-	const lenguage = campaign.idioma;
-	const localitation = campaign.localizacion;
-	const week_day = campaign.dia_semana;
-	const frecuency = campaign.frecuencia;
-	const gtm = campaign.horario_gtm;
-	const num_people = campaign.num_personas;
-	const duration = campaign.duracion;
-	const ownerId = campaign.ownerId;
-	const playerIds = campaign.playerIds || [];
+	const communications = campaign.communications;
+	const languages = campaign.languages;
+	const weekDay = campaign.weekDay;
+	const frecuency = campaign.frecuency;
+	const timeZone = campaign.timeZone;
+	const duration = campaign.duration;
+	const owner = campaign.owner;
+	const members = campaign.members || [];
 
 	const [openAccordion, setOpenAccordion] = React.useState(false);
 	const handleAccordion = () => setOpenAccordion(!openAccordion);
@@ -42,36 +51,39 @@ export default function CampaignDetail({ isMobileSize, midSize, id_user }) {
 			<ul className='space-y-3'>
 				<li className='flex items-center gap-2 text-sm'>
 					<span className='font-bold text-blue-gray-700'>Idioma:</span>
-					<span className='text-blue-gray-700 ml-2'>{lenguage}</span>
+					<span className='text-blue-gray-700 ml-2'>
+						{(languages || []).join(', ')}
+					</span>
 				</li>
-				<li className='flex items-center gap-2 text-sm'>
-					<span className='font-bold text-blue-gray-700'>Localización:</span>
-					<span className='text-blue-gray-700 ml-2'>{localitation}</span>
-				</li>
+
 				<li className='flex items-center gap-2 text-sm'>
 					<span className='font-bold text-blue-gray-700'>Comunicación:</span>
-					<span className='text-blue-gray-700 ml-2'>{comunication}</span>
+					<span className='text-blue-gray-700 ml-2'>
+						{(communications || []).join(', ')}
+					</span>
 				</li>
-				<li className='flex items-center gap-2 text-sm'>
-					<span className='font-bold text-blue-gray-700'>Día semana:</span>
-					<span className='text-blue-gray-700 ml-2'>{week_day}</span>
-				</li>
+				{weekDay && (
+					<li className='flex items-center gap-2 text-sm'>
+						<span className='font-bold text-blue-gray-700'>Día semana:</span>
+						<span className='text-blue-gray-700 ml-2'>{weekDay}</span>
+					</li>
+				)}
 				<li className='flex items-center gap-2 text-sm'>
 					<span className='font-bold text-blue-gray-700'>Horario GTM:</span>
-					<span className='text-blue-gray-700 ml-2'>{gtm}</span>
+					<span className='text-blue-gray-700 ml-2'>{timeZone}</span>
 				</li>
-				<li className='flex items-center gap-2 text-sm'>
-					<span className='font-bold text-blue-gray-700'>Frecuencia:</span>
-					<span className='text-blue-gray-700 ml-2'>{frecuency}</span>
-				</li>
-				<li className='flex items-center gap-2 text-sm'>
-					<span className='font-bold text-blue-gray-700'>Duración:</span>
-					<span className='text-blue-gray-700 ml-2'>{duration}</span>
-				</li>
-				<li className='flex items-center gap-2 text-sm'>
-					<span className='font-bold text-blue-gray-700'>Participantes:</span>
-					<span className='text-blue-gray-700 ml-2'>{num_people}</span>
-				</li>
+				{frecuency && (
+					<li className='flex items-center gap-2 text-sm'>
+						<span className='font-bold text-blue-gray-700'>Frecuencia:</span>
+						<span className='text-blue-gray-700 ml-2'>{frecuency}</span>
+					</li>
+				)}
+				{duration && (
+					<li className='flex items-center gap-2 text-sm'>
+						<span className='font-bold text-blue-gray-700'>Duración:</span>
+						<span className='text-blue-gray-700 ml-2'>{duration}</span>
+					</li>
+				)}
 			</ul>
 		);
 	}
@@ -82,7 +94,7 @@ export default function CampaignDetail({ isMobileSize, midSize, id_user }) {
 				<div className='flex flex-col md:flex-row items-center gap-8'>
 					<div className='w-44 h-44 bg-gray-100 flex items-center justify-center rounded-2xl border shadow-sm'>
 						<img
-							src={photo}
+							src={image}
 							alt='Foto campaña'
 							className='w-full h-full object-cover rounded-2xl'
 						/>
@@ -92,31 +104,29 @@ export default function CampaignDetail({ isMobileSize, midSize, id_user }) {
 							variant='h1'
 							className='font-bold text-blue-gray-900 mb-1 text-3xl md:text-4xl'
 						>
-							{title}
+							{name || ''}
 						</Typography>
 						<Typography
 							variant='h4'
 							className='text-blue-gray-600 mb-1 text-xl'
 						>
-							{sistem}
+							{rpgsystem || ''}
 						</Typography>
 						<Typography
 							variant='h5'
 							className='text-blue-gray-500 mb-1 text-lg'
 						>
-							{theme}
+							{theme || ''}
 						</Typography>
 						<div className='flex items-center gap-2 mt-2'>
-							<Rating value={ratingValue} readonly size='md' />
-							<span className='text-blue-gray-500 text-sm'>
-								({ratingValue}/5)
-							</span>
+							<Rating value={4} readonly size='md' />
+							<span className='text-blue-gray-500 text-sm'>({4}/5)</span>
 						</div>
 					</div>
 				</div>
 				<div className='rounded-2xl p-6 bg-blue-gray-50 min-h-[120px] flex items-center justify-center shadow-sm'>
 					<span className='text-base text-blue-gray-700 max-w-2xl text-center'>
-						{description}
+						{description || ''}
 					</span>
 				</div>
 			</Card>
@@ -130,7 +140,7 @@ export default function CampaignDetail({ isMobileSize, midSize, id_user }) {
 				<Card className='w-full p-4 rounded-2xl shadow-xl bg-white flex flex-col gap-4 items-center'>
 					<div className='w-32 h-32 bg-gray-100 flex items-center justify-center rounded-xl border shadow-sm mb-2'>
 						<img
-							src={photo}
+							src={image}
 							alt='Foto campaña'
 							className='w-full h-full object-cover rounded-xl'
 						/>
@@ -139,13 +149,13 @@ export default function CampaignDetail({ isMobileSize, midSize, id_user }) {
 						variant='h3'
 						className='font-bold text-blue-gray-900 mb-1 text-xl text-center'
 					>
-						{title}
+						{name}
 					</Typography>
 					<Typography
 						variant='h5'
 						className='text-blue-gray-600 mb-1 text-base text-center'
 					>
-						{sistem}
+						{rpgsystem}
 					</Typography>
 					<Typography
 						variant='h6'
@@ -154,10 +164,8 @@ export default function CampaignDetail({ isMobileSize, midSize, id_user }) {
 						{theme}
 					</Typography>
 					<div className='flex items-center gap-2 mt-1 justify-center'>
-						<Rating value={ratingValue} readonly size='sm' />
-						<span className='text-blue-gray-500 text-xs'>
-							({ratingValue}/5)
-						</span>
+						<Rating value={4} readonly size='sm' />
+						<span className='text-blue-gray-500 text-xs'>({4}/5)</span>
 					</div>
 					<Card className='w-full p-4 rounded-2xl bg-blue-gray-50 shadow-sm flex items-center justify-center'>
 						<span className='text-base text-blue-gray-700 text-center'>
@@ -183,20 +191,22 @@ export default function CampaignDetail({ isMobileSize, midSize, id_user }) {
 					</AccordionBody>
 				</Accordion>
 
-				{ownerId !== id_user && playerIds.includes(id_user) && (
-					<>
-						<CampaignForum />
-						<Button color='red' size='lg' className='w-full mt-1'>
-							Salir del Rol
+				{owner?.email !== user_email &&
+					members.some(m => m.email === user_email) && (
+						<>
+							<CampaignForum />
+							<Button color='red' size='lg' className='w-full mt-1'>
+								Salir del Rol
+							</Button>
+						</>
+					)}
+				{owner?.email !== user_email &&
+					!members.some(m => m.email === user_email) && (
+						<Button color='green' size='lg' className='w-full mt-1'>
+							Solicitar
 						</Button>
-					</>
-				)}
-				{ownerId !== id_user && !playerIds.includes(id_user) && (
-					<Button color='green' size='lg' className='w-full mt-1'>
-						Solicitar
-					</Button>
-				)}
-				{ownerId === id_user && (
+					)}
+				{owner?.email === user_email && (
 					<>
 						<CampaignForum />
 						<Button color='blue' size='lg' className='w-full mt-1'>
@@ -213,10 +223,9 @@ export default function CampaignDetail({ isMobileSize, midSize, id_user }) {
 		return (
 			<div className='flex flex-col gap-6 items-start w-full max-w-6xl mx-auto'>
 				{generalInfo()}
-				{ownerId !== id_user && playerIds.includes(id_user) && (
-					<CampaignForum />
-				)}
-				{ownerId === id_user && <CampaignForum />}
+				{owner?.email !== user_email &&
+					members.some(m => m.email === user_email) && <CampaignForum />}
+				{owner?.email === user_email && <CampaignForum />}
 				<Accordion
 					open={openAccordion}
 					className='w-full mb-1 rounded-lg border border-blue-gray-100 px-2 mt-1'
@@ -234,13 +243,17 @@ export default function CampaignDetail({ isMobileSize, midSize, id_user }) {
 					</AccordionBody>
 				</Accordion>
 
-				{ownerId !== id_user && playerIds.includes(id_user) && (
-					<Button color='red'>Salir del Rol</Button>
+				{owner?.email !== user_email &&
+					members.some(m => m.email === user_email) && (
+						<Button color='red'>Salir del Rol</Button>
+					)}
+				{owner?.email !== user_email &&
+					!members.some(m => m.email === user_email) && (
+						<Button color='green'>Solicitar</Button>
+					)}
+				{owner?.email === user_email && (
+					<Button color='blue'>Editar campaña</Button>
 				)}
-				{ownerId !== id_user && !playerIds.includes(id_user) && (
-					<Button color='green'>Solicitar</Button>
-				)}
-				{ownerId === id_user && <Button color='blue'>Editar campaña</Button>}
 			</div>
 		);
 	}
@@ -249,22 +262,25 @@ export default function CampaignDetail({ isMobileSize, midSize, id_user }) {
 		<div className='flex flex-col md:flex-row gap-10 items-start w-full max-w-6xl mx-auto'>
 			<div className='w-full md:w-3/4 flex flex-col gap-6'>
 				{generalInfo()}
-				{ownerId !== id_user && playerIds.includes(id_user) && (
-					<CampaignForum />
-				)}
-				{ownerId === id_user && <CampaignForum />}
+				{owner?.email !== user_email &&
+					members.some(m => m.email === user_email) && <CampaignForum />}
+				{owner?.email === user_email && <CampaignForum />}
 			</div>
 			<div className='w-full md:w-1/4 flex flex-col gap-6'>
 				<Card className='w-full p-6 rounded-2xl shadow-lg bg-gray-50'>
 					{list_atributes()}
 				</Card>
-				{ownerId !== id_user && playerIds.includes(id_user) && (
-					<Button color='red'>Salir del Rol</Button>
+				{owner?.email !== user_email &&
+					members.some(m => m.email === user_email) && (
+						<Button color='red'>Salir del Rol</Button>
+					)}
+				{owner?.email !== user_email &&
+					!members.some(m => m.email === user_email) && (
+						<Button color='green'>Solicitar</Button>
+					)}
+				{owner?.email === user_email && (
+					<Button color='blue'>Editar campaña</Button>
 				)}
-				{ownerId !== id_user && !playerIds.includes(id_user) && (
-					<Button color='green'>Solicitar</Button>
-				)}
-				{ownerId === id_user && <Button color='blue'>Editar campaña</Button>}
 			</div>
 		</div>
 	);

@@ -7,22 +7,26 @@ import {
 	CardFooter,
 } from '@material-tailwind/react';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
+import parseRpgSystem from '../../data/RPGSystem';
 
 export default function CampaignCardVertical({ campana }) {
+	const id = campana.id;
 	const name = campana.name;
 	const theme = campana.theme;
-	const rpgsystem = campana.rpgsystem || 'Sin sistema';
+	const rpgsystem = parseRpgSystem(campana.rpgsystem);
 	const description = campana.description;
 	const image =
 		campana.image ||
 		'https://www.svgrepo.com/show/508699/landscape-placeholder.svg';
 
-	{
-		/* const navigate = useNavigate();
-		onClick={() => navigate(`/campaign/${campana.id}`)} */
-	}
+	const navigate = useNavigate();
+
 	return (
-		<Card className='mt-10 cursor-pointer'>
+		<Card
+			className='mt-10 cursor-pointer'
+			onClick={() => navigate(`/campaign/${id}`)}
+		>
 			<CardHeader color='blue-gray' className='relative h-36'>
 				<img
 					src={image}
@@ -34,9 +38,11 @@ export default function CampaignCardVertical({ campana }) {
 				<Typography variant='h5' color='blue-gray' className='mb-2'>
 					{name}
 				</Typography>
-				<Typography variant='h6' color='blue-gray'>
-					{rpgsystem}
-				</Typography>
+				{rpgsystem && (
+					<Typography variant='h6' color='blue-gray'>
+						{rpgsystem}
+					</Typography>
+				)}
 				<Typography
 					variant='small'
 					color='gray'

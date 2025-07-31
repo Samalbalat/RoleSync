@@ -7,22 +7,25 @@ import {
 } from '@material-tailwind/react';
 
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
+import parseRpgSystem from '../../data/RPGSystem';
 
 export default function CampaignCardHorizontal({ campana }) {
+	const id = campana.id;
 	const name = campana.name;
 	const theme = campana.theme;
-	const rpgsystem = campana.rpgsystem;
+	const rpgsystem = parseRpgSystem(campana.rpgsystem);
 	const description = campana.description;
 	const image =
 		campana.image ||
 		'https://www.svgrepo.com/show/508699/landscape-placeholder.svg';
+	const navigate = useNavigate();
 
-	{
-		/* const navigate = useNavigate();
-		onClick={() => navigate(`/campaign/${campana.id}`)} */
-	}
 	return (
-		<Card className='w-full max-w-md flex-row mb-2 shadow-sm rounded-lg cursor-pointer'>
+		<Card
+			className='w-full max-w-md flex-row mb-2 shadow-sm rounded-lg cursor-pointer'
+			onClick={() => navigate(`/campaign/${id}`)}
+		>
 			<CardHeader
 				shadow={false}
 				floated={false}
@@ -35,16 +38,18 @@ export default function CampaignCardHorizontal({ campana }) {
 				/>
 			</CardHeader>
 			<CardBody className='p-3 flex flex-col justify-between'>
-				<Typography variant='h5' color='blue-gray' className='mb-1 truncate'>
+				<Typography variant='h6' color='blue-gray' className='mb-1 truncate'>
 					{name}
 				</Typography>
-				<Typography
-					variant='small'
-					color='gray'
-					className='mb-1 uppercase font-bold'
-				>
-					{rpgsystem}
-				</Typography>
+				{rpgsystem && (
+					<Typography
+						variant='small'
+						color='gray'
+						className='mb-1 uppercase font-bold'
+					>
+						{rpgsystem}
+					</Typography>
+				)}
 				<Typography variant='h6' color='gray' className='mb-1'>
 					{theme}
 				</Typography>
@@ -63,9 +68,7 @@ CampaignCardHorizontal.propTypes = {
 		id: PropTypes.number.isRequired,
 		name: PropTypes.string.isRequired,
 		theme: PropTypes.string.isRequired,
-		rpgsystem: PropTypes.string.isRequired,
 		description: PropTypes.string.isRequired,
-		rate: PropTypes.number.isRequired,
 		image: PropTypes.string,
 	}).isRequired,
 };
