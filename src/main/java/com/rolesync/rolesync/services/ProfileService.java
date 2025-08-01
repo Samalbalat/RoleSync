@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.rolesync.rolesync.entities.Campaign;
 import com.rolesync.rolesync.entities.Profile;
 import com.rolesync.rolesync.repositories.ProfileRepository;
 
@@ -17,6 +18,10 @@ public class ProfileService {
     // This method retrieves all profiles
     public List<Profile> getAllProfiles() {
         return (List<Profile>) profileRepository.findAll();
+    }
+
+    public List<Profile> getAllMembersByCampaign(Campaign campaign) {
+        return profileRepository.findAllMembersByCampaignId(campaign.getId()).stream().toList();
     }
 
     // This method retrieves a profile by its ID

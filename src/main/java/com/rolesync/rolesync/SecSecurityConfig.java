@@ -2,8 +2,6 @@ package com.rolesync.rolesync;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -39,24 +37,16 @@ public class SecSecurityConfig {
 
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity.authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/admin").hasRole("ADMIN")
-                        .requestMatchers("/error").permitAll()
-                        .anyRequest().authenticated()
-                ).oneTimeTokenLogin(configurer -> configurer.tokenGenerationSuccessHandler(
-                        (request, response, oneTimeToken) -> {
-                            var msg = "go to http://localhost:8080/login/ott?token=" + oneTimeToken.getTokenValue();
-                            System.out.println(msg);
-                            response.setContentType(MediaType.TEXT_PLAIN_VALUE);
-                            response.getWriter().print("you've got console mail!");
-                        })).webAuthn(c -> c
-                        .rpId("localhost")
-                        .rpName("bootiful passkeys")
-                        .allowedOrigins("http://localhost:8080")
-                )
-                .formLogin(Customizer.withDefaults())
-                // ...
-                .build();
-    }
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http
+			.authorizeHttpRequests((requests) -> requests.anyRequest().anonymous()
+			)
+			.formLogin((form) -> form
+				.loginPage("/login")
+				.permitAll()
+			)
+			.logout((logout) -> logout.permitAll());
+
+		return http.build();
+	}
 }
