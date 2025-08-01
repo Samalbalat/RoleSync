@@ -5,11 +5,13 @@ import ListCampaigns from './components/campaign/ListCampaign.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Sidebar from './components/Sidebar.jsx';
 import CampaignDetail from './components/campaign/CampaignDetail.jsx';
+import CreateCampaign from './components/campaign/CreateCampaign.jsx';
 
 function App() {
 	const [isMobileSize, setisMobileSize] = React.useState(false);
 	const [midSize, setMidSize] = React.useState(false);
 	const user_email = 'gm@example.com'; // Simulación de email de usuario
+	const profile_type = 'table';
 	React.useEffect(() => {
 		const handleResize = () => {
 			setisMobileSize(window.innerWidth <= 720);
@@ -63,6 +65,17 @@ function App() {
 										isMobileSize={isMobileSize}
 										midSize={midSize}
 										user_email={user_email}
+									/>
+								}
+							/>
+							<Route
+								path='/create-campaign'
+								element={
+									<CreateCampaign
+										isMobileSize={isMobileSize}
+										midSize={midSize}
+										user_email={user_email}
+										profile_type={profile_type}
 									/>
 								}
 							/>

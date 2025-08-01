@@ -1,4 +1,4 @@
-const RPG_SYSTEM_ENUM = {
+export const RPG_SYSTEM_ENUM = {
 	DUNGEONS_AND_DRAGONS: 'D&D',
 	PATHFINDER: 'Pathfinder',
 	STARFINDER: 'Sarfinder',

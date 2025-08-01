@@ -14,25 +14,25 @@ export const navList = (
 			<ListItemPrefix>
 				<PresentationChartBarIcon className='h-5 w-5' />
 			</ListItemPrefix>
-			<a href='/'> Dashboard </a>
+			<a href='/list_campaigns'> Buscar campañas </a>
 		</ListItem>
 		<ListItem>
 			<ListItemPrefix>
 				<ShoppingBagIcon className='h-5 w-5' />
 			</ListItemPrefix>
-			<a href='/'>E-Commerce</a>
+			<a href='/create-campaign'>Crear Campaña</a>
 		</ListItem>
 		<ListItem>
 			<ListItemPrefix>
 				<InboxIcon className='h-5 w-5' />
 			</ListItemPrefix>
-			<a href='/'>Inbox</a>
+			<a href='/'>Crear personaje</a>
 		</ListItem>
 		<ListItem>
 			<ListItemPrefix>
 				<UserCircleIcon className='h-5 w-5' />
 			</ListItemPrefix>
-			<a href='/'>Profile</a>
+			<a href='/'>Perfil</a>
 		</ListItem>
 		<ListItem>
 			<ListItemPrefix>
