@@ -10,35 +10,45 @@ import {
 
 export const navList = (
 	<List>
-		<ListItem>
-			<ListItemPrefix>
-				<PresentationChartBarIcon className='h-5 w-5' />
-			</ListItemPrefix>
-			<a href='/list_campaigns'> Buscar campañas </a>
-		</ListItem>
-		<ListItem>
-			<ListItemPrefix>
-				<ShoppingBagIcon className='h-5 w-5' />
-			</ListItemPrefix>
-			<a href='/create-campaign'>Crear Campaña</a>
-		</ListItem>
-		<ListItem>
-			<ListItemPrefix>
-				<InboxIcon className='h-5 w-5' />
-			</ListItemPrefix>
-			<a href='/'>Crear personaje</a>
-		</ListItem>
-		<ListItem>
-			<ListItemPrefix>
-				<UserCircleIcon className='h-5 w-5' />
-			</ListItemPrefix>
-			<a href='/'>Perfil</a>
-		</ListItem>
-		<ListItem>
-			<ListItemPrefix>
-				<Cog6ToothIcon className='h-5 w-5' />
-			</ListItemPrefix>
-			<a href='/'>Settings</a>
-		</ListItem>
+		<a href='/list_campaigns'>
+			<ListItem>
+				<ListItemPrefix>
+					<PresentationChartBarIcon className='h-5 w-5' />
+				</ListItemPrefix>
+				Buscar campañas
+			</ListItem>
+		</a>
+		<a href='/create-campaign'>
+			<ListItem>
+				<ListItemPrefix>
+					<ShoppingBagIcon className='h-5 w-5' />
+				</ListItemPrefix>
+				Crear Campaña
+			</ListItem>
+		</a>
+		<a href='/'>
+			<ListItem>
+				<ListItemPrefix>
+					<InboxIcon className='h-5 w-5' />
+				</ListItemPrefix>
+				Crear personaje
+			</ListItem>
+		</a>
+		<a href='/'>
+			<ListItem>
+				<ListItemPrefix>
+					<UserCircleIcon className='h-5 w-5' />
+				</ListItemPrefix>
+				Perfil
+			</ListItem>
+		</a>
+		<a href='/'>
+			<ListItem>
+				<ListItemPrefix>
+					<Cog6ToothIcon className='h-5 w-5' />
+				</ListItemPrefix>
+				Settings
+			</ListItem>
+		</a>
 	</List>
 );
