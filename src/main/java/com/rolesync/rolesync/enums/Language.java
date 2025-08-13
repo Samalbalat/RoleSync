@@ -21,7 +21,7 @@ public enum Language {
         this.code = code;
     }
 
-    public String getcode() {
+    public String getCode() {
         return code;
     }
 }

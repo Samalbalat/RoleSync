@@ -19,9 +19,10 @@ public class WrittenCampaign extends Campaign {
     }
 
     public WrittenCampaign(String name, String theme, String description, Profile owner, Set<Profile> members,
-            Set<Communication> communications, Set<Language> languages, TimeZone timeZone, String image) {
+            Integer maxNumberOfMembers, Set<Communication> communications, Set<Language> languages, TimeZone timeZone,
+            ImageData image) {
 
-        super(name, theme, description, owner, members, communications, languages, timeZone, image);
+        super(name, theme, description, owner, members, maxNumberOfMembers, communications, languages, timeZone, image);
     }
 
 }

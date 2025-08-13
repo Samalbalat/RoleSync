@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rolesync.rolesync.dto.CampaignDTO;
 import com.rolesync.rolesync.entities.Campaign;
 import com.rolesync.rolesync.services.CampaignService;
 import com.rolesync.rolesync.services.ProfileService;
@@ -27,7 +28,7 @@ public class CampaignController {
 
     // This method can be used to get all campaigns
     @GetMapping
-    public List<Campaign> getAllCampaigns() {
+    public List<CampaignDTO> getAllCampaigns() {
         return campaignService.getAllCampaigns();
     }
 
@@ -46,7 +47,7 @@ public class CampaignController {
 
     // This method can be used to search campaigns based on a query parameter
     @GetMapping("/search")
-    public List<Campaign> searchCampaigns() {
+    public List<CampaignDTO> searchCampaigns() {
         // This method can be implemented to search campaigns based on the query
         // For now, we will return all campaigns
         return campaignService.getAllCampaigns();

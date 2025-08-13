@@ -23,10 +23,10 @@ public class TabletopCampaign extends Campaign {
     }
 
     public TabletopCampaign(String name, String theme, String description, Profile owner, Set<Profile> members,
-            Set<Communication> communications, Set<Language> languages, TimeZone timeZone, String image,
-            RPGSystem RPGSystem,
+            Integer maxNumberOfMembers, Set<Communication> communications, Set<Language> languages,
+            TimeZone timeZone, ImageData image, RPGSystem RPGSystem,
             WeekDay WeekDay, String frecuency, Double duration) {
-        super(name, theme, description, owner, members, communications, languages, timeZone, image);
+        super(name, theme, description, owner, members, maxNumberOfMembers, communications, languages, timeZone, image);
         this.RPGSystem = RPGSystem;
         this.weekDay = WeekDay;
         this.frecuency = frecuency;

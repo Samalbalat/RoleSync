@@ -2,10 +2,10 @@ package com.rolesync.rolesync.entities;
 
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,6 +19,10 @@ import jakarta.persistence.Table;
 // be used to calculate the user's level, experience points and review weights
 
 @Entity
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "name" // Using name as the identifier for JSON serialization
+)
 @Table(name = "profile")
 public class Profile {
 
@@ -29,6 +33,9 @@ public class Profile {
     //This field represents the name of the profile
     private String name;
 
+    //This field represents the password of the profile
+    private String password;
+
     //This field represents the email of the profile
     private String email;
 
@@ -36,13 +43,11 @@ public class Profile {
     private Integer phone;
 
     // This field represents the campaigns that the profile is a member of
-    @JsonBackReference
     @ManyToMany(mappedBy = "members")
     private Set<Campaign> memberOf;
     
     // This field represents the campaigns that the profile owns
-    @JsonBackReference
-    @OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "owner"   )
     private Set<Campaign> ownerOf;
 
     public Profile() {
@@ -63,6 +68,14 @@ public class Profile {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+            public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getEmail() {

@@ -70,8 +70,6 @@ public class RolesyncApplication implements CommandLineRunner {
 		tabletop.setWeekDay(WeekDay.FRIDAY);
 		tabletop.setTimeZone(TimeZone.GMTE10);
 		tabletop.setMembers(Set.of(member1, member2));
-		tabletop.setImage(
-				"https://cdn.prod.website-files.com/646df590700064e1c084f708/65cf741bb83c9eb63075389e_20170202_135906.jpeg");
 		tabletop.setFrecuency("Weekly");
 		tabletop.setDuration(2.0);
 		tabletop.setTheme("Fantasía");
@@ -86,10 +84,19 @@ public class RolesyncApplication implements CommandLineRunner {
 		written.setCommunications(Set.of(Communication.FACEBOOK, Communication.TWITTER));
 		written.setTimeZone(TimeZone.GMTE1);
 		written.setTheme("Renacimiento");
-		written.setImage(
-				"https://vramon1958.wordpress.com/wp-content/uploads/2014/02/escena-de-carnaval-domenico-tiepolo.jpg");
 		written.setMembers(Set.of(member1));
 		campanyaRepository.save(written);
+
+		WrittenCampaign third = new WrittenCampaign();
+		third.setName("Mystery by Post");
+		third.setDescription("A slow-paced, text-based mystery campaign.");
+		third.setOwner(owner);
+		third.setLanguages(Set.of(Language.ENGLISH));
+		third.setCommunications(Set.of(Communication.FACEBOOK, Communication.TWITTER));
+		third.setTimeZone(TimeZone.GMTE1);
+		third.setTheme("Renacimiento");
+		third.setMembers(Set.of(member1));
+		campanyaRepository.save(third);
 
 		// READ campaigns
 		Iterable<Campaign> allCampaigns = campanyaRepository.findAll();

@@ -2,15 +2,16 @@ package com.rolesync.rolesync.entities;
 
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.rolesync.rolesync.enums.Communication;
 import com.rolesync.rolesync.enums.TimeZone;
 import com.rolesync.rolesync.enums.Language;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,10 +21,15 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 
 // This class represents a Campaign in the RoleSync application.
 // It serves as a base class for different types of campaigns, such as tabletop and written campaigns
 @Entity(name = "campaign")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
+)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "campaignType", discriminatorType = DiscriminatorType.STRING)
 public class Campaign {
@@ -42,16 +48,16 @@ public class Campaign {
     private String description;
 
     // This field represents the owner of the campaign
-    @JsonManagedReference
     @ManyToOne
     @JoinColumn(name = "profileId", nullable = false)
     private Profile owner;
 
     // This field represents the members of the campaign
-    @JsonManagedReference
     @ManyToMany
     @JoinTable(name = "campaignMembers", joinColumns = @JoinColumn(name = "campaignId"), inverseJoinColumns = @JoinColumn(name = "profileId"))
     private Set<Profile> members;
+
+    private Integer maxNumberOfMembers;
 
     // This field represents the communications available for the campaign
     private Set<Communication> communications;
@@ -63,19 +69,23 @@ public class Campaign {
     private TimeZone timeZone;
 
     // This field represents the image associated with the campaign
-    private String image;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "image_id", referencedColumnName = "id")
+    private ImageData image;
 
     public Campaign() {
         // Default constructor for JPA
     }
 
     public Campaign(String name, String theme, String description, Profile owner, Set<Profile> members,
-            Set<Communication> communications, Set<Language> languages, TimeZone timeZone, String image) {
+            Integer maxNumberOfMembers, Set<Communication> communications, Set<Language> languages, 
+            TimeZone timeZone, ImageData image) {
         this.name = name;
         this.theme = theme;
         this.description = description;
         this.owner = owner;
         this.members = members;
+        this.maxNumberOfMembers = maxNumberOfMembers;
         this.communications = communications;
         this.languages = languages;
         this.timeZone = timeZone;
@@ -126,6 +136,14 @@ public class Campaign {
         this.members = members;
     }
 
+    public Integer getMaxNumberOfMembers() {
+        return maxNumberOfMembers;
+    }
+
+    public void setMaxNumberOfMembers(Integer maxNumberOfMembers) {
+        this.maxNumberOfMembers = maxNumberOfMembers;
+    }
+
     public Set<Communication> getCommunications() {
         return communications;
     }
@@ -150,11 +168,11 @@ public class Campaign {
         this.timeZone = timeZone;
     }
 
-    public String getImage() {
+    public ImageData getImage() {
         return image;
     }
 
-    public void setImage(String image) {
+    public void setImage(ImageData image) {
         this.image = image;
     }
 

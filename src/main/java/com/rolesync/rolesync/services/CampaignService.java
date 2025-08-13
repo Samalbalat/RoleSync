@@ -1,10 +1,12 @@
 package com.rolesync.rolesync.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.rolesync.rolesync.dto.CampaignDTO;
 import com.rolesync.rolesync.entities.Campaign;
 import com.rolesync.rolesync.repositories.CampaignRepository;
 
@@ -15,8 +17,14 @@ public class CampaignService {
     private CampaignRepository campaignRepository;
 
     // This method retrieves all campaigns
-    public List<Campaign> getAllCampaigns() {
-        return (List<Campaign>) campaignRepository.findAll();
+    public List<CampaignDTO> getAllCampaigns() {
+        List<CampaignDTO> campaignDTOs = new ArrayList<>();
+        // Convert each Campaign entity to CampaignDTO
+        campaignRepository.findAll().forEach(campaign -> {
+            CampaignDTO campaignDTO = new CampaignDTO(campaign);
+            campaignDTOs.add(campaignDTO);
+        });
+        return campaignDTOs;
     }
 
     // This method retrieves a campaign by its ID
