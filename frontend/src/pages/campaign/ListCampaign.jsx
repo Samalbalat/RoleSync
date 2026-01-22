@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import CampaignCardHorizontal from './campaignCardHorizontal';
-import CampaignCardVertical from './campaignCardVertical';
+import CampaignCardHorizontal from '../../components/campaign/CampaignCardHorizontal';
+import CampaignCardVertical from '../../components/campaign/CampaignCardVertical';
 import {
 	Button,
 	Checkbox,
