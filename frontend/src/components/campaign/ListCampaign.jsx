@@ -2,34 +2,18 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import CampaignCardHorizontal from './campaignCardHorizontal';
 import CampaignCardVertical from './campaignCardVertical';
-import {
-	Button,
-	Checkbox,
-	Input,
-	Typography,
-	Select,
-	Option,
-	IconButton,
-} from '@material-tailwind/react';
+import { Button, Checkbox, Input, Typography, Select, Option, IconButton } from '@material-tailwind/react';
 import { ArrowRightIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 import CampaignService from '../../services/CampaignService';
 
 const CampaignFilter = () => {
 	return (
 		<div className='w-full max-w-[20rem] px-2 py-4 flex flex-col items-center'>
-			<Typography
-				variant='h5'
-				color='blue-gray'
-				className='font-bold tracking-wide mb-1'
-			>
+			<Typography variant='h5' color='blue-gray' className='font-bold tracking-wide mb-1'>
 				Aquí irán los filtros
 			</Typography>
 			<div className='w-12 border-b-2 border-red-400 mb-4' />
-			<Typography
-				variant='small'
-				color='red'
-				className='text-center font-semibold mb-6'
-			>
+			<Typography variant='small' color='red' className='text-center font-semibold mb-6'>
 				Solo ejemplo. Actualmente no funciona
 			</Typography>
 			<div className='w-full flex flex-col gap-5'>
@@ -50,11 +34,7 @@ const CampaignFilter = () => {
 					<Option>Opcion 5</Option>
 				</Select>
 				<div className='flex justify-center pt-2'>
-					<Button
-						size='sm'
-						color='red'
-						className='shadow-md hover:scale-105 transition-transform font-bold px-6 py-2'
-					>
+					<Button size='sm' color='red' className='shadow-md hover:scale-105 transition-transform font-bold px-6 py-2'>
 						Filtrar
 					</Button>
 				</div>
@@ -67,39 +47,19 @@ const CampaignFilterMobile = () => {
 	const [open, setOpen] = useState(false);
 	return (
 		<div className='w-full px-2'>
-			<button
-				type='button'
-				className='flex items-center justify-between w-full py-2'
-				onClick={() => setOpen(!open)}
-				aria-expanded={open}
-			>
+			<button type='button' className='flex items-center justify-between w-full py-2' onClick={() => setOpen(!open)} aria-expanded={open}>
 				<Typography variant='h6' color='blue-gray' className='font-bold'>
 					Filtros
 				</Typography>
 				<span className={`transition-transform ${open ? 'rotate-180' : ''}`}>
-					<svg
-						xmlns='http://www.w3.org/2000/svg'
-						fill='none'
-						viewBox='0 0 24 24'
-						strokeWidth={1.5}
-						stroke='currentColor'
-						className='size-6'
-					>
-						<path
-							strokeLinecap='round'
-							strokeLinejoin='round'
-							d='M19 9l-7 7-7-7'
-						/>
+					<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth={1.5} stroke='currentColor' className='size-6'>
+						<path strokeLinecap='round' strokeLinejoin='round' d='M19 9l-7 7-7-7' />
 					</svg>
 				</span>
 			</button>
 			{open && (
 				<div className='mt-2 flex flex-col items-center'>
-					<Typography
-						variant='small'
-						color='red'
-						className='text-center font-semibold mb-4'
-					>
+					<Typography variant='small' color='red' className='text-center font-semibold mb-4'>
 						Solo ejemplo. Actualmente no funciona
 					</Typography>
 					<div className='w-full flex flex-col gap-4'>
@@ -120,11 +80,7 @@ const CampaignFilterMobile = () => {
 							<Option>Opcion 5</Option>
 						</Select>
 						<div className='flex justify-center pt-2'>
-							<Button
-								size='md'
-								color='red'
-								className='shadow-md hover:scale-105 transition-transform font-bold px-8 py-3'
-							>
+							<Button size='md' color='red' className='shadow-md hover:scale-105 transition-transform font-bold px-8 py-3'>
 								Filtrar
 							</Button>
 						</div>
@@ -156,10 +112,7 @@ export default function ListCampaigns({ isMobileSize, midSize }) {
 	const itemsPerPage = 9;
 	const totalPages = Math.ceil(lista_campanas.length / itemsPerPage);
 
-	const paginatedCampanas = lista_campanas.slice(
-		itemsPerPage * (activePage - 1),
-		itemsPerPage * activePage,
-	);
+	const paginatedCampanas = lista_campanas.slice(itemsPerPage * (activePage - 1), itemsPerPage * activePage);
 
 	const getItemProps = index => ({
 		variant: activePage === index ? 'filled' : 'text',
@@ -179,12 +132,7 @@ export default function ListCampaigns({ isMobileSize, midSize }) {
 
 	const Pagination = () => (
 		<div className='flex items-center gap-4 justify-center mt-6'>
-			<Button
-				variant='text'
-				className='flex items-center gap-2'
-				onClick={prev}
-				disabled={activePage === 1}
-			>
+			<Button variant='text' className='flex items-center gap-2' onClick={prev} disabled={activePage === 1}>
 				<ArrowLeftIcon strokeWidth={2} className='h-4 w-4' /> Anterior
 			</Button>
 			<div className='flex items-center gap-2'>
@@ -194,12 +142,7 @@ export default function ListCampaigns({ isMobileSize, midSize }) {
 					</IconButton>
 				))}
 			</div>
-			<Button
-				variant='text'
-				className='flex items-center gap-2'
-				onClick={next}
-				disabled={activePage === totalPages}
-			>
+			<Button variant='text' className='flex items-center gap-2' onClick={next} disabled={activePage === totalPages}>
 				Siguiente
 				<ArrowRightIcon strokeWidth={2} className='h-4 w-4' />
 			</Button>
@@ -237,8 +180,7 @@ export default function ListCampaigns({ isMobileSize, midSize }) {
 							<div
 								className='w-full h-[2px] my-1'
 								style={{
-									background:
-										'linear-gradient(90deg, #f43f5e 0%, #3b82f6 100%)',
+									background: 'linear-gradient(90deg, #f43f5e 0%, #3b82f6 100%)',
 								}}
 							/>
 

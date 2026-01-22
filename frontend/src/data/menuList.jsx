@@ -1,12 +1,6 @@
 import React from 'react';
 import { List, ListItem, ListItemPrefix } from '@material-tailwind/react';
-import {
-	PresentationChartBarIcon,
-	ShoppingBagIcon,
-	UserCircleIcon,
-	Cog6ToothIcon,
-	InboxIcon,
-} from '@heroicons/react/24/solid';
+import { PresentationChartBarIcon, ShoppingBagIcon, UserCircleIcon, Cog6ToothIcon, InboxIcon } from '@heroicons/react/24/solid';
 
 export const navList = (
 	<List>
@@ -34,7 +28,7 @@ export const navList = (
 				Crear personaje
 			</ListItem>
 		</a>
-		<a href='/'>
+		<a href='/userprofile'>
 			<ListItem>
 				<ListItemPrefix>
 					<UserCircleIcon className='h-5 w-5' />
