@@ -2,9 +2,10 @@ import React from 'react';
 import { Navbar as MTNavbar, Button, IconButton, Collapse, Typography } from '@material-tailwind/react';
 import { NavLink } from 'react-router-dom';
 import { menuItems } from '../../data/menuList';
-import logo from '../../assets/DnD-Symbol.png';
+import { useTranslation } from 'react-i18next';
 
 export default function Navbar() {
+	const { t } = useTranslation('global');
 	const [openNav, setOpenNav] = React.useState(false);
 
 	React.useEffect(() => {
@@ -34,7 +35,7 @@ export default function Navbar() {
 							}
 						>
 							<Icon className='h-5 w-5' />
-							{label}
+							{t(label)}
 						</NavLink>
 					</Typography>
 				);
@@ -47,17 +48,17 @@ export default function Navbar() {
 			<div className='flex items-center justify-between text-gray-900'>
 				{/* LOGO */}
 				<div className='flex items-center cursor-pointer'>
-					<img alt='RolSync Logo' src={logo} className='h-8 w-auto' />
+					<img alt='RolSync Logo' src={'/DnD-Symbol.png'} className='h-8 w-auto' />
 					<span className='ml-3 text-xl font-bold font-mono tracking-tight'>RolSync</span>
 				</div>
 
 				{/* BOTONES DESKTOP: Ocultos en móviles y tablets (lg:flex) */}
 				<div className='hidden lg:flex items-center gap-x-2'>
 					<Button variant='text' size='sm' className='text-gray-900'>
-						Log In
+						{t('auth.login')}
 					</Button>
 					<Button variant='gradient' size='sm' color='red'>
-						Sign in
+						{t('auth.register')}
 					</Button>
 				</div>
 
@@ -86,10 +87,10 @@ export default function Navbar() {
 					{navList}
 					<div className='flex flex-col gap-2 mt-4'>
 						<Button fullWidth variant='outlined' size='sm' color='red'>
-							Log In
+							{t('auth.login')}
 						</Button>
 						<Button fullWidth variant='gradient' size='sm' color='red'>
-							Sign in
+							{t('auth.register')}
 						</Button>
 					</div>
 				</div>

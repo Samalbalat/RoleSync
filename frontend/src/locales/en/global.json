@@ -1,0 +1,32 @@
+{
+  "menu": {
+    "dashboard": "Dashboard",
+    "ecommerce": "Store",
+    "inbox": "Inbox",
+    "profile": "My Profile",
+    "settings": "Settings"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "enterEmailPassword": "Enter your email and password to sign in",
+    "notRegistered": "Not registered",
+    "createAccount": "Create account"
+  },
+  "account": {
+    "email": "Email",
+    "password": "Password",
+    "timeZone": "Time Zone"
+  },
+  "profile": {
+    "profileName": "Profile Name",
+    "description": "Description",
+    "rolType": "Role Type"
+  },
+  "common": {
+    "welcome": "Welcome to RoleSync",
+    "name": "Name",
+    "image": "Image"
+  }
+}

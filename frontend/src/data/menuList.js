@@ -2,28 +2,28 @@ import { PresentationChartBarIcon, ShoppingBagIcon, UserCircleIcon, Cog6ToothIco
 
 export const menuItems = [
 	{
-		label: 'Dashboard',
+		label: 'menu.dashboard',
 		path: '/',
 		icon: PresentationChartBarIcon,
 	},
 	{
-		label: 'E-Commerce',
-		path: '/',
+		label: 'menu.ecommerce',
+		path: '/ecommerce',
 		icon: ShoppingBagIcon,
 	},
 	{
-		label: 'Inbox',
-		path: '/',
+		label: 'menu.inbox',
+		path: '/inbox',
 		icon: InboxIcon,
 	},
 	{
-		label: 'Profile',
-		path: '/',
+		label: 'menu.profile',
+		path: '/profile',
 		icon: UserCircleIcon,
 	},
 	{
-		label: 'Settings',
-		path: '/',
+		label: 'menu.settings',
+		path: '/settings',
 		icon: Cog6ToothIcon,
 	},
 ];

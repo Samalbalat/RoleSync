@@ -9,6 +9,9 @@ export default withMT({
     "node_modules/@material-tailwind/react/theme/components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    fontFamily: {
+      sans: ["'Atkinson Hyperlegible'", "ui-sans-serif", "system-ui", "-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "sans-serif"],
+    },
     extend: {},
   },
   plugins: [],

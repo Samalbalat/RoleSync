@@ -14,10 +14,12 @@
     "@heroicons/react": "^2.2.0",
     "@material-tailwind/react": "^2.1.10",
     "axios": "^1.11.0",
+    "i18next": "^25.8.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.56.2",
     "react-hot-toast": "^2.5.2",
+    "react-i18next": "^16.5.3",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.5.3"
   },

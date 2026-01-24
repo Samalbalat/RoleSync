@@ -2,8 +2,10 @@ import React from 'react';
 import { Card, Typography, List, ListItem, ListItemPrefix } from '@material-tailwind/react';
 import { NavLink } from 'react-router-dom';
 import { menuItems } from '../../data/menuList'; // Importamos el array, no el JSX
+import { useTranslation } from 'react-i18next';
 
 export default function Sidebar() {
+	const { t } = useTranslation('global');
 	return (
 		<Card className='h-full w-full p-4 shadow-none bg-gray-100 rounded-none border-r border-gray-300'>
 			<div className='mb-2 p-4'>
@@ -24,7 +26,7 @@ export default function Sidebar() {
 									<ListItemPrefix>
 										<Icon className='h-5 w-5' />
 									</ListItemPrefix>
-									{label}
+									{t(label)}
 								</ListItem>
 							)}
 						</NavLink>

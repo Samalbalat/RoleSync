@@ -1,27 +1,26 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainLayout from './components/layout/MainLayout';
 import HomePage from './pages/HomePage';
+import RegisterPage from './pages/auth/RegisterPage';
+import LoginPage from './pages/auth/LoginPage';
+import AccountSettings from './pages/account/AccountSettings';
 
 function App() {
-	// const user_email = 'gm@example.com';
-
 	return (
 		<BrowserRouter>
 			<Routes>
+				{/* Rutas Públicas */}
+				<Route path='/login' element={<LoginPage />} />
+				<Route path='/register' element={<RegisterPage />} />
+
+				{/* Rutas Privadas */}
 				<Route path='/' element={<MainLayout />}>
 					<Route index element={<HomePage />} />
 
-					{/* Redirección: si entran a /list_campaigns, los mandamos al home */}
-					<Route path='home_page' element={<Navigate to='/' replace />} />
-
-					{/* <Route path='list_campaigns' element={<Navigate to='/' replace />} />
-					<Route path='campaign/:id' element={<CampaignDetail user_email={user_email} />} />*/}
+					{/* ACCOUNT */}
+					<Route path='account/settings' element={<AccountSettings />} />
 				</Route>
-
-				{/* Aquí podrías poner rutas SIN layout (ej. Login)
-                    <Route path="/login" element={<Login />} /> 
-                */}
 			</Routes>
 		</BrowserRouter>
 	);
