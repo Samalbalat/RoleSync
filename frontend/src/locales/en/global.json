@@ -8,25 +8,37 @@
   },
   "auth": {
     "login": "Login",
-    "register": "Register",
+    "signin": "Sign In",
     "logout": "Logout",
     "enterEmailPassword": "Enter your email and password to sign in",
     "notRegistered": "Not registered",
-    "createAccount": "Create account"
+    "createAccount": "Create account",
+    "profileTypeNote": "Don't worry: you'll be able to create the other type of profile later with this same account."
   },
   "account": {
+    "name": "Name",
     "email": "Email",
     "password": "Password",
+    "confirmPassword": "Confirm Password",
     "timeZone": "Time Zone"
   },
   "profile": {
     "profileName": "Profile Name",
     "description": "Description",
-    "rolType": "Role Type"
+    "rolType": "Role Type",
+    "narrative": "Narrative",
+    "table": "Table"
   },
   "common": {
     "welcome": "Welcome to RoleSync",
     "name": "Name",
     "image": "Image"
+  },
+  "errors": {
+    "required": "This field is required",
+    "invalidEmail": "The email format is not valid",
+    "passwordLength": "Minimum 8 characters",
+    "passwordComplexity": "Must include uppercase, lowercase, number, and symbol (_@$!%*?&-)",
+    "passwordMatch": "Passwords do not match"
   }
 }

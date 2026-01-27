@@ -1,26 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Drawer, Typography, IconButton } from '@material-tailwind/react';
 import { ChevronRightIcon, XMarkIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid';
+import PropTypes from 'prop-types';
 
-export function NarrativeDrawer() {
-	const [open, setOpen] = useState(false);
-	const openDrawer = () => setOpen(true);
-	const closeDrawer = () => setOpen(false);
-
+export function NarrativeDrawer({ open, onClose, openDrawer }) {
 	return (
 		<>
 			{/* --- BARRA LATERAL VISIBLE (TRIGGER) --- */}
 			<div
 				onMouseEnter={openDrawer}
-				className='group relative w-20 hover:w-24 h-screen bg-gray-900/85 backdrop-blur-md border-r border-white/10 text-white flex flex-col items-center justify-center shrink-0 sticky top-0 z-20 cursor-pointer shadow-2xl transition-all duration-300 ease-out'
+				className='hidden lg:flex group relative w-20 hover:w-24 h-screen bg-gray-900/85 backdrop-blur-md border-r border-white/10 text-white flex-col items-center justify-center shrink-0 sticky top-0 z-20 cursor-pointer shadow-2xl transition-all duration-300 ease-out'
 			>
 				<div className='absolute left-0 h-full w-1 bg-gradient-to-b from-transparent via-blue-500/60 to-transparent opacity-50 group-hover:opacity-100 transition-opacity' />
-
 				<div className='flex flex-col items-center gap-3 transition-transform duration-300 group-hover:scale-105'>
 					<div className='absolute w-12 h-12 bg-blue-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500' />
-
 					<ChatBubbleLeftRightIcon className='h-8 w-8 text-blue-100 z-10 drop-shadow-lg' />
-
 					<span className='text-[10px] font-bold tracking-widest uppercase text-blue-200 opacity-60 group-hover:opacity-100 transition-all'>
 						Narrativo
 					</span>
@@ -37,9 +31,9 @@ export function NarrativeDrawer() {
 			<Drawer
 				placement='left'
 				open={open}
-				onClose={closeDrawer}
+				onClose={onClose}
 				className='p-4 bg-gray-900/95 backdrop-blur-xl border-r border-white/10 text-white shadow-2xl'
-				overlayProps={{ className: 'bg-black/60 backdrop-blur-sm' }}
+				overlayProps={{ className: 'fixed inset-0 h-screen w-screen bg-black/60 backdrop-blur-sm z-[9999]' }}
 				size={window.innerWidth > 720 ? window.innerWidth * 0.8 : window.innerWidth}
 				transition={{ type: 'tween', duration: 0.75 }}
 			>
@@ -50,7 +44,7 @@ export function NarrativeDrawer() {
 							Nuestra Historia
 						</Typography>
 					</div>
-					<IconButton variant='text' color='white' onClick={closeDrawer} className='hover:bg-white/10 focus:bg-white/10'>
+					<IconButton variant='text' color='white' onClick={onClose} className='hover:bg-white/10 focus:bg-white/10'>
 						<XMarkIcon strokeWidth={2} className='h-6 w-6 text-blue-gray-100' />
 					</IconButton>
 				</div>
@@ -65,3 +59,9 @@ export function NarrativeDrawer() {
 		</>
 	);
 }
+
+NarrativeDrawer.propTypes = {
+	open: PropTypes.bool.isRequired,
+	onClose: PropTypes.func.isRequired,
+	openDrawer: PropTypes.func.isRequired,
+};

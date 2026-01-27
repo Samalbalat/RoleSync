@@ -8,25 +8,37 @@
   },
   "auth": {
     "login": "Iniciar Sesión",
-    "register": "Registrarse",
+    "signin": "Registrarse",
     "logout": "Cerrar Sesión",
     "enterEmailPassword": "Ingrese su correo electrónico y contraseña para iniciar sesión",
     "notRegistered": "No está registrado",
-    "createAccount": "Crear cuenta"
+    "createAccount": "Crear cuenta",
+    "profileTypeNote": "No te preocupes: podrás crear un perfil del otro tipo más tarde con esta misma cuenta."
   },
   "account": {
+    "name": "Nombre",
     "email": "Correo Electrónico",
     "password": "Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
     "timeZone": "Zona Horaria"
   },
   "profile": {
     "profileName": "Nombre del Perfil",
     "description": "Descripción",
-    "rolType": "Tipo de Rol"
+    "rolType": "Tipo de Rol",
+    "narrative": "Narrativo",
+    "table": "Mesa"
   },
   "common": {
     "welcome": "Bienvenido a RoleSync",
     "name": "Nombre",
     "image": "Imagen"
+  },
+  "errors": {
+    "required": "Este campo es obligatorio",
+    "invalidEmail": "El formato del correo no es válido",
+    "passwordLength": "Mínimo 8 caracteres",
+    "passwordComplexity": "Debe incluir mayúscula, minúscula, número y símbolo (@$!%*?&)",
+    "passwordMatch": "Las contraseñas no coinciden"
   }
 }
