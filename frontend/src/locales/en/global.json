@@ -13,7 +13,8 @@
     "enterEmailPassword": "Enter your email and password to sign in",
     "notRegistered": "Not registered",
     "createAccount": "Create account",
-    "profileTypeNote": "Don't worry: you'll be able to create the other type of profile later with this same account."
+    "profileTypeNote": "Don't worry: you'll be able to create the other type of profile later with this same account.",
+    "errorInvalidCredentials": "Invalid email or password"
   },
   "account": {
     "name": "Name",

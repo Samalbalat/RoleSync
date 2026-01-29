@@ -1,28 +1,44 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './components/layout/MainLayout';
 import HomePage from './pages/HomePage';
 import RegisterPage from './pages/auth/RegisterPage';
 import LoginPage from './pages/auth/LoginPage';
 import AccountSettings from './pages/account/AccountSettings';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import PublicRoute from './components/auth/PublicRoute';
+import { AuthProvider } from './utils/AuthContext';
+import ProfileSelectionPage from './pages/auth/ProfileSelectionPage';
 
 function App() {
 	return (
-		<BrowserRouter>
-			<Routes>
-				{/* Rutas Públicas */}
-				<Route path='/login' element={<LoginPage />} />
-				<Route path='/register' element={<RegisterPage />} />
+		<AuthProvider>
+			<BrowserRouter>
+				<Routes>
+					{/* Rutas Públicas */}
+					<Route element={<PublicRoute />}>
+						<Route path='/login' element={<LoginPage />} />
+						<Route path='/register' element={<RegisterPage />} />
+					</Route>
 
-				{/* Rutas Privadas */}
-				<Route path='/' element={<MainLayout />}>
-					<Route index element={<HomePage />} />
+					{/* Punto intermedio */}
+					<Route element={<ProtectedRoute />}>
+						<Route path='/profile-selection' element={<ProfileSelectionPage />} />
+					</Route>
 
-					{/* ACCOUNT */}
-					<Route path='account/settings' element={<AccountSettings />} />
-				</Route>
-			</Routes>
-		</BrowserRouter>
+					{/* Rutas Privadas */}
+					<Route element={<ProtectedRoute />}>
+						<Route path='/' element={<MainLayout />}>
+							<Route index element={<HomePage />} />
+
+							{/* ACCOUNT */}
+							<Route path='account/settings' element={<AccountSettings />} />
+						</Route>
+					</Route>
+					<Route path='*' element={<Navigate to='/' replace />} />
+				</Routes>
+			</BrowserRouter>
+		</AuthProvider>
 	);
 }
 
