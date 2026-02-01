@@ -1,19 +1,21 @@
 import { useState } from 'react';
-import { Input, Button, Typography, Select, Option } from '@material-tailwind/react';
-import { EyeSlashIcon, EyeIcon } from '@heroicons/react/24/solid';
+import { Input, Button, Typography, Select, Option, Alert } from '@material-tailwind/react';
+import { EyeSlashIcon, EyeIcon, InformationCircleIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
 import AuthLayout from '../../components/auth/AuthLayout';
 import { TIMEZONES } from '../../data/timezones';
 import { validateEmail, validatePassword, validateRequired } from '../../utils/validators';
+import { useNavigate } from 'react-router-dom';
+import AuthService from '../../services/authService';
 
 export function RegisterPage() {
 	const { t } = useTranslation('global');
+	const navigate = useNavigate();
 
 	const [formData, setFormData] = useState({
-		name: '',
 		profileName: '',
 		profileType: '',
-		timezone: '',
+		timeZone: '',
 		email: '',
 		password: '',
 		confirmPassword: '',
@@ -23,22 +25,25 @@ export function RegisterPage() {
 	const [passwordShown, setPasswordShown] = useState(false);
 	const [confirmShown, setConfirmShown] = useState(false);
 
+	const [loading, setLoading] = useState(false);
+	const [serverError, setServerError] = useState(null);
 	const [errors, setErrors] = useState({});
 
 	const handleChange = (key, value) => {
 		setFormData({ ...formData, [key]: value });
 		if (errors[key]) setErrors({ ...errors, [key]: null });
+		if (serverError) setServerError(null);
 	};
 
-	const handleSubmit = e => {
-		e.preventDefault(); // Evita que la página se recargue
+	const handleSubmit = async e => {
+		e.preventDefault();
+		setServerError(null);
 
+		//Validaciones frontend
 		const newErrors = {};
-
-		newErrors.name = validateRequired(formData.name);
 		newErrors.profileName = validateRequired(formData.profileName);
 		newErrors.profileType = validateRequired(formData.profileType);
-		newErrors.timezone = validateRequired(formData.timezone);
+		newErrors.timeZone = validateRequired(formData.timeZone);
 		newErrors.email = validateEmail(formData.email);
 		newErrors.password = validatePassword(formData.password);
 
@@ -53,14 +58,37 @@ export function RegisterPage() {
 		setErrors(newErrors);
 
 		if (Object.keys(newErrors).length === 0) {
-			console.log('REGISTRO VÁLIDO, ENVIANDO DATOS...', formData);
-			// LLAMADA A LA API
+			setLoading(true);
+			try {
+				const signupRequest = {
+					profilename: formData.profileName,
+					profileType: formData.profileType.toUpperCase(),
+					timeZone: formData.timeZone,
+					email: formData.email,
+					password: formData.password,
+				};
+
+				console.log('Enviando payload:', signupRequest);
+
+				await AuthService.register(signupRequest);
+
+				navigate('/login', { state: { message: t('auth.successRegistration') } });
+			} catch (error) {
+				// Validaciones backend
+				console.error('Error en registro:', error);
+				if (error.response?.data == 'Error: Username ya está en uso') {
+					setServerError(t('auth.errorEmailInUse'));
+				} else {
+					setServerError(t('auth.errorConnection'));
+				}
+			} finally {
+				setLoading(false);
+			}
 		}
 	};
 
 	return (
 		<AuthLayout>
-			{' '}
 			<form
 				onSubmit={handleSubmit}
 				noValidate
@@ -68,26 +96,18 @@ export function RegisterPage() {
 			>
 				<div className='lg:col-span-2 text-center mb-2'>
 					<Typography variant='h3' color='blue-gray'>
-						{t('auth.signin')}
+						{t('auth.signUp')}
 					</Typography>
 				</div>
-				{/* Nombre Real*/}
-				<div>
-					<Input
-						label={t('account.name')}
-						size='lg'
-						placeholder='Pepe'
-						value={formData.name}
-						onChange={e => handleChange('name', e.target.value)}
-						className='bg-white'
-						error={!!errors.name}
-					/>
-					{errors.name && (
-						<Typography variant='small' color='red' className='mt-1 text-xs'>
-							{t(errors.name)}
-						</Typography>
-					)}
-				</div>
+
+				{/* ERROR DEL BACKEND */}
+				{serverError && (
+					<div className='lg:col-span-2'>
+						<Alert color='red' icon={<InformationCircleIcon strokeWidth={2} className='h-6 w-6' />}>
+							{serverError}
+						</Alert>
+					</div>
+				)}
 
 				{/* Nombre de Perfil */}
 				<div>
@@ -117,8 +137,8 @@ export function RegisterPage() {
 						className='bg-white'
 						error={!!errors.profileType}
 					>
-						<Option value='narrative'>{t('profile.narrative')}</Option>
-						<Option value='table'>{t('profile.table')}</Option>
+						<Option value='WRITTEN'>{t('profile.narrative')}</Option>
+						<Option value='TABLETOP'>{t('profile.table')}</Option>
 					</Select>
 					{errors.profileType && (
 						<Typography variant='small' color='red' className='mt-1 text-xs'>
@@ -136,10 +156,10 @@ export function RegisterPage() {
 					<Select
 						label={t('account.timeZone')}
 						size='lg'
-						value={formData.timezone}
-						onChange={val => handleChange('timezone', val)}
+						value={formData.timeZone}
+						onChange={val => handleChange('timeZone', val)}
 						className='bg-white'
-						error={!!errors.timezone}
+						error={!!errors.timeZone}
 					>
 						{TIMEZONES.map(({ value, label }) => (
 							<Option key={value} value={value}>
@@ -147,9 +167,9 @@ export function RegisterPage() {
 							</Option>
 						))}
 					</Select>
-					{errors.timezone && (
+					{errors.timeZone && (
 						<Typography variant='small' color='red' className='mt-1 text-xs'>
-							{t(errors.timezone)}
+							{t(errors.timeZone)}
 						</Typography>
 					)}
 				</div>
@@ -161,7 +181,7 @@ export function RegisterPage() {
 						size='lg'
 						type='email'
 						placeholder='name@mail.com'
-						autoComplete='username'
+						autoComplete='email'
 						value={formData.email}
 						onChange={e => handleChange('email', e.target.value)}
 						className='bg-white'
@@ -223,8 +243,14 @@ export function RegisterPage() {
 					)}
 				</div>
 				<div className='lg:col-span-2 flex flex-col items-center mt-2'>
-					<Button type='submit' color='red' size='lg' className='mt-1'>
-						{t('auth.signin')}
+					<Button
+						type='submit'
+						color='red'
+						size='lg'
+						className='mt-1 flex justify-center items-center gap-2'
+						disabled={loading}
+					>
+						{loading ? 'Creando cuenta...' : t('auth.signUp')}
 					</Button>
 
 					<Typography variant='small' color='gray' className='!mt-4 text-center font-normal'>

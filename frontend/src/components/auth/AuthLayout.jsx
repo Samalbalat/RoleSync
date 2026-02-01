@@ -12,8 +12,15 @@ export const AuthLayout = ({ children }) => {
 	const [tableOpen, setTableOpen] = useState(false);
 
 	return (
-		<div className='flex min-h-screen w-full bg-cover bg-center bg-no-repeat' style={{ backgroundImage: "url('/papire-background.jpg')" }}>
-			<NarrativeDrawer open={narrativeOpen} onClose={() => setNarrativeOpen(false)} openDrawer={() => setNarrativeOpen(true)} />
+		<div
+			className='flex min-h-screen w-full bg-cover bg-center bg-no-repeat'
+			style={{ backgroundImage: "url('/papire-background.jpg')" }}
+		>
+			<NarrativeDrawer
+				open={narrativeOpen}
+				onClose={() => setNarrativeOpen(false)}
+				openDrawer={() => setNarrativeOpen(true)}
+			/>
 
 			<section className='flex-1 flex flex-col p-4 md:p-8'>
 				<div className='w-full flex justify-center mt-4 md:mt-6'>

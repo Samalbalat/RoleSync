@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardBody, Typography, Avatar } from '@material-tailwind/react';
+import { Card, CardBody, Typography } from '@material-tailwind/react';
 import { UserIcon, BookOpenIcon, TableCellsIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../../utils/AuthContext';
-import AuthLayout from '../../components/auth/AuthLayout'; // Usamos tu layout existente
 
 export function ProfileSelectionPage() {
 	const navigate = useNavigate();
@@ -47,32 +46,41 @@ export function ProfileSelectionPage() {
 	};
 
 	return (
-		<div className='min-h-screen bg-gray-100 flex flex-col justify-center items-center p-4'>
-			<Typography variant='h2' color='blue-gray' className='mb-8 text-center'>
-				¿Quién eres hoy?
-			</Typography>
+		<div
+			className='flex min-h-screen w-full bg-cover bg-center bg-no-repeat'
+			style={{ backgroundImage: "url('/papire-background.jpg')" }}
+		>
+			<div className='min-h-screen flex flex-col justify-center items-center p-4'>
+				<div className='w-full flex justify-center mt-4 md:mt-6'>
+					<img src='/logo.png' alt='Logo' className='h-40 md:h-72 w-auto object-contain' />
+				</div>
 
-			<div className='flex flex-wrap gap-6 justify-center max-w-4xl'>
-				{profiles.map((profile, index) => (
-					<Card
-						key={index}
-						className='w-48 h-48 cursor-pointer hover:scale-105 transition-transform hover:shadow-xl border border-gray-200'
-						onClick={() => handleSelectProfile(profile)}
-					>
-						<CardBody className='flex flex-col items-center justify-center h-full gap-4'>
-							<div className='p-4 bg-gray-50 rounded-full'>{getIcon(profile.profileType)}</div>
+				<Typography variant='h2' color='blue-gray' className='mt-8mb-8 text-center'>
+					¿Quién eres hoy?
+				</Typography>
 
-							<div className='text-center'>
-								<Typography variant='h5' color='blue-gray' className='font-bold capitalize'>
-									{profile.profileName}
-								</Typography>
-								<Typography variant='small' color='gray' className='font-normal'>
-									{getLabel(profile.profileType)}
-								</Typography>
-							</div>
-						</CardBody>
-					</Card>
-				))}
+				<div className='flex flex-wrap gap-6 justify-center max-w-4xl'>
+					{profiles.map(profile => (
+						<Card
+							key={`${profile.profileName}-${profile.profileType}`}
+							className='w-48 h-48 cursor-pointer hover:scale-105 transition-transform hover:shadow-xl border border-gray-200'
+							onClick={() => handleSelectProfile(profile)}
+						>
+							<CardBody className='flex flex-col items-center justify-center h-full gap-4'>
+								<div className='p-4 bg-gray-50 rounded-full'>{getIcon(profile.profileType)}</div>
+
+								<div className='text-center'>
+									<Typography variant='h5' color='blue-gray' className='font-bold capitalize'>
+										{profile.profileName}
+									</Typography>
+									<Typography variant='small' color='gray' className='font-normal'>
+										{getLabel(profile.profileType)}
+									</Typography>
+								</div>
+							</CardBody>
+						</Card>
+					))}
+				</div>
 			</div>
 		</div>
 	);

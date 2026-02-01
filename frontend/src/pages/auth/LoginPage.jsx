@@ -1,14 +1,15 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Typography, Input, Button } from '@material-tailwind/react';
 import { EyeSlashIcon, EyeIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
 import AuthLayout from '../../components/auth/AuthLayout';
 import { useAuth } from '../../utils/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 export function LoginPage() {
 	const { t } = useTranslation('global');
-	const { login } = useAuth();
+	const { login, setActiveProfile } = useAuth();
 	const navigate = useNavigate();
 
 	const [email, setEmail] = useState('');
@@ -17,6 +18,28 @@ export function LoginPage() {
 	const [error, setError] = useState(null);
 
 	const togglePasswordVisiblity = () => setPasswordShown(cur => !cur);
+
+	const location = useLocation();
+	const successMessage = location.state?.message;
+	const errorMessage = location.state?.errorMessage;
+	useEffect(() => {
+		if (successMessage) {
+			toast.success(successMessage, {
+				id: 'registro-exito',
+				style: {
+					background: '#333',
+					color: '#fff',
+				},
+			});
+			window.history.replaceState({}, document.title);
+		} else if (errorMessage) {
+			toast.error(errorMessage, {
+				id: 'auth-error',
+				style: { background: '#333', color: '#fff' },
+			});
+			window.history.replaceState({}, document.title);
+		}
+	}, [successMessage, errorMessage]);
 
 	const handleLogin = async e => {
 		e.preventDefault();
@@ -35,15 +58,14 @@ export function LoginPage() {
 				// CASO A: Solo tiene 1 perfil -> Entrar directo (Auto-login)
 				if (profiles.length === 1) {
 					const p = profiles[0];
-					localStorage.setItem(
-						'activeProfile',
-						JSON.stringify({
-							name: p.profileName,
-							type: p.profileType,
-						}),
-					);
+					const profileData = {
+						name: p.profileName,
+						type: p.profileType,
+					};
+					localStorage.setItem('activeProfile', JSON.stringify(profileData));
+					setActiveProfile(profileData);
 
-					navigate('/');
+					navigate('/', { state: { message: t('auth.successLogin') } });
 				}
 
 				// CASO B: Tiene más de 1 perfil -> Selector de perfiles
@@ -52,15 +74,14 @@ export function LoginPage() {
 					navigate('/profile-selection');
 				}
 			} else {
-				// Caso raro: Array vacío o formato inesperado
-				setError('Error: No se encontraron perfiles asociados.');
+				setError(t('auth.errorNoProfilesFound'));
 			}
-		} catch (err) {
-			console.error(err);
-			if (err.response && err.response.status === 401) {
+		} catch (error) {
+			console.error(error);
+			if (error.response?.status === 401) {
 				setError(t('auth.errorInvalidCredentials'));
 			} else {
-				setError('Error de conexión');
+				setError(t('auth.errorConnection'));
 			}
 		}
 	};

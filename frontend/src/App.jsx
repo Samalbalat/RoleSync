@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import MainLayout from './components/layout/MainLayout';
 import HomePage from './pages/HomePage';
 import RegisterPage from './pages/auth/RegisterPage';
@@ -13,6 +14,7 @@ import ProfileSelectionPage from './pages/auth/ProfileSelectionPage';
 function App() {
 	return (
 		<AuthProvider>
+			<Toaster position='top-center' reverseOrder={false} />
 			<BrowserRouter>
 				<Routes>
 					{/* Rutas Públicas */}

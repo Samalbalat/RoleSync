@@ -12,6 +12,7 @@ export const AuthProvider = ({ children }) => {
 	useEffect(() => {
 		const initAuth = async () => {
 			try {
+				// Ver si la cookie del backend es válida
 				await AuthService.checkSession();
 
 				const savedProfile = JSON.parse(localStorage.getItem('activeProfile'));
@@ -25,10 +26,7 @@ export const AuthProvider = ({ children }) => {
 				}
 			} catch (error) {
 				console.log('Error de sesión o no hay usuario:', error);
-				localStorage.removeItem('activeProfile');
-				localStorage.removeItem('accountEmail');
-				setAccount(null);
-				setActiveProfile(null);
+				handleLocalLogout();
 			} finally {
 				setLoading(false);
 			}
@@ -36,14 +34,30 @@ export const AuthProvider = ({ children }) => {
 		initAuth();
 	}, []);
 
+	const handleLocalLogout = () => {
+		localStorage.clear();
+		setAccount(null);
+		setActiveProfile(null);
+	};
+
 	const login = async (email, password) => {
 		const data = await AuthService.login(email, password);
 		setAccount(data);
 		return data;
 	};
 
+	const logout = async () => {
+		try {
+			await AuthService.logout();
+		} catch (error) {
+			console.error('Error al cerrar sesión en servidor (posiblemente ya expiró):', error);
+		} finally {
+			handleLocalLogout();
+		}
+	};
+
 	return (
-		<AuthContext.Provider value={{ account, setAccount, activeProfile, setActiveProfile, login, loading }}>
+		<AuthContext.Provider value={{ account, setAccount, activeProfile, setActiveProfile, login, logout, loading }}>
 			{children}
 		</AuthContext.Provider>
 	);

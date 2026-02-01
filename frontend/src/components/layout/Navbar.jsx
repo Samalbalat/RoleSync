@@ -1,16 +1,19 @@
 import React from 'react';
 import { Navbar as MTNavbar, Button, IconButton, Collapse, Typography } from '@material-tailwind/react';
-import { NavLink } from 'react-router-dom';
+import { UserCircleIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/solid';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { menuItems } from '../../data/menuList';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../utils/AuthContext';
 
 export default function Navbar() {
 	const { t } = useTranslation('global');
+	const navigate = useNavigate();
+	const { activeProfile, logout } = useAuth();
 	const [openNav, setOpenNav] = React.useState(false);
 
 	React.useEffect(() => {
 		const handleResize = () => {
-			// CAMBIO: Ahora usamos 1024px (lg) como límite
 			if (window.innerWidth >= 1024) {
 				setOpenNav(false);
 			}
@@ -19,7 +22,11 @@ export default function Navbar() {
 		return () => window.removeEventListener('resize', handleResize);
 	}, []);
 
-	// Lista del menú (igual que antes)
+	const handleLogout = () => {
+		logout();
+		navigate('/login');
+	};
+
 	const navList = (
 		<ul className='mb-4 mt-2 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6'>
 			{menuItems.map(({ icon, label, path }) => {
@@ -54,11 +61,21 @@ export default function Navbar() {
 
 				{/* BOTONES DESKTOP: Ocultos en móviles y tablets (lg:flex) */}
 				<div className='hidden lg:flex items-center gap-x-2'>
-					<Button variant='text' size='sm' className='text-gray-900'>
-						{t('auth.login')}
+					<Button
+						variant='text'
+						size='sm'
+						className='flex items-center gap-2 text-gray-900 capitalize hover:bg-gray-300/50'
+						onClick={() => navigate('/profile')}
+					>
+						<UserCircleIcon className='h-6 w-6 text-blue-gray-700' />
+						<Typography variant='small' className='font-bold'>
+							{activeProfile?.name || 'Usuario'}
+						</Typography>
 					</Button>
-					<Button variant='gradient' size='sm' color='red'>
-						{t('auth.register')}
+
+					<Button variant='gradient' size='sm' color='red' className='flex items-center gap-2' onClick={handleLogout}>
+						<ArrowRightOnRectangleIcon className='h-4 w-4' />
+						<span className='hidden xl:inline'>{t('auth.logout')}</span>
 					</Button>
 				</div>
 
@@ -70,7 +87,14 @@ export default function Navbar() {
 					onClick={() => setOpenNav(!openNav)}
 				>
 					{openNav ? (
-						<svg xmlns='http://www.w3.org/2000/svg' fill='none' className='h-6 w-6' viewBox='0 0 24 24' stroke='currentColor' strokeWidth={2}>
+						<svg
+							xmlns='http://www.w3.org/2000/svg'
+							fill='none'
+							className='h-6 w-6'
+							viewBox='0 0 24 24'
+							stroke='currentColor'
+							strokeWidth={2}
+						>
 							<path strokeLinecap='round' strokeLinejoin='round' d='M6 18L18 6M6 6l12 12' />
 						</svg>
 					) : (
@@ -86,11 +110,25 @@ export default function Navbar() {
 				<div className='container mx-auto mt-4 pb-2'>
 					{navList}
 					<div className='flex flex-col gap-2 mt-4'>
-						<Button fullWidth variant='outlined' size='sm' color='red'>
-							{t('auth.login')}
+						<Button
+							fullWidth
+							variant='outlined'
+							className='flex items-center justify-center gap-2 border-gray-400 text-gray-900'
+							onClick={() => navigate('/profile')}
+						>
+							<UserCircleIcon className='h-5 w-5' />
+							{activeProfile?.name || 'Perfil'}
 						</Button>
-						<Button fullWidth variant='gradient' size='sm' color='red'>
-							{t('auth.register')}
+
+						<Button
+							fullWidth
+							variant='gradient'
+							color='red'
+							className='flex items-center justify-center gap-2'
+							onClick={handleLogout}
+						>
+							<ArrowRightOnRectangleIcon className='h-4 w-4' />
+							{t('auth.logout')}
 						</Button>
 					</div>
 				</div>

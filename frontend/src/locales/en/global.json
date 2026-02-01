@@ -8,13 +8,21 @@
   },
   "auth": {
     "login": "Login",
-    "signin": "Sign In",
+    "signUp": "Sign Up",
     "logout": "Logout",
     "enterEmailPassword": "Enter your email and password to sign in",
     "notRegistered": "Not registered",
     "createAccount": "Create account",
     "profileTypeNote": "Don't worry: you'll be able to create the other type of profile later with this same account.",
-    "errorInvalidCredentials": "Invalid email or password"
+
+    "errorInvalidCredentials": "Invalid email or password",
+    "errorEmailInUse": "Email is already in use",
+    "errorConnection": "Connection error. Please try again later.",
+    "errorNoProfilesFound": "Error: No associated profiles were found.",
+    "errorNotAuthenticated": "You must be logged in to access this page.",
+    "errorAuthenticated": "You are already logged in.",
+    "successRegistration": "Registration successful! You can now log in.",
+    "successLogin": "Login successful!"
   },
   "account": {
     "name": "Name",
