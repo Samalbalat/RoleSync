@@ -60,7 +60,7 @@ public class ProfileController {
             return ResponseEntity.status(404).body("Profile not found");
         }  
     }
-    /*
+    /**
     * Create a profile for the authenticated user with the given roleType if it does not exist
     *
     * @param authentication The authentication object containing the user's details
