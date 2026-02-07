@@ -4,6 +4,11 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * The Profile class represents a user profile in the RoleSync application.
+ * The profile data is stored in the database and can be retrieved and updated by authenticated users through the ProfileController endpoints.
+ * Each username can have two profiles, one for each profile type (Tabletop and Written), but the profilename must be unique across all profiles.
+ */
 @Entity
 @Table(name = "profiles", uniqueConstraints = {
     @UniqueConstraint(columnNames={"username", "profileType"}), @UniqueConstraint(columnNames = "profilename")

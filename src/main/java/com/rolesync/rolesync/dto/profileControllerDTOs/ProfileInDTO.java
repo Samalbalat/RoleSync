@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ProfilePostInDTO {
+public class ProfileInDTO {
 
     String profileName;
     byte[] image;

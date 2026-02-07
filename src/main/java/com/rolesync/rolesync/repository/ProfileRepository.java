@@ -1,6 +1,8 @@
 package com.rolesync.rolesync.repository;
 
 import com.rolesync.rolesync.model.Profile;
+import com.rolesync.rolesync.model.ProfileType;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,8 +13,8 @@ import java.util.Optional;
 public interface ProfileRepository extends JpaRepository<Profile, Long> {
     Optional<Profile> findByProfilename(String profilename);
     List<Profile> findAllByUsername(String username);
-    Optional<Profile> findByUsernameAndProfileType(String username, String profileType);
-    Boolean existsByUsernameAndProfileType(String username, String profileType);
+    Optional<Profile> findByUsernameAndProfileType(String username, ProfileType profileType);
+    Boolean existsByUsernameAndProfileType(String username, ProfileType profileType);
     Boolean existsByProfilename(String profilename);
 }
 

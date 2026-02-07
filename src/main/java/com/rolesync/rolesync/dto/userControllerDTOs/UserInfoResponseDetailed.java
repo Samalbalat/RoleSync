@@ -1,7 +1,5 @@
-package com.rolesync.rolesync.dto;
+package com.rolesync.rolesync.dto.userControllerDTOs;
 import java.util.List;
-
-import com.rolesync.rolesync.model.Profile;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +10,7 @@ public class UserInfoResponseDetailed {
     Long id;
     String email;
     String timeZone;
-    List<Profile> profiles;
+    List<SimpleProfileDTO> profiles;
 
     public UserInfoResponseDetailed() {
     }

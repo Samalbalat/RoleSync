@@ -1,4 +1,4 @@
-package com.rolesync.rolesync.dto;
+package com.rolesync.rolesync.dto.userControllerDTOs;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
