@@ -9,8 +9,8 @@ import {
 } from '@material-tailwind/react';
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import CampaignForum from '../forum/campaignForum.jsx';
-import CampaignService from '../../services/CampaignService';
+import CampaignForum from '../forum/CampaignForum.jsx';
+import CampaignService from '../../services/CampaignService.js';
 import parseRpgSystem from '../../data/RPGSystem.jsx';
 
 export default function CampaignDetail({ isMobileSize, midSize, user_email }) {

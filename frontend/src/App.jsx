@@ -1,77 +1,46 @@
 import React from 'react';
-import Footer from './components/Footer.jsx';
-import Navbar from './components/Navbar.jsx';
-import ListCampaigns from './components/campaign/ListCampaign.jsx';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Sidebar from './components/Sidebar.jsx';
-import CampaignDetail from './components/campaign/CampaignDetail.jsx';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import MainLayout from './components/layout/MainLayout';
+import HomePage from './pages/HomePage';
+import RegisterPage from './pages/auth/RegisterPage';
+import LoginPage from './pages/auth/LoginPage';
+import AccountSettings from './pages/account/AccountSettings';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import PublicRoute from './components/auth/PublicRoute';
+import { AuthProvider } from './utils/AuthContext';
+import ProfileSelectionPage from './pages/auth/ProfileSelectionPage';
 
 function App() {
-	const [isMobileSize, setisMobileSize] = React.useState(false);
-	const [midSize, setMidSize] = React.useState(false);
-	const user_email = 'gm@example.com'; // Simulación de email de usuario
-	React.useEffect(() => {
-		const handleResize = () => {
-			setisMobileSize(window.innerWidth <= 720);
-			setMidSize(window.innerWidth <= 1150);
-		};
-		handleResize(); // Para establecer el estado inicial correctamente
-		window.addEventListener('resize', handleResize);
-		return () => window.removeEventListener('resize', handleResize);
-	}, []);
-
 	return (
-		<div className='min-h-screen flex flex-col'>
+		<AuthProvider>
+			<Toaster position='top-center' reverseOrder={false} />
 			<BrowserRouter>
-				<Navbar />
+				<Routes>
+					{/* Rutas Públicas */}
+					<Route element={<PublicRoute />}>
+						<Route path='/login' element={<LoginPage />} />
+						<Route path='/register' element={<RegisterPage />} />
+					</Route>
 
-				<div
-					className={`flex flex-1 mx-auto ${!isMobileSize ? 'mt-28' : 'mt-20'}`}
-				>
-					{!isMobileSize && (
-						<div className='fixed ml-6'>
-							<Sidebar />
-						</div>
-					)}
-					<main
-						className={`flex-grow p-6 pt-0 ${!isMobileSize ? 'ml-80' : ''}`}
-					>
-						<Routes>
-							<Route
-								exact
-								path='/'
-								element={
-									<ListCampaigns
-										isMobileSize={isMobileSize}
-										midSize={midSize}
-									/>
-								}
-							/>
-							<Route
-								path='/list_campaigns'
-								element={
-									<ListCampaigns
-										isMobileSize={isMobileSize}
-										midSize={midSize}
-									/>
-								}
-							/>
-							<Route
-								path='/campaign/:id'
-								element={
-									<CampaignDetail
-										isMobileSize={isMobileSize}
-										midSize={midSize}
-										user_email={user_email}
-									/>
-								}
-							/>
-						</Routes>
-					</main>
-				</div>
-				<Footer />
+					{/* Punto intermedio */}
+					<Route element={<ProtectedRoute />}>
+						<Route path='/profile-selection' element={<ProfileSelectionPage />} />
+					</Route>
+
+					{/* Rutas Privadas */}
+					<Route element={<ProtectedRoute />}>
+						<Route path='/' element={<MainLayout />}>
+							<Route index element={<HomePage />} />
+
+							{/* ACCOUNT */}
+							<Route path='account/settings' element={<AccountSettings />} />
+						</Route>
+					</Route>
+					<Route path='*' element={<Navigate to='/' replace />} />
+				</Routes>
 			</BrowserRouter>
-		</div>
+		</AuthProvider>
 	);
 }
 

@@ -1,15 +1,23 @@
-import axios from 'axios';
+import api from '../utils/backendApi';
 
-const BASE_URL = import.meta.env.VITE_BACKEND_API_URL;
-
-class CampaignService {
-
-    getAllCampaigns() {
-        return axios.get(`${BASE_URL}/campaigns`);
+// Función para obtener todas las campañas
+export const getAllCampaigns = async () => {
+    try {
+        const response = await api.get('/campaigns');
+        return response.data; 
+    } catch (error) {
+        console.error("Error al obtener campañas:", error);
+        throw error; 
     }
+};
 
-    getCampaignById(id) {
-        return axios.get(`${BASE_URL}/campaigns/search/${id}`);
+// Función para obtener una campaña por ID
+export const getCampaignById = async (id) => {
+    try {
+        const response = await api.get(`/campaigns/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Error al obtener campaña ${id}:`, error);
+        throw error;
     }
-}
-export default new CampaignService();
+};
