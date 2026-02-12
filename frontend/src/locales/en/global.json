@@ -1,10 +1,8 @@
 {
   "menu": {
-    "dashboard": "Dashboard",
-    "ecommerce": "Store",
-    "inbox": "Inbox",
-    "profile": "My Profile",
-    "settings": "Settings"
+    "findCampaign": "Find Campaign", 
+    "createCampaign": "Create Campaign",
+    "provisional": "Provisional"
   },
   "auth": {
     "login": "Login",
@@ -41,7 +39,8 @@
   "common": {
     "welcome": "Welcome to RoleSync",
     "name": "Name",
-    "image": "Image"
+    "image": "Image",
+    "back": "Back"
   },
   "errors": {
     "required": "This field is required",
@@ -49,5 +48,53 @@
     "passwordLength": "Minimum 8 characters",
     "passwordComplexity": "Must include uppercase, lowercase, number, and symbol (_@$!%*?&-)",
     "passwordMatch": "Passwords do not match"
-  }
+  },
+
+  "campaign": {
+    "fraseFinder": "Find your next ",
+    "adventure": "Adventure",
+    "fraseCreator": "Create your own campaign" ,
+    "cleanFilters": "Clear filters", 
+    "noResultsFound": "No results found.",
+    "name": "Name", 
+    "type": "Type", 
+    "system": "System",
+    "language": "Language",
+    "timeZone": "Time Zone", 
+    "theme": "Theme",
+    "themePlaceholder": "E.g.: Vampires, Sci-Fi...",
+    "location": "Location",
+    "locationPlaceholder": "E.g.: Seville, Online...",
+    "schedule": "Day / Frequency", 
+    "duration": "Duration",
+    "communication": "Communication",
+    "communicationPlaceholder": "E.g.: Discord, Twitter..." ,
+    "detail": {
+      "about": "About the Campaign",
+      "tags": "Tags / Theme",
+      "players": "Players",
+      "spotsLeft": "{{count}} spots left!",
+      "fullMessage": "The game is full",
+      "join": "Request to Join",
+      "joinFull": "Waiting List",
+      "contactGM": "Message the GM",
+      "infoTitle": "Game Details",
+      "communication": "Communication",
+      "lorem": "This is a campaign designed to immerse players in a deep world. Commitment and respect for other players are required. A zero session will be held to define limits and expectations. Get ready for the adventure!"
+    }
+  },
+
+  "status": {
+    "open": "Open",
+    "full": "Full"
+  },
+
+  "filter": { 
+    "filter":"Filter",
+    "searchLabel": "Search by name",
+    "close":"Close",
+    "cleanFilters": "Clear filters",
+    "applyFilters": "Apply Filters"
+    }
+
 }

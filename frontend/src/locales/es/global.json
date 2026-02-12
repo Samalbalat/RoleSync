@@ -1,10 +1,8 @@
 {
   "menu": {
-    "dashboard": "Tablero",
-    "ecommerce": "Tienda",
-    "inbox": "Bandeja de entrada",
-    "profile": "Mi Perfil",
-    "settings": "Ajustes"
+    "findCampaign": "Buscar Campaña", 
+    "createCampaign": "Crear Campaña",
+    "provisional": "Provisional"
   },
   "auth": {
     "login": "Iniciar Sesión",
@@ -40,7 +38,8 @@
   "common": {
     "welcome": "Bienvenido a RoleSync",
     "name": "Nombre",
-    "image": "Imagen"
+    "image": "Imagen",
+    "back": "Volver"
   },
   "errors": {
     "required": "Este campo es obligatorio",
@@ -48,5 +47,53 @@
     "passwordLength": "Mínimo 8 caracteres",
     "passwordComplexity": "Debe incluir mayúscula, minúscula, número y símbolo (@$!%*?&)",
     "passwordMatch": "Las contraseñas no coinciden"
-  }
+  },
+
+"campaign": { 
+    "fraseFinder": "Encuentra tu próxima ", 
+    "adventure": "Aventura", 
+    "fraseCreator": "Crea tu propia campaña" ,
+    "cleanFilters": "Limpiar filtros", 
+    "noResultsFound": "No se encontraron resultados.",
+    "name": "Nombre", 
+    "type": "Tipo", 
+    "system": "Sistema",
+    "language": "Idioma",
+    "timeZone": "Zona Horaria", 
+    "theme": "Temática",
+    "themePlaceholder": "Ej: Vampiros, Sci-Fi...",
+    "location": "Lugar",
+    "locationPlaceholder": "Ej: Sevilla, Online...",
+    "schedule": "Día / Frecuencia", 
+    "duration": "Duración",
+    "communication": "Comunicación",
+    "communicationPlaceholder": "Ej: Discord, Twitter...",
+    "detail": {
+      "about": "Sobre la Campaña",
+      "tags": "Etiquetas / Temática",
+      "players": "Jugadores",
+      "spotsLeft": "¡Quedan {{count}} plazas!",
+      "fullMessage": "La partida está completa",
+      "join": "Solicitar Unirse",
+      "joinFull": "Lista de Espera",
+      "contactGM": "Mensaje al Master",
+      "infoTitle": "Detalles de la Partida",
+      "communication": "Comunicación",
+      "lorem": "Esta es una campaña diseñada para sumergir a los jugadores en un mundo profundo. Se requiere compromiso y respeto por los demás jugadores. La sesión cero se realizará para definir límites y expectativas. ¡Prepárate para la aventura!"
+    }
+  },
+
+  "status": {
+    "open": "Abierta",
+    "full": "Completa"
+  },
+
+  "filter": { 
+    "filter": "Filtrar",
+    "searchLabel": "Buscar por nombre",
+    "close": "Cerrar",
+    "cleanFilters": "Limpiar filtros",
+    "applyFilters": "Aplicar filtros"
+}
+
 }
