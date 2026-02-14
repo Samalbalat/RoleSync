@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.core.Authentication;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.rolesync.rolesync.dto.campaignControllerDTOs.CampaignGetByIdOutDTO;
-import com.rolesync.rolesync.dto.campaignControllerDTOs.CampaignPostInDTO;
-import com.rolesync.rolesync.dto.campaignControllerDTOs.CampaignPutInDTO;
-import com.rolesync.rolesync.dto.campaignControllerDTOs.OwnerProfileDTO;
+import com.rolesync.rolesync.dto.campaigncontroller.CampaignGetByIdOutDTO;
+import com.rolesync.rolesync.dto.campaigncontroller.CampaignPostInDTO;
+import com.rolesync.rolesync.dto.campaigncontroller.CampaignPutInDTO;
+import com.rolesync.rolesync.dto.campaigncontroller.OwnerProfileDTO;
 import com.rolesync.rolesync.model.Campaign;
 import com.rolesync.rolesync.model.CampaignStatus;
 import com.rolesync.rolesync.model.Profile;
@@ -121,7 +121,9 @@ public class CampaignController {
         Profile activeProfile = utilsCalls
                 .getProfileFromAuthentication(authentication, dto.getType().name())
                 .orElseThrow(() -> new IllegalStateException("Active profile not found"));
-
+        if(id == null){
+            return ResponseEntity.badRequest().build();
+        }
         Optional<Campaign> campaignOpt = campaignRepository.findById(id);
         if (campaignOpt.isEmpty()) {
             return ResponseEntity.notFound().build();

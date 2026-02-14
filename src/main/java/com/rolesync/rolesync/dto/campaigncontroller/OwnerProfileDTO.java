@@ -1,4 +1,4 @@
-package com.rolesync.rolesync.dto.campaignControllerDTOs;
+package com.rolesync.rolesync.dto.campaigncontroller;
 
 import lombok.Data;
 

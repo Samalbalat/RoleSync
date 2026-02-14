@@ -1,4 +1,4 @@
-package com.rolesync.rolesync.dto.profileControllerDTOs;
+package com.rolesync.rolesync.dto.profilecontroller;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

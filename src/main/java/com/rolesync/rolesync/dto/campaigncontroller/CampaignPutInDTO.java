@@ -1,15 +1,17 @@
-package com.rolesync.rolesync.dto.campaignControllerDTOs;
+package com.rolesync.rolesync.dto.campaigncontroller;
+
+import com.rolesync.rolesync.model.ProfileType;
 
 import lombok.Data;
 
 @Data
-public class CampaignPostInDTO {
+public class CampaignPutInDTO {
     private String name;
     private String image;
     private String description;
     private String system;
     private String[] themes;
-    private String type;
+    private ProfileType type;
     private Integer maxPlayers;
     private String communication;
     private String timeZone;
@@ -18,4 +20,5 @@ public class CampaignPostInDTO {
     private String frequency;
     private String duration;
     private String location;
+    private String status;
 }

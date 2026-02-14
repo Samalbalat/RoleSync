@@ -11,16 +11,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rolesync.rolesync.dto.usercontroller.SimpleProfileDTO;
+import com.rolesync.rolesync.dto.usercontroller.UserInfoResponseDetailed;
+import com.rolesync.rolesync.dto.usercontroller.UserPutInDTO;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.User;
 import com.rolesync.rolesync.repository.ProfileRepository;
 import com.rolesync.rolesync.repository.UserRepository;
 import com.rolesync.rolesync.security.jwt.JwtUtils;
 import com.rolesync.rolesync.utils.UtilsCalls;
-import com.rolesync.rolesync.dto.userControllerDTOs.UserInfoResponseDetailed;
-
-import com.rolesync.rolesync.dto.userControllerDTOs.SimpleProfileDTO;
-import com.rolesync.rolesync.dto.userControllerDTOs.UserPutInDTO;
 
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
