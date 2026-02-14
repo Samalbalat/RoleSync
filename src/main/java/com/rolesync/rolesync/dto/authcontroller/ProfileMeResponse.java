@@ -1,4 +1,4 @@
-package com.rolesync.rolesync.dto.authControllerDTOs;
+package com.rolesync.rolesync.dto.authcontroller;
 
 import lombok.Data;
 

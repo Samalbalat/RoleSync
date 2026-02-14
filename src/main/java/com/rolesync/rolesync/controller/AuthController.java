@@ -14,9 +14,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import com.rolesync.rolesync.dto.authControllerDTOs.LoginRequest;
-import com.rolesync.rolesync.dto.authControllerDTOs.ProfileMeResponse;
-import com.rolesync.rolesync.dto.authControllerDTOs.SignupRequest;
+import com.rolesync.rolesync.dto.authcontroller.LoginRequest;
+import com.rolesync.rolesync.dto.authcontroller.ProfileMeResponse;
+import com.rolesync.rolesync.dto.authcontroller.SignupRequest;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.User;
 import com.rolesync.rolesync.repository.UserRepository;

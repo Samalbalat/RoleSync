@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.rolesync.rolesync.dto.profileControllerDTOs.ProfileInDTO;
+import com.rolesync.rolesync.dto.profilecontroller.ProfileInDTO;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.ProfileType;
 import com.rolesync.rolesync.repository.ProfileRepository;

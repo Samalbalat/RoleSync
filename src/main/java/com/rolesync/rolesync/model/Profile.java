@@ -23,6 +23,8 @@ public class Profile {
     private String username;
     private String profilename;
     private String description;
+    
+    @Enumerated(EnumType.STRING)
     private ProfileType profileType;
 
     @Lob

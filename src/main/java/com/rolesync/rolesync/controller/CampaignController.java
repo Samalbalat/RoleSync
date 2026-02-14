@@ -1,0 +1,229 @@
+package com.rolesync.rolesync.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.rolesync.rolesync.dto.campaigncontroller.CampaignGetByIdOutDTO;
+import com.rolesync.rolesync.dto.campaigncontroller.CampaignPostInDTO;
+import com.rolesync.rolesync.dto.campaigncontroller.CampaignPutInDTO;
+import com.rolesync.rolesync.dto.campaigncontroller.OwnerProfileDTO;
+import com.rolesync.rolesync.model.Campaign;
+import com.rolesync.rolesync.model.CampaignStatus;
+import com.rolesync.rolesync.model.Profile;
+import com.rolesync.rolesync.model.ProfileType;
+import com.rolesync.rolesync.model.QCampaign;
+import com.rolesync.rolesync.repository.CampaignRepository;
+import com.rolesync.rolesync.repository.ProfileRepository;
+import com.rolesync.rolesync.utils.UtilsCalls;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+
+@RestController
+@RequestMapping("/campaigns")
+public class CampaignController {
+
+    private final CampaignRepository campaignRepository;
+    private final ProfileRepository profileRepository;
+    private final UtilsCalls utilsCalls;
+    private static final QCampaign Q = QCampaign.campaign;
+
+    public CampaignController(
+            CampaignRepository campaignRepository,
+            UtilsCalls utilsCalls,
+            ProfileRepository profileRepository) 
+    {
+        this.campaignRepository = campaignRepository;
+        this.utilsCalls = utilsCalls;
+        this.profileRepository = profileRepository;
+    }
+
+    // ---------- FILTERED GET ----------
+
+    @GetMapping
+    public ResponseEntity<List<Campaign>> getCampaigns(
+            @RequestParam ProfileType type,
+            @RequestParam(required = false) String system,
+            @RequestParam(required = false) String location) 
+    {
+        BooleanExpression predicate = Q.campaignType.eq(type);
+
+        if (system != null && !system.isBlank()) {
+            predicate = predicate.and(Q.system.containsIgnoreCase(system));
+        }
+
+        if (location != null && !location.isBlank()) {
+            predicate = predicate.and(Q.location.containsIgnoreCase(location));
+        }
+
+        return ResponseEntity.ok(
+                (List<Campaign>) campaignRepository.findAll(predicate)
+        );
+    }
+
+    // ---------- DETAIL ----------
+    @GetMapping("/{id}")
+    public ResponseEntity<CampaignGetByIdOutDTO> getCampaign(
+        Authentication authentication,
+        @PathVariable Long id)
+    {   if(id == null){
+            return ResponseEntity.badRequest().build();
+        }
+        Campaign campaign = campaignRepository.findById(id).get();
+        if(campaign != null){
+            CampaignGetByIdOutDTO response = new CampaignGetByIdOutDTO();
+            formFindByIdResponse(campaign, response);
+            response.setUserRelation(utilsCalls.getUserRelationToCampaign(authentication, campaign));
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    // ---------- POST ----------
+
+    @PostMapping
+    public ResponseEntity<String> createCampaign(
+            Authentication authentication,
+            @RequestBody CampaignPostInDTO dto) 
+    {
+        Campaign campaign = new Campaign();
+        Profile activeProfile = utilsCalls
+                .getProfileFromAuthentication(authentication, dto.getType())
+                .orElseThrow(() -> new IllegalStateException("Active profile not found"));
+        campaign.setOwnerName(activeProfile.getProfilename());
+        createCampaignFromPostInDto(dto, campaign);
+        campaignRepository.save(campaign);
+        return ResponseEntity.ok("Campaign created");
+    }
+
+    // ---------- PUT ----------
+
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateCampaign(
+            Authentication authentication,
+            @PathVariable Long id,
+            @RequestBody CampaignPutInDTO dto) 
+    {
+        Profile activeProfile = utilsCalls
+                .getProfileFromAuthentication(authentication, dto.getType().name())
+                .orElseThrow(() -> new IllegalStateException("Active profile not found"));
+        if(id == null){
+            return ResponseEntity.badRequest().build();
+        }
+        Optional<Campaign> campaignOpt = campaignRepository.findById(id);
+        if (campaignOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Campaign campaign = campaignOpt.get();
+        if (!campaign.getOwnerName().equals(activeProfile.getProfilename())) {
+            return ResponseEntity.status(403).body("User is not the campaign owner");
+        }
+
+        applyUpdates(campaign, dto);
+        campaignRepository.save(campaign);
+
+        return ResponseEntity.ok("Campaign updated");
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteCampaign(
+            Authentication authentication,
+            @PathVariable Long id) 
+    {
+        Optional<Campaign> campaignOpt = campaignRepository.findById(id);
+        if (campaignOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Campaign campaign = campaignOpt.get();
+
+        Profile activeProfile = utilsCalls
+                .getProfileFromAuthentication(authentication, campaign.getCampaignType().name())
+                .orElseThrow(() -> new IllegalStateException("Active profile not found"));
+
+        if (!campaign.getOwnerName().equals(activeProfile.getProfilename())) {
+            return ResponseEntity.status(403).body("User is not the campaign owner");
+        }
+
+        campaignRepository.delete(campaign);
+        return ResponseEntity.ok("Campaign deleted");
+    }
+
+    // ---------- Helpers ----------
+
+    private void applyUpdates(Campaign campaign, CampaignPutInDTO dto)
+    {
+        campaign.setName(dto.getName());
+        campaign.setImage(dto.getImage());
+        campaign.setDescription(dto.getDescription());
+        campaign.setSystem(dto.getSystem());
+        campaign.setThemes(dto.getThemes());
+        campaign.setMaxPlayers(dto.getMaxPlayers());
+        campaign.setCommunication(dto.getCommunication());
+        campaign.setLanguage(dto.getLanguage());
+        campaign.setDayWeek(dto.getDayWeek());
+        campaign.setFrequency(dto.getFrequency());
+        campaign.setDuration(dto.getDuration());
+        campaign.setLocation(dto.getLocation());
+        campaign.setTimeZone(dto.getTimeZone());
+        campaign.setStatus(CampaignStatus.valueOf(dto.getStatus().toUpperCase()));
+    }
+
+    private void formFindByIdResponse(Campaign campaign, CampaignGetByIdOutDTO dto)
+    {
+        dto.setId(campaign.getId().toString());
+        dto.setName(campaign.getName());
+        dto.setDescription(campaign.getDescription());
+        dto.setSystem(campaign.getSystem());
+        dto.setThemes(campaign.getThemes());
+        dto.setLanguage(campaign.getLanguage());
+        dto.setTimeZone(campaign.getTimeZone());
+        dto.setDayWeek(campaign.getDayWeek());
+        dto.setDuration(campaign.getDuration());
+        dto.setLocation(campaign.getLocation());
+        dto.setImage(campaign.getImage());
+        dto.setStatus(campaign.getStatus().name());
+        dto.setType(campaign.getCampaignType().name());
+
+        OwnerProfileDTO owner = new OwnerProfileDTO();
+        profileRepository.findByProfilename(campaign.getOwnerName()).ifPresent(p -> {
+            owner.setProfileName(p.getProfilename());
+            owner.setProfileImage(p.getImage());
+        });
+
+        dto.setOwner(owner);
+    }
+
+    private void createCampaignFromPostInDto(CampaignPostInDTO dto, Campaign campaign)
+    {
+        campaign.setName(dto.getName());
+        campaign.setImage(dto.getImage());
+        campaign.setDescription(dto.getDescription());
+        campaign.setSystem(dto.getSystem());
+        campaign.setThemes(dto.getThemes());
+        campaign.setMaxPlayers(dto.getMaxPlayers());
+        campaign.setCommunication(dto.getCommunication());
+        campaign.setLanguage(dto.getLanguage());
+        campaign.setDayWeek(dto.getDayWeek());
+        campaign.setFrequency(dto.getFrequency());
+        campaign.setDuration(dto.getDuration());
+        campaign.setLocation(dto.getLocation());
+        campaign.setTimeZone(dto.getTimeZone());
+        campaign.setMembers(new ArrayList<>());
+        campaign.setCampaignType(ProfileType.valueOf(dto.getType()));
+        campaign.setStatus(CampaignStatus.OPEN);
+    }
+}

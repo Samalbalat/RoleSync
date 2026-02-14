@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import com.rolesync.rolesync.model.Campaign;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.ProfileType;
 import com.rolesync.rolesync.model.User;
@@ -29,5 +30,18 @@ public class UtilsCalls {
         String username = authentication.getName();
         Optional<User> user = userRepository.findByEmail(username);
         return user;
+    }
+
+    public String getUserRelationToCampaign(Authentication authentication, Campaign campaign) {
+        Optional<Profile> profileOpt = getProfileFromAuthentication(authentication, campaign.getCampaignType().name());
+        if (profileOpt.isPresent()) {
+            Profile profile = profileOpt.get();
+            if (profile.getProfilename().equals(campaign.getOwnerName())) {
+                return "OWNER";
+            } else if(campaign.getMembers()!=null && campaign.getMembers().contains(profile.getProfilename())) {
+                return "MEMBER";
+            }
+        }
+        return "NONE";
     }
 }
