@@ -9,12 +9,14 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Campaign {
 
     @Id
@@ -55,24 +57,4 @@ public class Campaign {
     private String frequency;
     private String duration;
     private String location;
-
-    public Campaign(String ownerName, List<String> members, String name, String image, String description, String system, String[] themes, String campaignType, String status, Integer maxPlayers, String communication, String language, String dayWeek, String timeZone, String frequency, String duration, String location) {
-        this.ownerName = ownerName;
-        this.members = members;
-        this.name = name;
-        this.image = image;
-        this.description = description;
-        this.system = system;
-        this.themes = themes;
-        this.campaignType = ProfileType.valueOf(campaignType);
-        this.status = CampaignStatus.valueOf(status);
-        this.maxPlayers = maxPlayers;
-        this.communication = communication;
-        this.language = language;
-        this.timeZone = timeZone;
-        this.dayWeek = dayWeek;
-        this.frequency = frequency;
-        this.duration = duration;
-        this.location = location;
-    }
 }

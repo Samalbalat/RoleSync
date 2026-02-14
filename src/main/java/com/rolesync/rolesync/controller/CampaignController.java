@@ -222,7 +222,6 @@ public class CampaignController {
         campaign.setDuration(dto.getDuration());
         campaign.setLocation(dto.getLocation());
         campaign.setTimeZone(dto.getTimeZone());
-        
         campaign.setMembers(new ArrayList<>());
         campaign.setCampaignType(ProfileType.valueOf(dto.getType()));
         campaign.setStatus(CampaignStatus.OPEN);
