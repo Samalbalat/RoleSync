@@ -1,31 +1,81 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react'; // Añadimos useState y useEffect
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Card, CardBody, Typography, Chip, Avatar, Progress } from '@material-tailwind/react';
 import {
 	ArrowLeftIcon,
 	CalendarDaysIcon,
-	GlobeAltIcon,
-	ComputerDesktopIcon,
 	ClockIcon,
 	BookOpenIcon,
-	UserGroupIcon,
+	LanguageIcon,
+	GlobeAmericasIcon,
+	ChatBubbleLeftRightIcon,
+	MapPinIcon,
+	ShieldExclamationIcon,
 } from '@heroicons/react/24/outline';
 import { useTranslation } from 'react-i18next';
-import { mockCampaigns } from '../../data/mockCampaigns'; // Tus datos de ejemplo
+import { mockCampaigns } from '../../data/mockCampaigns';
 
+// --- COMPONENTE AUXILIAR (InfoRow) ---
+const InfoRow = ({ icon: IconComponent, color, title, value }) => {
+	if (!value) return null;
+
+	const colorClasses = {
+		blue: 'bg-blue-50 text-blue-600',
+		indigo: 'bg-indigo-50 text-indigo-600',
+		green: 'bg-green-50 text-green-600',
+		purple: 'bg-purple-50 text-purple-600',
+		teal: 'bg-teal-50 text-teal-600',
+		orange: 'bg-orange-50 text-orange-600',
+		pink: 'bg-pink-50 text-pink-600',
+		gray: 'bg-gray-100 text-gray-600',
+	};
+
+	return (
+		<div className='p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors'>
+			<div className={`p-2 rounded-lg ${colorClasses[color] || colorClasses.gray}`}>
+				<IconComponent className='h-6 w-6' />
+			</div>
+			<div>
+				<Typography variant='small' className='font-bold text-gray-900'>
+					{title}
+				</Typography>
+				<Typography variant='small' className='text-gray-600 font-medium'>
+					{value}
+				</Typography>
+			</div>
+		</div>
+	);
+};
+
+// --- COMPONENTE PRINCIPAL ---
 export default function CampaignDetailPage() {
 	const { t } = useTranslation('global');
 	const { id } = useParams();
 	const navigate = useNavigate();
 
-	// 1. Buscamos la campaña por ID
+	const [userProfile, setUserProfile] = useState(null);
+
+	useEffect(() => {
+		const storedProfile = localStorage.getItem('activeProfile');
+		if (storedProfile) {
+			try {
+				const parsedProfile = JSON.parse(storedProfile);
+				setUserProfile(parsedProfile);
+			} catch (error) {
+				console.error('Error al leer el perfil:', error);
+			}
+		}
+	}, []);
+
 	const campaign = mockCampaigns.find(c => c.id === Number(id));
 
-	// Si no existe (alguien puso una URL rara), mostramos error o volvemos
+	// Si no existe la campaña
 	if (!campaign) {
 		return (
-			<div className='flex flex-col items-center justify-center h-screen'>
-				<Typography variant='h4'>{t('campaign.noResultsFound')}</Typography>
+			<div className='flex flex-col items-center justify-center h-screen animate-fade-in'>
+				<Typography variant='h4' color='blue-gray'>
+					{t('campaign.noResultsFound')}
+				</Typography>
 				<Button className='mt-4' onClick={() => navigate('/campaigns')}>
 					{t('common.back')}
 				</Button>
@@ -33,15 +83,32 @@ export default function CampaignDetailPage() {
 		);
 	}
 
-	// Lógica visual
+	// 2. COMPROBACIÓN DE SEGURIDAD
+
+	if (userProfile && campaign.type !== userProfile.type) {
+		return (
+			<div className='flex flex-col items-center justify-center h-[60vh] text-center px-4 animate-fade-in'>
+				<div className='p-6 bg-red-50 rounded-full mb-4'>
+					<ShieldExclamationIcon className='h-16 w-16 text-red-500' />
+				</div>
+				<Typography variant='h3' color='blue-gray' className='mb-2'>
+					{t('auth.accessDenied')}
+				</Typography>
+				<Typography className='text-gray-600 max-w-md mb-8'>{t('campaign.accessDeniedMessage')}</Typography>
+				<Button color='gray' variant='outlined' onClick={() => navigate('/campaigns')}>
+					{t('common.back')}
+				</Button>
+			</div>
+		);
+	}
+
 	const isWritten = campaign.type === 'WRITTEN';
-	const themeColor = isWritten ? 'indigo' : 'deep-orange'; // O el color que uses en tu tema
+	const themeColor = isWritten ? 'indigo' : 'deep-orange';
 	const progress = (campaign.currentPlayers / campaign.maxPlayers) * 100;
 	const isFull = campaign.currentPlayers >= campaign.maxPlayers;
 
 	return (
 		<div className='max-w-7xl mx-auto px-4 py-8 animate-fade-in'>
-			{/* BOTÓN VOLVER */}
 			<Button
 				variant='text'
 				className='flex items-center gap-2 mb-6 pl-0 hover:bg-transparent text-gray-600 hover:text-gray-900'
@@ -51,9 +118,8 @@ export default function CampaignDetailPage() {
 			</Button>
 
 			<div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
-				{/* --- COLUMNA IZQUIERDA (Principal) --- */}
+				{/* --- COLUMNA IZQUIERDA --- */}
 				<div className='lg:col-span-2 space-y-8'>
-					{/* 1. Imagen y Título */}
 					<div className='relative rounded-2xl overflow-hidden shadow-lg h-[300px] md:h-[400px]'>
 						<img src={campaign.image} alt={campaign.name} className='w-full h-full object-cover' />
 						<div className='absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 md:p-8'>
@@ -64,6 +130,13 @@ export default function CampaignDetailPage() {
 									className='rounded-full'
 									size='sm'
 								/>
+								<Chip
+									value={campaign.type}
+									color={isWritten ? 'indigo' : 'orange'}
+									className='rounded-full border-none bg-white/20 text-white'
+									size='sm'
+									variant='filled'
+								/>
 							</div>
 							<Typography variant='h2' color='white' className='font-bold text-3xl md:text-4xl'>
 								{campaign.name}
@@ -71,7 +144,6 @@ export default function CampaignDetailPage() {
 						</div>
 					</div>
 
-					{/* 2. Descripción */}
 					<Card className='shadow-sm border border-gray-200'>
 						<CardBody className='p-6 md:p-8'>
 							<Typography variant='h5' color='blue-gray' className='mb-4 font-bold flex items-center gap-2'>
@@ -80,8 +152,6 @@ export default function CampaignDetailPage() {
 							</Typography>
 							<Typography className='text-gray-600 text-lg leading-relaxed whitespace-pre-line'>
 								{campaign.description}
-
-								<br />
 							</Typography>
 
 							<div className='mt-8'>
@@ -103,9 +173,8 @@ export default function CampaignDetailPage() {
 					</Card>
 				</div>
 
-				{/* --- COLUMNA DERECHA (Sidebar) --- */}
+				{/* --- COLUMNA DERECHA --- */}
 				<div className='space-y-6'>
-					{/* 1. Detalles Técnicos (Info Grid) */}
 					<Card className='shadow-sm border border-gray-200'>
 						<CardBody className='p-0'>
 							<div className='p-4 border-b border-gray-100'>
@@ -113,92 +182,49 @@ export default function CampaignDetailPage() {
 									{t('campaign.detail.infoTitle')}
 								</Typography>
 							</div>
+
 							<div className='divide-y divide-gray-100'>
-								{/* Idioma */}
-								<div className='p-4 flex items-center gap-4'>
-									<div className='p-2 bg-blue-50 text-blue-600 rounded-lg'>
-										<GlobeAltIcon className='h-6 w-6' />
-									</div>
-									<div>
-										<Typography variant='small' className='font-bold text-gray-900'>
-											{t('campaign.language')}
-										</Typography>
-										<Typography variant='small' className='text-gray-600'>
-											{campaign.language}
-										</Typography>
-									</div>
-								</div>
+								<InfoRow icon={LanguageIcon} color='blue' title={t('campaign.language')} value={campaign.language} />
+								<InfoRow
+									icon={GlobeAmericasIcon}
+									color='indigo'
+									title={t('campaign.timeZone') || 'Zona Horaria'}
+									value={campaign.timeZone}
+								/>
+								<InfoRow
+									icon={ChatBubbleLeftRightIcon}
+									color='green'
+									title={t('campaign.communication')}
+									value={campaign.communication}
+								/>
 
-								{/* Sistema (Solo si existe) */}
-								{campaign.system && (
-									<div className='p-4 flex items-center gap-4'>
-										<div className='p-2 bg-purple-50 text-purple-600 rounded-lg'>
-											<BookOpenIcon className='h-6 w-6' />
-										</div>
-										<div>
-											<Typography variant='small' className='font-bold text-gray-900'>
-												{t('campaign.system')}
-											</Typography>
-											<Typography variant='small' className='text-gray-600'>
-												{campaign.system}
-											</Typography>
-										</div>
-									</div>
-								)}
-
-								{/* Plataforma */}
-								<div className='p-4 flex items-center gap-4'>
-									<div className='p-2 bg-green-50 text-green-600 rounded-lg'>
-										<ComputerDesktopIcon className='h-6 w-6' />
-									</div>
-									<div>
-										<Typography variant='small' className='font-bold text-gray-900'>
-											{isWritten ? t('campaign.communication') : t('campaign.platform')}
-										</Typography>
-										<Typography variant='small' className='text-gray-600'>
-											{campaign.location || campaign.communication || 'N/A'}
-										</Typography>
-									</div>
-								</div>
-
-								{/* Horario (Solo Tabletop) */}
-								{!isWritten && campaign.schedule && (
-									<div className='p-4 flex items-center gap-4'>
-										<div className='p-2 bg-orange-50 text-orange-600 rounded-lg'>
-											<CalendarDaysIcon className='h-6 w-6' />
-										</div>
-										<div>
-											<Typography variant='small' className='font-bold text-gray-900'>
-												{t('campaign.schedule')}
-											</Typography>
-											<Typography variant='small' className='text-gray-600'>
-												{campaign.schedule}
-											</Typography>
-										</div>
-									</div>
-								)}
-
-								{/* Duración */}
-								{campaign.duration && (
-									<div className='p-4 flex items-center gap-4'>
-										<div className='p-2 bg-pink-50 text-pink-600 rounded-lg'>
-											<ClockIcon className='h-6 w-6' />
-										</div>
-										<div>
-											<Typography variant='small' className='font-bold text-gray-900'>
-												{t('campaign.duration')}
-											</Typography>
-											<Typography variant='small' className='text-gray-600'>
-												{campaign.duration}
-											</Typography>
-										</div>
-									</div>
+								{!isWritten && (
+									<>
+										<InfoRow icon={BookOpenIcon} color='purple' title={t('campaign.system')} value={campaign.system} />
+										<InfoRow
+											icon={MapPinIcon}
+											color='teal'
+											title={t('campaign.location') || t('campaign.platform')}
+											value={campaign.location}
+										/>
+										<InfoRow
+											icon={CalendarDaysIcon}
+											color='orange'
+											title={t('campaign.schedule')}
+											value={campaign.schedule}
+										/>
+										<InfoRow
+											icon={ClockIcon}
+											color='pink'
+											title={t('campaign.duration')}
+											value={campaign.duration ? `${campaign.duration}` : null}
+										/>
+									</>
 								)}
 							</div>
 						</CardBody>
 					</Card>
 
-					{/* 2. Tarjeta del Master */}
 					<Card className='shadow-sm border border-gray-200 bg-gray-50'>
 						<CardBody className='flex items-center gap-4 p-4'>
 							<Avatar
@@ -218,7 +244,6 @@ export default function CampaignDetailPage() {
 						</CardBody>
 					</Card>
 
-					{/* 3. Tarjeta de Acción y Plazas */}
 					<Card className='shadow-lg border border-gray-100 sticky top-4'>
 						<CardBody className='p-6'>
 							<div className='mb-6'>

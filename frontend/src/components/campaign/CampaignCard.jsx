@@ -12,7 +12,6 @@ export default function CampaignCard({ campana, theme }) {
 			className='w-full overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer group border border-gray-100'
 			onClick={() => navigate(`/campaign/${campana.id}`)}
 		>
-			{/* --- IMAGEN DE PORTADA --- */}
 			<div className='relative h-48 overflow-hidden'>
 				<img
 					src={campana.image}
@@ -21,7 +20,6 @@ export default function CampaignCard({ campana, theme }) {
 				/>
 				<div className='absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60' />
 
-				{/* Chip Estado (Arriba Derecha) */}
 				<div className='absolute top-3 right-3'>
 					<Chip
 						size='sm'
@@ -31,7 +29,6 @@ export default function CampaignCard({ campana, theme }) {
 					/>
 				</div>
 
-				{/* Chip Sistema (Abajo Izquierda) */}
 				<div className='absolute bottom-3 left-3'>
 					<Chip
 						size='sm'
@@ -43,15 +40,12 @@ export default function CampaignCard({ campana, theme }) {
 			</div>
 
 			<CardBody className='p-5'>
-				{/* Título */}
 				<Typography variant='h5' className={`mb-2 font-bold ${theme.textPrimary} line-clamp-1`}>
 					{campana.name}
 				</Typography>
 
-				{/* --- AQUÍ FALTABA ESTO: LOS TAGS DE TEMÁTICA --- */}
 				<div className='flex flex-wrap gap-1 mb-3'>
 					{Array.isArray(campana.theme) ? (
-						// Si es un Array, mostramos hasta 3 etiquetas
 						campana.theme.slice(0, 3).map((tag, index) => (
 							<span
 								key={index}
@@ -61,13 +55,11 @@ export default function CampaignCard({ campana, theme }) {
 							</span>
 						))
 					) : (
-						// Fallback si viene como texto simple
 						<span className='text-xs text-gray-500 font-medium bg-gray-100 px-2 py-0.5 rounded'>{campana.theme}</span>
 					)}
 				</div>
 				{/* ----------------------------------------------- */}
 
-				{/* Info Grid (Iconos abajo) */}
 				<div className='flex items-center justify-between pt-2 border-t border-gray-100'>
 					<Tooltip content='Jugadores actuales / Máximos'>
 						<div className='flex items-center gap-1.5 text-gray-600 font-medium text-xs'>

@@ -23,14 +23,12 @@ export default function CampaignFilterBar({ filters, setFilters, onClean, theme 
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	}, [containerRef]);
 
-	// Configuración para los desplegables internos
 	const fixedMenuProps = {
 		placement: 'bottom',
 		className: 'max-h-[300px] overflow-y-auto',
 	};
 
 	return (
-		// Usamos 'relative' aquí para que el absoluto se posicione respecto a esta barra
 		<div className='w-full mb-8 relative z-30' ref={containerRef}>
 			{/* 1. BARRA SUPERIOR (Buscador) */}
 			<div className='bg-white p-2 md:p-6 rounded-xl shadow-sm border border-gray-100 flex gap-2 md:gap-4 items-center relative z-20'>
@@ -63,7 +61,7 @@ export default function CampaignFilterBar({ filters, setFilters, onClean, theme 
 			</div>
 
 			{/* 2. PANEL FLOTANTE (OVERLAY) */}
-			{/* Renderizado condicional simple. Sin Collapse. */}
+
 			{openFilters && (
 				<div className='absolute top-full left-0 w-full mt-2 bg-white p-6 rounded-xl shadow-2xl border border-gray-100 z-50 animate-fade-in-down'>
 					<div className='flex justify-between items-center mb-4'>

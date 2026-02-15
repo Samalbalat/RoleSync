@@ -1,4 +1,19 @@
 {
+  "home": {
+    "masterCampaigns": {
+      "title": "🛡️ Campaigns You Lead",
+      "subtitle": "Active campaigns under your control.",
+      "emptyMessage": "You don't have any active campaigns currently.",
+      "createButton": "Create New Campaign"
+    },
+    "playerCampaigns": {
+      "title": "⚔️ Your Adventures (Player)",
+      "subtitle": "Worlds you're currently exploring.",
+      "emptyMessage": "You're not playing in any active tables.",
+      "findButton": "Find in the Tavern"
+    }
+  },
+  
   "menu": {
     "findCampaign": "Find Campaign", 
     "createCampaign": "Create Campaign",
@@ -12,7 +27,7 @@
     "notRegistered": "Not registered",
     "createAccount": "Create account",
     "profileTypeNote": "Don't worry: you'll be able to create the other type of profile later with this same account.",
-
+    "accessDenied": "Access Denied",
     "errorInvalidCredentials": "Invalid email or password",
     "errorEmailInUse": "Email is already in use",
     "errorConnection": "Connection error. Please try again later.",
@@ -69,6 +84,7 @@
     "duration": "Duration",
     "communication": "Communication",
     "communicationPlaceholder": "E.g.: Discord, Twitter..." ,
+    "accessDeniedMessage": "You are not authorized to view this campaign.",
     "detail": {
       "about": "About the Campaign",
       "tags": "Tags / Theme",

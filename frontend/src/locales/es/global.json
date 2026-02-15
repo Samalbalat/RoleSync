@@ -1,4 +1,18 @@
 {
+  "home": {
+    "masterCampaigns": {
+      "title": "🛡️ Partidas que Diriges",
+      "subtitle": "Campañas activas bajo tu control.",
+      "emptyMessage": "No tienes campañas activas en curso.",
+      "createButton": "Crear Nueva Campaña"
+    },
+    "playerCampaigns": {
+      "title": "⚔️ Tus Aventuras (Jugador)",
+      "subtitle": "Mundos que estás explorando actualmente.",
+      "emptyMessage": "No estás jugando en ninguna mesa activa.",
+      "findButton": "Buscar en la Taberna"
+    }
+  },
   "menu": {
     "findCampaign": "Buscar Campaña", 
     "createCampaign": "Crear Campaña",
@@ -12,6 +26,7 @@
     "notRegistered": "No está registrado",
     "createAccount": "Crear cuenta",
     "profileTypeNote": "No te preocupes: podrás crear un perfil del otro tipo más tarde con esta misma cuenta.",
+    "accessDenied": "Acceso Denegado",
     "errorInvalidCredentials": "Correo electrónico o contraseña inválidos",
     "errorEmailInUse": "El email ya está en uso",
     "errorConnection": "Error de conexión. Por favor, inténtelo de nuevo más tarde.",
@@ -68,6 +83,7 @@
     "duration": "Duración",
     "communication": "Comunicación",
     "communicationPlaceholder": "Ej: Discord, Twitter...",
+    "accessDeniedMessage": "No estás autorizado para ver esta campaña.",
     "detail": {
       "about": "Sobre la Campaña",
       "tags": "Etiquetas / Temática",
