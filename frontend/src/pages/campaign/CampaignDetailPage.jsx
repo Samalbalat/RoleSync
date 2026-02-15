@@ -15,22 +15,21 @@ import {
 import { useTranslation } from 'react-i18next';
 import { mockCampaigns } from '../../data/mockCampaigns';
 
-// --- COMPONENTE AUXILIAR (InfoRow) ---
 const InfoRow = ({ icon: IconComponent, color, title, value }) => {
 	if (!value) return null;
 
-	const colorClasses = {
-		blue: 'bg-blue-50 text-blue-600',
-		indigo: 'bg-indigo-50 text-indigo-600',
-		green: 'bg-green-50 text-green-600',
-		purple: 'bg-purple-50 text-purple-600',
-		teal: 'bg-teal-50 text-teal-600',
-		orange: 'bg-orange-50 text-orange-600',
-		pink: 'bg-pink-50 text-pink-600',
-		gray: 'bg-gray-100 text-gray-600',
-	};
+	const colorMap = new Map([
+		['blue', 'bg-blue-50 text-blue-600'],
+		['indigo', 'bg-indigo-50 text-indigo-600'],
+		['green', 'bg-green-50 text-green-600'],
+		['purple', 'bg-purple-50 text-purple-600'],
+		['teal', 'bg-teal-50 text-teal-600'],
+		['orange', 'bg-orange-50 text-orange-600'],
+		['pink', 'bg-pink-50 text-pink-600'],
+		['gray', 'bg-gray-100 text-gray-600'],
+	]);
 
-	const activeClass = Object.hasOwn.hasOwnProperty.call(colorClasses, color) ? colorClasses[color] : colorClasses.gray;
+	const activeClass = colorMap.get(color) || 'bg-gray-100 text-gray-600';
 
 	return (
 		<div className='p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors'>

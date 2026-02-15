@@ -22,14 +22,15 @@ export const getTheme = () => {
             buttonColor: 'indigo',
             badge: 'purple'
         };
-    } else {
-        return {
-            primary: 'red', // Rojo para mesa (D&D vibes)
-            secondary: 'orange',
-            bgLight: 'bg-red-50',
-            textPrimary: 'text-red-900',
-            buttonColor: 'red',
-            badge: 'red'
-        };
-    }
+    } 
+    
+    return {
+        primary: 'red', // Rojo para mesa (D&D vibes)
+        secondary: 'orange',
+        bgLight: 'bg-red-50',
+        textPrimary: 'text-red-900',
+        buttonColor: 'red',
+        badge: 'red'
+    };
+    
 };
