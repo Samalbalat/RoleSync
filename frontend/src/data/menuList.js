@@ -1,4 +1,4 @@
-import { DocumentMagnifyingGlassIcon, PencilSquareIcon, UserCircleIcon, Cog6ToothIcon, InboxIcon } from '@heroicons/react/24/solid';
+import { DocumentMagnifyingGlassIcon, PencilSquareIcon, InboxIcon } from '@heroicons/react/24/solid';
 
 export const menuItems = [
 	{

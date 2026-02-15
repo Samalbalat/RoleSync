@@ -30,9 +30,11 @@ const InfoRow = ({ icon: IconComponent, color, title, value }) => {
 		gray: 'bg-gray-100 text-gray-600',
 	};
 
+	const activeClass = Object.hasOwn.hasOwnProperty.call(colorClasses, color) ? colorClasses[color] : colorClasses.gray;
+
 	return (
 		<div className='p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors'>
-			<div className={`p-2 rounded-lg ${colorClasses[color] || colorClasses.gray}`}>
+			<div className={`p-2 rounded-lg ${activeClass}`}>
 				<IconComponent className='h-6 w-6' />
 			</div>
 			<div>

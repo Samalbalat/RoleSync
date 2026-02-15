@@ -1,76 +1,54 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Typography, Spinner, Button } from '@material-tailwind/react';
-import { getTheme } from '../../utils/themeUtils'; // Importa nuestra utilidad
+import { getTheme } from '../../utils/themeUtils';
 import { useTranslation } from 'react-i18next';
-import { mockCampaigns } from '../../data/mockCampaigns'; // Tus datos
+import { mockCampaigns } from '../../data/mockCampaigns';
 import CampaignFilterBar from '../../components/campaign/CampaignFilterBar';
 import CampaignCard from '../../components/campaign/CampaignCard';
 
-export default function FindCampaignPage() {
-	const { t } = useTranslation('global');
-	const theme = getTheme();
+// --- 1. HELPERS ---
+// Al estar fuera, no cuentan para la complejidad del componente principal
 
-	const [campaigns, setCampaigns] = useState([]);
-	const [loading, setLoading] = useState(true);
-	const [filters, setFilters] = useState({ name: '', type: '', system: '' });
+const checkText = (field, value) => {
+	if (!value) return true;
+	return field?.toLowerCase().includes(value.toLowerCase());
+};
 
-	useEffect(() => {
-		const storedProfile = localStorage.getItem('activeProfile');
-		let initialType = 'TABLETOP'; // Fallback por seguridad
+const checkExact = (field, value) => {
+	if (!value) return true;
+	return field === value;
+};
 
-		if (storedProfile) {
-			try {
-				const parsed = JSON.parse(storedProfile);
-				initialType = parsed.type;
-			} catch (e) {
-				console.error('Error leyendo perfil', e);
-			}
-		}
+const checkTags = (tagsArray, searchValue) => {
+	if (!searchValue) return true;
+	if (!tagsArray || !Array.isArray(tagsArray)) return false;
+	return tagsArray.some(tag => tag.toLowerCase().includes(searchValue.toLowerCase()));
+};
 
-		setFilters(prev => ({ ...prev, type: initialType }));
+const getInitialProfileType = () => {
+	const storedProfile = localStorage.getItem('activeProfile');
+	if (!storedProfile) return 'TABLETOP';
+	try {
+		const parsed = JSON.parse(storedProfile);
+		return parsed.type || 'TABLETOP';
+	} catch (e) {
+		console.error('Error leyendo perfil', e);
+		return 'TABLETOP';
+	}
+};
 
-		setTimeout(() => {
-			setCampaigns(mockCampaigns);
-			setLoading(false);
-		}, 800);
-	}, []);
-
-	// Lógica de Filtrado (Mock Frontend) ACTUALIZADA
-	const filteredData = campaigns.filter(c => {
-		// 1. Helper texto simple
-		const checkText = (field, value) => {
-			if (!value) return true;
-			return field?.toLowerCase().includes(value.toLowerCase());
-		};
-
-		// 2. Helper Exacto (Selects)
-		const checkExact = (field, value) => {
-			if (!value) return true;
-			return field === value;
-		};
-
-		// 3. NUEVO: Helper para Arrays (Tags)
-		// Devuelve true si ALGUNO de los tags de la campaña coincide con lo que escribiste
-		const checkTags = (tagsArray, searchValue) => {
-			if (!searchValue) return true;
-			if (!tagsArray || !Array.isArray(tagsArray)) return false;
-
-			// Buscamos si el string de búsqueda está incluido en alguno de los tags
-			return tagsArray.some(tag => tag.toLowerCase().includes(searchValue.toLowerCase()));
-		};
-
-		// Verificamos si es perfil Tabletop para aplicar filtros extra o no
+// --- 2. LÓGICA DE FILTRADO PURA ---
+const filterCampaigns = (campaigns, filters) => {
+	return campaigns.filter(c => {
 		const isTabletop = filters.type === 'TABLETOP';
 
-		// Lógica Base (Común)
 		let matches =
 			checkText(c.name, filters.name) &&
-			checkTags(c.theme, filters.theme) && // Usamos checkTags aquí
+			checkTags(c.theme, filters.theme) &&
 			checkExact(c.language, filters.language) &&
 			checkExact(c.timeZone, filters.timeZone) &&
-			checkExact(c.type, filters.type); // WRITTEN o TABLETOP
+			checkExact(c.type, filters.type);
 
-		// Si es Tabletop, aplicamos los filtros extra
 		if (isTabletop) {
 			matches =
 				matches &&
@@ -82,11 +60,38 @@ export default function FindCampaignPage() {
 
 		return matches;
 	});
+};
+
+export default function FindCampaignPage() {
+	const { t } = useTranslation('global');
+	const theme = getTheme();
+
+	const [campaigns, setCampaigns] = useState([]);
+	const [loading, setLoading] = useState(true);
+
+	const [filters, setFilters] = useState(() => ({
+		name: '',
+		type: getInitialProfileType(),
+		system: '',
+	}));
+
+	useEffect(() => {
+		setTimeout(() => {
+			setCampaigns(mockCampaigns);
+			setLoading(false);
+		}, 800);
+	}, []);
+
+	const filteredData = useMemo(() => {
+		return filterCampaigns(campaigns, filters);
+	}, [campaigns, filters]);
 
 	const handleClean = () => {
-		const storedProfile = localStorage.getItem('activeProfile');
-		const defaultType = storedProfile ? JSON.parse(storedProfile).type : 'TABLETOP';
-		setFilters({ name: '', type: defaultType, system: '' });
+		setFilters({
+			name: '',
+			type: getInitialProfileType(),
+			system: '',
+		});
 	};
 
 	return (
@@ -100,7 +105,6 @@ export default function FindCampaignPage() {
 
 			<CampaignFilterBar filters={filters} setFilters={setFilters} onClean={handleClean} theme={theme} />
 
-			{/* CONTENIDO */}
 			{loading ? (
 				<div className='flex justify-center mt-20'>
 					<Spinner className={`h-12 w-12 text-${theme.primary}-500`} />

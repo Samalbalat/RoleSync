@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardBody, CardFooter, Typography, Chip, Avatar, Tooltip } from '@material-tailwind/react';
+import { Card, CardBody, Typography, Chip, Avatar, Tooltip } from '@material-tailwind/react';
 import { UserGroupIcon, CalendarIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';

@@ -11,7 +11,6 @@ import PublicRoute from './components/auth/PublicRoute';
 import { AuthProvider } from './utils/AuthContext';
 import ProfileSelectionPage from './pages/auth/ProfileSelectionPage';
 import FindCampaignPage from './pages/campaign/FindCampaignPage';
-import CampaignDetail from './pages/campaign/CampaignDetailPage';
 import CampaignDetailPage from './pages/campaign/CampaignDetailPage';
 
 function App() {
