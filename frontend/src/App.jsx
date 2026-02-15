@@ -10,6 +10,8 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import PublicRoute from './components/auth/PublicRoute';
 import { AuthProvider } from './utils/AuthContext';
 import ProfileSelectionPage from './pages/auth/ProfileSelectionPage';
+import FindCampaignPage from './pages/campaign/FindCampaignPage';
+import CampaignDetailPage from './pages/campaign/CampaignDetailPage';
 
 function App() {
 	return (
@@ -17,24 +19,36 @@ function App() {
 			<Toaster position='top-center' reverseOrder={false} />
 			<BrowserRouter>
 				<Routes>
-					{/* Rutas Públicas */}
+					{/* =========================================
+            				RUTAS PÚBLICAS (Sin Login)
+           			========================================= */}
 					<Route element={<PublicRoute />}>
 						<Route path='/login' element={<LoginPage />} />
 						<Route path='/register' element={<RegisterPage />} />
 					</Route>
 
-					{/* Punto intermedio */}
+					{/* =========================================
+            				RUTAS PRIVADAS: NIVEL CUENTA
+            			(Logueado, pero eligiendo perfil)
+           			========================================= */}
 					<Route element={<ProtectedRoute />}>
 						<Route path='/profile-selection' element={<ProfileSelectionPage />} />
 					</Route>
 
-					{/* Rutas Privadas */}
+					{/* =========================================
+            				RUTAS PRIVADAS: NIVEL APP
+            		(Logueado + Perfil Seleccionado + Navbar + Sidebar)
+           			========================================= */}
 					<Route element={<ProtectedRoute />}>
 						<Route path='/' element={<MainLayout />}>
 							<Route index element={<HomePage />} />
 
-							{/* ACCOUNT */}
+							{/* Rutas de Cuenta */}
 							<Route path='account/settings' element={<AccountSettings />} />
+
+							{/* Rutas de Campañas */}
+							<Route path='find-campaign' element={<FindCampaignPage />} />
+							<Route path='/campaign/:id' element={<CampaignDetailPage />} />
 						</Route>
 					</Route>
 					<Route path='*' element={<Navigate to='/' replace />} />
