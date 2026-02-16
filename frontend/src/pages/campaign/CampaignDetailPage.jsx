@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'; // Añadimos useState y useEffect
+import PropTypes from 'prop-types';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Card, CardBody, Typography, Chip, Avatar, Progress } from '@material-tailwind/react';
 import {
@@ -11,6 +12,7 @@ import {
 	ChatBubbleLeftRightIcon,
 	MapPinIcon,
 	ShieldExclamationIcon,
+	PencilSquareIcon,
 } from '@heroicons/react/24/outline';
 import { useTranslation } from 'react-i18next';
 import { mockCampaigns } from '../../data/mockCampaigns';
@@ -48,6 +50,178 @@ const InfoRow = ({ icon: IconComponent, color, title, value }) => {
 	);
 };
 
+InfoRow.propTypes = {
+	icon: PropTypes.elementType.isRequired,
+	color: PropTypes.string.isRequired,
+	title: PropTypes.string.isRequired,
+	value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};
+
+const NotFoundView = ({ t, navigate }) => (
+	<div className='flex flex-col items-center justify-center h-screen animate-fade-in'>
+		<Typography variant='h4' color='blue-gray'>
+			{t('campaign.noResultsFound')}
+		</Typography>
+		<Button className='mt-4' onClick={() => navigate('/campaigns')}>
+			{t('common.back')}
+		</Button>
+	</div>
+);
+
+NotFoundView.propTypes = {
+	t: PropTypes.func.isRequired,
+	navigate: PropTypes.func.isRequired,
+};
+
+const AccessDeniedView = ({ t, navigate }) => (
+	<div className='flex flex-col items-center justify-center h-[60vh] text-center px-4 animate-fade-in'>
+		<div className='p-6 bg-red-50 rounded-full mb-4'>
+			<ShieldExclamationIcon className='h-16 w-16 text-red-500' />
+		</div>
+		<Typography variant='h3' color='blue-gray' className='mb-2'>
+			{t('auth.accessDenied')}
+		</Typography>
+		<Typography className='text-gray-600 max-w-md mb-8'>{t('campaign.accessDeniedMessage')}</Typography>
+		<Button color='gray' variant='outlined' onClick={() => navigate('/campaigns')}>
+			{t('common.back')}
+		</Button>
+	</div>
+);
+
+AccessDeniedView.propTypes = {
+	t: PropTypes.func.isRequired,
+	navigate: PropTypes.func.isRequired,
+};
+
+const CampaignInfoList = ({ campaign, isWritten, t }) => (
+	<Card className='shadow-sm border border-gray-200'>
+		<CardBody className='p-0'>
+			<div className='p-4 border-b border-gray-100'>
+				<Typography variant='h6' color='blue-gray'>
+					{t('campaign.detail.infoTitle')}
+				</Typography>
+			</div>
+			<div className='divide-y divide-gray-100'>
+				<InfoRow icon={LanguageIcon} color='blue' title={t('campaign.language')} value={campaign.language} />
+				<InfoRow
+					icon={GlobeAmericasIcon}
+					color='indigo'
+					title={t('campaign.timeZone') || 'Zona Horaria'}
+					value={campaign.timeZone}
+				/>
+				<InfoRow
+					icon={ChatBubbleLeftRightIcon}
+					color='green'
+					title={t('campaign.communication')}
+					value={campaign.communication}
+				/>
+				{!isWritten && (
+					<>
+						<InfoRow icon={BookOpenIcon} color='purple' title={t('campaign.system')} value={campaign.system} />
+						<InfoRow
+							icon={MapPinIcon}
+							color='teal'
+							title={t('campaign.location') || t('campaign.platform')}
+							value={campaign.location}
+						/>
+						<InfoRow icon={CalendarDaysIcon} color='orange' title={t('campaign.schedule')} value={campaign.schedule} />
+						<InfoRow
+							icon={ClockIcon}
+							color='pink'
+							title={t('campaign.duration')}
+							value={campaign.duration ? `${campaign.duration}` : null}
+						/>
+					</>
+				)}
+			</div>
+		</CardBody>
+	</Card>
+);
+
+const ActionCard = ({ isOwner, campaign, t, navigate, isFull, progress, themeColor }) => {
+	return (
+		<Card className='shadow-lg border border-gray-100 sticky top-4'>
+			<CardBody className='p-6'>
+				{isOwner ? (
+					<div className='text-center space-y-4'>
+						<Typography variant='h5' color='blue-gray'>
+							Gestionar Aventura
+						</Typography>
+						<Typography variant='small' className='text-gray-600 mb-4'>
+							Eres el creador de esta campaña. Puedes editar los detalles o gestionar los jugadores.
+						</Typography>
+						<Button
+							fullWidth
+							size='lg'
+							color='blue-gray'
+							variant='outlined'
+							className='flex items-center justify-center gap-2 border-2'
+							onClick={() => navigate(`/campaigns/edit/${campaign.id}`)}
+						>
+							<PencilSquareIcon className='h-5 w-5' />
+							{t('campaign.editTitle') || 'Editar Campaña'}
+						</Button>
+					</div>
+				) : (
+					<div className='mb-0'>
+						<div className='flex justify-between items-center mb-2'>
+							<Typography variant='h6' color='blue-gray'>
+								{t('campaign.detail.players')}
+							</Typography>
+							<Typography variant='small' className='font-bold text-gray-600'>
+								{campaign.currentPlayers} / {campaign.maxPlayers}
+							</Typography>
+						</div>
+						<Progress value={progress} color={isFull ? 'red' : 'green'} className='h-2 mb-4' />
+						<Typography variant='small' className='text-gray-500 mb-6 text-center'>
+							{isFull
+								? t('campaign.detail.fullMessage')
+								: t('campaign.detail.spotsLeft', { count: campaign.maxPlayers - campaign.currentPlayers })}
+						</Typography>
+						<Button
+							fullWidth
+							size='lg'
+							color={themeColor}
+							disabled={isFull}
+							className='shadow-md hover:shadow-lg transition-all text-base'
+						>
+							{isFull ? t('campaign.detail.joinFull') : t('campaign.detail.join')}
+						</Button>
+					</div>
+				)}
+			</CardBody>
+		</Card>
+	);
+};
+
+CampaignInfoList.propTypes = {
+	campaign: PropTypes.shape({
+		language: PropTypes.string,
+		timeZone: PropTypes.string,
+		communication: PropTypes.string,
+		system: PropTypes.string,
+		location: PropTypes.string,
+		schedule: PropTypes.string,
+		duration: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+	}).isRequired,
+	isWritten: PropTypes.bool.isRequired,
+	t: PropTypes.func.isRequired,
+};
+
+ActionCard.propTypes = {
+	isOwner: PropTypes.bool.isRequired,
+	campaign: PropTypes.shape({
+		id: PropTypes.number.isRequired,
+		currentPlayers: PropTypes.number.isRequired,
+		maxPlayers: PropTypes.number.isRequired,
+	}).isRequired,
+	t: PropTypes.func.isRequired,
+	navigate: PropTypes.func.isRequired,
+	isFull: PropTypes.bool.isRequired,
+	progress: PropTypes.number.isRequired,
+	themeColor: PropTypes.string.isRequired,
+};
+
 // --- COMPONENTE PRINCIPAL ---
 export default function CampaignDetailPage() {
 	const { t } = useTranslation('global');
@@ -70,39 +244,15 @@ export default function CampaignDetailPage() {
 
 	const campaign = mockCampaigns.find(c => c.id === Number(id));
 
-	// Si no existe la campaña
-	if (!campaign) {
-		return (
-			<div className='flex flex-col items-center justify-center h-screen animate-fade-in'>
-				<Typography variant='h4' color='blue-gray'>
-					{t('campaign.noResultsFound')}
-				</Typography>
-				<Button className='mt-4' onClick={() => navigate('/campaigns')}>
-					{t('common.back')}
-				</Button>
-			</div>
-		);
-	}
+	// Guard Clause 1: No existe
+	if (!campaign) return <NotFoundView t={t} navigate={navigate} />;
 
-	// 2. COMPROBACIÓN DE SEGURIDAD
-
+	// Guard Clause 2: Acceso denegado
 	if (userProfile && campaign.type !== userProfile.type) {
-		return (
-			<div className='flex flex-col items-center justify-center h-[60vh] text-center px-4 animate-fade-in'>
-				<div className='p-6 bg-red-50 rounded-full mb-4'>
-					<ShieldExclamationIcon className='h-16 w-16 text-red-500' />
-				</div>
-				<Typography variant='h3' color='blue-gray' className='mb-2'>
-					{t('auth.accessDenied')}
-				</Typography>
-				<Typography className='text-gray-600 max-w-md mb-8'>{t('campaign.accessDeniedMessage')}</Typography>
-				<Button color='gray' variant='outlined' onClick={() => navigate('/campaigns')}>
-					{t('common.back')}
-				</Button>
-			</div>
-		);
+		return <AccessDeniedView t={t} navigate={navigate} />;
 	}
 
+	const isOwner = userProfile && userProfile.name === campaign.profileName;
 	const isWritten = campaign.type === 'WRITTEN';
 	const themeColor = isWritten ? 'indigo' : 'deep-orange';
 	const progress = (campaign.currentPlayers / campaign.maxPlayers) * 100;
@@ -110,17 +260,26 @@ export default function CampaignDetailPage() {
 
 	return (
 		<div className='max-w-7xl mx-auto px-4 py-8 animate-fade-in'>
-			<Button
-				variant='text'
-				className='flex items-center gap-2 mb-6 pl-0 hover:bg-transparent text-gray-600 hover:text-gray-900'
-				onClick={() => navigate(-1)}
-			>
-				<ArrowLeftIcon className='h-4 w-4' /> {t('common.back')}
-			</Button>
+			<div className='flex justify-between items-center mb-6'>
+				<Button variant='text' className='flex items-center gap-2 pl-0 text-gray-600' onClick={() => navigate('/campaigns')}>
+					<ArrowLeftIcon className='h-4 w-4' /> {t('common.back')}
+				</Button>
+				{isOwner && (
+					<Button
+						variant='text'
+						color='blue-gray'
+						className='flex items-center gap-2'
+						onClick={() => navigate(`/campaigns/edit/${id}`)}
+					>
+						<PencilSquareIcon className='h-5 w-5' />
+						{t('common.edit') || 'Editar'}
+					</Button>
+				)}
+			</div>
 
 			<div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
-				{/* --- COLUMNA IZQUIERDA --- */}
 				<div className='lg:col-span-2 space-y-8'>
+					{/* Header Image Section */}
 					<div className='relative rounded-2xl overflow-hidden shadow-lg h-[300px] md:h-[400px]'>
 						<img src={campaign.image} alt={campaign.name} className='w-full h-full object-cover' />
 						<div className='absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 md:p-8'>
@@ -145,24 +304,23 @@ export default function CampaignDetailPage() {
 						</div>
 					</div>
 
+					{/* Description Section */}
 					<Card className='shadow-sm border border-gray-200'>
 						<CardBody className='p-6 md:p-8'>
 							<Typography variant='h5' color='blue-gray' className='mb-4 font-bold flex items-center gap-2'>
-								<BookOpenIcon className='h-6 w-6 text-gray-600' />
-								{t('campaign.detail.about')}
+								<BookOpenIcon className='h-6 w-6 text-gray-600' /> {t('campaign.detail.about')}
 							</Typography>
 							<Typography className='text-gray-600 text-lg leading-relaxed whitespace-pre-line'>
 								{campaign.description}
 							</Typography>
-
 							<div className='mt-8'>
 								<Typography variant='h6' color='blue-gray' className='mb-3'>
 									{t('campaign.detail.tags')}
 								</Typography>
 								<div className='flex flex-wrap gap-2'>
-									{campaign.theme.map((tag, index) => (
+									{campaign.theme.map((tag, i) => (
 										<span
-											key={index}
+											key={i}
 											className='bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm font-medium border border-gray-200'
 										>
 											#{tag}
@@ -174,107 +332,39 @@ export default function CampaignDetailPage() {
 					</Card>
 				</div>
 
-				{/* --- COLUMNA DERECHA --- */}
 				<div className='space-y-6'>
-					<Card className='shadow-sm border border-gray-200'>
-						<CardBody className='p-0'>
-							<div className='p-4 border-b border-gray-100'>
-								<Typography variant='h6' color='blue-gray'>
-									{t('campaign.detail.infoTitle')}
-								</Typography>
-							</div>
+					<CampaignInfoList campaign={campaign} isWritten={isWritten} t={t} />
 
-							<div className='divide-y divide-gray-100'>
-								<InfoRow icon={LanguageIcon} color='blue' title={t('campaign.language')} value={campaign.language} />
-								<InfoRow
-									icon={GlobeAmericasIcon}
-									color='indigo'
-									title={t('campaign.timeZone') || 'Zona Horaria'}
-									value={campaign.timeZone}
+					{!isOwner && (
+						<Card className='shadow-sm border border-gray-200 bg-gray-50'>
+							<CardBody className='flex items-center gap-4 p-4'>
+								<Avatar
+									src={campaign.ownerImage}
+									alt={campaign.ownerName}
+									size='lg'
+									className='border border-white shadow-sm'
 								/>
-								<InfoRow
-									icon={ChatBubbleLeftRightIcon}
-									color='green'
-									title={t('campaign.communication')}
-									value={campaign.communication}
-								/>
-
-								{!isWritten && (
-									<>
-										<InfoRow icon={BookOpenIcon} color='purple' title={t('campaign.system')} value={campaign.system} />
-										<InfoRow
-											icon={MapPinIcon}
-											color='teal'
-											title={t('campaign.location') || t('campaign.platform')}
-											value={campaign.location}
-										/>
-										<InfoRow
-											icon={CalendarDaysIcon}
-											color='orange'
-											title={t('campaign.schedule')}
-											value={campaign.schedule}
-										/>
-										<InfoRow
-											icon={ClockIcon}
-											color='pink'
-											title={t('campaign.duration')}
-											value={campaign.duration ? `${campaign.duration}` : null}
-										/>
-									</>
-								)}
-							</div>
-						</CardBody>
-					</Card>
-
-					<Card className='shadow-sm border border-gray-200 bg-gray-50'>
-						<CardBody className='flex items-center gap-4 p-4'>
-							<Avatar
-								src={campaign.ownerImage}
-								alt={campaign.ownerName}
-								size='lg'
-								className='border border-white shadow-sm'
-							/>
-							<div>
-								<Typography variant='small' className='text-gray-500 font-medium'>
-									Game Master
-								</Typography>
-								<Typography variant='h6' color='blue-gray'>
-									{campaign.ownerName}
-								</Typography>
-							</div>
-						</CardBody>
-					</Card>
-
-					<Card className='shadow-lg border border-gray-100 sticky top-4'>
-						<CardBody className='p-6'>
-							<div className='mb-6'>
-								<div className='flex justify-between items-center mb-2'>
-									<Typography variant='h6' color='blue-gray'>
-										{t('campaign.detail.players')}
+								<div>
+									<Typography variant='small' className='text-gray-500 font-medium'>
+										Game Master
 									</Typography>
-									<Typography variant='small' className='font-bold text-gray-600'>
-										{campaign.currentPlayers} / {campaign.maxPlayers}
+									<Typography variant='h6' color='blue-gray'>
+										{campaign.ownerName}
 									</Typography>
 								</div>
-								<Progress value={progress} color={isFull ? 'red' : 'green'} className='h-2' />
-								<Typography variant='small' className='text-gray-500 mt-2 text-center'>
-									{isFull
-										? t('campaign.detail.fullMessage')
-										: t('campaign.detail.spotsLeft', { count: campaign.maxPlayers - campaign.currentPlayers })}
-								</Typography>
-							</div>
+							</CardBody>
+						</Card>
+					)}
 
-							<Button
-								fullWidth
-								size='lg'
-								color={themeColor}
-								disabled={isFull}
-								className='shadow-md hover:shadow-lg transition-all text-base'
-							>
-								{isFull ? t('campaign.detail.joinFull') : t('campaign.detail.join')}
-							</Button>
-						</CardBody>
-					</Card>
+					<ActionCard
+						isOwner={isOwner}
+						campaign={campaign}
+						t={t}
+						navigate={navigate}
+						isFull={isFull}
+						progress={progress}
+						themeColor={themeColor}
+					/>
 				</div>
 			</div>
 		</div>

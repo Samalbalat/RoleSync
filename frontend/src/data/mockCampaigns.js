@@ -30,7 +30,7 @@ export const mockCampaigns = [
         currentPlayers: 12,
         maxPlayers: 20,
         communication: "Discord",
-        ownerName: "Skywalker_Writer",
+        ownerName: "Alex",
         ownerImage: "https://docs.material-tailwind.com/img/face-2.jpg",
         language: "Inglés",
         timeZone: "N/A (Asíncrono)",

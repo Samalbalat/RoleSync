@@ -12,6 +12,8 @@ import { AuthProvider } from './utils/AuthContext';
 import ProfileSelectionPage from './pages/auth/ProfileSelectionPage';
 import FindCampaignPage from './pages/campaign/FindCampaignPage';
 import CampaignDetailPage from './pages/campaign/CampaignDetailPage';
+import CreateCampaignPage from './pages/campaign/CreateCampaignPage';
+import EditCampaignPage from './pages/campaign/EditCampaignPage';
 
 function App() {
 	return (
@@ -49,6 +51,8 @@ function App() {
 							{/* Rutas de Campañas */}
 							<Route path='find-campaign' element={<FindCampaignPage />} />
 							<Route path='/campaign/:id' element={<CampaignDetailPage />} />
+							<Route path='/campaigns/create' element={<CreateCampaignPage />} />
+							<Route path='/campaigns/edit/:id' element={<EditCampaignPage />} />
 						</Route>
 					</Route>
 					<Route path='*' element={<Navigate to='/' replace />} />
