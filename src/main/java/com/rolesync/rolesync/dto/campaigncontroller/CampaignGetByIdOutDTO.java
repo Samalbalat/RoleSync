@@ -12,6 +12,7 @@ public class CampaignGetByIdOutDTO {
     private OwnerProfileDTO owner;
 
     private String status;
+    private String communication;
     private String description;
     private String[] themes;
     private String language;

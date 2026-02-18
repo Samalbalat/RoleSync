@@ -58,7 +58,15 @@ public class CampaignController {
     public ResponseEntity<List<Campaign>> getCampaigns(
             @RequestParam ProfileType type,
             @RequestParam(required = false) String system,
-            @RequestParam(required = false) String location) 
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String language,
+            @RequestParam(required = false) String timeZone,
+            @RequestParam(required = false) String dayWeek,
+            @RequestParam(required = false) String communication,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String page
+) 
     {
         BooleanExpression predicate = Q.campaignType.eq(type);
 
@@ -68,6 +76,36 @@ public class CampaignController {
 
         if (location != null && !location.isBlank()) {
             predicate = predicate.and(Q.location.containsIgnoreCase(location));
+        }
+
+        if (language != null && !language.isBlank()) {
+            predicate = predicate.and(Q.language.containsIgnoreCase(language));
+        }
+
+        if (timeZone != null && !timeZone.isBlank()) {
+            predicate = predicate.and(Q.timeZone.containsIgnoreCase(timeZone));
+        }
+
+        if (dayWeek != null && !dayWeek.isBlank()) {
+            predicate = predicate.and(Q.dayWeek.containsIgnoreCase(dayWeek));
+        }
+
+        if (communication != null && !communication.isBlank()) {
+            predicate = predicate.and(Q.communication.containsIgnoreCase(communication));
+        }
+
+        if (status != null && !status.isBlank()) {
+            predicate = predicate.and(Q.status.eq(CampaignStatus.valueOf(status.toUpperCase())));
+        }
+
+        if (search != null && !search.isBlank()) {
+            search = search.trim();
+            String[] keywords = search.split(" ");
+            BooleanExpression searchPredicate = Q.name.containsIgnoreCase(keywords[0]);
+            for (int i = 1; i < keywords.length; i++) {
+                searchPredicate = searchPredicate.and(Q.name.containsIgnoreCase(keywords[i]));
+            }
+            predicate = predicate.and(searchPredicate);
         }
 
         return ResponseEntity.ok(
@@ -194,9 +232,13 @@ public class CampaignController {
         dto.setDayWeek(campaign.getDayWeek());
         dto.setDuration(campaign.getDuration());
         dto.setLocation(campaign.getLocation());
+        dto.setCommunication(campaign.getCommunication());
         dto.setImage(campaign.getImage());
         dto.setStatus(campaign.getStatus().name());
         dto.setType(campaign.getCampaignType().name());
+
+        dto.setCurrentPlayers(campaign.getMembers() != null ? campaign.getMembers().size() : 0);
+        dto.setMaxPlayers(campaign.getMaxPlayers());
 
         OwnerProfileDTO owner = new OwnerProfileDTO();
         profileRepository.findByProfilename(campaign.getOwnerName()).ifPresent(p -> {
