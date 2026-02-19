@@ -3,7 +3,7 @@ import { Typography } from '@material-tailwind/react';
 import { getTheme } from '../../utils/themeUtils';
 import { useTranslation } from 'react-i18next';
 import CampaignForm from '../../components/campaign/CampaignForm';
-import { createCampaign } from '../../services/campaignService';
+import { createCampaign } from '../../services/CampaignService';
 
 export default function CreateCampaignPage() {
 	const { t } = useTranslation('global');

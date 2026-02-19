@@ -50,9 +50,9 @@ function App() {
 
 							{/* Rutas de Campañas */}
 							<Route path='find-campaign' element={<FindCampaignPage />} />
-							<Route path='/campaign/:id' element={<CampaignDetailPage />} />
-							<Route path='/campaigns/create' element={<CreateCampaignPage />} />
-							<Route path='/campaigns/edit/:id' element={<EditCampaignPage />} />
+							<Route path='campaign/:id' element={<CampaignDetailPage />} />
+							<Route path='campaigns/create' element={<CreateCampaignPage />} />
+							<Route path='campaigns/edit/:id' element={<EditCampaignPage />} />
 						</Route>
 					</Route>
 					<Route path='*' element={<Navigate to='/' replace />} />
