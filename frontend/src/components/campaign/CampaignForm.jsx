@@ -39,8 +39,29 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 		}
 	}, [initialValues]);
 
+	// Esto es para evitar ataques de manipulación de campos CODACY
+	const ALLOWED_FIELDS = [
+		'name',
+		'description',
+		'image',
+		'system',
+		'maxPlayers',
+		'language',
+		'timeZone',
+		'schedule',
+		'duration',
+		'location',
+		'communication',
+	];
+
 	const handleChange = e => {
 		const { name, value } = e.target;
+		//Validamos por seguridad (Fix para Codacy)
+		if (!ALLOWED_FIELDS.includes(name)) {
+			console.warn(`Campo no permitido bloqueado: ${name}`);
+			return;
+		}
+
 		setFormData(prev => ({ ...prev, [name]: value }));
 		if (errors[name]) {
 			setErrors(prev => ({ ...prev, [name]: null }));
@@ -48,6 +69,11 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 	};
 
 	const handleSelectChange = (name, value) => {
+		if (!ALLOWED_FIELDS.includes(name)) {
+			console.warn(`Campo select no permitido bloqueado: ${name}`);
+			return;
+		}
+
 		setFormData(prev => ({ ...prev, [name]: value }));
 		if (errors[name]) {
 			setErrors(prev => ({ ...prev, [name]: null }));

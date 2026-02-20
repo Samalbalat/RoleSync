@@ -68,7 +68,7 @@ export const getCampaignById = (id) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             // Aseguramos que id sea número porque viene como string del URL
-            const campaign = mockCampaigns.find(c => c.id === parseInt(id));
+            const campaign = mockCampaigns.find(c => c.id === Number.parseInt(id));
             
             if (campaign) {
                 console.log("Campaña encontrada:", campaign);
