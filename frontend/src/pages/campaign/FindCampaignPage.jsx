@@ -4,7 +4,6 @@ import { getTheme } from '../../utils/themeUtils';
 import { useTranslation } from 'react-i18next';
 import CampaignFilterBar from '../../components/campaign/CampaignFilterBar';
 import CampaignCard from '../../components/campaign/CampaignCard';
-// Asegúrate de importar tu servicio (mock o real)
 import { searchCampaignsInBackend } from '../../services/CampaignService';
 
 export default function FindCampaignPage() {
@@ -13,7 +12,6 @@ export default function FindCampaignPage() {
 	const [campaigns, setCampaigns] = useState([]);
 	const [loading, setLoading] = useState(true);
 
-	// 1. Lógica para obtener el tipo base (extraída para reusarla)
 	const getDefaultType = () => {
 		const stored = localStorage.getItem('activeProfile');
 		if (stored) {
@@ -26,7 +24,6 @@ export default function FindCampaignPage() {
 		return 'TABLETOP';
 	};
 
-	// 2. Estado inicial
 	const [filters, setFilters] = useState({
 		name: '',
 		type: getDefaultType(),
@@ -43,7 +40,6 @@ export default function FindCampaignPage() {
 		const fetchData = async () => {
 			setLoading(true);
 			try {
-				// Enviamos los filtros limpios al backend/mock
 				const results = await searchCampaignsInBackend(filters);
 				setCampaigns(results);
 			} catch (error) {
@@ -54,21 +50,19 @@ export default function FindCampaignPage() {
 			}
 		};
 
-		const timeoutId = setTimeout(fetchData, 500); // Debounce
+		const timeoutId = setTimeout(fetchData, 500);
 		return () => clearTimeout(timeoutId);
 	}, [filters]);
 
 	// 3. CORRECCIÓN DE HANDLE CLEAN
 	const handleClean = () => {
-		// En lugar de usar "...prev", creamos un objeto NUEVO y LIMPIO.
-		// Solo mantenemos el 'type' del perfil del usuario.
 		setFilters({
 			name: '',
-			type: getDefaultType(), // Reseteamos al tipo de perfil original
+			type: getDefaultType(),
 			system: '',
 			language: '',
 			timeZone: '',
-			theme: [], // Importante: Array vacío para tags
+			theme: [],
 			location: '',
 			schedule: '',
 			duration: '',
@@ -84,7 +78,6 @@ export default function FindCampaignPage() {
 				</Typography>
 			</div>
 
-			{/* Pasamos handleClean corregido */}
 			<CampaignFilterBar filters={filters} setFilters={setFilters} onClean={handleClean} theme={theme} />
 
 			{loading ? (

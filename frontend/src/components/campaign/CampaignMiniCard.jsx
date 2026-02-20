@@ -76,7 +76,7 @@ CampaignMiniCard.propTypes = {
 	}).isRequired,
 	isMaster: PropTypes.bool.isRequired,
 	theme: PropTypes.shape({
-		isDark: PropTypes.bool.isRequired,
+		isDark: PropTypes.bool,
 	}).isRequired,
 	onClick: PropTypes.func,
 };

@@ -13,11 +13,13 @@
       "findButton": "Buscar en la Taberna"
     }
   },
+
   "menu": {
     "findCampaign": "Buscar Campaña", 
     "createCampaign": "Crear Campaña",
     "provisional": "Provisional"
   },
+
   "auth": {
     "login": "Iniciar Sesión",
     "signUp": "Registrarse",
@@ -36,6 +38,7 @@
     "successRegistration": "¡Registro exitoso! Ahora puedes iniciar sesión.",
     "successLogin": "¡Inicio de sesión exitoso!"
   },
+
   "account": {
     "name": "Nombre",
     "email": "Correo Electrónico",
@@ -43,6 +46,7 @@
     "confirmPassword": "Confirmar Contraseña",
     "timeZone": "Zona Horaria"
   },
+
   "profile": {
     "profileName": "Nombre del Perfil",
     "description": "Descripción",
@@ -50,40 +54,58 @@
     "narrative": "Narrativo",
     "table": "Mesa"
   },
+
   "common": {
     "welcome": "Bienvenido a RoleSync",
     "name": "Nombre",
     "image": "Imagen",
-    "back": "Volver"
+    "back": "Volver",
+    "create": "Crear",
+    "save": "Guardar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "confirmDelete": "¿Estás seguro de que deseas eliminar esto?"
   },
+
   "errors": {
     "required": "Este campo es obligatorio",
     "invalidEmail": "El formato del correo no es válido",
+    "invalidNumber": "Debe ser un número mayor a 0",
     "passwordLength": "Mínimo 8 caracteres",
     "passwordComplexity": "Debe incluir mayúscula, minúscula, número y símbolo (@$!%*?&)",
-    "passwordMatch": "Las contraseñas no coinciden"
+    "passwordMatch": "Las contraseñas no coinciden",
+    "maxTags": "No puedes agregar más de 6 etiquetas",
+    "tooLong1000": "No puede exceder los 1000 caracteres"
   },
 
-"campaign": { 
-    "fraseFinder": "Encuentra tu próxima ", 
-    "adventure": "Aventura", 
-    "fraseCreator": "Crea tu propia campaña" ,
-    "cleanFilters": "Limpiar filtros", 
-    "noResultsFound": "No se encontraron resultados.",
+  "campaign": { 
     "name": "Nombre", 
+    "image": "Imagen",
+    "description": "Descripción",
     "type": "Tipo", 
     "system": "Sistema",
     "language": "Idioma",
     "timeZone": "Zona Horaria", 
     "theme": "Temática",
+    "themes": "Temáticas",
+    "tagHelper": "Presiona",
     "themePlaceholder": "Ej: Vampiros, Sci-Fi...",
     "location": "Lugar",
     "locationPlaceholder": "Ej: Sevilla, Online...",
     "schedule": "Día / Frecuencia", 
     "duration": "Duración",
     "communication": "Comunicación",
+    "maxPlayers": "Máximo de Jugadores",
     "communicationPlaceholder": "Ej: Discord, Twitter...",
+    "logistics": "Logística",
     "accessDeniedMessage": "No estás autorizado para ver esta campaña.",
+    "fraseFinder": "Encuentra tu próxima ", 
+    "adventure": "Aventura", 
+    "fraseCreator": "Crea tu propia campaña" ,
+    "cleanFilters": "Limpiar filtros", 
+    "noResultsFound": "No se encontraron resultados.",
+    "createTitle": "Crear Nueva Campaña",
+    "generalInfo": "Información General",
     "detail": {
       "about": "Sobre la Campaña",
       "tags": "Etiquetas / Temática",
@@ -93,9 +115,7 @@
       "join": "Solicitar Unirse",
       "joinFull": "Lista de Espera",
       "contactGM": "Mensaje al Master",
-      "infoTitle": "Detalles de la Partida",
-      "communication": "Comunicación",
-      "lorem": "Esta es una campaña diseñada para sumergir a los jugadores en un mundo profundo. Se requiere compromiso y respeto por los demás jugadores. La sesión cero se realizará para definir límites y expectativas. ¡Prepárate para la aventura!"
+      "infoTitle": "Detalles de la Partida"
     }
   },
 

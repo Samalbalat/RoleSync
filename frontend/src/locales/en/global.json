@@ -55,36 +55,52 @@
     "welcome": "Welcome to RoleSync",
     "name": "Name",
     "image": "Image",
-    "back": "Back"
+    "back": "Back",
+    "create": "Create",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmDelete": "Are you sure you want to delete this?"
   },
   "errors": {
     "required": "This field is required",
     "invalidEmail": "The email format is not valid",
+    "invalidNumber": "Must be a number greater than 0",
     "passwordLength": "Minimum 8 characters",
     "passwordComplexity": "Must include uppercase, lowercase, number, and symbol (_@$!%*?&-)",
-    "passwordMatch": "Passwords do not match"
+    "passwordMatch": "Passwords do not match",
+    "maxTags": "You cannot add more than 6 tags",
+    "tooLong1000": "Cannot exceed 1000 characters"
   },
 
   "campaign": {
-    "fraseFinder": "Find your next ",
-    "adventure": "Adventure",
-    "fraseCreator": "Create your own campaign" ,
-    "cleanFilters": "Clear filters", 
-    "noResultsFound": "No results found.",
     "name": "Name", 
+    "image": "Image",
+    "description": "Description",
     "type": "Type", 
     "system": "System",
     "language": "Language",
     "timeZone": "Time Zone", 
     "theme": "Theme",
+    "themes": "Themes",
     "themePlaceholder": "E.g.: Vampires, Sci-Fi...",
+    "tagHelper": "Press",
     "location": "Location",
     "locationPlaceholder": "E.g.: Seville, Online...",
     "schedule": "Day / Frequency", 
     "duration": "Duration",
     "communication": "Communication",
+    "maxPlayers": "Maximum Players",
     "communicationPlaceholder": "E.g.: Discord, Twitter..." ,
+    "logistics": "Logistics",
     "accessDeniedMessage": "You are not authorized to view this campaign.",
+    "fraseFinder": "Find your next ",
+    "adventure": "Adventure",
+    "fraseCreator": "Create your own campaign" ,
+    "cleanFilters": "Clear filters", 
+    "noResultsFound": "No results found.",
+    "createTitle": "Create New Campaign",
+    "generalInfo": "General Information",
     "detail": {
       "about": "About the Campaign",
       "tags": "Tags / Theme",
@@ -94,9 +110,7 @@
       "join": "Request to Join",
       "joinFull": "Waiting List",
       "contactGM": "Message the GM",
-      "infoTitle": "Game Details",
-      "communication": "Communication",
-      "lorem": "This is a campaign designed to immerse players in a deep world. Commitment and respect for other players are required. A zero session will be held to define limits and expectations. Get ready for the adventure!"
+      "infoTitle": "Game Details"
     }
   },
 

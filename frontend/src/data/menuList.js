@@ -8,7 +8,7 @@ export const menuItems = [
 	},
 	{
 		label: 'menu.createCampaign',
-		path: '/create-campaign',
+		path: '/campaigns/create',
 		icon: PencilSquareIcon,
 	},
 	{
