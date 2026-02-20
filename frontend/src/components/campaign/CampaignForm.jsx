@@ -54,30 +54,24 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 		'communication',
 	];
 
-	const handleChange = e => {
-		const { name, value } = e.target;
-		//Validamos por seguridad (Fix para Codacy)
-		if (!ALLOWED_FIELDS.includes(name)) {
-			console.warn(`Campo no permitido bloqueado: ${name}`);
+	const updateField = (fieldName, value) => {
+		if (!ALLOWED_FIELDS.includes(fieldName)) {
+			console.warn(`Campo ignorado por seguridad: ${fieldName}`);
 			return;
 		}
 
-		setFormData(prev => ({ ...prev, [name]: value }));
-		if (errors[name]) {
-			setErrors(prev => ({ ...prev, [name]: null }));
+		setFormData(prev => ({ ...prev, [fieldName]: value }));
+		if (errors[fieldName]) {
+			setErrors(prev => ({ ...prev, [fieldName]: null }));
 		}
 	};
 
-	const handleSelectChange = (name, value) => {
-		if (!ALLOWED_FIELDS.includes(name)) {
-			console.warn(`Campo select no permitido bloqueado: ${name}`);
-			return;
-		}
+	const handleChange = e => {
+		updateField(e.target.name, e.target.value);
+	};
 
-		setFormData(prev => ({ ...prev, [name]: value }));
-		if (errors[name]) {
-			setErrors(prev => ({ ...prev, [name]: null }));
-		}
+	const handleSelectChange = (name, value) => {
+		updateField(name, value);
 	};
 
 	const handleAddTag = e => {
@@ -104,44 +98,70 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 		}));
 	};
 
-	const validateForm = () => {
-		let tempErrors = {};
-		let isValid = true;
+	const validateCommonFields = () => {
+		let errs = {};
 
-		// Validaciones comunes
-		if (!formData.name.trim()) tempErrors.name = t('errors.required');
-		if (!formData.description.trim()) tempErrors.description = t('errors.required');
-		if (formData.description.length > LIMITS.DESCRIPTION) tempErrors.description = t('errors.tooLong1000');
-		if (!formData.communication) tempErrors.communication = t('errors.required');
-		if (!formData.language) tempErrors.language = t('errors.required');
-		if (!formData.timeZone) tempErrors.timeZone = t('errors.required');
+		if (!formData.name.trim()) errs.name = t('errors.required');
+		if (!formData.communication) errs.communication = t('errors.required');
+		if (!formData.language) errs.language = t('errors.required');
+		if (!formData.timeZone) errs.timeZone = t('errors.required');
 
-		// Validación numérica para Jugadores
+		if (!formData.description.trim()) {
+			errs.description = t('errors.required');
+		} else if (formData.description.length > LIMITS.DESCRIPTION) {
+			errs.description = t('errors.tooLong1000');
+		}
+
+		return errs;
+	};
+
+	// datos numéricos
+	const validatePlayers = () => {
+		let errs = {};
+
 		if (!formData.maxPlayers) {
-			tempErrors.maxPlayers = t('errors.required');
+			errs.maxPlayers = t('errors.required');
 		} else if (Number.isNaN(formData.maxPlayers) || Number(formData.maxPlayers) <= 0) {
-			tempErrors.maxPlayers = t('errors.invalidNumber');
+			errs.maxPlayers = t('errors.invalidNumber');
 		}
 
-		// Validaciones específicas para TABLETOP
+		return errs;
+	};
+
+	const validateTabletopFields = () => {
+		let errs = {};
+
 		if (campaignType === 'TABLETOP') {
-			if (!formData.system) tempErrors.system = t('errors.required');
-			if (!formData.location) tempErrors.location = t('errors.required');
-			if (!formData.schedule) tempErrors.schedule = t('errors.required');
+			if (!formData.system) errs.system = t('errors.required');
+			if (!formData.location) errs.location = t('errors.required');
+			if (!formData.schedule) errs.schedule = t('errors.required');
 		}
+
+		return errs;
+	};
+
+	const validateForm = () => {
+		const commonErrors = validateCommonFields();
+		const playerErrors = validatePlayers();
+		const tabletopErrors = validateTabletopFields();
+
+		const tempErrors = {
+			...commonErrors,
+			...playerErrors,
+			...tabletopErrors,
+		};
 
 		setErrors(tempErrors);
-		isValid = Object.keys(tempErrors).length === 0;
+		const isValid = Object.keys(tempErrors).length === 0;
 		return isValid;
 	};
 
 	const handleSubmit = e => {
 		e.preventDefault();
-		// Solo enviamos si pasa la validación
+
 		if (validateForm()) {
 			onSubmit(formData);
 		} else {
-			// Opcional: Scroll hacia arriba o alerta visual
 			console.log('Formulario con errores', errors);
 		}
 	};
