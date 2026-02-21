@@ -14,6 +14,8 @@ import FindCampaignPage from './pages/campaign/FindCampaignPage';
 import CampaignDetailPage from './pages/campaign/CampaignDetailPage';
 import CreateCampaignPage from './pages/campaign/CreateCampaignPage';
 import EditCampaignPage from './pages/campaign/EditCampaignPage';
+import TemplateBuilder from './components/character/TemplateBuilder';
+import CreateCharacterPage from './pages/character/CreateCharacterPage';
 
 function App() {
 	return (
@@ -53,6 +55,18 @@ function App() {
 							<Route path='campaign/:id' element={<CampaignDetailPage />} />
 							<Route path='campaigns/create' element={<CreateCampaignPage />} />
 							<Route path='campaigns/edit/:id' element={<EditCampaignPage />} />
+
+							{/* Rutas de Personajes */}
+							<Route path='character/template-builder' element={<TemplateBuilder />} />
+							<Route path='test-crear-personaje' element={<CreateCharacterPage />} />
+							<Route
+								path='test-builder'
+								element={
+									<div className='min-h-screen bg-gray-50 py-10'>
+										<TemplateBuilder />
+									</div>
+								}
+							/>
 						</Route>
 					</Route>
 					<Route path='*' element={<Navigate to='/' replace />} />

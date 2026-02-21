@@ -119,6 +119,37 @@
     }
   },
 
+  "character":{
+    "templateBuilder": {
+      "title": "Constructor de Plantillas de Personaje",
+      "description": "Define qué campos deberán rellenar los jugadores para esta campaña.",
+      "nameField": "Nombre del Campo (ej: Raza, Historia, Fuerza)",
+      "requiredField": "¿Es obligatorio que el jugador lo rellene?",
+      "fields": "Campos",
+      "type": "Tipo de dato",
+      "minValue": "Valor Mínimo (Opcional)",
+      "maxValue": "Valor Máximo (Opcional)",
+      "cancel": "Cancelar edición",
+      "addField": "Añadir Campo",
+      "updateField": "Actualizar Campo",
+      "saveTemplate": "Guardar Plantilla",
+      "newField": "Nuevo Campo",
+      "editing": "Editando",
+      "shortText": "Texto Corto",
+      "shortTextDes": "Texto Corto (Ej: Raza, Clase)",
+      "longText": "Texto Largo",
+      "longTextDes": "Texto Largo (Ej: Historia, diarios)",
+      "number": "Número",
+      "numberDes": "Número (Ej: Fuerza, Edad)",
+      "checkbox": "Interruptor / Checkbox",
+      "checkboxDes": "Interruptor / Checkbox (Ej: Inspiración)"
+    },
+    "form": {
+      "submit": "Enviar Personaje",
+      "reset": "Reiniciar Formulario"
+    }
+  },
+
   "status": {
     "open": "Abierta",
     "full": "Completa"

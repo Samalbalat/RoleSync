@@ -114,6 +114,34 @@
     }
   },
 
+  "character": {
+    "templateBuilder": {
+      "title": "Character Template Builder",
+      "description": "Define which fields players will need to fill out for this campaign.",
+      "nameField": "Field Name (e.g. Race, History, Strength)",
+      "requiredField": "Is the field required?",
+      "fields": "Fields",
+      "type": "Data Type",
+      "minValue": "Minimum Value (Optional)",
+      "maxValue": "Maximum Value (Optional)",
+      "cancel": "Cancel editing",
+      "addField": "Add Field",
+      "updateField": "Update Field",
+      "saveTemplate": "Save Template",
+      "newField": "New Field",
+      "editing": "Editing",
+      "shortText": "Short Text",
+      "shortTextDes": "Short Text (e.g. Race, Class)",
+      "longText": "Long Text",
+      "longTextDes": "Long Text (e.g. History, Journals)",
+      "number": "Number",
+      "numberDes": "Number (e.g. Strength, Age)",
+      "checkbox": "Toggle / Checkbox",
+      "checkboxDes": "Toggle / Checkbox (e.g. Inspiration)"
+    
+    }
+  },
+
   "status": {
     "open": "Open",
     "full": "Full"
