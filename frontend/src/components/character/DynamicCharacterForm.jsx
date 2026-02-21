@@ -2,9 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { Card, CardBody, Typography, Input, Textarea, Button, Checkbox } from '@material-tailwind/react';
+import { useTranslation } from 'react-i18next';
 import { getTheme } from '../../utils/themeUtils';
 
 export default function DynamicCharacterForm({ templateData }) {
+	const { t } = useTranslation('global');
 	const theme = getTheme();
 	const {
 		register,
@@ -55,10 +57,10 @@ export default function DynamicCharacterForm({ templateData }) {
 				<CardBody>
 					<div className='mb-6 text-center'>
 						<Typography variant='h3' color='blue-gray'>
-							Crear Personaje
+							{t('character.form.title')}
 						</Typography>
 						<Typography color='gray' className='mt-1 font-normal'>
-							Rellena los datos para dar vida a tu nuevo personaje.
+							{t('character.form.description')}
 						</Typography>
 					</div>
 
@@ -66,13 +68,13 @@ export default function DynamicCharacterForm({ templateData }) {
 						{/* 1. CAMPOS FIJOS (Siempre están, van en la raíz del JSON) */}
 						<section className='space-y-4'>
 							<Typography variant='h5' color='blue-gray' className='border-b pb-2'>
-								Datos Básicos
+								{t('character.form.basicInfo')}
 							</Typography>
 							<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
 								<div>
 									<Input
-										label='Nombre del Personaje *'
-										{...register('name', { required: 'El nombre es obligatorio' })}
+										label={t('character.form.name')}
+										{...register('name', { required: t('errors.required') })}
 										error={!!errors.name}
 									/>
 									{errors.name && (
@@ -82,7 +84,7 @@ export default function DynamicCharacterForm({ templateData }) {
 									)}
 								</div>
 								<div>
-									<Input label='URL del Avatar (Opcional)' type='url' {...register('avatar_url')} />
+									<Input label={t('character.form.image')} type='url' {...register('avatar_url')} />
 								</div>
 							</div>
 						</section>
@@ -91,7 +93,7 @@ export default function DynamicCharacterForm({ templateData }) {
 						{schema_definition.length > 0 && (
 							<section className='space-y-4'>
 								<Typography variant='h5' color='blue-gray' className='border-b pb-2'>
-									Atributos de la Campaña
+									{t('character.form.attributes')}
 								</Typography>
 								<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 									{schema_definition.map(field => {
@@ -106,7 +108,7 @@ export default function DynamicCharacterForm({ templateData }) {
 														<Input
 															label={`${field.label} ${field.required ? '*' : ''}`}
 															{...register(fieldPath, {
-																required: field.required ? 'Este campo es obligatorio' : false,
+																required: field.required ? t('errors.required') : false,
 															})}
 															error={!!errors?.attributes?.[field.key]}
 														/>
@@ -124,7 +126,7 @@ export default function DynamicCharacterForm({ templateData }) {
 														<Textarea
 															label={`${field.label} ${field.required ? '*' : ''}`}
 															{...register(fieldPath, {
-																required: field.required ? 'Este campo es obligatorio' : false,
+																required: field.required ? t('errors.required') : false,
 															})}
 															error={!!errors?.attributes?.[field.key]}
 														/>
@@ -145,10 +147,10 @@ export default function DynamicCharacterForm({ templateData }) {
 															min={field.min}
 															max={field.max}
 															{...register(fieldPath, {
-																required: field.required,
+																required: field.required ? t('errors.required') : false,
 																valueAsNumber: true, // Crucial para que el JSON envíe un número y no un string
-																min: { value: field.min, message: `Mínimo ${field.min}` },
-																max: { value: field.max, message: `Máximo ${field.max}` },
+																min: { value: field.min, message: `${t('common.minimum')} ${field.min}` },
+																max: { value: field.max, message: `${t('common.maximum')} ${field.max}` },
 															})}
 															error={!!errors?.attributes?.[field.key]}
 														/>
@@ -177,7 +179,7 @@ export default function DynamicCharacterForm({ templateData }) {
 						{/* BOTÓN DE ENVÍO */}
 						<div className='flex justify-end pt-4'>
 							<Button type='submit' color='blue' size='lg'>
-								Forjar Personaje
+								{t('character.form.submit')}
 							</Button>
 						</div>
 					</form>

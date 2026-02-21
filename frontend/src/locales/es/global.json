@@ -20,6 +20,34 @@
     "provisional": "Provisional"
   },
 
+  "common": {
+    "welcome": "Bienvenido a RoleSync",
+    "name": "Nombre",
+    "image": "Imagen",
+    "back": "Volver",
+    "create": "Crear",
+    "save": "Guardar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "close": "Cerrar",
+    "confirmDelete": "¿Estás seguro de que deseas eliminar esto?",
+    "minimum": "Mínimo",
+    "maximum": "Máximo",
+    "yes": "Sí",
+    "no": "No"
+  },
+
+  "errors": {
+    "required": "Este campo es obligatorio",
+    "invalidEmail": "El formato del correo no es válido",
+    "invalidNumber": "Debe ser un número mayor a 0",
+    "passwordLength": "Mínimo 8 caracteres",
+    "passwordComplexity": "Debe incluir mayúscula, minúscula, número y símbolo (@$!%*?&)",
+    "passwordMatch": "Las contraseñas no coinciden",
+    "maxTags": "No puedes agregar más de 6 etiquetas",
+    "tooLong1000": "No puede exceder los 1000 caracteres"
+  },
+
   "auth": {
     "login": "Iniciar Sesión",
     "signUp": "Registrarse",
@@ -55,30 +83,8 @@
     "table": "Mesa"
   },
 
-  "common": {
-    "welcome": "Bienvenido a RoleSync",
-    "name": "Nombre",
-    "image": "Imagen",
-    "back": "Volver",
-    "create": "Crear",
-    "save": "Guardar",
-    "edit": "Editar",
-    "delete": "Eliminar",
-    "confirmDelete": "¿Estás seguro de que deseas eliminar esto?"
-  },
-
-  "errors": {
-    "required": "Este campo es obligatorio",
-    "invalidEmail": "El formato del correo no es válido",
-    "invalidNumber": "Debe ser un número mayor a 0",
-    "passwordLength": "Mínimo 8 caracteres",
-    "passwordComplexity": "Debe incluir mayúscula, minúscula, número y símbolo (@$!%*?&)",
-    "passwordMatch": "Las contraseñas no coinciden",
-    "maxTags": "No puedes agregar más de 6 etiquetas",
-    "tooLong1000": "No puede exceder los 1000 caracteres"
-  },
-
   "campaign": { 
+    "campaign": "Campaña",
     "name": "Nombre", 
     "image": "Imagen",
     "description": "Descripción",
@@ -89,14 +95,11 @@
     "theme": "Temática",
     "themes": "Temáticas",
     "tagHelper": "Presiona",
-    "themePlaceholder": "Ej: Vampiros, Sci-Fi...",
     "location": "Lugar",
-    "locationPlaceholder": "Ej: Sevilla, Online...",
     "schedule": "Día / Frecuencia", 
     "duration": "Duración",
     "communication": "Comunicación",
     "maxPlayers": "Máximo de Jugadores",
-    "communicationPlaceholder": "Ej: Discord, Twitter...",
     "logistics": "Logística",
     "accessDeniedMessage": "No estás autorizado para ver esta campaña.",
     "fraseFinder": "Encuentra tu próxima ", 
@@ -106,6 +109,16 @@
     "noResultsFound": "No se encontraron resultados.",
     "createTitle": "Crear Nueva Campaña",
     "generalInfo": "Información General",
+    "placeholder": {
+      "theme": "E.j.: Vampiros, Sci-Fi...",
+      "location": "E.j.: Sevilla, Online...",
+      "communication": "E.j.: Discord, Twitter..." 
+    },
+    "message":{
+      "manageCampaign":"Gestionar Campaña",
+      "technicalDetails":"Detalles Técnicos y DM",
+      "playerMessage":"Eres jugador en esta aventura."
+    },
     "detail": {
       "about": "Sobre la Campaña",
       "tags": "Etiquetas / Temática",
@@ -115,11 +128,16 @@
       "join": "Solicitar Unirse",
       "joinFull": "Lista de Espera",
       "contactGM": "Mensaje al Master",
-      "infoTitle": "Detalles de la Partida"
+      "infoTitle": "Detalles de la Partida",
+      "pending": "Solicitud Pendiente"
     }
   },
 
   "character":{
+    "characters": "Personajes",
+    "history": "Historia y Trasfondo",
+    "description": "Descripción",
+    "attributes": "Atributos",
     "templateBuilder": {
       "title": "Constructor de Plantillas de Personaje",
       "description": "Define qué campos deberán rellenar los jugadores para esta campaña.",
@@ -145,8 +163,19 @@
       "checkboxDes": "Interruptor / Checkbox (Ej: Inspiración)"
     },
     "form": {
-      "submit": "Enviar Personaje",
-      "reset": "Reiniciar Formulario"
+      "title": "Crear Personaje",
+      "description": "Rellena los datos para dar vida a tu nuevo personaje.",
+      "basicInfo": "Información Básica",
+      "name": "Nombre del Personaje *",
+      "image": "URL del Avatar (Opcional)",
+      "attributes": "Atributos de la Campaña",
+      "submit": "Forjar Personaje"
+    },
+    "message": {
+      "loadingCharacter": "Cargando perfil del personaje..."
+    },
+    "list": {
+      "withoutCharacters": "Aún no hay jugadores en esta campaña."
     }
   },
 
