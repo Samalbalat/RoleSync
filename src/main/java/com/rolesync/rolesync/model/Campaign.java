@@ -29,11 +29,11 @@ public class Campaign {
     // We store the members as an array of profile names for easy access, 
     // but we will always check the profiles service to get the actual profiles and their types when needed
     @Column(name = "members", columnDefinition = "text[]")
-    private List<String> members;
+    private String[] members;
 
     // We store the characters as an array of character ids for easy access
     @Column(name = "characters", columnDefinition = "integer[]")
-    private List<Integer> characters;
+    private Integer[] characters;
 
     private String name;
     private String image;

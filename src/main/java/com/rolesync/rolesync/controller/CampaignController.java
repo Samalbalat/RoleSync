@@ -1,10 +1,10 @@
 package com.rolesync.rolesync.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -236,8 +236,7 @@ public class CampaignController {
         dto.setImage(campaign.getImage());
         dto.setStatus(campaign.getStatus().name());
         dto.setType(campaign.getCampaignType().name());
-
-        dto.setCurrentPlayers(campaign.getMembers() != null ? campaign.getMembers().size() : 0);
+        dto.setCurrentPlayers(campaign.getMembers() != null ? Arrays.asList(campaign.getMembers()).size() : 0);
         dto.setMaxPlayers(campaign.getMaxPlayers());
 
         OwnerProfileDTO owner = new OwnerProfileDTO();
@@ -264,7 +263,8 @@ public class CampaignController {
         campaign.setDuration(dto.getDuration());
         campaign.setLocation(dto.getLocation());
         campaign.setTimeZone(dto.getTimeZone());
-        campaign.setMembers(new ArrayList<>());
+        campaign.setMembers(new String[0]);
+        campaign.setCharacters(new Integer[0]);
         campaign.setCampaignType(ProfileType.valueOf(dto.getType()));
         campaign.setStatus(CampaignStatus.OPEN);
     }
