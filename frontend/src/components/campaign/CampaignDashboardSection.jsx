@@ -1,51 +1,81 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 import { Typography, Button } from '@material-tailwind/react';
+import { PlusIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { useTranslation } from 'react-i18next';
+import { getTheme } from '../../utils/themeUtils';
 import CampaignMiniCard from './CampaignMiniCard';
 
-export default function CampaignDashboardSection({ title, subtitle, campaigns, isMaster, theme, onCardClick, emptyState }) {
+export default function CampaignDashboardSection({ campaigns, role }) {
+	const { t } = useTranslation('global');
+	const navigate = useNavigate();
+	const theme = getTheme();
+	const isMaster = role === 'master';
+
+	const sectionConfig = {
+		master: {
+			title: t('home.masterCampaigns.title'),
+			emptyMsg: t('home.masterCampaigns.emptyMessage'),
+			btnText: t('home.masterCampaigns.createButton'),
+			btnIcon: <PlusIcon className='h-4 w-4' />,
+			btnVariant: 'filled',
+			actionRoute: '/create-campaign',
+		},
+		player: {
+			title: t('home.playerCampaigns.title'),
+			emptyMsg: t('home.playerCampaigns.emptyMessage'),
+			btnText: t('home.playerCampaigns.findButton'),
+			btnIcon: <MagnifyingGlassIcon className='h-4 w-4' />,
+			btnVariant: 'outlined',
+			actionRoute: '/find-campaign',
+		},
+	};
+
+	const config = sectionConfig[role];
+
 	return (
-		<section className='animate-fade-in-up mb-12'>
-			<div className='mb-6'>
+		<section className='animate-fade-in-up w-full'>
+			<div className='mb-4 px-1'>
 				<Typography
-					variant='h5'
-					className={`font-bold flex items-center gap-2 ${theme.isDark ? 'text-gray-200' : 'text-gray-800'}`}
+					variant='h6'
+					className={`font-bold flex items-center gap-2 ${theme.isDark ? 'text-gray-300' : 'text-gray-700'}`}
 				>
-					{title}
-				</Typography>
-				<Typography variant='small' className='text-gray-500'>
-					{subtitle}
+					{config.title}
 				</Typography>
 			</div>
 
 			{campaigns.length > 0 ? (
-				<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
-					{campaigns.slice(0, 4).map(campaign => (
-						<CampaignMiniCard
-							key={campaign.id}
-							campaign={campaign}
-							isMaster={isMaster}
-							theme={theme}
-							onClick={() => onCardClick(campaign.id)}
-						/>
+				<div
+					className='flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 pt-1 px-1 scrollbar-hide'
+					style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+				>
+					{campaigns.map(campaign => (
+						<div key={campaign.id} className='min-w-[260px] sm:min-w-[280px] snap-start flex-shrink-0'>
+							<CampaignMiniCard
+								campaign={campaign}
+								isMaster={isMaster}
+								theme={theme}
+								onClick={() => navigate(`/campaigns/${campaign.id}`)}
+							/>
+						</div>
 					))}
 				</div>
 			) : (
-				/* Estado Vacío */
 				<div
 					className={`p-8 rounded-xl border border-dashed text-center ${theme.isDark ? 'bg-blue-gray-900/30 border-gray-700' : 'bg-white border-gray-300'}`}
 				>
 					<Typography color='gray' className='mb-2'>
-						{emptyState.message}
+						{config.emptyMsg}
 					</Typography>
 					<Button
 						size='sm'
-						variant={emptyState.btnVariant || 'filled'}
+						variant={config.btnVariant}
 						color={theme.primary}
 						className='flex items-center gap-2 mx-auto'
-						onClick={emptyState.action}
+						onClick={() => navigate(config.actionRoute)}
 					>
-						{emptyState.icon} {emptyState.btnText}
+						{config.btnIcon} {config.btnText}
 					</Button>
 				</div>
 			)}
@@ -54,17 +84,6 @@ export default function CampaignDashboardSection({ title, subtitle, campaigns, i
 }
 
 CampaignDashboardSection.propTypes = {
-	title: PropTypes.string.isRequired,
-	subtitle: PropTypes.string.isRequired,
 	campaigns: PropTypes.array.isRequired,
-	isMaster: PropTypes.bool.isRequired,
-	theme: PropTypes.object.isRequired,
-	onCardClick: PropTypes.func.isRequired,
-	emptyState: PropTypes.shape({
-		message: PropTypes.string.isRequired,
-		btnVariant: PropTypes.string,
-		action: PropTypes.func.isRequired,
-		icon: PropTypes.node,
-		btnText: PropTypes.string.isRequired,
-	}).isRequired,
+	role: PropTypes.oneOf(['master', 'player']).isRequired,
 };

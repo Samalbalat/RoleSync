@@ -77,7 +77,7 @@ export default function CampaignFilterBar({ filters, setFilters, onClean, theme 
 						{/* --- CAMPOS COMUNES --- */}
 						<Input
 							label={t('campaign.theme')}
-							placeholder={t('campaign.themePlaceholder')}
+							placeholder={t('campaign.placeholder.theme')}
 							value={filters.theme}
 							onChange={e => handleChange('theme', e.target.value)}
 							color={theme.primary}
@@ -85,7 +85,7 @@ export default function CampaignFilterBar({ filters, setFilters, onClean, theme 
 
 						<Input
 							label={t('campaign.communication')}
-							placeholder={t('campaign.communicationPlaceholder')}
+							placeholder={t('campaign.placeholder.communication')}
 							value={filters.communication}
 							onChange={e => handleChange('communication', e.target.value)}
 							color={theme.primary}
@@ -132,7 +132,7 @@ export default function CampaignFilterBar({ filters, setFilters, onClean, theme 
 
 								<Input
 									label={t('campaign.location')}
-									placeholder={t('campaign.locationPlaceholder')}
+									placeholder={t('campaign.placeholder.location')}
 									value={filters.location}
 									onChange={e => handleChange('location', e.target.value)}
 									color={theme.primary}

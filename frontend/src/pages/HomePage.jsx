@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Typography, Spinner } from '@material-tailwind/react';
-import { PlusIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { Typography, Spinner, Button } from '@material-tailwind/react';
 import { getTheme } from '../utils/themeUtils';
 import CampaignDashboardSection from '../components/campaign/CampaignDashboardSection';
+import UserCharacterCarousel from '../components/character/UserCharacterCarousel';
+import { ArrowRightIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
 
 // Mock Data (Simulado)
@@ -33,10 +34,10 @@ const mockMyCampaigns = {
 };
 
 export default function HomePage() {
-	const { t } = useTranslation('global');
 	const location = useLocation();
 	const navigate = useNavigate();
 	const theme = getTheme();
+	const { t } = useTranslation('global');
 
 	const [loading, setLoading] = useState(true);
 	const [myCampaigns, setMyCampaigns] = useState({ asMaster: [], asPlayer: [] });
@@ -45,7 +46,7 @@ export default function HomePage() {
 	useEffect(() => {
 		if (location.state?.message) {
 			toast.success(location.state.message, { style: { background: '#333', color: '#fff' } });
-			window.history.replaceState({}, document.title);
+			globalThis.history.replaceState({}, document.title);
 		}
 	}, [location.state]);
 
@@ -72,48 +73,46 @@ export default function HomePage() {
 		<div className={`min-h-screen ${theme.background} transition-colors duration-300`}>
 			<header
 				className={`${theme.isDark ? 'bg-blue-gray-900/50 border-b border-blue-gray-800' : 'bg-white shadow-sm'} sticky top-0 z-10 backdrop-blur-md`}
-			>
-				<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4'>
-					<Typography variant='h4' className={`font-bold ${theme.isDark ? 'text-white' : 'text-gray-900'}`}>
-						RoleSync <span className={`text-${theme.primary}-500`}>Dashboard</span>
-					</Typography>
-				</div>
-			</header>
+			></header>
 
 			<main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-				{/* partidas como Master */}
-				<CampaignDashboardSection
-					title={t('home.masterCampaigns.title')}
-					subtitle={t('home.masterCampaigns.subtitle')}
-					campaigns={activeMasterCampaigns}
-					isMaster={true}
-					theme={theme}
-					onCardClick={id => navigate(`/campaigns/${id}`)}
-					emptyState={{
-						message: t('home.masterCampaigns.emptyMessage'),
-						btnText: t('home.masterCampaigns.createButton'),
-						icon: <PlusIcon className='h-4 w-4' />,
-						action: () => navigate('/create-campaign'),
-						btnVariant: 'filled',
-					}}
-				/>
+				<div className='flex justify-between items-end mb-6 px-2'>
+					<div>
+						<Typography variant='h4' color='blue-gray' className={theme.isDark ? 'text-white' : ''}>
+							{t('home.yourCampaigns')}
+						</Typography>
+						<Typography color='gray' className='font-normal mt-1'>
+							{t('home.campaignPhrase')}
+						</Typography>
+					</div>
+					<Button
+						variant='text'
+						color={theme.secondary}
+						className='hidden sm:flex items-center gap-2'
+						onClick={() => navigate('/campaigns')}
+					>
+						{t('common.viewAll')} <ArrowRightIcon className='h-4 w-4' />
+					</Button>
+				</div>
 
-				{/* partidas como Jugador */}
-				<CampaignDashboardSection
-					title={t('home.playerCampaigns.title')}
-					subtitle={t('home.playerCampaigns.subtitle')}
-					campaigns={activePlayerCampaigns}
-					isMaster={false}
-					theme={theme}
-					onCardClick={id => navigate(`/campaigns/${id}`)}
-					emptyState={{
-						message: t('home.playerCampaigns.emptyMessage'),
-						btnText: t('home.playerCampaigns.findButton'),
-						icon: <MagnifyingGlassIcon className='h-4 w-4' />,
-						action: () => navigate('/find-campaign'),
-						btnVariant: 'outlined',
-					}}
-				/>
+				{/* Grid de 2 columnas para PC */}
+				<div className='grid grid-cols-1 xl:grid-cols-2 gap-8 mb-12'>
+					<div className='min-w-0'>
+						<CampaignDashboardSection campaigns={activeMasterCampaigns} role='master' />
+					</div>
+					<div className='min-w-0'>
+						<CampaignDashboardSection campaigns={activePlayerCampaigns} role='player' />
+					</div>
+				</div>
+
+				{/* Botón móvil global de campañas (opcional, si quieres que se vea en móvil) */}
+				<div className='mb-12 sm:hidden flex justify-center px-2'>
+					<Button variant='outlined' color={theme.secondary} fullWidth onClick={() => navigate('/campaigns')}>
+						{t('common.viewAll')} {t('home.yourCampaigns')}
+					</Button>
+				</div>
+
+				<UserCharacterCarousel />
 			</main>
 		</div>
 	);

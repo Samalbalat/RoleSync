@@ -19,6 +19,8 @@ export const getTheme = () => {
             secondary: 'blue',
             bgLight: 'bg-indigo-50',
             textPrimary: 'text-indigo-900',
+            textSecondary: 'text-indigo-500',
+            border: 'border-t-indigo-500',
             buttonColor: 'indigo',
             badge: 'purple'
         };
@@ -29,6 +31,8 @@ export const getTheme = () => {
         secondary: 'orange',
         bgLight: 'bg-red-50',
         textPrimary: 'text-red-900',
+        textSecondary: 'text-red-500',
+        border: 'border-t-red-500',
         buttonColor: 'red',
         badge: 'red'
     };

@@ -5,6 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import prettier from 'eslint-config-prettier/flat';
 
 export default [
+  prettier,
   { ignores: ['dist'] },
 
   {
@@ -21,7 +22,6 @@ export default [
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
-      'prettier': prettier
     },
     settings: {
       react: {

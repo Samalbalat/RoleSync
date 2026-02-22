@@ -1,5 +1,7 @@
-{
+{ 
   "home": {
+    "yourCampaigns": "Your campaigns",
+    "campaignPhrase": "The worlds you lead and the adventures you explore.",
     "masterCampaigns": {
       "title": "🛡️ Campaigns You Lead",
       "subtitle": "Active campaigns under your control.",
@@ -11,6 +13,13 @@
       "subtitle": "Worlds you're currently exploring.",
       "emptyMessage": "You're not playing in any active tables.",
       "findButton": "Find in the Tavern"
+    },
+    "playerCharacters": {
+      "title": "🎭 Your Characters",
+      "subtitle": "The heroes you've forged in your adventures.",
+      "emptyMessage": "You haven't created any characters yet.",
+      "createButton": "Create Your First Character",
+      "noCampaign": "No campaign"
     }
   },
   
@@ -19,6 +28,37 @@
     "createCampaign": "Create Campaign",
     "provisional": "Provisional"
   },
+
+  "common": {
+    "welcome": "Welcome to RoleSync",
+    "name": "Name",
+    "image": "Image",
+    "back": "Back",
+    "create": "Create",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirmDelete": "Are you sure you want to delete this?",
+    "viewAll": "View All",
+    "minimum": "Minimum",
+    "maximum": "Maximum",
+    "yes": "Yes",
+    "no": "No"
+  },
+  
+  "errors": {
+    "required": "This field is required",
+    "invalidEmail": "The email format is not valid",
+    "invalidNumber": "Must be a number greater than 0",
+    "passwordLength": "Minimum 8 characters",
+    "passwordComplexity": "Must include uppercase, lowercase, number, and symbol (_@$!%*?&-)",
+    "passwordMatch": "Passwords do not match",
+    "maxTags": "You cannot add more than 6 tags",
+    "tooLong1000": "Cannot exceed 1000 characters"
+  },
+
   "auth": {
     "login": "Login",
     "signUp": "Sign Up",
@@ -37,6 +77,7 @@
     "successRegistration": "Registration successful! You can now log in.",
     "successLogin": "Login successful!"
   },
+
   "account": {
     "name": "Name",
     "email": "Email",
@@ -44,6 +85,7 @@
     "confirmPassword": "Confirm Password",
     "timeZone": "Time Zone"
   },
+
   "profile": {
     "profileName": "Profile Name",
     "description": "Description",
@@ -51,29 +93,9 @@
     "narrative": "Narrative",
     "table": "Table"
   },
-  "common": {
-    "welcome": "Welcome to RoleSync",
-    "name": "Name",
-    "image": "Image",
-    "back": "Back",
-    "create": "Create",
-    "save": "Save",
-    "edit": "Edit",
-    "delete": "Delete",
-    "confirmDelete": "Are you sure you want to delete this?"
-  },
-  "errors": {
-    "required": "This field is required",
-    "invalidEmail": "The email format is not valid",
-    "invalidNumber": "Must be a number greater than 0",
-    "passwordLength": "Minimum 8 characters",
-    "passwordComplexity": "Must include uppercase, lowercase, number, and symbol (_@$!%*?&-)",
-    "passwordMatch": "Passwords do not match",
-    "maxTags": "You cannot add more than 6 tags",
-    "tooLong1000": "Cannot exceed 1000 characters"
-  },
 
   "campaign": {
+    "campaign": "Campaign",
     "name": "Name", 
     "image": "Image",
     "description": "Description",
@@ -83,15 +105,12 @@
     "timeZone": "Time Zone", 
     "theme": "Theme",
     "themes": "Themes",
-    "themePlaceholder": "E.g.: Vampires, Sci-Fi...",
     "tagHelper": "Press",
     "location": "Location",
-    "locationPlaceholder": "E.g.: Seville, Online...",
     "schedule": "Day / Frequency", 
     "duration": "Duration",
     "communication": "Communication",
     "maxPlayers": "Maximum Players",
-    "communicationPlaceholder": "E.g.: Discord, Twitter..." ,
     "logistics": "Logistics",
     "accessDeniedMessage": "You are not authorized to view this campaign.",
     "fraseFinder": "Find your next ",
@@ -101,6 +120,16 @@
     "noResultsFound": "No results found.",
     "createTitle": "Create New Campaign",
     "generalInfo": "General Information",
+    "placeholder": {
+      "theme": "E.g.: Vampires, Sci-Fi...",
+      "location": "E.g.: Seville, Online...",
+      "communication": "E.g.: Discord, Twitter..." 
+    },
+    "message":{
+      "manageCampaign":"Manage Campaign",
+      "technicalDetails":"Technical Details and DM",
+      "playerMessage":"You are a player in this adventure"
+    },
     "detail": {
       "about": "About the Campaign",
       "tags": "Tags / Theme",
@@ -110,7 +139,66 @@
       "join": "Request to Join",
       "joinFull": "Waiting List",
       "contactGM": "Message the GM",
-      "infoTitle": "Game Details"
+      "infoTitle": "Game Details",
+      "pending": "Request Pending"
+    }
+  },
+
+  "character": {
+    "characters": "Characters",
+    "history": "History and Background",
+    "description": "Description",
+    "attributes": "Attributes",
+    "templateBuilder": {
+      "title": "Character Template Builder",
+      "description": "Define which fields players will need to fill out for this campaign.",
+      "nameField": "Field Name (e.g. Race, History, Strength)",
+      "requiredField": "Is the field required?",
+      "fields": "Fields",
+      "type": "Data Type",
+      "minValue": "Minimum Value (Optional)",
+      "maxValue": "Maximum Value (Optional)",
+      "cancel": "Cancel editing",
+      "addField": "Add Field",
+      "updateField": "Update Field",
+      "saveTemplate": "Save Template",
+      "newField": "New Field",
+      "editing": "Editing",
+      "shortText": "Short Text",
+      "shortTextDes": "Short Text (e.g. Race, Class)",
+      "longText": "Long Text",
+      "longTextDes": "Long Text (e.g. History, Journals)",
+      "number": "Number",
+      "numberDes": "Number (e.g. Strength, Age)",
+      "checkbox": "Toggle / Checkbox",
+      "checkboxDes": "Toggle / Checkbox (e.g. Inspiration)",
+      "successSave": "Template saved successfully!",
+      "errorNoFields": "You must add at least one field to the template.",
+      "errorNoCampaignId": "Error: Campaign ID not found.",
+      "errorSave": "There was an error saving the template."
+    },
+    "form": {
+      "title": "Create Character",
+      "freeCreation": "Free Creation",
+      "freeCreationDescription": "Create a character from scratch by adding the attributes and features you need.",
+      "description": "Fill in the details to bring your new character to life.",
+      "basicInfo": "Basic Information",
+      "name": "Character Name *",
+      "image": "Avatar URL (Optional)",
+      "attributes": "Campaign Attributes",
+      "attributeName": "Attribute Name",
+      "personalAttributes": "Personal Attributes",
+      "atributesDescription": "Add stats, background, inventory... (e.g. \"Strength\", \"History\").",
+      "value": "Value (e.g. 18, 'Dark Elf...')",
+      "submit": "Forge Character"
+    },
+    "message": {
+      "loadingCharacter": "Loading character profile...",
+      "complete": "Complete the character sheet according to the rules of this campaign.",
+      "errorLoading": "Error loading campaign template. Try again later."
+    },
+    "list": {
+      "withoutCharacters": "There are no adventurers forged in this campaign yet."
     }
   },
 

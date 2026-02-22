@@ -4,11 +4,13 @@ import { UserCircleIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/s
 import { NavLink, useNavigate } from 'react-router-dom';
 import { menuItems } from '../../data/menuList';
 import { useTranslation } from 'react-i18next';
+import { getTheme } from '../../utils/themeUtils';
 import { useAuth } from '../../utils/AuthContext';
 
 export default function Navbar() {
 	const { t } = useTranslation('global');
 	const navigate = useNavigate();
+	const theme = getTheme();
 	const { activeProfile, logout } = useAuth();
 	const [openNav, setOpenNav] = React.useState(false);
 
@@ -37,7 +39,7 @@ export default function Navbar() {
 							to={path}
 							className={({ isActive }) =>
 								`flex items-center gap-x-2 p-1 rounded transition-colors ${
-									isActive ? 'text-blue-600 bg-blue-50 font-medium' : 'text-gray-900 hover:text-blue-500'
+									isActive ? `${theme.textPrimary} bg-blue-50 font-medium` : `text-gray-900 hover:${theme.textPrimary}`
 								}`
 							}
 						>
