@@ -1,5 +1,7 @@
 { 
   "home": {
+    "yourCampaigns": "Your campaigns",
+    "campaignPhrase": "The worlds you lead and the adventures you explore.",
     "masterCampaigns": {
       "title": "🛡️ Campaigns You Lead",
       "subtitle": "Active campaigns under your control.",
@@ -11,6 +13,13 @@
       "subtitle": "Worlds you're currently exploring.",
       "emptyMessage": "You're not playing in any active tables.",
       "findButton": "Find in the Tavern"
+    },
+    "playerCharacters": {
+      "title": "🎭 Your Characters",
+      "subtitle": "The heroes you've forged in your adventures.",
+      "emptyMessage": "You haven't created any characters yet.",
+      "createButton": "Create Your First Character",
+      "noCampaign": "No campaign"
     }
   },
   
@@ -30,7 +39,9 @@
     "edit": "Edit",
     "delete": "Delete",
     "close": "Close",
+    "cancel": "Cancel",
     "confirmDelete": "Are you sure you want to delete this?",
+    "viewAll": "View All",
     "minimum": "Minimum",
     "maximum": "Maximum",
     "yes": "Yes",
@@ -164,15 +175,23 @@
     },
     "form": {
       "title": "Create Character",
+      "freeCreation": "Free Creation",
+      "freeCreationDescription": "Create a character from scratch by adding the attributes and features you need.",
       "description": "Fill in the details to bring your new character to life.",
       "basicInfo": "Basic Information",
       "name": "Character Name *",
       "image": "Avatar URL (Optional)",
       "attributes": "Campaign Attributes",
+      "attributeName": "Attribute Name",
+      "personalAttributes": "Personal Attributes",
+      "atributesDescription": "Add stats, background, inventory... (e.g. \"Strength\", \"History\").",
+      "value": "Value (e.g. 18, 'Dark Elf...')",
       "submit": "Forge Character"
     },
     "message": {
-      "loadingCharacter": "Loading character profile..."
+      "loadingCharacter": "Loading character profile...",
+      "complete": "Complete the character sheet according to the rules of this campaign.",
+      "errorLoading": "Error loading campaign template. Try again later."
     },
     "list": {
       "withoutCharacters": "There are no adventurers forged in this campaign yet."

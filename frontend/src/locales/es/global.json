@@ -1,5 +1,7 @@
 {
   "home": {
+    "yourCampaigns": "Tus campañas",
+    "campaignPhrase": "Los mundos que diriges y las aventuras que exploras.",
     "masterCampaigns": {
       "title": "🛡️ Partidas que Diriges",
       "subtitle": "Campañas activas bajo tu control.",
@@ -11,6 +13,13 @@
       "subtitle": "Mundos que estás explorando actualmente.",
       "emptyMessage": "No estás jugando en ninguna mesa activa.",
       "findButton": "Buscar en la Taberna"
+    },
+    "playerCharacters": {
+      "title": "🎭 Tus Personajes",
+      "subtitle": "Los héroes que has forjado en tus aventuras.",
+      "emptyMessage": "Aún no has creado ningún personaje.",
+      "createButton": "Crear Tu Primer Personaje",
+      "noCampaign": "Sin campaña"
     }
   },
 
@@ -30,6 +39,8 @@
     "edit": "Editar",
     "delete": "Eliminar",
     "close": "Cerrar",
+    "cancel": "Cancelar",
+    "viewAll": "Ver Todos",
     "confirmDelete": "¿Estás seguro de que deseas eliminar esto?",
     "minimum": "Mínimo",
     "maximum": "Máximo",
@@ -164,15 +175,23 @@
     },
     "form": {
       "title": "Crear Personaje",
+      "freeCreation": "Creación Libre",
+      "freeCreationDescription": "Crea un personaje desde cero añadiendo los atributos y características que necesites.",
       "description": "Rellena los datos para dar vida a tu nuevo personaje.",
       "basicInfo": "Información Básica",
       "name": "Nombre del Personaje *",
       "image": "URL del Avatar (Opcional)",
       "attributes": "Atributos de la Campaña",
+      "attributeName": "Nombre del atributo",
+      "personalAttributes": "Atributos Personalizados",
+      "atributesDescription": "Añade estadísticas, trasfondo, inventario... (Ej: \"Fuerza\", \"Historia\").",
+      "value": "Valor (Ej: 18, 'Elfo oscuro...')",
       "submit": "Forjar Personaje"
     },
     "message": {
-      "loadingCharacter": "Cargando perfil del personaje..."
+      "loadingCharacter": "Cargando perfil del personaje...",
+      "complete": "Completa la ficha según las reglas de esta campaña.",
+      "errorLoading": "Error al cargar la plantilla de la campaña. Por favor, inténtalo de nuevo más tarde."
     },
     "list": {
       "withoutCharacters": "Aún no hay jugadores en esta campaña."

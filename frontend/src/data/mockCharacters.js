@@ -78,6 +78,9 @@ export const mockFullCharacters = [
       "Raza": "Humano",
       "Fuerza": 18,
       "Vida": 45,
+      "Pelo": "Castaño",
+      "Ojos": "Verdes",
+      "Altura": "1.80m",
       "Historia": "Nacido en las frías montañas del norte, Alex siempre destacó por su fuerza descomunal...",
       "Inspiración del DM": true
     }
@@ -114,6 +117,7 @@ export const mockFullCharacters = [
       "Inspiración del DM": true
     }
   },
+  
 ];
 
 // Simulamos la llamada a la API

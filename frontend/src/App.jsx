@@ -57,16 +57,15 @@ function App() {
 							<Route path='campaigns/edit/:id' element={<EditCampaignPage />} />
 
 							{/* Rutas de Personajes */}
-							<Route path='character/template-builder' element={<TemplateBuilder />} />
-							<Route path='test-crear-personaje' element={<CreateCharacterPage />} />
 							<Route
-								path='test-builder'
+								path='character/templateBuilder'
 								element={
 									<div className='min-h-screen bg-gray-50 py-10'>
 										<TemplateBuilder />
 									</div>
 								}
 							/>
+							<Route path='createCharacter' element={<CreateCharacterPage />} />
 						</Route>
 					</Route>
 					<Route path='*' element={<Navigate to='/' replace />} />
