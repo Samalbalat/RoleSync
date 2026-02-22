@@ -2,12 +2,23 @@ import React, { useState } from 'react';
 import { Card, CardBody, Typography, Input, Select, Option, Button, Checkbox, IconButton } from '@material-tailwind/react';
 import { TrashIcon, PlusIcon, PencilIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useSearchParams } from 'react-router-dom'; // <-- IMPORTANTE
+import toast from 'react-hot-toast'; // <-- IMPORTANTE
 import { validateRequired } from '../../utils/validators';
+import { getTheme } from '../../utils/themeUtils';
 
 export default function TemplateBuilder() {
 	const { t } = useTranslation('global');
+	const navigate = useNavigate();
+
+	// Obtenemos el campaignId de la URL para saber a qué campaña pertenece esta plantilla
+	const [searchParams] = useSearchParams();
+	const campaignId = searchParams.get('campaignId');
+
 	const [fields, setFields] = useState([]);
+	const theme = getTheme();
 	const [editingIndex, setEditingIndex] = useState(null);
+	const [errors, setErrors] = useState({});
 
 	const [currentField, setCurrentField] = useState({
 		label: '',
@@ -36,8 +47,6 @@ export default function TemplateBuilder() {
 		return `${cleanLabel}_${randomSuffix}`;
 	};
 
-	const [errors, setErrors] = useState({});
-
 	const handleChange = (name, value) => {
 		setCurrentField(prev => ({ ...prev, [name]: value }));
 		if (errors[name]) {
@@ -53,7 +62,6 @@ export default function TemplateBuilder() {
 			return;
 		}
 
-		// Comprobación en positivo
 		if (typeof editingIndex === 'number') {
 			const updatedFields = [...fields];
 			updatedFields[editingIndex] = currentField;
@@ -66,18 +74,11 @@ export default function TemplateBuilder() {
 			};
 			setFields([...fields, newFieldWithKey]);
 		}
-
 		resetForm();
 	};
 
 	const resetForm = () => {
-		setCurrentField({
-			label: '',
-			type: 'short_text',
-			required: false,
-			min: '',
-			max: '',
-		});
+		setCurrentField({ label: '', type: 'short_text', required: false, min: '', max: '' });
 		setEditingIndex(null);
 		setErrors({});
 	};
@@ -95,6 +96,40 @@ export default function TemplateBuilder() {
 		}
 	};
 	const isEditing = typeof editingIndex === 'number';
+
+	// --- NUEVO MANEJADOR DE ENVÍO DE LA PLANTILLA COMPLETA ---
+	const handleSubmitTemplate = async e => {
+		e.preventDefault();
+
+		if (fields.length === 0) {
+			toast.error(t('character.templateBuilder.errorNoFields'));
+			return;
+		}
+		if (!campaignId) {
+			toast.error(t('character.templateBuilder.errorNoCampaignId'));
+			return;
+		}
+
+		const payload = {
+			campaign_id: campaignId,
+			fields: fields,
+		};
+
+		try {
+			// Simulación de la respuesta exitosa de la API
+			console.log('Enviando JSON al backend:', JSON.stringify(payload, null, 2));
+			const mockResponse = { id: 1, campaign_id: campaignId };
+
+			toast.success(t('character.templateBuilder.successSave'));
+
+			setTimeout(() => {
+				navigate(`/campaign/${mockResponse.campaign_id}`);
+			}, 1000);
+		} catch (error) {
+			console.error('Error al guardar la plantilla:', error);
+			toast.error(t('character.templateBuilder.errorSave'));
+		}
+	};
 
 	return (
 		<div className='w-full max-w-4xl mx-auto p-4 space-y-6'>
@@ -151,7 +186,7 @@ export default function TemplateBuilder() {
 			)}
 
 			{/* FORMULARIO PARA AÑADIR/EDITAR CAMPO */}
-			<Card className={`w-full shadow-md border-t-4 ${isEditing ? 'border-t-blue-500' : 'border-t-transparent'}`}>
+			<Card className={`w-full shadow-md border-t-4 ${isEditing ? theme.border : 'border-t-transparent'}`}>
 				<CardBody className='flex flex-col gap-4'>
 					<div className='flex justify-between items-center'>
 						<Typography variant='h5' color={editingIndex === null ? 'blue-gray' : 'blue'}>
@@ -237,16 +272,11 @@ export default function TemplateBuilder() {
 				</CardBody>
 			</Card>
 
-			<div className='flex justify-end mt-8 border-t pt-6'>
-				<Button
-					color='green'
-					size='lg'
-					onClick={() => console.log('Enviando JSON al backend:', JSON.stringify(fields, null, 2))}
-					disabled={fields.length === 0}
-				>
+			<form onSubmit={handleSubmitTemplate} className='flex justify-end mt-8 border-t pt-6'>
+				<Button type='submit' color='green' size='lg' disabled={fields.length === 0}>
 					{t('character.templateBuilder.saveTemplate')}
 				</Button>
-			</div>
+			</form>
 		</div>
 	);
 }

@@ -32,6 +32,7 @@ import {
 import { mockCampaigns } from '../../data/mockCampaigns';
 import CampaignCharacterList from '../../components/character/CampaignCharacterList';
 import { mockCampaignCharacters } from '../../data/mockCharacters';
+import { getTheme } from '../../utils/themeUtils';
 
 // eslint-disable-next-line no-unused-vars
 const InfoRow = ({ icon: IconComponent, color, title, value }) => {
@@ -128,7 +129,7 @@ const ActionCard = ({ campaign, t, navigate, isFull, progress, themeColor }) => 
 		if (relation === 'OWNER') {
 			return (
 				<div className='text-center space-y-4'>
-					<Typography variant='h5' color='blue-gray'>
+					<Typography variant='h5' className={`${themeColor.textPrimary} `}>
 						{t('campaign.message.manageCampaign')}
 					</Typography>
 
@@ -212,6 +213,7 @@ const ActionCard = ({ campaign, t, navigate, isFull, progress, themeColor }) => 
 export default function CampaignDetailPage() {
 	const { t } = useTranslation('global');
 	const { id } = useParams();
+	const theme = getTheme();
 	const navigate = useNavigate();
 
 	const [userProfile, setUserProfile] = useState(null);
@@ -244,7 +246,6 @@ export default function CampaignDetailPage() {
 	const hasInsideAccess = isOwner || isParticipant;
 
 	const isWritten = campaign.type === 'WRITTEN';
-	const themeColor = isWritten ? 'indigo' : 'deep-orange';
 	const progress = (campaign.currentPlayers / campaign.maxPlayers) * 100;
 	const isFull = campaign.currentPlayers >= campaign.maxPlayers;
 
@@ -280,20 +281,13 @@ export default function CampaignDetailPage() {
 		<div className='max-w-7xl mx-auto px-4 py-8 animate-fade-in'>
 			{/* Header / Botones Superiores */}
 			<div className='flex justify-between items-center mb-6'>
-				<Button variant='text' className='flex items-center gap-2 pl-0 text-gray-600' onClick={() => navigate('/campaigns')}>
+				<Button
+					variant='text'
+					className={`flex items-center gap-2 pl-0 ${theme.textSecondary}`}
+					onClick={() => navigate('/campaigns')}
+				>
 					<ArrowLeftIcon className='h-4 w-4' /> {t('common.back') || 'Volver'}
 				</Button>
-				{isOwner && (
-					<Button
-						variant='text'
-						color='blue-gray'
-						className='flex items-center gap-2'
-						onClick={() => navigate(`/campaigns/edit/${id}`)}
-					>
-						<PencilSquareIcon className='h-5 w-5' />
-						{t('common.edit') || 'Editar'}
-					</Button>
-				)}
 			</div>
 
 			<div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
@@ -368,7 +362,10 @@ export default function CampaignDetailPage() {
 										<ChevronDownIcon className={`h-5 w-5 transition-transform ${openAccordion === 1 ? 'rotate-180' : ''}`} />
 									}
 								>
-									<AccordionHeader onClick={() => handleOpenAccordion(1)} className='border-b-0 px-4 py-4'>
+									<AccordionHeader
+										onClick={() => handleOpenAccordion(1)}
+										className={`border-b-0 px-4 py-4 ${theme.bgLight} rounded-t-lg`}
+									>
 										<Typography variant='h6' color='blue-gray'>
 											{t('campaign.message.technicalDetails')}
 										</Typography>
@@ -398,7 +395,7 @@ export default function CampaignDetailPage() {
 							navigate={navigate}
 							isFull={isFull}
 							progress={progress}
-							themeColor={themeColor}
+							themeColor={theme}
 						/>
 					</div>
 				</div>

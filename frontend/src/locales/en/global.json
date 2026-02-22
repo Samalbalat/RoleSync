@@ -171,7 +171,11 @@
       "number": "Number",
       "numberDes": "Number (e.g. Strength, Age)",
       "checkbox": "Toggle / Checkbox",
-      "checkboxDes": "Toggle / Checkbox (e.g. Inspiration)"
+      "checkboxDes": "Toggle / Checkbox (e.g. Inspiration)",
+      "successSave": "Template saved successfully!",
+      "errorNoFields": "You must add at least one field to the template.",
+      "errorNoCampaignId": "Error: Campaign ID not found.",
+      "errorSave": "There was an error saving the template."
     },
     "form": {
       "title": "Create Character",

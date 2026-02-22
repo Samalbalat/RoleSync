@@ -87,7 +87,7 @@ export default function HomePage() {
 					</div>
 					<Button
 						variant='text'
-						color='blue'
+						color={theme.secondary}
 						className='hidden sm:flex items-center gap-2'
 						onClick={() => navigate('/campaigns')}
 					>
@@ -107,7 +107,7 @@ export default function HomePage() {
 
 				{/* Botón móvil global de campañas (opcional, si quieres que se vea en móvil) */}
 				<div className='mb-12 sm:hidden flex justify-center px-2'>
-					<Button variant='outlined' color='blue' fullWidth onClick={() => navigate('/campaigns')}>
+					<Button variant='outlined' color={theme.secondary} fullWidth onClick={() => navigate('/campaigns')}>
 						{t('common.viewAll')} {t('home.yourCampaigns')}
 					</Button>
 				</div>

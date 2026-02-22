@@ -52,7 +52,7 @@ export default function CharacterDetailDialog({ open, handleClose, characterId }
 		>
 			{isLoading || !character ? (
 				<div className='flex flex-col items-center justify-center h-64 gap-4'>
-					<Spinner className={`h-10 w-10 ${theme.textSecondary}`} />
+					<Spinner className={`h-12 w-12 text-${theme.primary}-500`} />
 					<Typography color='gray'>{t('character.message.loadingCharacter')}</Typography>
 				</div>
 			) : (

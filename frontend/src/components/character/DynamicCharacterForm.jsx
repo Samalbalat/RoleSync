@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { Card, CardBody, Typography, Input, Textarea, Button, Checkbox } from '@material-tailwind/react';
 import { useTranslation } from 'react-i18next';
 import { getTheme } from '../../utils/themeUtils';
@@ -8,6 +10,7 @@ import { getTheme } from '../../utils/themeUtils';
 export default function DynamicCharacterForm({ templateData }) {
 	const { t } = useTranslation('global');
 	const theme = getTheme();
+	const navigate = useNavigate();
 	const {
 		register,
 		handleSubmit,
@@ -49,6 +52,8 @@ export default function DynamicCharacterForm({ templateData }) {
 		};
 
 		console.log('JSON PERFECTO para enviar al backend:', JSON.stringify(payload, null, 2));
+		toast.success(`¡Personaje ${data.name} creado con éxito!`);
+		setTimeout(() => navigate('/characters'), 1500);
 	};
 
 	return (

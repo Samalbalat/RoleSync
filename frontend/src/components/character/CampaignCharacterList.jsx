@@ -35,7 +35,7 @@ export default function CampaignCharacterList({ characters }) {
 	return (
 		<>
 			<Card className='w-full max-w-md shadow-sm border border-blue-gray-50'>
-				<div className='p-4 border-b border-blue-gray-50'>
+				<div className={`p-4 border-b border-blue-gray-50 ${theme.bgLight} rounded-t-lg`}>
 					<Typography variant='h5' color='blue-gray'>
 						{t('character.characters')} ({characters.length})
 					</Typography>

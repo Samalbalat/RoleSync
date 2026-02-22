@@ -5,9 +5,11 @@ import { PlusIcon, TrashIcon, CheckIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
+import { getTheme } from '../../utils/themeUtils';
 
 export default function FreeStyleCharacterForm() {
 	const navigate = useNavigate();
+	const theme = getTheme();
 	const { t } = useTranslation('global');
 
 	const {
@@ -83,7 +85,7 @@ export default function FreeStyleCharacterForm() {
 						{/* DATOS BÁSICOS */}
 						<div>
 							<Typography variant='h6' color='blue-gray' className='mb-4 flex items-center gap-2'>
-								<span className='bg-blue-50 text-blue-500 p-2 rounded-lg'>1</span>
+								<span className={`bg-blue-50 ${theme.textPrimary} p-2 rounded-lg`}>1</span>
 								{t('character.form.basicInfo')}
 							</Typography>
 							<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
@@ -115,7 +117,7 @@ export default function FreeStyleCharacterForm() {
 						{/* ATRIBUTOS DINÁMICOS */}
 						<div>
 							<Typography variant='h6' color='blue-gray' className='mb-1 flex items-center gap-2'>
-								<span className='bg-blue-50 text-blue-500 p-2 rounded-lg'>2</span>
+								<span className={`bg-blue-50 ${theme.textPrimary} p-2 rounded-lg`}>2</span>
 								{t('character.form.personalAttributes')}
 							</Typography>
 							<Typography variant='small' color='gray' className='mb-4 ml-11'>

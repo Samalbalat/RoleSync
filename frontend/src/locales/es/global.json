@@ -171,7 +171,11 @@
       "number": "Número",
       "numberDes": "Número (Ej: Fuerza, Edad)",
       "checkbox": "Interruptor / Checkbox",
-      "checkboxDes": "Interruptor / Checkbox (Ej: Inspiración)"
+      "checkboxDes": "Interruptor / Checkbox (Ej: Inspiración)",
+      "successSave": "¡Plantilla guardada correctamente!",
+      "errorNoFields": "Debes añadir al menos un campo a la plantilla.",
+      "errorNoCampaignId": "Error: No se encontró el ID de la campaña.",
+      "errorSave": "Hubo un error al guardar la plantilla."
     },
     "form": {
       "title": "Crear Personaje",

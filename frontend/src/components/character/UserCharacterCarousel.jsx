@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardBody, Typography, Avatar, Button } from '@material-tailwind/react';
 import { ArrowRightIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { useTranslation } from 'react-i18next';
+import { getTheme } from '../../utils/themeUtils';
 import { mockFullCharacters } from '../../data/mockCharacters';
 import CharacterDetailDialog from './CharacterDetailDialog';
 
 export default function UserCharacterCarousel() {
 	const { t } = useTranslation('global');
+	const theme = getTheme();
 	const navigate = useNavigate();
 
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -30,7 +32,7 @@ export default function UserCharacterCarousel() {
 				<Typography variant='h5' color='blue-gray' className='mb-4'>
 					{t('home.playerCharacters.emptyMessage')}
 				</Typography>
-				<Button variant='outlined' color='blue' onClick={() => navigate('/createCharacter')}>
+				<Button variant='outlined' color={theme.secondary} onClick={() => navigate('/createCharacter')}>
 					{t('home.playerCharacters.createButton')}
 				</Button>
 			</div>
@@ -50,7 +52,7 @@ export default function UserCharacterCarousel() {
 				</div>
 				<Button
 					variant='text'
-					color='blue'
+					color={theme.secondary}
 					className='hidden sm:flex items-center gap-2'
 					onClick={() => navigate('/characters')}
 				>
@@ -86,7 +88,9 @@ export default function UserCharacterCarousel() {
 							</Typography>
 
 							{char.campaign_name ? (
-								<div className='bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-medium w-full truncate mt-2'>
+								<div
+									className={`bg-blue-50 ${theme.textPrimary} px-3 py-1 rounded-full text-xs font-medium w-full truncate mt-2`}
+								>
 									{char.campaign_name}
 								</div>
 							) : (
@@ -100,11 +104,13 @@ export default function UserCharacterCarousel() {
 
 				{/* Tarjeta Extra: "Ver todos / Crear Nuevo" al final del carrusel */}
 				<Card
-					className='min-w-[200px] sm:min-w-[240px] snap-start cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors border-2 border-dashed border-gray-300 bg-gray-50 flex-shrink-0 flex items-center justify-center shadow-none'
+					className={`min-w-[200px] sm:min-w-[240px] snap-start cursor-pointer hover:${theme.hoverBorder} hover:bg-blue-50 transition-colors border-2 border-dashed border-gray-300 bg-gray-50 flex-shrink-0 flex items-center justify-center shadow-none`}
 					onClick={() => navigate('/characters')}
 				>
 					<CardBody className='flex flex-col items-center justify-center text-center p-6 h-full'>
-						<div className='h-16 w-16 rounded-full bg-white shadow-sm flex items-center justify-center mb-4 text-blue-500'>
+						<div
+							className={`h-16 w-16 rounded-full bg-white shadow-sm flex items-center justify-center mb-4 ${theme.textPrimary}`}
+						>
 							<ArrowRightIcon className='h-8 w-8' />
 						</div>
 						<Typography variant='h6' color='blue-gray'>
@@ -115,7 +121,7 @@ export default function UserCharacterCarousel() {
 			</div>
 
 			<div className='mt-4 sm:hidden flex justify-center'>
-				<Button variant='outlined' color='blue' fullWidth onClick={() => navigate('/characters')}>
+				<Button variant='outlined' color={theme.secondary} fullWidth onClick={() => navigate('/characters')}>
 					{t('common.viewAll')}
 				</Button>
 			</div>
