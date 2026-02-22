@@ -65,7 +65,10 @@ function App() {
 									</div>
 								}
 							/>
+							{/* onClick={() => navigate(`/character/templateBuilder?campaignId=${campaign.id}`)} /> */}
+
 							<Route path='createCharacter' element={<CreateCharacterPage />} />
+							{/* onClick={() => navigate(`/createCharacter?campaignId=${campaign.id}`)} */}
 						</Route>
 					</Route>
 					<Route path='*' element={<Navigate to='/' replace />} />

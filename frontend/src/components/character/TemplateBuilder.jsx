@@ -48,8 +48,14 @@ export default function TemplateBuilder() {
 	};
 
 	const handleChange = (name, value) => {
+		// Validamos que 'name' es una propiedad legítima que esperamos (evita inyección)
+		const allowedKeys = ['label', 'type', 'required', 'min', 'max'];
+		if (!allowedKeys.includes(name)) return;
+
 		setCurrentField(prev => ({ ...prev, [name]: value }));
-		if (errors[name]) {
+
+		// Usamos hasOwnProperty en lugar de errors[name]
+		if (Object.hasOwn(errors, name)) {
 			setErrors(prev => ({ ...prev, [name]: null }));
 		}
 	};
@@ -63,9 +69,7 @@ export default function TemplateBuilder() {
 		}
 
 		if (typeof editingIndex === 'number') {
-			const updatedFields = [...fields];
-			updatedFields[editingIndex] = currentField;
-			setFields(updatedFields);
+			setFields(prevFields => prevFields.map((field, idx) => (idx === editingIndex ? currentField : field)));
 			setEditingIndex(null);
 		} else {
 			const newFieldWithKey = {
@@ -84,9 +88,13 @@ export default function TemplateBuilder() {
 	};
 
 	const startEditing = index => {
-		setCurrentField(fields[index]);
-		setEditingIndex(index);
-		setErrors({});
+		const fieldToEdit = fields.find((_, idx) => idx === index);
+
+		if (fieldToEdit) {
+			setCurrentField(fieldToEdit);
+			setEditingIndex(index);
+			setErrors({});
+		}
 	};
 
 	const removeField = indexToRemove => {
