@@ -1,5 +1,7 @@
 package com.rolesync.rolesync.model;
 
+import java.util.Set;
+
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,6 +24,9 @@ public class User {
     private String email;
     private String password;
     private String timeZone;
+
+    @OneToMany(mappedBy = "owner")
+    private Set<CharacterSheet> sheets;
 
     public User(String email, String password, String timeZone) {
         this.email = email;

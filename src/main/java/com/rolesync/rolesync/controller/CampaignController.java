@@ -1,6 +1,5 @@
 package com.rolesync.rolesync.controller;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -208,7 +207,7 @@ public class CampaignController {
         campaign.setImage(dto.getImage());
         campaign.setDescription(dto.getDescription());
         campaign.setSystem(dto.getSystem());
-        campaign.setThemes(dto.getThemes());
+        campaign.setThemes(Arrays.asList(dto.getThemes()));
         campaign.setMaxPlayers(dto.getMaxPlayers());
         campaign.setCommunication(dto.getCommunication());
         campaign.setLanguage(dto.getLanguage());
@@ -254,7 +253,7 @@ public class CampaignController {
         campaign.setImage(dto.getImage());
         campaign.setDescription(dto.getDescription());
         campaign.setSystem(dto.getSystem());
-        campaign.setThemes(dto.getThemes());
+        campaign.setThemes(Arrays.asList(dto.getThemes()));
         campaign.setMaxPlayers(dto.getMaxPlayers());
         campaign.setCommunication(dto.getCommunication());
         campaign.setLanguage(dto.getLanguage());
@@ -263,8 +262,7 @@ public class CampaignController {
         campaign.setDuration(dto.getDuration());
         campaign.setLocation(dto.getLocation());
         campaign.setTimeZone(dto.getTimeZone());
-        campaign.setMembers(new String[0]);
-        campaign.setCharacters(new Integer[0]);
+        campaign.setMembers(List.of());
         campaign.setCampaignType(ProfileType.valueOf(dto.getType()));
         campaign.setStatus(CampaignStatus.OPEN);
     }

@@ -1,5 +1,7 @@
 package com.rolesync.rolesync.dto.campaigncontroller;
 
+import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -14,7 +16,7 @@ public class CampaignGetByIdOutDTO {
     private String status;
     private String communication;
     private String description;
-    private String[] themes;
+    private List<String> themes;
     private String language;
     private String timeZone;
     private String image;

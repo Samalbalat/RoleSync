@@ -1,6 +1,11 @@
 package com.rolesync.rolesync.model;
 
 import java.util.List;
+import java.util.Set;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
+import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,6 +14,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,12 +34,13 @@ public class Campaign {
 
     // We store the members as an array of profile names for easy access, 
     // but we will always check the profiles service to get the actual profiles and their types when needed
+    @JdbcTypeCode(SqlTypes.ARRAY)
     @Column(name = "members", columnDefinition = "text[]")
-    private String[] members;
+    private List<String> members;
 
     // We store the characters as an array of character ids for easy access
-    @Column(name = "characters", columnDefinition = "integer[]")
-    private Integer[] characters;
+    @OneToMany(mappedBy="campaign")
+    private Set<CharacterSheet> sheets;
 
     private String name;
     private String image;
@@ -41,7 +48,8 @@ public class Campaign {
     private String system;
     
     @Column(name = "themes", columnDefinition = "text[]")
-    private String[] themes;
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    private List<String> themes;
 
     @Enumerated(EnumType.STRING)
     private ProfileType campaignType;
