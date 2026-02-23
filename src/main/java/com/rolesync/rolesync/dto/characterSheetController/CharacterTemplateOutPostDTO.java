@@ -1,4 +1,4 @@
-package com.rolesync.rolesync.dto.characterSheetController;
+package com.rolesync.rolesync.dto.charactersheetcontroller;
 
 import java.util.List;
 

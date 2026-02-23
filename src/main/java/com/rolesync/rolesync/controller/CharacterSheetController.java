@@ -9,9 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.core.Authentication;
 
-import com.rolesync.rolesync.dto.characterSheetController.CharacterSheetInPostDTO;
-import com.rolesync.rolesync.dto.characterSheetController.CharacterTemplateInPostDTO;
-import com.rolesync.rolesync.dto.characterSheetController.CharacterTemplateOutPostDTO;
+import com.rolesync.rolesync.dto.charactersheetcontroller.CharacterSheetInPostDTO;
+import com.rolesync.rolesync.dto.charactersheetcontroller.CharacterTemplateOutPostDTO;
 import com.rolesync.rolesync.model.Campaign;
 import com.rolesync.rolesync.model.CharacterSheet;
 import com.rolesync.rolesync.model.Profile;
