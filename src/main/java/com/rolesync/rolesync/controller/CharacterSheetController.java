@@ -35,7 +35,6 @@ public class CharacterSheetController {
 
     private final CampaignRepository campaignRepository;
     private final CharacterSheetRepository characterSheetRepository;
-    private final UserRepository userRepository;
     private final UtilsCalls utilsCalls;
 
     public CharacterSheetController(
@@ -47,44 +46,7 @@ public class CharacterSheetController {
     {
         this.campaignRepository = campaignRepository;
         this.characterSheetRepository = characterSheetRepository;
-        this.userRepository = userRepository;
         this.utilsCalls = utilsCalls;
-    }
-
-    // ---------- POST TEMPLATE FOR CAMPAIGN >>>> NO TIENE SENTIDO DADALA NUEVA DISTRIBUCION ----------
-    @PostMapping("/campaigns/{campaignId}/templates")
-    public ResponseEntity<?> createTemplate(
-            Authentication authentication,
-            @PathVariable Long campaignId,
-            @RequestBody CharacterTemplateInPostDTO dto) 
-    {
-        Optional<Campaign> campaignOpt = campaignRepository.findById(campaignId);
-        if (campaignOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        Campaign campaign = campaignOpt.get();
-        Profile activeProfile = utilsCalls
-                .getProfileFromAuthentication(authentication, campaign.getCampaignType().name())
-                .orElseThrow(() -> new IllegalStateException("Active profile not found"));
-        if (!campaign.getOwnerName().equals(activeProfile.getProfilename())) {
-            return ResponseEntity.status(403).body("User is not the campaign owner");
-        }
-        
-        CharacterSheet characterSheet = new CharacterSheet();
-        characterSheet.setName(null);
-        characterSheet.setSchema(dto.getSchema_definition());
-        characterSheet.setImage(null);
-        characterSheet.setIsTemplate(true);
-        characterSheet.setCampaign(campaign);
-        characterSheet.setIsPublic(false);
-        characterSheet.setOwner(userRepository.findByEmail(activeProfile.getUsername()).orElse(null));
-        characterSheetRepository.save(characterSheet);
-        CharacterTemplateOutPostDTO response = new CharacterTemplateOutPostDTO();
-        response.setId(characterSheet.getId());
-        response.setCampaign_id(campaignId.toString());
-        response.setCampaign_name(campaign.getName());
-        response.setSchema_definition(characterSheet.getSchema());
-        return ResponseEntity.ok(response);
     }
 
     // ---------- GET TEMPLATES FROM CAMPAIGN ----------
@@ -127,19 +89,16 @@ public class CharacterSheetController {
             @PathVariable Long id
     ) 
     {   
-        Optional<User> userOpt = utilsCalls.getUserFromUsername(authentication);
-        Optional<CharacterSheet> character = characterSheetRepository.findById(id);
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.status(403).body("User not found");
-        }else{
-        
-            if(character.isEmpty()){
-                return ResponseEntity.status(404).body("Character not found");
-            }else if(character.get().getIsPublic()==false && !character.get().getOwner().equals(userOpt.get())){
-                return ResponseEntity.status(403).body("User is not the owner of this character");
-            }
-        }
-        return ResponseEntity.ok(character.get());
+        return getSheetById(authentication, id);
+    }
+
+    @GetMapping("/templates/{id}")
+    public ResponseEntity<?> getTemplateById(
+            Authentication authentication,
+            @PathVariable Long id
+    ) 
+    {   
+        return getSheetById(authentication, id);
     }
 
     // ---------- PUT CHARACTER BY ID ----------
@@ -150,26 +109,17 @@ public class CharacterSheetController {
             @RequestBody CharacterSheetInPostDTO dto
     ) 
     {   
-        Optional<User> userOpt = utilsCalls.getUserFromUsername(authentication);
-        Optional<CharacterSheet> character = characterSheetRepository.findById(id);
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.status(403).body("User not found");
-        }else{
-        
-            if(character.isEmpty()){
-                return ResponseEntity.status(404).body("Character not found");
-            }else if(!character.get().getOwner().equals(userOpt.get())){
-                return ResponseEntity.status(403).body("User is not the owner of this character");
-            }
-        }
-        CharacterSheet characterSheet = character.get();
-        characterSheet.setName(dto.getName());
-        characterSheet.setSchema(dto.getAttributes());
-        characterSheet.setImage(dto.getAvatar_url());
-        characterSheetRepository.save(characterSheet);
-        CharacterTemplateOutPostDTO response = new CharacterTemplateOutPostDTO();
-        response.setId(characterSheet.getId());
-        return ResponseEntity.ok(response);
+        return updateSheet(authentication, id, dto);
+    }
+
+     @PutMapping("/templates/{id}")
+    public ResponseEntity<?> updateTemplate(
+            Authentication authentication,
+            @PathVariable Long id,
+            @RequestBody CharacterSheetInPostDTO dto
+    ) 
+    {   
+        return updateSheet(authentication, id, dto);
     }
 
     // ---------- GET MY CHARACTERS ----------
@@ -307,5 +257,43 @@ public class CharacterSheetController {
         return ResponseEntity.ok(response);
     }
 
+    private ResponseEntity<?> getSheetById(Authentication authentication, Long id){
+        Optional<User> userOpt = utilsCalls.getUserFromUsername(authentication);
+        Optional<CharacterSheet> character = characterSheetRepository.findById(id);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(403).body("User not found");
+        }else{
+        
+            if(character.isEmpty()){
+                return ResponseEntity.status(404).body("Character not found");
+            }else if(character.get().getIsPublic()==false && !character.get().getOwner().equals(userOpt.get())){
+                return ResponseEntity.status(403).body("User is not the owner of this character");
+            }
+        }
+        return ResponseEntity.ok(character.get());
+    }
+
+    private ResponseEntity<?> updateSheet(Authentication authentication, Long id, CharacterSheetInPostDTO dto){
+        Optional<User> userOpt = utilsCalls.getUserFromUsername(authentication);
+        Optional<CharacterSheet> character = characterSheetRepository.findById(id);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(403).body("User not found");
+        }else{
+        
+            if(character.isEmpty()){
+                return ResponseEntity.status(404).body("Character not found");
+            }else if(!character.get().getOwner().equals(userOpt.get())){
+                return ResponseEntity.status(403).body("User is not the owner of this character");
+            }
+        }
+        CharacterSheet characterSheet = character.get();
+        characterSheet.setName(dto.getName());
+        characterSheet.setSchema(dto.getAttributes());
+        characterSheet.setImage(dto.getAvatar_url());
+        characterSheetRepository.save(characterSheet);
+        CharacterTemplateOutPostDTO response = new CharacterTemplateOutPostDTO();
+        response.setId(characterSheet.getId());
+        return ResponseEntity.ok(response);
+    }
 }
 
