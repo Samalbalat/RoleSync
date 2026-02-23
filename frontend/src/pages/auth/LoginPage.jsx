@@ -60,7 +60,7 @@ export function LoginPage() {
 					const p = profiles[0];
 					const profileData = {
 						name: p.profileName,
-						type: p.profileType,
+						type: p.roleType,
 					};
 					localStorage.setItem('activeProfile', JSON.stringify(profileData));
 					setActiveProfile(profileData);

@@ -4,7 +4,7 @@ import { getTheme } from '../../utils/themeUtils';
 import { useTranslation } from 'react-i18next';
 import CampaignFilterBar from '../../components/campaign/CampaignFilterBar';
 import CampaignCard from '../../components/campaign/CampaignCard';
-import { searchCampaignsInBackend } from '../../services/CampaignService';
+import CampaignService from '../../services/CampaignService';
 
 export default function FindCampaignPage() {
 	const { t } = useTranslation('global');
@@ -25,22 +25,39 @@ export default function FindCampaignPage() {
 	};
 
 	const [filters, setFilters] = useState({
-		name: '',
+		search: '',
 		type: getDefaultType(),
 		system: '',
 		language: '',
 		timeZone: '',
-		theme: [],
+		themes: [],
 		location: '',
-		schedule: '',
+		dayWeek: '',
 		duration: '',
+		communication: '',
 	});
 
 	useEffect(() => {
 		const fetchData = async () => {
 			setLoading(true);
 			try {
-				const results = await searchCampaignsInBackend(filters);
+				const backendParams = {
+					search: filters.search || undefined,
+					system: filters.system || undefined,
+					location: filters.location || undefined,
+					language: filters.language || undefined,
+					timeZone: filters.timeZone || undefined,
+					dayWeek: filters.dayWeek || undefined,
+					communication: filters.communication || undefined,
+					//'themes' y 'duration' no se envían porque el backend aún no los soporta
+				};
+
+				// Limpiamos los undefined para no mandar basura en la URL
+				const cleanParams = Object.fromEntries(Object.entries(backendParams).filter(([, v]) => v != null && v !== ''));
+
+				// Llamamos a la API
+				const results = await CampaignService.getCampaigns(cleanParams);
+
 				setCampaigns(results);
 			} catch (error) {
 				console.error('Error fetching campaigns:', error);
@@ -54,18 +71,18 @@ export default function FindCampaignPage() {
 		return () => clearTimeout(timeoutId);
 	}, [filters]);
 
-	// 3. CORRECCIÓN DE HANDLE CLEAN
 	const handleClean = () => {
 		setFilters({
-			name: '',
+			search: '',
 			type: getDefaultType(),
 			system: '',
 			language: '',
 			timeZone: '',
-			theme: [],
+			themes: [],
 			location: '',
-			schedule: '',
+			dayWeek: '',
 			duration: '',
+			communication: '',
 		});
 	};
 
