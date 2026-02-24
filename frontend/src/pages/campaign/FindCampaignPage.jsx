@@ -11,6 +11,7 @@ export default function FindCampaignPage() {
 	const theme = getTheme();
 	const [campaigns, setCampaigns] = useState([]);
 	const [loading, setLoading] = useState(true);
+	const [triggerSearch, setTriggerSearch] = useState(0);
 
 	const getDefaultType = () => {
 		const stored = localStorage.getItem('activeProfile');
@@ -37,6 +38,10 @@ export default function FindCampaignPage() {
 		communication: '',
 	});
 
+	const handleSearch = () => {
+		setTriggerSearch(prev => prev + 1);
+	};
+
 	useEffect(() => {
 		const fetchData = async () => {
 			setLoading(true);
@@ -49,15 +54,11 @@ export default function FindCampaignPage() {
 					timeZone: filters.timeZone || undefined,
 					dayWeek: filters.dayWeek || undefined,
 					communication: filters.communication || undefined,
-					//'themes' y 'duration' no se envían porque el backend aún no los soporta
 				};
 
-				// Limpiamos los undefined para no mandar basura en la URL
 				const cleanParams = Object.fromEntries(Object.entries(backendParams).filter(([, v]) => v != null && v !== ''));
 
-				// Llamamos a la API
 				const results = await CampaignService.getCampaigns(cleanParams);
-
 				setCampaigns(results);
 			} catch (error) {
 				console.error('Error fetching campaigns:', error);
@@ -67,9 +68,9 @@ export default function FindCampaignPage() {
 			}
 		};
 
-		const timeoutId = setTimeout(fetchData, 500);
-		return () => clearTimeout(timeoutId);
-	}, [filters]);
+		fetchData();
+		// 3. SOLO se ejecuta al montar el componente o cuando triggerSearch cambia
+	}, [triggerSearch]);
 
 	const handleClean = () => {
 		setFilters({
@@ -84,6 +85,7 @@ export default function FindCampaignPage() {
 			duration: '',
 			communication: '',
 		});
+		setTriggerSearch(prev => prev + 1);
 	};
 
 	return (
@@ -95,7 +97,13 @@ export default function FindCampaignPage() {
 				</Typography>
 			</div>
 
-			<CampaignFilterBar filters={filters} setFilters={setFilters} onClean={handleClean} theme={theme} />
+			<CampaignFilterBar
+				filters={filters}
+				setFilters={setFilters}
+				onClean={handleClean}
+				onSearch={handleSearch}
+				theme={theme}
+			/>
 
 			{loading ? (
 				<div className='flex justify-center mt-20'>
