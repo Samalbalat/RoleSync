@@ -23,11 +23,12 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 		maxPlayers: '',
 		language: '',
 		timeZone: '',
-		schedule: '',
+		dayWeek: '',
 		duration: '',
 		location: '',
-		theme: [],
-		...initialValues, // Sobrescribe con lo que venga de props (si es edición)
+		themes: [],
+		frequency: '',
+		...initialValues,
 	});
 
 	const [tagInput, setTagInput] = useState('');
@@ -40,7 +41,7 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 	}, [initialValues]);
 
 	// Esto es para evitar ataques de manipulación de campos CODACY
-	const ALLOWED_FIELDS = [
+	const ALLOWED_FIELDS = new Set([
 		'name',
 		'description',
 		'image',
@@ -48,14 +49,16 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 		'maxPlayers',
 		'language',
 		'timeZone',
-		'schedule',
+		'dayWeek',
 		'duration',
 		'location',
 		'communication',
-	];
+		'themes',
+		'frequency',
+	]);
 
 	const updateField = (fieldName, value) => {
-		if (!ALLOWED_FIELDS.includes(fieldName)) {
+		if (!ALLOWED_FIELDS.has(fieldName)) {
 			console.warn(`Campo ignorado por seguridad: ${fieldName}`);
 			return;
 		}
@@ -77,14 +80,14 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 	const handleAddTag = e => {
 		if (e.key === 'Enter' && tagInput.trim() !== '') {
 			e.preventDefault(); // Evita que el form se envíe al dar Enter
-			if (formData.theme.length >= 6) {
-				setErrors(prev => ({ ...prev, theme: t('errors.maxTags') }));
+			if (formData.themes.length >= 6) {
+				setErrors(prev => ({ ...prev, themes: t('errors.maxTags') }));
 				return;
 			}
-			if (!formData.theme.includes(tagInput.trim())) {
+			if (!formData.themes.includes(tagInput.trim())) {
 				setFormData(prev => ({
 					...prev,
-					theme: [...prev.theme, tagInput.trim()],
+					themes: [...prev.themes, tagInput.trim()],
 				}));
 			}
 			setTagInput('');
@@ -94,7 +97,7 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 	const removeTag = tagToRemove => {
 		setFormData(prev => ({
 			...prev,
-			theme: prev.theme.filter(tag => tag !== tagToRemove),
+			themes: prev.themes.filter(tag => tag !== tagToRemove),
 		}));
 	};
 
@@ -134,7 +137,9 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 		if (campaignType === 'TABLETOP') {
 			if (!formData.system) errs.system = t('errors.required');
 			if (!formData.location) errs.location = t('errors.required');
-			if (!formData.schedule) errs.schedule = t('errors.required');
+			if (!formData.dayWeek) errs.dayWeek = t('errors.required');
+			if (!formData.duration) errs.duration = t('errors.required');
+			if (!formData.frequency) errs.frequency = t('errors.required');
 		}
 
 		return errs;
@@ -338,11 +343,11 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 					<Typography variant='small' className='text-gray-500 mt-1.5 ml-1 flex items-center gap-1'>
 						{t('campaign.tagHelper')}
 						<span className='bg-gray-200 px-1.5 py-0.5 rounded text-xs font-mono text-gray-700'>Enter</span>{' '}
-						<span className='text-xs'>{formData.theme.length}/6</span>
+						<span className='text-xs'>{formData.themes.length}/6</span>
 					</Typography>
 
 					<div className='flex flex-wrap gap-2 mt-3'>
-						{formData.theme.map((tag, index) => (
+						{formData.themes.map((tag, index) => (
 							<Chip
 								key={index}
 								value={tag}
@@ -399,18 +404,36 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 
 						<div>
 							<Input
-								label={t('campaign.schedule')}
-								name='schedule'
+								label={t('campaign.dayWeek')}
+								name='dayWeek'
 								placeholder='Viernes 20:00'
-								value={formData.schedule}
+								value={formData.dayWeek}
 								onChange={handleChange}
 								maxLength={LIMITS.SHORT_TEXT}
 								color={theme.primary}
-								error={!!errors.schedule}
+								error={!!errors.dayWeek}
 							/>
-							{errors.schedule && (
+							{errors.dayWeek && (
 								<Typography variant='small' color='red' className='mt-1'>
-									⚠ {errors.schedule}
+									⚠ {errors.dayWeek}
+								</Typography>
+							)}
+						</div>
+
+						<div>
+							<Input
+								label={t('campaign.frequency')}
+								name='frequency'
+								placeholder='Ej. Semanal, Mensual...'
+								value={formData.frequency}
+								onChange={handleChange}
+								maxLength={LIMITS.SHORT_TEXT}
+								color={theme.primary}
+								error={!!errors.frequency}
+							/>
+							{errors.frequency && (
+								<Typography variant='small' color='red' className='mt-1'>
+									⚠ {errors.frequency}
 								</Typography>
 							)}
 						</div>

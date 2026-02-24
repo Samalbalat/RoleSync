@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { Typography } from '@material-tailwind/react';
 import { getTheme } from '../../utils/themeUtils';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import CampaignForm from '../../components/campaign/CampaignForm';
-import { createCampaign } from '../../services/CampaignService';
+import CampaignService from '../../services/CampaignService';
+import toast from 'react-hot-toast';
 
 export default function CreateCampaignPage() {
 	const { t } = useTranslation('global');
 	const theme = getTheme();
+	const navigate = useNavigate();
 	const [loading, setLoading] = useState(false);
 
 	const getProfileType = () => {
@@ -28,9 +31,10 @@ export default function CreateCampaignPage() {
 	const handleCreate = async formData => {
 		setLoading(true);
 		try {
-			const result = await createCampaign(formData);
+			const result = await CampaignService.createCampaign(formData);
 			console.log('Campaña creada:', result);
-			alert('Campaña creada exitosamente');
+			toast.success(`¡Campaña creada con éxito!`);
+			setTimeout(() => navigate('/campaigns'), 1500);
 		} catch (error) {
 			console.error('Error al crear:', error);
 		} finally {

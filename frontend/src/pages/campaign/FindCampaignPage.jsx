@@ -4,13 +4,14 @@ import { getTheme } from '../../utils/themeUtils';
 import { useTranslation } from 'react-i18next';
 import CampaignFilterBar from '../../components/campaign/CampaignFilterBar';
 import CampaignCard from '../../components/campaign/CampaignCard';
-import { searchCampaignsInBackend } from '../../services/CampaignService';
+import CampaignService from '../../services/CampaignService';
 
 export default function FindCampaignPage() {
 	const { t } = useTranslation('global');
 	const theme = getTheme();
 	const [campaigns, setCampaigns] = useState([]);
 	const [loading, setLoading] = useState(true);
+	const [triggerSearch, setTriggerSearch] = useState(0);
 
 	const getDefaultType = () => {
 		const stored = localStorage.getItem('activeProfile');
@@ -25,22 +26,39 @@ export default function FindCampaignPage() {
 	};
 
 	const [filters, setFilters] = useState({
-		name: '',
+		search: '',
 		type: getDefaultType(),
 		system: '',
 		language: '',
 		timeZone: '',
-		theme: [],
+		themes: [],
 		location: '',
-		schedule: '',
+		dayWeek: '',
 		duration: '',
+		communication: '',
 	});
+
+	const handleSearch = () => {
+		setTriggerSearch(prev => prev + 1);
+	};
 
 	useEffect(() => {
 		const fetchData = async () => {
 			setLoading(true);
 			try {
-				const results = await searchCampaignsInBackend(filters);
+				const backendParams = {
+					search: filters.search || undefined,
+					system: filters.system || undefined,
+					location: filters.location || undefined,
+					language: filters.language || undefined,
+					timeZone: filters.timeZone || undefined,
+					dayWeek: filters.dayWeek || undefined,
+					communication: filters.communication || undefined,
+				};
+
+				const cleanParams = Object.fromEntries(Object.entries(backendParams).filter(([, v]) => v != null && v !== ''));
+
+				const results = await CampaignService.getCampaigns(cleanParams);
 				setCampaigns(results);
 			} catch (error) {
 				console.error('Error fetching campaigns:', error);
@@ -50,23 +68,24 @@ export default function FindCampaignPage() {
 			}
 		};
 
-		const timeoutId = setTimeout(fetchData, 500);
-		return () => clearTimeout(timeoutId);
-	}, [filters]);
+		fetchData();
+		// 3. SOLO se ejecuta al montar el componente o cuando triggerSearch cambia
+	}, [triggerSearch]);
 
-	// 3. CORRECCIÓN DE HANDLE CLEAN
 	const handleClean = () => {
 		setFilters({
-			name: '',
+			search: '',
 			type: getDefaultType(),
 			system: '',
 			language: '',
 			timeZone: '',
-			theme: [],
+			themes: [],
 			location: '',
-			schedule: '',
+			dayWeek: '',
 			duration: '',
+			communication: '',
 		});
+		setTriggerSearch(prev => prev + 1);
 	};
 
 	return (
@@ -78,7 +97,13 @@ export default function FindCampaignPage() {
 				</Typography>
 			</div>
 
-			<CampaignFilterBar filters={filters} setFilters={setFilters} onClean={handleClean} theme={theme} />
+			<CampaignFilterBar
+				filters={filters}
+				setFilters={setFilters}
+				onClean={handleClean}
+				onSearch={handleSearch}
+				theme={theme}
+			/>
 
 			{loading ? (
 				<div className='flex justify-center mt-20'>

@@ -4,7 +4,7 @@ import { AdjustmentsHorizontalIcon, MagnifyingGlassIcon, TrashIcon, XMarkIcon } 
 import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 
-export default function CampaignFilterBar({ filters, setFilters, onClean, theme }) {
+export default function CampaignFilterBar({ filters, setFilters, onClean, onSearch, theme }) {
 	const { t } = useTranslation('global');
 	const [openFilters, setOpenFilters] = useState(false);
 	const containerRef = useRef(null);
@@ -12,6 +12,11 @@ export default function CampaignFilterBar({ filters, setFilters, onClean, theme 
 	const handleChange = (key, val) => setFilters(prev => ({ ...prev, [key]: val }));
 	const isWritten = theme.primary === 'indigo';
 
+	const handleKeyDown = e => {
+		if (e.key === 'Enter') {
+			onSearch();
+		}
+	};
 	// Cerrar el menú si haces clic fuera de él
 	useEffect(() => {
 		function handleClickOutside(event) {
@@ -35,26 +40,33 @@ export default function CampaignFilterBar({ filters, setFilters, onClean, theme 
 				<div className='flex-grow'>
 					<Input
 						label={t('filter.searchLabel')}
-						icon={<MagnifyingGlassIcon />}
-						value={filters.name}
-						onChange={e => handleChange('name', e.target.value)}
+						icon={<MagnifyingGlassIcon className='cursor-pointer' onClick={onSearch} />}
+						value={filters.search}
+						onChange={e => handleChange('search', e.target.value)}
+						onKeyDown={handleKeyDown}
 						color={theme.primary}
-						className='!border-t-blue-gray-200 focus:!border-t-gray-900'
 					/>
 				</div>
+				<Button color={theme.primary} onClick={onSearch} className='flex items-center gap-2'>
+					<MagnifyingGlassIcon className='h-4 w-4' />
+					<span className='hidden md:inline'>Buscar</span>
+				</Button>
+
 				<Button
 					variant={openFilters ? 'filled' : 'outlined'}
 					color={theme.primary}
 					onClick={() => setOpenFilters(!openFilters)}
-					className='flex items-center gap-2 whitespace-nowrap min-w-[120px] justify-center'
+					className='flex items-center gap-2 whitespace-nowrap'
 				>
 					{openFilters ? (
 						<>
-							<XMarkIcon className='h-4 w-4' /> {t('filter.close')}
+							<XMarkIcon className='h-4 w-4' />
+							{t('filter.close')}
 						</>
 					) : (
 						<>
-							<AdjustmentsHorizontalIcon className='h-4 w-4' /> {t('filter.filter')}
+							<AdjustmentsHorizontalIcon className='h-4 w-4' />
+							{t('filter.filter')}
 						</>
 					)}
 				</Button>
@@ -76,10 +88,10 @@ export default function CampaignFilterBar({ filters, setFilters, onClean, theme 
 					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
 						{/* --- CAMPOS COMUNES --- */}
 						<Input
-							label={t('campaign.theme')}
-							placeholder={t('campaign.placeholder.theme')}
-							value={filters.theme}
-							onChange={e => handleChange('theme', e.target.value)}
+							label={t('campaign.themes')}
+							placeholder={t('campaign.placeholder.themes')}
+							value={filters.themes}
+							onChange={e => handleChange('themes', e.target.value)}
 							color={theme.primary}
 						/>
 
@@ -139,9 +151,9 @@ export default function CampaignFilterBar({ filters, setFilters, onClean, theme 
 								/>
 
 								<Select
-									label={t('campaign.schedule')}
-									value={filters.schedule}
-									onChange={val => handleChange('schedule', val)}
+									label={t('campaign.dayWeek')}
+									value={filters.dayWeek}
+									onChange={val => handleChange('dayWeek', val)}
 									color={theme.primary}
 									menuProps={fixedMenuProps}
 								>
@@ -164,12 +176,18 @@ export default function CampaignFilterBar({ filters, setFilters, onClean, theme 
 						)}
 					</div>
 
-					<div className='mt-6 flex justify-end'>
+					<div className='mt-6 flex justify-end gap-2'>
+						<Button variant='text' color='gray' onClick={() => setOpenFilters(false)}>
+							Cancelar
+						</Button>
 						<Button
 							className='w-full md:w-auto'
 							variant='gradient'
 							color={theme.primary}
-							onClick={() => setOpenFilters(false)}
+							onClick={() => {
+								onSearch();
+								setOpenFilters(false);
+							}}
 						>
 							{t('filter.applyFilters')}
 						</Button>
@@ -184,5 +202,6 @@ CampaignFilterBar.propTypes = {
 	filters: PropTypes.object.isRequired,
 	setFilters: PropTypes.func.isRequired,
 	onClean: PropTypes.func.isRequired,
+	onSearch: PropTypes.func.isRequired, // <-- Añade esta línea
 	theme: PropTypes.object.isRequired,
 };

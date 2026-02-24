@@ -5,35 +5,36 @@ import AuthService from '../services/authService';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-	const [account, setAccount] = useState(null);
-	const [activeProfile, setActiveProfile] = useState(null);
+	const [account, setAccount] = useState(() => {
+		const savedAccount = localStorage.getItem('accountEmail');
+		return savedAccount ? { email: JSON.parse(savedAccount) } : null;
+	});
+
+	const [activeProfile, setActiveProfile] = useState(() => {
+		const savedProfile = localStorage.getItem('activeProfile');
+		return savedProfile ? JSON.parse(savedProfile) : null;
+	});
+
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		const initAuth = async () => {
 			try {
-				// Ver si la cookie del backend es válida
 				await AuthService.checkSession();
-
-				const savedProfile = JSON.parse(localStorage.getItem('activeProfile'));
-				const savedAccount = JSON.parse(localStorage.getItem('accountEmail'));
-
-				if (savedProfile && savedAccount) {
-					setAccount({ email: savedAccount });
-					setActiveProfile(savedProfile);
-				} else {
-					throw new Error('Sesión válida pero faltan datos locales');
-				}
 			} catch (error) {
-				console.log('Error de sesión o no hay usuario:', error);
-				handleLocalLogout();
+				// Solo borramos la sesión si el error es 401 (No autorizado) o 403 (Prohibido)
+				if (error.response?.status === 401 || error.response?.status === 403) {
+					console.log('Sesión expirada');
+					handleLocalLogout();
+				} else {
+					console.error('Error del servidor, manteniendo sesión local:', error);
+				}
 			} finally {
 				setLoading(false);
 			}
 		};
 		initAuth();
 	}, []);
-
 	const handleLocalLogout = () => {
 		localStorage.clear();
 		setAccount(null);

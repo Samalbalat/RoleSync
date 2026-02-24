@@ -5,7 +5,8 @@ import { ShieldExclamationIcon } from '@heroicons/react/24/outline'; // ¡Añadi
 import { getTheme } from '../../utils/themeUtils';
 import { useTranslation } from 'react-i18next';
 import CampaignForm from '../../components/campaign/CampaignForm';
-import { mockCampaigns } from '../../data/mockCampaigns';
+import CampaignService from '../../services/CampaignService';
+import toast from 'react-hot-toast';
 
 import PropTypes from 'prop-types';
 
@@ -42,17 +43,17 @@ export default function EditCampaignPage() {
 	const [loadingData, setLoadingData] = useState(true);
 	const [accessDenied, setAccessDenied] = useState(false);
 
+	const [saving, setSaving] = useState(false);
+
 	useEffect(() => {
 		const loadCampaign = async () => {
 			try {
-				// 1. Obtenemos los datos
-				const data = mockCampaigns.find(c => c.id === Number(id));
+				const data = await CampaignService.getCampaignById(id);
 
 				if (!data) {
 					throw new Error('Campaña no encontrada');
 				}
 
-				// 2. Comprobamos la relación
 				if (data.userRelation !== 'OWNER') {
 					setAccessDenied(true);
 					setLoadingData(false);
@@ -62,8 +63,8 @@ export default function EditCampaignPage() {
 				setCampaign(data);
 			} catch (error) {
 				console.error('Error cargando campaña', error);
-				alert('No se encontró la campaña');
-				navigate('/campaigns');
+
+				navigate('/');
 			} finally {
 				setLoadingData(false);
 			}
@@ -71,6 +72,19 @@ export default function EditCampaignPage() {
 
 		loadCampaign();
 	}, [id, navigate, t]);
+
+	const handleUpdate = async formData => {
+		setSaving(true);
+		try {
+			await CampaignService.updateCampaign(id, formData);
+			navigate(`/campaigns/${id}`);
+		} catch (error) {
+			console.error('Error al actualizar:', error);
+			toast.error('Error al actualizar la campaña');
+		} finally {
+			setSaving(false);
+		}
+	};
 
 	// 1. Si está cargando, mostramos el spinner
 	if (loadingData) {
@@ -102,8 +116,8 @@ export default function EditCampaignPage() {
 
 				<CampaignForm
 					initialValues={campaign}
-					//onSubmit={handleUpdate}
-					//loading={saving}
+					onSubmit={handleUpdate}
+					loading={saving}
 					theme={theme}
 					campaignType={campaign.type}
 				/>

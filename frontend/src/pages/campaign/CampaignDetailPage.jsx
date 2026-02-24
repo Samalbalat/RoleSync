@@ -25,14 +25,13 @@ import {
 	MapPinIcon,
 	ShieldExclamationIcon,
 	PencilSquareIcon,
-	PlayIcon,
 	ClockIcon as ClockOutlineIcon,
 	ChevronDownIcon,
 } from '@heroicons/react/24/outline';
-import { mockCampaigns } from '../../data/mockCampaigns';
 import CampaignCharacterList from '../../components/character/CampaignCharacterList';
-import { mockCampaignCharacters } from '../../data/mockCharacters';
 import { getTheme } from '../../utils/themeUtils';
+import CampaignService from '../../services/CampaignService';
+import { mockCampaignCharacters } from '../../data/mockCharacters';
 
 // eslint-disable-next-line no-unused-vars
 const InfoRow = ({ icon: IconComponent, color, title, value }) => {
@@ -161,6 +160,16 @@ const ActionCard = ({ campaign, t, navigate, isFull, progress, themeColor }) => 
 
 		// Si es visitante o está pendiente (NONE o PENDING)
 		const isPending = relation === 'PENDING';
+		const getButtonText = () => {
+			if (isPending) {
+				return t('campaign.detail.pending') || 'Solicitud enviada';
+			}
+			if (isFull) {
+				return t('campaign.detail.joinFull') || 'Campaña llena';
+			}
+			return t('campaign.detail.join') || 'Solicitar unirse';
+		};
+		const buttonText = getButtonText();
 
 		return (
 			<div className='mb-0'>
@@ -183,7 +192,7 @@ const ActionCard = ({ campaign, t, navigate, isFull, progress, themeColor }) => 
 				<Button
 					fullWidth
 					size='lg'
-					color={isPending ? 'blue-gray' : themeColor}
+					color={isPending ? 'blue-gray' : themeColor.primary}
 					disabled={isFull || isPending}
 					className='flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all text-base'
 					onClick={() => {
@@ -192,11 +201,7 @@ const ActionCard = ({ campaign, t, navigate, isFull, progress, themeColor }) => 
 					}}
 				>
 					{isPending && <ClockOutlineIcon className='h-5 w-5' />}
-					{isPending
-						? t('campaign.detail.pending') || 'Solicitud enviada'
-						: isFull
-							? t('campaign.detail.joinFull') || 'Campaña llena'
-							: t('campaign.detail.join') || 'Solicitar unirse'}
+					{buttonText}
 				</Button>
 			</div>
 		);
@@ -219,25 +224,49 @@ export default function CampaignDetailPage() {
 	const [userProfile, setUserProfile] = useState(null);
 	const [openAccordion, setOpenAccordion] = useState(0);
 
+	const [campaign, setCampaign] = useState(null);
+	const [loading, setLoading] = useState(true);
+
 	useEffect(() => {
 		const storedProfile = localStorage.getItem('activeProfile');
 		if (storedProfile) {
 			try {
-				const parsedProfile = JSON.parse(storedProfile);
-				setUserProfile(parsedProfile);
+				setUserProfile(JSON.parse(storedProfile));
 			} catch (error) {
 				console.error('Error al leer el perfil:', error);
 			}
 		}
-	}, []);
 
-	const campaign = mockCampaigns.find(c => c.id === Number(id));
+		const fetchCampaign = async () => {
+			try {
+				setLoading(true);
+				const data = await CampaignService.getCampaignById(id);
+				setCampaign(data);
+			} catch (error) {
+				console.error('Error al obtener la campaña:', error);
+				setCampaign(null);
+			} finally {
+				setLoading(false);
+			}
+		};
 
-	// No existe
+		fetchCampaign();
+	}, [id]);
+
+	if (loading) {
+		return (
+			<div className='flex justify-center items-center h-screen'>
+				<Typography variant='h5' color='blue-gray'>
+					Cargando campaña...
+				</Typography>
+			</div>
+		);
+	}
+
 	if (!campaign) return <NotFoundView t={t} navigate={navigate} />;
 
 	// Acceso denegado (Comparando tipo de rol)
-	if (userProfile && userProfile.type && campaign.type !== userProfile.type) {
+	if (userProfile?.type && campaign.type !== userProfile.type) {
 		return <AccessDeniedView t={t} navigate={navigate} />;
 	}
 
@@ -258,7 +287,7 @@ export default function CampaignDetailPage() {
 				<Card className='shadow-sm border border-gray-200 bg-gray-50'>
 					<CardBody className='flex items-center gap-4 p-4'>
 						<Avatar
-							src={campaign.owner?.image || `https://ui-avatars.com/api/?name=DM`}
+							src={campaign.owner?.profileImage || `https://ui-avatars.com/api/?name=DM`}
 							alt={campaign.owner?.profileName || 'DM'}
 							size='lg'
 							className='border border-white shadow-sm'
@@ -294,7 +323,15 @@ export default function CampaignDetailPage() {
 				{/* COLUMNA IZQUIERDA: Imagen y Descripción */}
 				<div className='lg:col-span-2 space-y-8'>
 					<div className='relative rounded-2xl overflow-hidden shadow-lg h-[300px] md:h-[400px]'>
-						<img src={campaign.image} alt={campaign.name} className='w-full h-full object-cover' />
+						<img
+							src={campaign.image || '/default_image.png'}
+							alt={campaign.name}
+							className='w-full h-full object-cover'
+							onError={e => {
+								e.target.onerror = null;
+								e.target.src = '/default_image.png';
+							}}
+						/>
 						<div className='absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 md:p-8'>
 							<div className='flex gap-2 mb-3'>
 								<Chip
@@ -335,7 +372,7 @@ export default function CampaignDetailPage() {
 									{t('campaign.detail.tags') || 'Etiquetas'}
 								</Typography>
 								<div className='flex flex-wrap gap-2'>
-									{campaign.theme.map((tag, i) => (
+									{campaign.themes.map((tag, i) => (
 										<span
 											key={i}
 											className='bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm font-medium border border-gray-200'
@@ -377,7 +414,7 @@ export default function CampaignDetailPage() {
 					) : (
 						<Card className='shadow-sm border border-gray-200'>
 							<CardBody className='p-0'>
-								<div className='p-4 border-b border-gray-100'>
+								<div className={`p-4 border-b border-gray-100 ${theme.bgLight}`}>
 									<Typography variant='h6' color='blue-gray'>
 										{t('campaign.detail.infoTitle')}
 									</Typography>
@@ -416,7 +453,7 @@ ActionCard.propTypes = {
 	navigate: PropTypes.func.isRequired,
 	isFull: PropTypes.bool.isRequired,
 	progress: PropTypes.number.isRequired,
-	themeColor: PropTypes.string.isRequired,
+	themeColor: PropTypes.object.isRequired,
 };
 
 AccessDeniedView.propTypes = {
