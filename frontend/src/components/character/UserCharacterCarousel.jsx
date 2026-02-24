@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardBody, Typography, Avatar, Button } from '@material-tailwind/react';
-import { ArrowRightIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { Card, CardBody, Typography, Avatar, Button, Spinner } from '@material-tailwind/react';
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import { useTranslation } from 'react-i18next';
 import { getTheme } from '../../utils/themeUtils';
-import { mockFullCharacters } from '../../data/mockCharacters';
 import CharacterDetailDialog from './CharacterDetailDialog';
+import CharacterService from '../../services/CharacterService'; // <-- Asegúrate de que la ruta es correcta
+import toast from 'react-hot-toast';
 
 export default function UserCharacterCarousel() {
 	const { t } = useTranslation('global');
@@ -15,7 +16,26 @@ export default function UserCharacterCarousel() {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [selectedCharacterId, setSelectedCharacterId] = useState(null);
 
-	const myCharacters = mockFullCharacters.slice(0, 6);
+	const [characters, setCharacters] = useState([]);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		const fetchMyCharacters = async () => {
+			try {
+				setLoading(true);
+				const data = await CharacterService.getMyCharacters();
+				console.log('Fetched characters:', data);
+				setCharacters(data || []);
+			} catch (error) {
+				console.error('Error fetching characters:', error);
+				toast.error(t('errors.fetchCharacters') || 'Error al cargar los personajes');
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchMyCharacters();
+	}, [t]);
 
 	const handleOpenDialog = id => {
 		setSelectedCharacterId(id);
@@ -26,7 +46,15 @@ export default function UserCharacterCarousel() {
 		setIsDialogOpen(false);
 	};
 
-	if (!myCharacters || myCharacters.length === 0) {
+	if (loading) {
+		return (
+			<div className='flex justify-center items-center py-20'>
+				<Spinner className={`h-10 w-10 text-${theme.primary}-500`} />
+			</div>
+		);
+	}
+
+	if (!characters || characters.length === 0) {
 		return (
 			<div className='flex flex-col items-center justify-center py-20'>
 				<Typography variant='h5' color='blue-gray' className='mb-4'>
@@ -38,6 +66,8 @@ export default function UserCharacterCarousel() {
 			</div>
 		);
 	}
+
+	const displayedCharacters = characters.slice(0, 6);
 
 	return (
 		<section className='w-full py-8 animate-fade-in'>
@@ -65,7 +95,7 @@ export default function UserCharacterCarousel() {
 				className='flex gap-6 overflow-x-auto snap-x snap-mandatory pb-6 pt-2 px-2 scrollbar-hide'
 				style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
 			>
-				{myCharacters.map(char => (
+				{displayedCharacters.map(char => (
 					<Card
 						key={char.id}
 						className='min-w-[200px] sm:min-w-[240px] snap-start cursor-pointer hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border border-gray-100 flex-shrink-0'
@@ -102,7 +132,7 @@ export default function UserCharacterCarousel() {
 					</Card>
 				))}
 
-				{/* Tarjeta Extra: "Ver todos / Crear Nuevo" al final del carrusel */}
+				{/* Tarjeta Extra: "Ver todos" al final del carrusel */}
 				<Card
 					className={`min-w-[200px] sm:min-w-[240px] snap-start cursor-pointer hover:${theme.hoverBorder} hover:bg-blue-50 transition-colors border-2 border-dashed border-gray-300 bg-gray-50 flex-shrink-0 flex items-center justify-center shadow-none`}
 					onClick={() => navigate('/characters')}
@@ -114,7 +144,7 @@ export default function UserCharacterCarousel() {
 							<ArrowRightIcon className='h-8 w-8' />
 						</div>
 						<Typography variant='h6' color='blue-gray'>
-							{t('common.viewAll')} ({mockFullCharacters.length})
+							{t('common.viewAll')} ({characters.length})
 						</Typography>
 					</CardBody>
 				</Card>

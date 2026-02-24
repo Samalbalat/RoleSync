@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { Card, CardBody, Typography, Input, Textarea, Button, Checkbox } from '@material-tailwind/react';
 import { useTranslation } from 'react-i18next';
 import { getTheme } from '../../utils/themeUtils';
+import CharacterService from '../../services/CharacterService';
 
 export default function DynamicCharacterForm({ templateData }) {
 	const { t } = useTranslation('global');
@@ -44,16 +45,33 @@ export default function DynamicCharacterForm({ templateData }) {
 
 	const { id: template_id, campaign_id, schema_definition } = templateData;
 
-	const onSubmit = data => {
+	const onSubmit = async data => {
+		// 1. Transformamos los atributos rellenados al formato Array que espera el backend
+		const formattedAttributes = schema_definition.map(field => {
+			return {
+				...field,
+				value: data.attributes[field.key],
+			};
+		});
+
 		const payload = {
-			...data,
-			campaign_id: campaign_id,
-			template_id: template_id,
+			name: data.name,
+			avatar_url: data.avatar_url || '',
+			campaign_id: Number(campaign_id),
+			template_id: Number(template_id),
+			attributes: formattedAttributes,
 		};
 
-		console.log('JSON PERFECTO para enviar al backend:', JSON.stringify(payload, null, 2));
-		toast.success(`¡Personaje ${data.name} creado con éxito!`);
-		setTimeout(() => navigate('/characters'), 1500);
+		console.log('JSON enviado al backend:', JSON.stringify(payload, null, 2));
+
+		try {
+			await CharacterService.createCharacter(payload);
+			toast.success(`¡Personaje ${data.name} creado con éxito!`);
+			setTimeout(() => navigate(`/campaign/${campaign_id}`), 1500);
+		} catch (error) {
+			console.error('Error al crear personaje:', error);
+			toast.error(t('character.message.errorCreating'));
+		}
 	};
 
 	return (

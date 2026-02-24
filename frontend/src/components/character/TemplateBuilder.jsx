@@ -1,22 +1,40 @@
-import React, { useState } from 'react';
-import { Card, CardBody, Typography, Input, Select, Option, Button, Checkbox, IconButton } from '@material-tailwind/react';
+import React, { useEffect, useState } from 'react';
+import {
+	Card,
+	CardBody,
+	Typography,
+	Input,
+	Select,
+	Option,
+	Button,
+	Checkbox,
+	IconButton,
+	Spinner,
+} from '@material-tailwind/react';
 import { TrashIcon, PlusIcon, PencilIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams } from 'react-router-dom'; // <-- IMPORTANTE
-import toast from 'react-hot-toast'; // <-- IMPORTANTE
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { validateRequired } from '../../utils/validators';
 import { getTheme } from '../../utils/themeUtils';
+import CharacterService from '../../services/CharacterService';
 
 export default function TemplateBuilder() {
 	const { t } = useTranslation('global');
 	const navigate = useNavigate();
 
-	// Obtenemos el campaignId de la URL para saber a qué campaña pertenece esta plantilla
+	// --- PARÁMETROS DE LA URL ---
 	const [searchParams] = useSearchParams();
 	const campaignId = searchParams.get('campaignId');
+	const templateId = searchParams.get('templateId');
+	const isEditMode = !!templateId;
 
-	const [fields, setFields] = useState([]);
 	const theme = getTheme();
+
+	// --- ESTADOS GENERALES ---
+	const [isLoading, setIsLoading] = useState(isEditMode);
+	const [templateName, setTemplateName] = useState('');
+	const [fields, setFields] = useState([]);
 	const [editingIndex, setEditingIndex] = useState(null);
 	const [errors, setErrors] = useState({});
 
@@ -35,6 +53,39 @@ export default function TemplateBuilder() {
 		{ value: 'boolean', label: t('character.templateBuilder.checkboxDes') },
 	];
 
+	useEffect(() => {
+		if (isEditMode) {
+			const fetchTemplateData = async () => {
+				try {
+					const data = await CharacterService.getTemplateById(templateId);
+					console.log('Datos brutos de la plantilla recibidos:', data);
+					setTemplateName(data.name || '');
+
+					// Mapeamos los atributos del backend a nuestro formato del frontend
+					if (data.schema && data.schema.length > 0) {
+						const mappedFields = data.schema.map(attr => ({
+							key: attr.key,
+							label: attr.label,
+							type: attr.type,
+							// Si el backend te devuelve required, min y max, los usamos. Si no, valores por defecto.
+							required: attr.required || false,
+							min: attr.min || '',
+							max: attr.max || '',
+						}));
+						setFields(mappedFields);
+					}
+				} catch (error) {
+					console.error('Error al cargar la plantilla:', error);
+					toast.error('Error al cargar los datos de la plantilla.');
+				} finally {
+					setIsLoading(false);
+				}
+			};
+
+			fetchTemplateData();
+		}
+	}, [templateId, isEditMode]);
+
 	const generateInternalKey = label => {
 		const cleanLabel = label
 			.toLowerCase()
@@ -48,13 +99,11 @@ export default function TemplateBuilder() {
 	};
 
 	const handleChange = (name, value) => {
-		// Validamos que 'name' es una propiedad legítima que esperamos (evita inyección)
 		const allowedKeys = ['label', 'type', 'required', 'min', 'max'];
 		if (!allowedKeys.includes(name)) return;
 
 		setCurrentField(prev => ({ ...prev, [name]: value }));
 
-		// Usamos hasOwnProperty en lugar de errors[name]
 		if (Object.hasOwn(errors, name)) {
 			setErrors(prev => ({ ...prev, [name]: null }));
 		}
@@ -105,50 +154,97 @@ export default function TemplateBuilder() {
 	};
 	const isEditing = typeof editingIndex === 'number';
 
-	// --- NUEVO MANEJADOR DE ENVÍO DE LA PLANTILLA COMPLETA ---
+	// --- MANEJADOR DE ENVÍO CONECTADO AL BACKEND ---
 	const handleSubmitTemplate = async e => {
 		e.preventDefault();
+
+		if (!templateName.trim()) {
+			toast.error(t('character.templateBuilder.errorNoName'));
+			return;
+		}
 
 		if (fields.length === 0) {
 			toast.error(t('character.templateBuilder.errorNoFields'));
 			return;
 		}
+
 		if (!campaignId) {
 			toast.error(t('character.templateBuilder.errorNoCampaignId'));
 			return;
 		}
 
+		const mappedAttributes = fields.map(field => ({
+			key: field.key,
+			label: field.label,
+			type: field.type,
+			required: field.required,
+			min: field.min,
+			max: field.max,
+		}));
+
 		const payload = {
-			campaign_id: campaignId,
-			fields: fields,
+			name: templateName,
+			avatar_url: '',
+			campaign_id: Number(campaignId),
+			template_id: isEditMode ? Number(templateId) : null,
+			attributes: mappedAttributes,
 		};
 
 		try {
-			// Simulación de la respuesta exitosa de la API
-			console.log('Enviando JSON al backend:', JSON.stringify(payload, null, 2));
-			const mockResponse = { id: 1, campaign_id: campaignId };
+			console.log('Enviando Payload al backend:', JSON.stringify(payload, null, 2));
 
-			toast.success(t('character.templateBuilder.successSave'));
+			// --- DECISIÓN: ¿CREAR O ACTUALIZAR? ---
+			if (isEditMode) {
+				await CharacterService.updateTemplate(templateId, payload);
+				toast.success(t('character.templateBuilder.successUpdate') || 'Plantilla actualizada con éxito');
+			} else {
+				await CharacterService.createTemplate(payload);
+				toast.success(t('character.templateBuilder.successSave'));
+			}
 
 			setTimeout(() => {
-				navigate(`/campaign/${mockResponse.campaign_id}`);
+				navigate(`/campaign/${campaignId}`);
 			}, 1000);
 		} catch (error) {
 			console.error('Error al guardar la plantilla:', error);
-			toast.error(t('character.templateBuilder.errorSave'));
+			toast.error(t('character.templateBuilder.errorSave') || 'Error al procesar la plantilla');
 		}
 	};
+
+	if (isLoading) {
+		return (
+			<div className='flex flex-col items-center justify-center h-[60vh] gap-4'>
+				<Spinner className={`h-10 w-10 ${theme.primary}`} />
+				<Typography variant='h5' color='blue-gray'>
+					Cargando datos de la plantilla...
+				</Typography>
+			</div>
+		);
+	}
 
 	return (
 		<div className='w-full max-w-4xl mx-auto p-4 space-y-6'>
 			<div className='text-center'>
 				<Typography variant='h3' color='blue-gray'>
-					{t('character.templateBuilder.title')}
+					{isEditMode
+						? t('character.templateBuilder.titleEdit') || 'Editar Plantilla de Personaje'
+						: t('character.templateBuilder.title')}
 				</Typography>
 				<Typography color='gray' className='mt-1 font-normal'>
 					{t('character.templateBuilder.description')}
 				</Typography>
 			</div>
+
+			<Card className='w-full shadow-sm border border-blue-gray-100'>
+				<CardBody>
+					<Input
+						label={t('character.templateBuilder.templateName') || 'Nombre de la Plantilla (ej: Ficha D&D 5e)'}
+						value={templateName}
+						onChange={e => setTemplateName(e.target.value)}
+						required
+					/>
+				</CardBody>
+			</Card>
 
 			{fields.length > 0 && (
 				<Card className='w-full border border-blue-gray-100 shadow-sm'>
@@ -282,7 +378,9 @@ export default function TemplateBuilder() {
 
 			<form onSubmit={handleSubmitTemplate} className='flex justify-end mt-8 border-t pt-6'>
 				<Button type='submit' color='green' size='lg' disabled={fields.length === 0}>
-					{t('character.templateBuilder.saveTemplate')}
+					{isEditMode
+						? t('character.templateBuilder.updateTemplate') || 'Actualizar Plantilla'
+						: t('character.templateBuilder.saveTemplate')}
 				</Button>
 			</form>
 		</div>

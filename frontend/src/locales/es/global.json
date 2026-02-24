@@ -26,7 +26,7 @@
   "menu": {
     "findCampaign": "Buscar Campaña", 
     "createCampaign": "Crear Campaña",
-    "provisional": "Provisional"
+    "createCharacter": "Crear Personaje"
   },
 
   "common": {
@@ -151,7 +151,9 @@
     "description": "Descripción",
     "attributes": "Atributos",
     "templateBuilder": {
+      "templateName": "Nombre de la Plantilla",
       "title": "Constructor de Plantillas de Personaje",
+      "titleEdit": "Editar Plantilla de Personaje",
       "description": "Define qué campos deberán rellenar los jugadores para esta campaña.",
       "nameField": "Nombre del Campo (ej: Raza, Historia, Fuerza)",
       "requiredField": "¿Es obligatorio que el jugador lo rellene?",
@@ -163,6 +165,9 @@
       "addField": "Añadir Campo",
       "updateField": "Actualizar Campo",
       "saveTemplate": "Guardar Plantilla",
+      "createTemplate": "Crear Plantilla",
+      "editTemplate": "Editar Plantilla",
+      "updateTemplate": "Actualizar Plantilla",
       "newField": "Nuevo Campo",
       "editing": "Editando",
       "shortText": "Texto Corto",
@@ -174,9 +179,11 @@
       "checkbox": "Interruptor / Checkbox",
       "checkboxDes": "Interruptor / Checkbox (Ej: Inspiración)",
       "successSave": "¡Plantilla guardada correctamente!",
+      "successUpdate": "¡Plantilla actualizada correctamente!",
       "errorNoFields": "Debes añadir al menos un campo a la plantilla.",
       "errorNoCampaignId": "Error: No se encontró el ID de la campaña.",
-      "errorSave": "Hubo un error al guardar la plantilla."
+      "errorSave": "Hubo un error al guardar la plantilla.",
+      "errorNoName": "Debes darle un nombre a la plantilla."
     },
     "form": {
       "title": "Crear Personaje",

@@ -1,4 +1,5 @@
-import { DocumentMagnifyingGlassIcon, PencilSquareIcon, InboxIcon } from '@heroicons/react/24/solid';
+import { UserPlusIcon } from '@heroicons/react/24/outline';
+import { DocumentMagnifyingGlassIcon, PencilSquareIcon } from '@heroicons/react/24/solid';
 
 export const menuItems = [
 	{
@@ -12,9 +13,9 @@ export const menuItems = [
 		icon: PencilSquareIcon,
 	},
 	{
-		label: 'menu.provisional',
-		path: '/',
-		icon: InboxIcon,
+		label: 'menu.createCharacter',
+		path: '/createCharacter',
+		icon: UserPlusIcon,
 	},
 	
 ];
