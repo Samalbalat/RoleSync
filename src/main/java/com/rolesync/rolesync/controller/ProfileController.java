@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,8 +41,11 @@ public class ProfileController {
      * @return ResponseEntity containing the profile data if found, or a 404 Not Found response if the profile does not exist
      */
     @GetMapping()
-    public ResponseEntity<?> getProfile(Authentication authentication, @PathVariable String roleType) {
-        Optional<Profile> profile = utilsCalls.getProfileFromAuthentication(authentication, roleType);
+    public ResponseEntity<?> getProfile(Authentication authentication,
+        @PathVariable String roleType,
+        @RequestHeader("X-Profile-Name") String profileName)
+        {
+        Optional<Profile> profile = profileRepository.findByProfilename(profileName);
         if (profile.isPresent()) {
             System.out.println("Profile found: " + profile.get());
             ProfileInDTO response = profile.map(p -> 
@@ -61,8 +65,12 @@ public class ProfileController {
      * @return ResponseEntity indicating the result of the operation
      */
     @PutMapping()
-    public ResponseEntity<?> putProfile(Authentication authentication, @PathVariable String roleType, @RequestBody ProfileInDTO profilePutInDTO) {
-        Optional<Profile> profile = utilsCalls.getProfileFromAuthentication(authentication, roleType);
+    public ResponseEntity<?> putProfile(Authentication authentication,
+        @PathVariable String roleType,
+        @RequestBody ProfileInDTO profilePutInDTO,
+        @RequestHeader("X-Profile-Name") String profileName)
+        {
+        Optional<Profile> profile = profileRepository.findByProfilename(profileName);
         if (profile.isPresent()) {
             System.out.println("Profile found: " + profile.get());
             Profile editable = profile.get();
@@ -87,14 +95,18 @@ public class ProfileController {
     * 
     */
     @PostMapping()
-    public ResponseEntity<?> postProfile(Authentication authentication, @PathVariable String roleType, @RequestBody ProfileInDTO profilePostInDTO) {
-        Optional<Profile> profile = utilsCalls.getProfileFromAuthentication(authentication, roleType);
+    public ResponseEntity<?> postProfile(Authentication authentication,
+        @PathVariable String roleType,
+        @RequestBody ProfileInDTO profilePostInDTO,
+        @RequestHeader("X-Profile-Name") String profileName)
+        {
+        Optional<Profile> profile = profileRepository.findByProfilename(profileName);
         if (!profile.isPresent()) {
             String principal = authentication.getName();
             System.out.println("Profile creation available for user: " + principal + " and roleType: " + roleType);
             Profile newProfile = new Profile();
             newProfile.setUsername(principal);
-            newProfile.setProfileType(ProfileType.valueOf(roleType));
+            newProfile.setProfileType(ProfileType.valueOf(roleType.toUpperCase()));
             newProfile.setProfilename(profilePostInDTO.getProfileName());
             newProfile.setImage(profilePostInDTO.getImage());
             newProfile.setDescription(profilePostInDTO.getDescription());

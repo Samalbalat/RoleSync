@@ -20,6 +20,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.rolesync.rolesync.security.jwt.AuthTokenFilter;
 import com.rolesync.rolesync.security.service.UserDetailsServiceImpl;
 
+import jakarta.servlet.DispatcherType;
+
 import java.util.Arrays;
 
 @Configuration
@@ -55,6 +57,8 @@ public class SecurityConfig {
         .csrf(csrf -> csrf.disable())
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .authorizeHttpRequests(auth -> auth
+            .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+            .requestMatchers("/error").permitAll()
             .requestMatchers("/rolesync/auth/**").permitAll()
             .anyRequest().authenticated()
         )

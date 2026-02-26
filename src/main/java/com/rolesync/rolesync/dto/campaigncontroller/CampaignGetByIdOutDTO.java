@@ -21,6 +21,7 @@ public class CampaignGetByIdOutDTO {
     private String timeZone;
     private String image;
     private String system;
+    private String frequency;
     private String location;
     private String dayWeek;
     private String duration;

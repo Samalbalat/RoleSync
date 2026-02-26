@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -64,7 +65,9 @@ public class CampaignController {
             @RequestParam(required = false) String communication,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) String page
+            @RequestParam(required = false) String page,
+            @RequestParam(required = false) String theme,
+            @RequestParam(required = false) String duration
 ) 
     {
         BooleanExpression predicate = Q.campaignType.eq(type);
@@ -89,12 +92,22 @@ public class CampaignController {
             predicate = predicate.and(Q.dayWeek.containsIgnoreCase(dayWeek));
         }
 
+        if (dayWeek != null && !dayWeek.isBlank()) {
+            predicate = predicate.and(Q.dayWeek.containsIgnoreCase(dayWeek));
+        }
+
         if (communication != null && !communication.isBlank()) {
             predicate = predicate.and(Q.communication.containsIgnoreCase(communication));
         }
 
         if (status != null && !status.isBlank()) {
             predicate = predicate.and(Q.status.eq(CampaignStatus.valueOf(status.toUpperCase())));
+        }
+        if (theme != null && !theme.isBlank()) {
+            predicate = predicate.and(Q.themes.any().containsIgnoreCase(theme));
+        }
+        if (duration != null && !duration.isBlank()) {
+            predicate = predicate.and(Q.duration.containsIgnoreCase(duration));
         }
 
         if (search != null && !search.isBlank()) {
@@ -116,7 +129,8 @@ public class CampaignController {
     @GetMapping("/{id}")
     public ResponseEntity<CampaignGetByIdOutDTO> getCampaign(
         Authentication authentication,
-        @PathVariable Long id)
+        @PathVariable Long id,
+        @RequestHeader("X-Profile-Name") String profileName)
     {   if(id == null){
             return ResponseEntity.badRequest().build();
         }
@@ -124,7 +138,7 @@ public class CampaignController {
         if(campaign != null){
             CampaignGetByIdOutDTO response = new CampaignGetByIdOutDTO();
             formFindByIdResponse(campaign, response);
-            response.setUserRelation(utilsCalls.getUserRelationToCampaign(authentication, campaign));
+            response.setUserRelation(utilsCalls.getProfileRelationToCampaign(profileName, campaign));
             return ResponseEntity.ok(response);
         }
         return ResponseEntity.notFound().build();
@@ -135,11 +149,11 @@ public class CampaignController {
     @PostMapping
     public ResponseEntity<String> createCampaign(
             Authentication authentication,
-            @RequestBody CampaignPostInDTO dto) 
+            @RequestBody CampaignPostInDTO dto,
+            @RequestHeader("X-Profile-Name") String profileName)  
     {
         Campaign campaign = new Campaign();
-        Profile activeProfile = utilsCalls
-                .getProfileFromAuthentication(authentication, dto.getType())
+        Profile activeProfile = profileRepository.findByProfilename(profileName)
                 .orElseThrow(() -> new IllegalStateException("Active profile not found"));
         campaign.setOwnerName(activeProfile.getProfilename());
         createCampaignFromPostInDto(dto, campaign);
@@ -153,10 +167,10 @@ public class CampaignController {
     public ResponseEntity<String> updateCampaign(
             Authentication authentication,
             @PathVariable Long id,
-            @RequestBody CampaignPutInDTO dto) 
+            @RequestBody CampaignPutInDTO dto,
+            @RequestHeader("X-Profile-Name") String profileName)  
     {
-        Profile activeProfile = utilsCalls
-                .getProfileFromAuthentication(authentication, dto.getType().name())
+        Profile activeProfile = profileRepository.findByProfilename(profileName)
                 .orElseThrow(() -> new IllegalStateException("Active profile not found"));
         if(id == null){
             return ResponseEntity.badRequest().build();
@@ -179,7 +193,8 @@ public class CampaignController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCampaign(
             Authentication authentication,
-            @PathVariable Long id) 
+            @PathVariable Long id,
+            @RequestHeader("X-Profile-Name") String profileName)  
     {
         Optional<Campaign> campaignOpt = campaignRepository.findById(id);
         if (campaignOpt.isEmpty()) {
@@ -187,8 +202,7 @@ public class CampaignController {
         }
         Campaign campaign = campaignOpt.get();
 
-        Profile activeProfile = utilsCalls
-                .getProfileFromAuthentication(authentication, campaign.getCampaignType().name())
+        Profile activeProfile = profileRepository.findByProfilename(profileName)
                 .orElseThrow(() -> new IllegalStateException("Active profile not found"));
 
         if (!campaign.getOwnerName().equals(activeProfile.getProfilename())) {
@@ -231,6 +245,7 @@ public class CampaignController {
         dto.setDayWeek(campaign.getDayWeek());
         dto.setDuration(campaign.getDuration());
         dto.setLocation(campaign.getLocation());
+        dto.setFrequency(campaign.getFrequency());
         dto.setCommunication(campaign.getCommunication());
         dto.setImage(campaign.getImage());
         dto.setStatus(campaign.getStatus().name());

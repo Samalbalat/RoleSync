@@ -5,7 +5,7 @@ import java.util.List;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import com.rolesync.rolesync.dto.characterSheetController.CharacterSchemaField;
+import com.rolesync.rolesync.dto.charactersheetcontroller.CharacterSchemaField;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

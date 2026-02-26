@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
 import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.Column;
