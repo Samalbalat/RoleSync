@@ -1,6 +1,5 @@
 package com.rolesync.rolesync.controller;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -167,7 +166,7 @@ public class CharacterSheetController {
                     .orElseThrow(() -> new IllegalStateException("Active profile not found"));
 
                 if (!campaign.getOwnerName().equals(activeProfile.getProfilename()) &&
-                    (campaign.getMembers() == null || !Arrays.asList(campaign.getMembers()).contains(activeProfile.getProfilename()))) {
+                    (campaign.getMembers() == null || !campaign.getMembers().contains(activeProfile.getProfilename()))) {
                     return ResponseEntity.status(403).body("User is not a member of the campaign");
                 }
 
@@ -245,7 +244,7 @@ public class CharacterSheetController {
         Profile activeProfile = profileRepository.findByProfilename(profileName)
                 .orElseThrow(() -> new IllegalStateException("Active profile not found"));
         if (!campaign.getOwnerName().equals(activeProfile.getProfilename()) &&
-            (campaign.getMembers() == null || !Arrays.asList(campaign.getMembers()).contains(activeProfile.getProfilename()))) {
+            (campaign.getMembers() == null || !campaign.getMembers().contains(activeProfile.getProfilename()))) {
             return ResponseEntity.status(403).body("User is not a member of the campaign");
         }
         

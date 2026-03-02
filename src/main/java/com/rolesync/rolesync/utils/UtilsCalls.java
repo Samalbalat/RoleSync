@@ -1,6 +1,5 @@
 package com.rolesync.rolesync.utils;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ public class UtilsCalls {
             String profileNameRetrieved = profileOpt.get().getProfilename();
             if (profileNameRetrieved.equals(campaign.getOwnerName())) {
                 return "OWNER";
-            } else if(campaign.getMembers()!=null && Arrays.asList(campaign.getMembers()).contains(profileNameRetrieved)) {
+            } else if(campaign.getMembers()!=null && campaign.getMembers().contains(profileNameRetrieved)) {
                 return "MEMBER";
             }
         }
