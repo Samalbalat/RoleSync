@@ -8,7 +8,7 @@ public class CampaignGetOutDTO {
     String name;
     byte[] image;
     String system;
-    String[] theme;
+    String[] themes;
     String status;
-    
+
 }
