@@ -1,4 +1,4 @@
-package com.rolesync.rolesync.dto.characterSheetController;
+package com.rolesync.rolesync.dto.charactersheetcontroller;
 
 import java.util.List;
 
@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class CharacterTemplateOutPostDTO {
 
     private Long id;
+    private String name;
     private String campaign_id;
     private String campaign_name;
     private List<CharacterSchemaField> schema_definition;
