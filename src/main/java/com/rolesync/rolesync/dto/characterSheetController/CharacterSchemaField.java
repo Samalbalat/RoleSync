@@ -11,4 +11,8 @@ public class CharacterSchemaField {
     private String key;
     private String label;
     private String type;
+    private Boolean required;
+    private Integer min;
+    private Integer max;
+    private Object value;
 }

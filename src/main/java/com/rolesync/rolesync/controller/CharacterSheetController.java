@@ -1,6 +1,5 @@
 package com.rolesync.rolesync.controller;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,12 +17,12 @@ import com.rolesync.rolesync.model.User;
 import com.rolesync.rolesync.repository.CampaignRepository;
 import com.rolesync.rolesync.repository.CharacterSheetRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
-import com.rolesync.rolesync.repository.UserRepository;
 import com.rolesync.rolesync.utils.UtilsCalls;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -35,50 +34,56 @@ public class CharacterSheetController {
     private final CampaignRepository campaignRepository;
     private final CharacterSheetRepository characterSheetRepository;
     private final UtilsCalls utilsCalls;
+    private final ProfileRepository profileRepository;
 
     public CharacterSheetController(
             CampaignRepository campaignRepository,
             UtilsCalls utilsCalls,
             ProfileRepository profileRepository,
-            CharacterSheetRepository characterSheetRepository,
-            UserRepository userRepository) 
+            CharacterSheetRepository characterSheetRepository
+        ) 
     {
         this.campaignRepository = campaignRepository;
         this.characterSheetRepository = characterSheetRepository;
         this.utilsCalls = utilsCalls;
+        this.profileRepository = profileRepository;
     }
 
     // ---------- GET TEMPLATES FROM CAMPAIGN ----------
     @GetMapping("/campaigns/{campaignId}/templates")
     public ResponseEntity<?> getTemplatesFromCampaign(
             Authentication authentication,
-            @PathVariable Long campaignId) 
+            @PathVariable Long campaignId,
+            @RequestHeader("X-Profile-Name") String profileName) 
     {
-        return getSheetsFromCampaign(authentication, campaignId, true);
+        return getSheetsFromCampaign(authentication, campaignId, true, profileName);
     }
 
     // ---------- GET CHARACTERS FROM CAMPAIGN----------
     @GetMapping("/campaigns/{campaignId}/characters")
     public ResponseEntity<?> getCharactersFromCampaign(
             Authentication authentication,
-            @PathVariable Long campaignId) 
+            @PathVariable Long campaignId,
+            @RequestHeader("X-Profile-Name") String profileName) 
     {
-        return getSheetsFromCampaign(authentication, campaignId, false);
+        return getSheetsFromCampaign(authentication, campaignId, false, profileName);
     }
 
     // ---------- POST A CHARACTER ----------
     @PostMapping("/characters")
     public ResponseEntity<?> createFreeCharacter(
             Authentication authentication,
-            @RequestBody CharacterSheetInPostDTO dto) 
-    {   return postMySheets(authentication, dto, false);
+            @RequestBody CharacterSheetInPostDTO dto,
+            @RequestHeader("X-Profile-Name") String profileName)  
+    {   return postMySheets(authentication, dto, false, profileName);
     }
 
     @PostMapping("/templates")
     public ResponseEntity<?> createTemplate(
             Authentication authentication,
-            @RequestBody CharacterSheetInPostDTO dto) 
-    {   return postMySheets(authentication, dto, true);
+            @RequestBody CharacterSheetInPostDTO dto,
+            @RequestHeader("X-Profile-Name") String profileName) 
+    {   return postMySheets(authentication, dto, true, profileName);
     }
 
     // ---------- GET CHARACTER BY ID ----------
@@ -145,7 +150,7 @@ public class CharacterSheetController {
     { return getMySheets(authentication, true);
     }
 
-    private ResponseEntity<?> postMySheets(Authentication authentication, CharacterSheetInPostDTO dto, boolean isTemplate) {
+    private ResponseEntity<?> postMySheets(Authentication authentication, CharacterSheetInPostDTO dto, boolean isTemplate, String profileName) {
         CharacterSheet characterSheet = new CharacterSheet();
         CharacterTemplateOutPostDTO response = new CharacterTemplateOutPostDTO();
 
@@ -157,12 +162,11 @@ public class CharacterSheetController {
 
             if (!campaignOpt.isEmpty()) {
                 Campaign campaign = campaignOpt.get();
-                Profile activeProfile = utilsCalls
-                    .getProfileFromAuthentication(authentication, campaign.getCampaignType().name())
+                Profile activeProfile = profileRepository.findByProfilename(profileName)
                     .orElseThrow(() -> new IllegalStateException("Active profile not found"));
 
                 if (!campaign.getOwnerName().equals(activeProfile.getProfilename()) &&
-                    (campaign.getMembers() == null || !Arrays.asList(campaign.getMembers()).contains(activeProfile.getProfilename()))) {
+                    (campaign.getMembers() == null || !campaign.getMembers().contains(activeProfile.getProfilename()))) {
                     return ResponseEntity.status(403).body("User is not a member of the campaign");
                 }
 
@@ -213,44 +217,45 @@ public class CharacterSheetController {
             return ResponseEntity.status(403).body("User not found");
         }
         User user = userOpt.get();
-        List<CharacterSheet> templates = characterSheetRepository.findByOwnerAndIsTemplate(user, isTemplate);
-        List<CharacterTemplateOutPostDTO> response = templates.stream().map(template -> {
+        List<CharacterSheet> sheets = characterSheetRepository.findByOwnerAndIsTemplate(user, isTemplate);
+        List<CharacterTemplateOutPostDTO> response = sheets.stream().map(sheet -> {
             CharacterTemplateOutPostDTO dto = new CharacterTemplateOutPostDTO();
-            dto.setId(template.getId());
-            if(template.getCampaign()!=null){
-                dto.setCampaign_id(template.getCampaign().getId().toString());
-                dto.setCampaign_name(template.getCampaign().getName());
+            dto.setId(sheet.getId());
+            if(sheet.getCampaign()!=null){
+                dto.setCampaign_id(sheet.getCampaign().getId().toString());
+                dto.setCampaign_name(sheet.getCampaign().getName());
             }else{
                 dto.setCampaign_id(null);
                 dto.setCampaign_name(null);
             }
-            dto.setSchema_definition(template.getSchema());
+            dto.setSchema_definition(sheet.getSchema());
+            dto.setName(sheet.getName());
             return dto;
         }).toList();
         return ResponseEntity.ok(response);
     }
 
-    private ResponseEntity<?> getSheetsFromCampaign(Authentication authentication, Long campaignId, boolean isTemplate) {
+    private ResponseEntity<?> getSheetsFromCampaign(Authentication authentication, Long campaignId, boolean isTemplate, String profileName) {
         Optional<Campaign> campaignOpt = campaignRepository.findById(campaignId);
         if (campaignOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         Campaign campaign = campaignOpt.get();
-        Profile activeProfile = utilsCalls
-                .getProfileFromAuthentication(authentication, campaign.getCampaignType().name())
+        Profile activeProfile = profileRepository.findByProfilename(profileName)
                 .orElseThrow(() -> new IllegalStateException("Active profile not found"));
         if (!campaign.getOwnerName().equals(activeProfile.getProfilename()) &&
-            (campaign.getMembers() == null || !Arrays.asList(campaign.getMembers()).contains(activeProfile.getProfilename()))) {
+            (campaign.getMembers() == null || !campaign.getMembers().contains(activeProfile.getProfilename()))) {
             return ResponseEntity.status(403).body("User is not a member of the campaign");
         }
         
-        List<CharacterSheet> templates = characterSheetRepository.findByCampaignAndIsTemplate(campaign, isTemplate);
-        List<CharacterTemplateOutPostDTO> response = templates.stream().map(template -> {
+        List<CharacterSheet> sheets = characterSheetRepository.findByCampaignAndIsTemplate(campaign, isTemplate);
+        List<CharacterTemplateOutPostDTO> response = sheets.stream().map(sheet -> {
             CharacterTemplateOutPostDTO dto = new CharacterTemplateOutPostDTO();
-            dto.setId(template.getId());
-            dto.setCampaign_id(campaignId.toString());
-            dto.setCampaign_name(campaign.getName());
-            dto.setSchema_definition(template.getSchema());
+            dto.setId(sheet.getId());
+            dto.setName(sheet.getName());
+            dto.setCampaign_id(sheet.getCampaign().getId().toString());
+            dto.setCampaign_name(sheet.getCampaign().getName());
+            dto.setSchema_definition(sheet.getSchema());
             return dto;
         }).toList();
         return ResponseEntity.ok(response);

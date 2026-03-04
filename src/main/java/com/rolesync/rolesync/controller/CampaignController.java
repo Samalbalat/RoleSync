@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.core.Authentication;
-
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignGetByIdOutDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignPostInDTO;
@@ -27,10 +27,10 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
 
 @RestController
 @RequestMapping("/campaigns")
@@ -44,8 +44,7 @@ public class CampaignController {
     public CampaignController(
             CampaignRepository campaignRepository,
             UtilsCalls utilsCalls,
-            ProfileRepository profileRepository) 
-    {
+            ProfileRepository profileRepository) {
         this.campaignRepository = campaignRepository;
         this.utilsCalls = utilsCalls;
         this.profileRepository = profileRepository;
@@ -64,9 +63,9 @@ public class CampaignController {
             @RequestParam(required = false) String communication,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) String page
-) 
-    {
+            @RequestParam(required = false) String page,
+            @RequestParam(required = false) String themes,
+            @RequestParam(required = false) String duration) {
         BooleanExpression predicate = Q.campaignType.eq(type);
 
         if (system != null && !system.isBlank()) {
@@ -96,6 +95,13 @@ public class CampaignController {
         if (status != null && !status.isBlank()) {
             predicate = predicate.and(Q.status.eq(CampaignStatus.valueOf(status.toUpperCase())));
         }
+        if (themes != null && !themes.isBlank()) {
+            predicate = predicate.and(
+                    Expressions.booleanTemplate("CAST({0} AS text) ilike {1}", Q.themes, "%" + themes + "%"));
+        }
+        if (duration != null && !duration.isBlank()) {
+            predicate = predicate.and(Q.duration.containsIgnoreCase(duration));
+        }
 
         if (search != null && !search.isBlank()) {
             search = search.trim();
@@ -108,23 +114,23 @@ public class CampaignController {
         }
 
         return ResponseEntity.ok(
-                (List<Campaign>) campaignRepository.findAll(predicate)
-        );
+                (List<Campaign>) campaignRepository.findAll(predicate));
     }
 
     // ---------- DETAIL ----------
     @GetMapping("/{id}")
     public ResponseEntity<CampaignGetByIdOutDTO> getCampaign(
-        Authentication authentication,
-        @PathVariable Long id)
-    {   if(id == null){
+            Authentication authentication,
+            @PathVariable Long id,
+            @RequestHeader("X-Profile-Name") String profileName) {
+        if (id == null) {
             return ResponseEntity.badRequest().build();
         }
         Campaign campaign = campaignRepository.findById(id).get();
-        if(campaign != null){
+        if (campaign != null) {
             CampaignGetByIdOutDTO response = new CampaignGetByIdOutDTO();
             formFindByIdResponse(campaign, response);
-            response.setUserRelation(utilsCalls.getUserRelationToCampaign(authentication, campaign));
+            response.setUserRelation(utilsCalls.getProfileRelationToCampaign(profileName, campaign));
             return ResponseEntity.ok(response);
         }
         return ResponseEntity.notFound().build();
@@ -135,11 +141,10 @@ public class CampaignController {
     @PostMapping
     public ResponseEntity<String> createCampaign(
             Authentication authentication,
-            @RequestBody CampaignPostInDTO dto) 
-    {
+            @RequestBody CampaignPostInDTO dto,
+            @RequestHeader("X-Profile-Name") String profileName) {
         Campaign campaign = new Campaign();
-        Profile activeProfile = utilsCalls
-                .getProfileFromAuthentication(authentication, dto.getType())
+        Profile activeProfile = profileRepository.findByProfilename(profileName)
                 .orElseThrow(() -> new IllegalStateException("Active profile not found"));
         campaign.setOwnerName(activeProfile.getProfilename());
         createCampaignFromPostInDto(dto, campaign);
@@ -153,12 +158,11 @@ public class CampaignController {
     public ResponseEntity<String> updateCampaign(
             Authentication authentication,
             @PathVariable Long id,
-            @RequestBody CampaignPutInDTO dto) 
-    {
-        Profile activeProfile = utilsCalls
-                .getProfileFromAuthentication(authentication, dto.getType().name())
+            @RequestBody CampaignPutInDTO dto,
+            @RequestHeader("X-Profile-Name") String profileName) {
+        Profile activeProfile = profileRepository.findByProfilename(profileName)
                 .orElseThrow(() -> new IllegalStateException("Active profile not found"));
-        if(id == null){
+        if (id == null) {
             return ResponseEntity.badRequest().build();
         }
         Optional<Campaign> campaignOpt = campaignRepository.findById(id);
@@ -179,16 +183,15 @@ public class CampaignController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCampaign(
             Authentication authentication,
-            @PathVariable Long id) 
-    {
+            @PathVariable Long id,
+            @RequestHeader("X-Profile-Name") String profileName) {
         Optional<Campaign> campaignOpt = campaignRepository.findById(id);
         if (campaignOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         Campaign campaign = campaignOpt.get();
 
-        Profile activeProfile = utilsCalls
-                .getProfileFromAuthentication(authentication, campaign.getCampaignType().name())
+        Profile activeProfile = profileRepository.findByProfilename(profileName)
                 .orElseThrow(() -> new IllegalStateException("Active profile not found"));
 
         if (!campaign.getOwnerName().equals(activeProfile.getProfilename())) {
@@ -201,8 +204,7 @@ public class CampaignController {
 
     // ---------- Helpers ----------
 
-    private void applyUpdates(Campaign campaign, CampaignPutInDTO dto)
-    {
+    private void applyUpdates(Campaign campaign, CampaignPutInDTO dto) {
         campaign.setName(dto.getName());
         campaign.setImage(dto.getImage());
         campaign.setDescription(dto.getDescription());
@@ -219,8 +221,7 @@ public class CampaignController {
         campaign.setStatus(CampaignStatus.valueOf(dto.getStatus().toUpperCase()));
     }
 
-    private void formFindByIdResponse(Campaign campaign, CampaignGetByIdOutDTO dto)
-    {
+    private void formFindByIdResponse(Campaign campaign, CampaignGetByIdOutDTO dto) {
         dto.setId(campaign.getId().toString());
         dto.setName(campaign.getName());
         dto.setDescription(campaign.getDescription());
@@ -231,6 +232,7 @@ public class CampaignController {
         dto.setDayWeek(campaign.getDayWeek());
         dto.setDuration(campaign.getDuration());
         dto.setLocation(campaign.getLocation());
+        dto.setFrequency(campaign.getFrequency());
         dto.setCommunication(campaign.getCommunication());
         dto.setImage(campaign.getImage());
         dto.setStatus(campaign.getStatus().name());
@@ -247,8 +249,7 @@ public class CampaignController {
         dto.setOwner(owner);
     }
 
-    private void createCampaignFromPostInDto(CampaignPostInDTO dto, Campaign campaign)
-    {
+    private void createCampaignFromPostInDto(CampaignPostInDTO dto, Campaign campaign) {
         campaign.setName(dto.getName());
         campaign.setImage(dto.getImage());
         campaign.setDescription(dto.getDescription());
