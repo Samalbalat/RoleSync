@@ -310,10 +310,31 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 							color={theme.primary}
 							error={!!errors.communication}
 						>
-							<Option value='Discord'>Discord</Option>
-							<Option value='Zoom'>Zoom</Option>
-							<Option value='Roll20'>Twitter / X</Option>
-							<Option value='WhatsApp'>WhatsApp</Option>
+							{[
+								isWritten ? (
+									<Option key='here' value='here'>
+										{t('communication.here')}
+									</Option>
+								) : null,
+								<Option key='discord' value='Discord'>
+									Discord
+								</Option>,
+								<Option key='twitter' value='Twitter'>
+									Twitter / X
+								</Option>,
+								<Option key='telegram' value='Telegram'>
+									Telegram
+								</Option>,
+								<Option key='whatsapp' value='WhatsApp'>
+									WhatsApp
+								</Option>,
+								<Option key='in-person' value='In-person'>
+									{t('communication.inPerson')}
+								</Option>,
+								<Option key='other' value='Other'>
+									{t('communication.other')}
+								</Option>,
+							].filter(Boolean)}
 						</Select>
 						{errors.communication && (
 							<Typography variant='small' color='red' className='mt-1'>
@@ -403,16 +424,23 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 						</div>
 
 						<div>
-							<Input
+							<Select
 								label={t('campaign.dayWeek')}
 								name='dayWeek'
-								placeholder='Viernes 20:00'
 								value={formData.dayWeek}
-								onChange={handleChange}
+								onChange={val => handleSelectChange('dayWeek', val)}
 								maxLength={LIMITS.SHORT_TEXT}
 								color={theme.primary}
 								error={!!errors.dayWeek}
-							/>
+							>
+								<Option value='monday'>{t('dayWeek.monday')}</Option>
+								<Option value='tuesday'>{t('dayWeek.tuesday')}</Option>
+								<Option value='wednesday'>{t('dayWeek.wednesday')}</Option>
+								<Option value='thursday'>{t('dayWeek.thursday')}</Option>
+								<Option value='friday'>{t('dayWeek.friday')}</Option>
+								<Option value='saturday'>{t('dayWeek.saturday')}</Option>
+								<Option value='sunday'>{t('dayWeek.sunday')}</Option>
+							</Select>
 							{errors.dayWeek && (
 								<Typography variant='small' color='red' className='mt-1'>
 									⚠ {errors.dayWeek}
@@ -421,16 +449,21 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 						</div>
 
 						<div>
-							<Input
+							<Select
 								label={t('campaign.frequency')}
 								name='frequency'
-								placeholder='Ej. Semanal, Mensual...'
 								value={formData.frequency}
-								onChange={handleChange}
+								onChange={val => handleSelectChange('frequency', val)}
 								maxLength={LIMITS.SHORT_TEXT}
 								color={theme.primary}
 								error={!!errors.frequency}
-							/>
+							>
+								<Option value='oneShot'>{t('frequency.oneShot')}</Option>
+								<Option value='weekly'>{t('frequency.weekly')}</Option>
+								<Option value='biweekly'>{t('frequency.biweekly')}</Option>
+								<Option value='monthly'>{t('frequency.monthly')}</Option>
+							</Select>
+
 							{errors.frequency && (
 								<Typography variant='small' color='red' className='mt-1'>
 									⚠ {errors.frequency}
@@ -441,7 +474,7 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 						<Input
 							label={t('campaign.duration')}
 							name='duration'
-							placeholder='Ej. 4 horas, Indefinida'
+							placeholder='Ej. 1 hora, 3 horas...'
 							value={formData.duration}
 							onChange={handleChange}
 							maxLength={LIMITS.SHORT_TEXT}

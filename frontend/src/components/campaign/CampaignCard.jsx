@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 
 export default function CampaignCard({ campana, theme }) {
 	const navigate = useNavigate();
-
 	return (
 		<Card
 			className='w-full overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer group border border-gray-100'
@@ -49,8 +48,8 @@ export default function CampaignCard({ campana, theme }) {
 				</Typography>
 
 				<div className='flex flex-wrap gap-1 mb-3'>
-					{Array.isArray(campana.theme) ? (
-						campana.theme.slice(0, 3).map((tag, index) => (
+					{Array.isArray(campana.themes) ? (
+						campana.themes.slice(0, 3).map((tag, index) => (
 							<span
 								key={index}
 								className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-${theme.primary}-50 text-${theme.primary}-700 border border-${theme.primary}-100`}
@@ -68,7 +67,7 @@ export default function CampaignCard({ campana, theme }) {
 					<Tooltip content='Jugadores actuales / Máximos'>
 						<div className='flex items-center gap-1.5 text-gray-600 font-medium text-xs'>
 							<UserGroupIcon className={`h-4 w-4 text-${theme.primary}-500`} />
-							{campana.currentPlayers}/{campana.maxPlayers}
+							{campana.members.length}/{campana.maxPlayers}
 						</div>
 					</Tooltip>
 

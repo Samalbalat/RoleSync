@@ -31,7 +31,7 @@ export default function FindCampaignPage() {
 		system: '',
 		language: '',
 		timeZone: '',
-		themes: [],
+		themes: '',
 		location: '',
 		dayWeek: '',
 		duration: '',
@@ -54,6 +54,7 @@ export default function FindCampaignPage() {
 					timeZone: filters.timeZone || undefined,
 					dayWeek: filters.dayWeek || undefined,
 					communication: filters.communication || undefined,
+					themes: filters.themes || undefined,
 				};
 
 				const cleanParams = Object.fromEntries(Object.entries(backendParams).filter(([, v]) => v != null && v !== ''));
@@ -79,7 +80,7 @@ export default function FindCampaignPage() {
 			system: '',
 			language: '',
 			timeZone: '',
-			themes: [],
+			themes: '',
 			location: '',
 			dayWeek: '',
 			duration: '',

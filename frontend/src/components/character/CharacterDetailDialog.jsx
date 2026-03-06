@@ -37,10 +37,10 @@ const CharacterHeader = ({ character, theme, t }) => (
 			}}
 		/>
 		<div>
-			<Typography variant='h4' color={theme.textPrimary}>
+			<Typography variant='h4' color={theme.primary}>
 				{character.name}
 			</Typography>
-			<Typography variant='small' color={theme.textSecondary} className='font-normal'>
+			<Typography variant='small' color='blue-gray' className='font-normal'>
 				{t('campaign.campaign')}: {character.campaign?.name || t('home.playerCharacters.noCampaign', 'Sin campaña')}
 			</Typography>
 		</div>
@@ -147,38 +147,26 @@ export default function CharacterDetailDialog({ open, handleClose, characterId }
 	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
-		if (open && characterId) {
-			setIsLoading(true);
+		if (!open || !characterId) return; // Si no está abierto, no hacer nada
 
-			CharacterService.getCharacterById(characterId)
-				.then(data => {
-					setCharacter(data);
-				})
-				.catch(error => {
-					console.error('Error al obtener los detalles del personaje:', error);
-					toast.error(t('errors.fetchCharacter', 'Hubo un error al cargar los detalles'));
-					handleClose();
-				})
-				.finally(() => {
-					setIsLoading(false);
-				});
-		} else {
-			setTimeout(() => setCharacter(null), 300);
-		}
+		setIsLoading(true);
+		CharacterService.getCharacterById(characterId)
+			.then(data => setCharacter(data))
+			.catch(error => {
+				console.error(error);
+				toast.error(t('errors.fetchCharacter'));
+				handleClose();
+			})
+			.finally(() => setIsLoading(false));
+		return () => {};
 	}, [open, characterId, handleClose, t]);
 
 	return (
-		<Dialog
-			open={open}
-			handler={handleClose}
-			size='md'
-			animate={{
-				mount: { scale: 1, y: 0 },
-				unmount: { scale: 0.9, y: -100 },
-			}}
-		>
+		<Dialog open={open} handler={handleClose} size='md' dismiss={{ enabled: true }} className='focus:outline-none'>
 			{isLoading || !character ? (
-				<LoadingContent theme={theme} t={t} />
+				<div className='p-10'>
+					<LoadingContent theme={theme} t={t} />
+				</div>
 			) : (
 				<>
 					<CharacterHeader character={character} theme={theme} t={t} />

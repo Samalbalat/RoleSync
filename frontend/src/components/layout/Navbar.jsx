@@ -56,8 +56,8 @@ export default function Navbar() {
 		<MTNavbar className='fixed top-0 left-0 z-50 w-full max-w-none px-4 py-2 lg:px-8 lg:py-4 bg-gray-200 border-0 rounded-none'>
 			<div className='flex items-center justify-between text-gray-900'>
 				{/* LOGO */}
-				<div className='flex items-center cursor-pointer'>
-					<img alt='RolSync Logo' src={'/DnD-Symbol.png'} className='h-8 w-auto' />
+				<div className='flex items-center cursor-pointer' onClick={() => navigate('/')}>
+					<img alt='RolSync Logo' src={'/simpleLogo.png'} className='h-10 w-auto' />
 					<span className='ml-3 text-xl font-bold font-mono tracking-tight'>RolSync</span>
 				</div>
 

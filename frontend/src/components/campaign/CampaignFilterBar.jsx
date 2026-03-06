@@ -95,13 +95,39 @@ export default function CampaignFilterBar({ filters, setFilters, onClean, onSear
 							color={theme.primary}
 						/>
 
-						<Input
+						<Select
 							label={t('campaign.communication')}
 							placeholder={t('campaign.placeholder.communication')}
 							value={filters.communication}
-							onChange={e => handleChange('communication', e.target.value)}
+							onChange={val => handleChange('communication', val)}
 							color={theme.primary}
-						/>
+						>
+							{[
+								isWritten ? (
+									<Option key='here' value='here'>
+										{t('communication.here')}
+									</Option>
+								) : null,
+								<Option key='discord' value='Discord'>
+									Discord
+								</Option>,
+								<Option key='twitter' value='Twitter'>
+									Twitter / X
+								</Option>,
+								<Option key='telegram' value='Telegram'>
+									Telegram
+								</Option>,
+								<Option key='whatsapp' value='WhatsApp'>
+									WhatsApp
+								</Option>,
+								<Option key='in-person' value='In-person'>
+									{t('communication.inPerson')}
+								</Option>,
+								<Option key='other' value='Other'>
+									{t('communication.other')}
+								</Option>,
+							].filter(Boolean)}
+						</Select>
 
 						<Select
 							label={t('campaign.language')}
@@ -111,7 +137,8 @@ export default function CampaignFilterBar({ filters, setFilters, onClean, onSear
 							menuProps={fixedMenuProps}
 						>
 							<Option value='Español'>Español</Option>
-							<Option value='Inglés'>Inglés</Option>
+							<Option value='English'>English</Option>
+							<Option value='Français'>Français</Option>
 						</Select>
 
 						<Select
@@ -121,26 +148,22 @@ export default function CampaignFilterBar({ filters, setFilters, onClean, onSear
 							color={theme.primary}
 							menuProps={fixedMenuProps}
 						>
-							<Option value='GMT+1 (España)'>Europa (GMT+1)</Option>
-							<Option value='GMT-5 (Latam)'>Latam (GMT-5)</Option>
-							<Option value='N/A (Asíncrono)'>Asíncrono</Option>
+							<Option value='GMT'>GMT (Europa Occidental)</Option>
+							<Option value='CET'>CET (Europa Central)</Option>
+							<Option value='EST'>EST (EEUU Costa Este)</Option>
+							<Option value='PST'>PST (EEUU Costa Oeste)</Option>
+							<Option value='UTC-3'>UTC-3 (Argentina/Uruguay)</Option>
 						</Select>
 
 						{/* --- CAMPOS SOLO PARA TABLETOP --- */}
 						{!isWritten && (
 							<>
-								<Select
+								<Input
 									label={t('campaign.system')}
 									value={filters.system}
-									onChange={val => handleChange('system', val)}
+									onChange={e => handleChange('system', e.target.value)}
 									color={theme.primary}
-									menuProps={fixedMenuProps}
-								>
-									<Option value='D&D 5e'>D&D 5e</Option>
-									<Option value='Pathfinder'>Pathfinder</Option>
-									<Option value='Vampiro'>Vampiro</Option>
-									<Option value='Call of Cthulhu'>Cthulhu</Option>
-								</Select>
+								/>
 
 								<Input
 									label={t('campaign.location')}
@@ -157,21 +180,21 @@ export default function CampaignFilterBar({ filters, setFilters, onClean, onSear
 									color={theme.primary}
 									menuProps={fixedMenuProps}
 								>
-									<Option value='Viernes Noche'>Viernes</Option>
-									<Option value='Sábados Tarde'>Sábados</Option>
+									<Option value='Lunes'>Lunes</Option>
+									<Option value='Martes'>Martes</Option>
+									<Option value='Miercoles'>Miercoles</Option>
+									<Option value='Jueves'>Jueves</Option>
+									<Option value='Viernes'>Viernes</Option>
+									<Option value='Sabado'>Sabado</Option>
+									<Option value='Domingo'>Domingo</Option>
 								</Select>
 
-								<Select
+								<Input
 									label={t('campaign.duration')}
 									value={filters.duration}
-									onChange={val => handleChange('duration', val)}
+									onChange={e => handleChange('duration', e.target.value)}
 									color={theme.primary}
-									menuProps={fixedMenuProps}
-								>
-									<Option value='One-Shot'>One-Shot</Option>
-									<Option value='Corta'>Corta (1-3 meses)</Option>
-									<Option value='Larga (+6 meses)'>Larga (+6 meses)</Option>
-								</Select>
+								/>
 							</>
 						)}
 					</div>
