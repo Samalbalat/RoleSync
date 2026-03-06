@@ -48,6 +48,29 @@
     "no": "No"
   },
 
+  "dayWeek": {
+    "monday": "Lunes",
+    "tuesday": "Martes",
+    "wednesday": "Miércoles",
+    "thursday": "Jueves",
+    "friday": "Viernes",
+    "saturday": "Sábado",
+    "sunday": "Domingo"
+  },
+
+  "frequency": {
+    "oneShot": "One-Shot",
+    "weekly": "Semanal",
+    "biweekly": "Quincenal",
+    "monthly": "Mensual"
+  },
+
+  "communication": {
+    "inPerson": "En persona",
+    "here": "Aquí en RoleSync",
+    "other": "Otro (mencionar en la descripción)"
+  },
+
   "errors": {
     "required": "Este campo es obligatorio",
     "invalidEmail": "El formato del correo no es válido",
@@ -56,7 +79,9 @@
     "passwordComplexity": "Debe incluir mayúscula, minúscula, número y símbolo (@$!%*?&)",
     "passwordMatch": "Las contraseñas no coinciden",
     "maxTags": "No puedes agregar más de 6 etiquetas",
-    "tooLong1000": "No puede exceder los 1000 caracteres"
+    "tooLong1000": "No puede exceder los 1000 caracteres",
+    "invalidMinMax": "Los valores mínimo y máximo deben ser números válidos",
+    "minMaxOrder": "El valor mínimo no puede ser mayor que el máximo"
   },
 
   "auth": {
@@ -105,7 +130,7 @@
     "timeZone": "Zona Horaria", 
     "theme": "Temática",
     "themes": "Temáticas",
-    "frecuency": "Frecuencia",
+    "frequency": "Frecuencia",
     "tagHelper": "Presiona",
     "location": "Lugar",
     "dayWeek": "Día de la Semana", 
@@ -150,6 +175,7 @@
     "history": "Historia y Trasfondo",
     "description": "Descripción",
     "attributes": "Atributos",
+    "createCharacter": "Crear Personaje",
     "templateBuilder": {
       "templateName": "Nombre de la Plantilla",
       "title": "Constructor de Plantillas de Personaje",

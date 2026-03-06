@@ -110,9 +110,7 @@ export default function CampaignCharacterList({ campaignId }) {
 			</Card>
 
 			{/* Diálogo de detalles del personaje */}
-			{selectedCharacterId && (
-				<CharacterDetailDialog open={open} handleClose={handleClose} characterId={selectedCharacterId} />
-			)}
+			<CharacterDetailDialog open={open} handleClose={handleClose} characterId={selectedCharacterId} />
 		</>
 	);
 }

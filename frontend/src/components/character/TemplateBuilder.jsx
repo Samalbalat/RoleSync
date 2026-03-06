@@ -15,7 +15,7 @@ import { TrashIcon, PlusIcon, PencilIcon, CheckIcon, XMarkIcon } from '@heroicon
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { validateRequired } from '../../utils/validators';
+import { validateMinMax, validateRequired } from '../../utils/validators';
 import { getTheme } from '../../utils/themeUtils';
 import CharacterService from '../../services/CharacterService';
 
@@ -69,8 +69,8 @@ export default function TemplateBuilder() {
 							type: attr.type,
 							// Si el backend te devuelve required, min y max, los usamos. Si no, valores por defecto.
 							required: attr.required || false,
-							min: attr.min || '',
-							max: attr.max || '',
+							min: attr.min ?? '',
+							max: attr.max ?? '',
 						}));
 						setFields(mappedFields);
 					}
@@ -111,9 +111,15 @@ export default function TemplateBuilder() {
 
 	const saveField = () => {
 		const labelError = validateRequired(currentField.label);
+		const minMaxError = validateMinMax(currentField.min, currentField.max);
 
 		if (labelError) {
 			setErrors({ label: labelError });
+			return;
+		}
+
+		if (minMaxError) {
+			setErrors({ minMax: minMaxError });
 			return;
 		}
 
@@ -266,8 +272,8 @@ export default function TemplateBuilder() {
 									<Typography variant='small' color='gray' className='font-mono'>
 										{t('character.templateBuilder.type')}: {fieldTypes.find(t => t.value === field.type)?.label}
 										{field.type === 'number' &&
-											(field.min || field.max) &&
-											` | Rango: [${field.min || '-'} a ${field.max || '-'}]`}
+											(field.min !== '' || field.max !== '') &&
+											` | Rango: [${field.min !== '' && field.min !== null ? field.min : '-'} a ${field.max !== '' && field.max !== null ? field.max : '-'}]`}
 									</Typography>
 								</div>
 								<div className='flex gap-2'>

@@ -47,7 +47,30 @@
     "yes": "Yes",
     "no": "No"
   },
-  
+
+  "dayWeek": {
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
+  },
+
+  "frequency": {
+    "oneShot": "One-Shot",
+    "weekly": "Weekly",
+    "biweekly": "Biweekly",
+    "monthly": "Monthly"
+  },
+
+  "communication": {
+    "inPerson": "In person",
+    "here": "Here in RoleSync",
+    "other": "Other (mention in description)"
+  },
+
   "errors": {
     "required": "This field is required",
     "invalidEmail": "The email format is not valid",
@@ -56,7 +79,9 @@
     "passwordComplexity": "Must include uppercase, lowercase, number, and symbol (_@$!%*?&-)",
     "passwordMatch": "Passwords do not match",
     "maxTags": "You cannot add more than 6 tags",
-    "tooLong1000": "Cannot exceed 1000 characters"
+    "tooLong1000": "Cannot exceed 1000 characters",
+    "invalidMinMax": "Minimum and maximum values must be valid numbers",
+    "minMaxOrder": "Minimum value cannot be greater than maximum value"
   },
 
   "auth": {
@@ -105,7 +130,7 @@
     "timeZone": "Time Zone", 
     "theme": "Theme",
     "themes": "Themes",
-    "frecuency": "Frequency",
+    "frequency": "Frequency",
     "tagHelper": "Press",
     "location": "Location",
     "dayWeek": "Week Day", 
@@ -150,6 +175,7 @@
     "history": "History and Background",
     "description": "Description",
     "attributes": "Attributes",
+    "createCharacter": "Create Character",
     "templateBuilder": {
       "templateName": "Template Name",
       "title": "Character Template Builder",

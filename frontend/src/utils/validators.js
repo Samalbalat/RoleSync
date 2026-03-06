@@ -23,3 +23,11 @@ export const validateRequired = (value) => {
     if (!value || value.trim() === '') return 'errors.required';
     return null; 
 };
+
+export const validateMinMax = (min, max) => {
+	if (min !== '' && max !== '') {
+		if (Number.isNaN(min) || Number.isNaN(max)) return 'errors.invalidMinMax';
+		if (Number(min) > Number(max)) return 'errors.minMaxOrder';
+	}
+	return null;
+};

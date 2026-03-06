@@ -109,7 +109,7 @@ export default function EditCampaignPage() {
 			<div className='max-w-4xl mx-auto'>
 				<div className='mb-8 text-center'>
 					<Typography variant='h2' color='blue-gray' className='font-bold'>
-						{t('campaign.editTitle') || 'Editar'}
+						{t('common.edit') || 'Editar'}
 						<span className={`text-${theme.primary}-600 ml-2`}>{t('campaign.adventure') || 'Aventura'}</span>
 					</Typography>
 				</div>

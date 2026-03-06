@@ -109,7 +109,7 @@ const CampaignInfoList = ({ campaign, isWritten, t }) => (
 			<>
 				<InfoRow icon={BookOpenIcon} color='purple' title={t('campaign.system')} value={campaign.system} />
 				<InfoRow icon={MapPinIcon} color='teal' title={t('campaign.location')} value={campaign.location} />
-
+				<InfoRow icon={ClockOutlineIcon} color='teal' title={t('campaign.frequency')} value={campaign.frequency} />
 				<InfoRow icon={CalendarDaysIcon} color='orange' title={t('campaign.dayWeek')} value={campaign.dayWeek} />
 				<InfoRow
 					icon={ClockIcon}
@@ -179,12 +179,24 @@ const ActionCard = ({ campaign, campaignTemplate, t, navigate, isFull, progress,
 		}
 
 		// Si ya es participante
-		if (relation === 'PARTICIPANT') {
+		if (relation === 'MEMBER') {
 			return (
 				<div className='text-center space-y-4'>
 					<Typography variant='small' className='text-gray-600 mb-4'>
 						{t('campaign.message.playerMessage')}
 					</Typography>
+
+					<Button
+						fullWidth
+						size='lg'
+						color='green'
+						variant='gradient'
+						className='flex items-center justify-center gap-2'
+						onClick={() => navigate(`/createCharacter?campaignId=${campaign.id}`)}
+					>
+						<DocumentPlusIcon className='h-5 w-5' />
+						{t('character.createCharacter') || 'Crear Personaje'}
+					</Button>
 				</div>
 			);
 		}
@@ -315,7 +327,7 @@ export default function CampaignDetailPage() {
 	}
 
 	const isOwner = campaign.userRelation === 'OWNER';
-	const isParticipant = campaign.userRelation === 'PARTICIPANT';
+	const isParticipant = campaign.userRelation === 'MEMBER';
 	const hasInsideAccess = isOwner || isParticipant;
 
 	const isWritten = campaign.type === 'WRITTEN';
