@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { getTheme } from '../../utils/themeUtils';
+import CharacterService from '../../services/CharacterService';
 
 export default function FreeStyleCharacterForm() {
 	const navigate = useNavigate();
@@ -43,16 +44,25 @@ export default function FreeStyleCharacterForm() {
 		setAttributes(updatedAttributes);
 	};
 
-	const onSubmit = data => {
-		// Transformación: Convertimos el array en el objeto JSONB final
-		const formattedAttributes = {};
-		attributes.forEach(attr => {
-			if (attr.key.trim() !== '') {
-				formattedAttributes[attr.key.trim()] = attr.value;
-			}
-		});
+	const onSubmit = async data => {
+		const formattedAttributes = attributes
+			.filter(attr => attr.key.trim() !== '')
+			.map(attr => {
+				const safeKey = attr.key
+					.trim()
+					.toLowerCase()
+					.replaceAll(/[^a-z0-9]/g, '');
+				const randomSuffix = Math.random().toString(36).substring(2, 6);
 
-		// Construimos el JSON final para el backend
+				return {
+					key: `${safeKey}_${randomSuffix}`,
+					label: attr.key.trim(),
+					type: 'short_text',
+					required: false,
+					value: attr.value,
+				};
+			});
+
 		const payload = {
 			name: data.name.trim(),
 			avatar_url: data.avatarUrl.trim() || null,
@@ -61,11 +71,15 @@ export default function FreeStyleCharacterForm() {
 			attributes: formattedAttributes,
 		};
 
-		// Simulación de envío
-		console.log('JSON enviado al backend:', JSON.stringify(payload, null, 2));
-
-		toast.success(`¡Personaje ${data.name} creado con éxito!`);
-		setTimeout(() => navigate('/characters'), 1500);
+		// 3. Llamada a la API
+		try {
+			await CharacterService.createCharacter(payload);
+			toast.success(`¡Personaje ${data.name} creado con éxito!`);
+			setTimeout(() => navigate('/characters'), 1500);
+		} catch (error) {
+			console.error('Error al guardar el personaje:', error);
+			toast.error('Hubo un error al guardar el personaje.');
+		}
 	};
 
 	return (

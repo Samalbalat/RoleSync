@@ -4,8 +4,8 @@ import { Typography, Spinner } from '@material-tailwind/react';
 import { useTranslation } from 'react-i18next';
 import DynamicCharacterForm from '../../components/character/DynamicCharacterForm';
 import FreeStyleCharacterForm from '../../components/character/FreeStyleCharacterForm';
-import { mockTemplates } from '../../data/mockCharacters';
 import { getTheme } from '../../utils/themeUtils';
+import CharacterService from '../../services/CharacterService';
 
 export default function CreateCharacterPage() {
 	const [searchParams] = useSearchParams();
@@ -18,12 +18,26 @@ export default function CreateCharacterPage() {
 
 	useEffect(() => {
 		if (campaignId) {
-			// --- AQUÍ IRÁ TU LLAMADA REAL A LA API ---
+			const fetchTemplate = async () => {
+				try {
+					// Pedimos las plantillas de esta campaña al backend
+					const templates = await CharacterService.getCampaignTemplates(campaignId);
 
-			setTimeout(() => {
-				setTemplateData(mockTemplates);
-				setLoading(false);
-			}, 800);
+					// Asumimos que la campaña tiene al menos 1 plantilla y cogemos la primera
+					if (templates && templates.length > 0) {
+						setTemplateData(templates[0]);
+					} else {
+						setTemplateData(null);
+					}
+				} catch (error) {
+					console.error('Error al cargar la plantilla de la campaña:', error);
+					setTemplateData(null);
+				} finally {
+					setLoading(false);
+				}
+			};
+
+			fetchTemplate();
 		}
 	}, [campaignId]);
 

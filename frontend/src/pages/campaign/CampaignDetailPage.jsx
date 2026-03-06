@@ -27,11 +27,13 @@ import {
 	PencilSquareIcon,
 	ClockIcon as ClockOutlineIcon,
 	ChevronDownIcon,
+	DocumentPlusIcon,
+	DocumentCheckIcon,
 } from '@heroicons/react/24/outline';
 import CampaignCharacterList from '../../components/character/CampaignCharacterList';
 import { getTheme } from '../../utils/themeUtils';
 import CampaignService from '../../services/CampaignService';
-import { mockCampaignCharacters } from '../../data/mockCharacters';
+import CharacterService from '../../services/CharacterService';
 
 // eslint-disable-next-line no-unused-vars
 const InfoRow = ({ icon: IconComponent, color, title, value }) => {
@@ -120,7 +122,7 @@ const CampaignInfoList = ({ campaign, isWritten, t }) => (
 	</div>
 );
 
-const ActionCard = ({ campaign, t, navigate, isFull, progress, themeColor }) => {
+const ActionCard = ({ campaign, campaignTemplate, t, navigate, isFull, progress, themeColor }) => {
 	const relation = campaign.userRelation;
 
 	const renderCardContent = () => {
@@ -143,6 +145,35 @@ const ActionCard = ({ campaign, t, navigate, isFull, progress, themeColor }) => 
 						<PencilSquareIcon className='h-5 w-5' />
 						{t('common.edit')}
 					</Button>
+
+					{campaignTemplate ? (
+						<Button
+							fullWidth
+							size='lg'
+							color='blue'
+							variant='gradient'
+							className='flex items-center justify-center gap-2'
+							// Pasamos el ID de la plantilla para que el builder sepa que es una edición
+							onClick={() =>
+								navigate(`/character/templateBuilder?campaignId=${campaign.id}&templateId=${campaignTemplate.id}`)
+							}
+						>
+							<DocumentCheckIcon className='h-5 w-5' />
+							{t('character.templateBuilder.editTemplate') || 'Editar Plantilla'}
+						</Button>
+					) : (
+						<Button
+							fullWidth
+							size='lg'
+							color='green'
+							variant='gradient'
+							className='flex items-center justify-center gap-2'
+							onClick={() => navigate(`/character/templateBuilder?campaignId=${campaign.id}`)}
+						>
+							<DocumentPlusIcon className='h-5 w-5' />
+							{t('character.templateBuilder.createTemplate') || 'Crear Plantilla'}
+						</Button>
+					)}
 				</div>
 			);
 		}
@@ -225,6 +256,7 @@ export default function CampaignDetailPage() {
 	const [openAccordion, setOpenAccordion] = useState(0);
 
 	const [campaign, setCampaign] = useState(null);
+	const [campaignTemplate, setCampaignTemplate] = useState(null);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
@@ -237,11 +269,24 @@ export default function CampaignDetailPage() {
 			}
 		}
 
-		const fetchCampaign = async () => {
+		const fetchCampaignAndTemplate = async () => {
 			try {
 				setLoading(true);
-				const data = await CampaignService.getCampaignById(id);
-				setCampaign(data);
+
+				const campaignData = await CampaignService.getCampaignById(id);
+				console.log('Datos de campaña obtenidos:', campaignData);
+				setCampaign(campaignData);
+
+				if (campaignData?.userRelation === 'OWNER') {
+					try {
+						const templates = await CharacterService.getCampaignTemplates(id);
+						if (templates?.[0]) {
+							setCampaignTemplate(templates[0]);
+						}
+					} catch (templateError) {
+						console.error('Error al obtener plantillas de la campaña:', templateError);
+					}
+				}
 			} catch (error) {
 				console.error('Error al obtener la campaña:', error);
 				setCampaign(null);
@@ -250,7 +295,7 @@ export default function CampaignDetailPage() {
 			}
 		};
 
-		fetchCampaign();
+		fetchCampaignAndTemplate();
 	}, [id]);
 
 	if (loading) {
@@ -265,7 +310,6 @@ export default function CampaignDetailPage() {
 
 	if (!campaign) return <NotFoundView t={t} navigate={navigate} />;
 
-	// Acceso denegado (Comparando tipo de rol)
 	if (userProfile?.type && campaign.type !== userProfile.type) {
 		return <AccessDeniedView t={t} navigate={navigate} />;
 	}
@@ -391,7 +435,7 @@ export default function CampaignDetailPage() {
 					{/* Lógica Condicional: Eres de la campaña VS Eres Visitante */}
 					{hasInsideAccess ? (
 						<>
-							<CampaignCharacterList characters={mockCampaignCharacters || []} />
+							<CampaignCharacterList campaignId={campaign.id} />
 							<Card className='shadow-sm border border-gray-200'>
 								<Accordion
 									open={openAccordion === 1}
@@ -428,6 +472,7 @@ export default function CampaignDetailPage() {
 					<div className='sticky top-4 z-10'>
 						<ActionCard
 							campaign={campaign}
+							campaignTemplate={campaignTemplate}
 							t={t}
 							navigate={navigate}
 							isFull={isFull}
@@ -449,6 +494,7 @@ CampaignInfoList.propTypes = {
 
 ActionCard.propTypes = {
 	campaign: PropTypes.object.isRequired,
+	campaignTemplate: PropTypes.object,
 	t: PropTypes.func.isRequired,
 	navigate: PropTypes.func.isRequired,
 	isFull: PropTypes.bool.isRequired,

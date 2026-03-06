@@ -26,7 +26,7 @@
   "menu": {
     "findCampaign": "Find Campaign", 
     "createCampaign": "Create Campaign",
-    "provisional": "Provisional"
+    "createCharacter": "Create Character"
   },
 
   "common": {
@@ -151,7 +151,9 @@
     "description": "Description",
     "attributes": "Attributes",
     "templateBuilder": {
+      "templateName": "Template Name",
       "title": "Character Template Builder",
+      "titleEdit": "Edit Character Template",
       "description": "Define which fields players will need to fill out for this campaign.",
       "nameField": "Field Name (e.g. Race, History, Strength)",
       "requiredField": "Is the field required?",
@@ -163,6 +165,9 @@
       "addField": "Add Field",
       "updateField": "Update Field",
       "saveTemplate": "Save Template",
+      "createTemplate": "Create Template",
+      "editTemplate": "Edit Template",
+      "updateTemplate": "Update Template",
       "newField": "New Field",
       "editing": "Editing",
       "shortText": "Short Text",
@@ -174,9 +179,11 @@
       "checkbox": "Toggle / Checkbox",
       "checkboxDes": "Toggle / Checkbox (e.g. Inspiration)",
       "successSave": "Template saved successfully!",
+      "successUpdate": "Template updated successfully!",
       "errorNoFields": "You must add at least one field to the template.",
       "errorNoCampaignId": "Error: Campaign ID not found.",
-      "errorSave": "There was an error saving the template."
+      "errorSave": "There was an error saving the template.",
+      "errorNoName": "You must give the template a name."
     },
     "form": {
       "title": "Create Character",
