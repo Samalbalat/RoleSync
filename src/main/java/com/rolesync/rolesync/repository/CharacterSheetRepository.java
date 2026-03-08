@@ -11,11 +11,15 @@ import com.rolesync.rolesync.model.CharacterSheet;
 import com.rolesync.rolesync.model.Profile;
 
 @Repository
-public interface CharacterSheetRepository extends JpaRepository<CharacterSheet, Long>, QuerydslPredicateExecutor<CharacterSheet>{
+public interface CharacterSheetRepository
+        extends JpaRepository<CharacterSheet, Long>, QuerydslPredicateExecutor<CharacterSheet> {
 
     List<CharacterSheet> findByCampaignAndIsTemplate(Campaign campaign, Boolean isTemplate);
-    List<CharacterSheet> findByIsTemplateAndIsPublic(Boolean isTemplate, Boolean isPublic);
-    List<CharacterSheet> findByOwnerAndIsTemplate(Profile owner, Boolean isTemplate);
-    List<CharacterSheet> findByCampaignIdAndOwnerAndIsTemplate(Campaign campaignId, Profile profileName, Boolean isTemplate);
-}
 
+    List<CharacterSheet> findByIsTemplateAndIsPublic(Boolean isTemplate, Boolean isPublic);
+
+    List<CharacterSheet> findByOwnerAndIsTemplate(Profile owner, Boolean isTemplate);
+
+    List<CharacterSheet> findByCampaignAndOwnerAndIsTemplate(Campaign campaign, Profile profileName,
+            Boolean isTemplate);
+}
