@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -10,254 +9,21 @@ import {
 	Card,
 	CardBody,
 	Typography,
-	Chip,
 	Avatar,
-	Progress,
 } from '@material-tailwind/react';
-import {
-	ArrowLeftIcon,
-	CalendarDaysIcon,
-	ClockIcon,
-	BookOpenIcon,
-	LanguageIcon,
-	GlobeAmericasIcon,
-	ChatBubbleLeftRightIcon,
-	MapPinIcon,
-	ShieldExclamationIcon,
-	PencilSquareIcon,
-	ClockIcon as ClockOutlineIcon,
-	ChevronDownIcon,
-	DocumentPlusIcon,
-	DocumentCheckIcon,
-} from '@heroicons/react/24/outline';
-import CampaignCharacterList from '../../components/character/CampaignCharacterList';
+import { ArrowLeftIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { getTheme } from '../../utils/themeUtils';
+
+import CampaignCharacterList from '../../components/character/CampaignCharacterList';
+import CampaignActionCard from '../../components/campaign/detail/CampaignActionCard';
+import CampaignInfoList from '../../components/campaign/detail/CampaignInfoList';
+import CampaignAbout from '../../components/campaign/detail/CampaignAbout';
+import { NotFoundView, AccessDeniedView } from '../../components/campaign/detail/CampaignErrorViews';
+
 import CampaignService from '../../services/CampaignService';
 import CharacterService from '../../services/CharacterService';
+import CampaignMembersManager from '../../components/campaign/detail/CampaignMembersManager';
 
-// eslint-disable-next-line no-unused-vars
-const InfoRow = ({ icon: IconComponent, color, title, value }) => {
-	if (!value) return null;
-
-	const colorMap = new Map([
-		['blue', 'bg-blue-50 text-blue-600'],
-		['indigo', 'bg-indigo-50 text-indigo-600'],
-		['green', 'bg-green-50 text-green-600'],
-		['purple', 'bg-purple-50 text-purple-600'],
-		['teal', 'bg-teal-50 text-teal-600'],
-		['orange', 'bg-orange-50 text-orange-600'],
-		['pink', 'bg-pink-50 text-pink-600'],
-		['gray', 'bg-gray-100 text-gray-600'],
-	]);
-
-	const activeClass = colorMap.get(color) || 'bg-gray-100 text-gray-600';
-
-	return (
-		<div className='p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors'>
-			<div className={`p-2 rounded-lg ${activeClass}`}>
-				<IconComponent className='h-6 w-6' />
-			</div>
-			<div>
-				<Typography variant='small' className='font-bold text-gray-900'>
-					{title}
-				</Typography>
-				<Typography variant='small' className='text-gray-600 font-medium'>
-					{value}
-				</Typography>
-			</div>
-		</div>
-	);
-};
-
-const NotFoundView = ({ t, navigate }) => (
-	<div className='flex flex-col items-center justify-center h-screen animate-fade-in'>
-		<Typography variant='h4' color='blue-gray'>
-			{t('campaign.noResultsFound')}
-		</Typography>
-		<Button className='mt-4' onClick={() => navigate('/campaigns')}>
-			{t('common.back')}
-		</Button>
-	</div>
-);
-
-const AccessDeniedView = ({ t, navigate }) => (
-	<div className='flex flex-col items-center justify-center h-[60vh] text-center px-4 animate-fade-in'>
-		<div className='p-6 bg-red-50 rounded-full mb-4'>
-			<ShieldExclamationIcon className='h-16 w-16 text-red-500' />
-		</div>
-		<Typography variant='h3' color='blue-gray' className='mb-2'>
-			{t('auth.accessDenied')}
-		</Typography>
-		<Typography className='text-gray-600 max-w-md mb-8'>{t('campaign.accessDeniedMessage')}</Typography>
-		<Button color='gray' variant='outlined' onClick={() => navigate('/campaigns')}>
-			{t('common.back')}
-		</Button>
-	</div>
-);
-
-const CampaignInfoList = ({ campaign, isWritten, t }) => (
-	<div className='divide-y divide-gray-100'>
-		<InfoRow icon={LanguageIcon} color='blue' title={t('campaign.language')} value={campaign.language} />
-		<InfoRow icon={GlobeAmericasIcon} color='indigo' title={t('campaign.timeZone')} value={campaign.timeZone} />
-		<InfoRow
-			icon={ChatBubbleLeftRightIcon}
-			color='green'
-			title={t('campaign.communication')}
-			value={campaign.communication}
-		/>
-		{!isWritten && (
-			<>
-				<InfoRow icon={BookOpenIcon} color='purple' title={t('campaign.system')} value={campaign.system} />
-				<InfoRow icon={MapPinIcon} color='teal' title={t('campaign.location')} value={campaign.location} />
-				<InfoRow icon={ClockOutlineIcon} color='teal' title={t('campaign.frequency')} value={campaign.frequency} />
-				<InfoRow icon={CalendarDaysIcon} color='orange' title={t('campaign.dayWeek')} value={campaign.dayWeek} />
-				<InfoRow
-					icon={ClockIcon}
-					color='pink'
-					title={t('campaign.duration')}
-					value={campaign.duration ? `${campaign.duration}` : null}
-				/>
-			</>
-		)}
-	</div>
-);
-
-const ActionCard = ({ campaign, campaignTemplate, t, navigate, isFull, progress, themeColor }) => {
-	const relation = campaign.userRelation;
-
-	const renderCardContent = () => {
-		// Si es el dueño de la campaña
-		if (relation === 'OWNER') {
-			return (
-				<div className='text-center space-y-4'>
-					<Typography variant='h5' className={`${themeColor.textPrimary} `}>
-						{t('campaign.message.manageCampaign')}
-					</Typography>
-
-					<Button
-						fullWidth
-						size='lg'
-						color='blue-gray'
-						variant='outlined'
-						className='flex items-center justify-center gap-2 border-2'
-						onClick={() => navigate(`/campaigns/edit/${campaign.id}`)}
-					>
-						<PencilSquareIcon className='h-5 w-5' />
-						{t('common.edit')}
-					</Button>
-
-					{campaignTemplate ? (
-						<Button
-							fullWidth
-							size='lg'
-							color='blue'
-							variant='gradient'
-							className='flex items-center justify-center gap-2'
-							// Pasamos el ID de la plantilla para que el builder sepa que es una edición
-							onClick={() =>
-								navigate(`/character/templateBuilder?campaignId=${campaign.id}&templateId=${campaignTemplate.id}`)
-							}
-						>
-							<DocumentCheckIcon className='h-5 w-5' />
-							{t('character.templateBuilder.editTemplate') || 'Editar Plantilla'}
-						</Button>
-					) : (
-						<Button
-							fullWidth
-							size='lg'
-							color='green'
-							variant='gradient'
-							className='flex items-center justify-center gap-2'
-							onClick={() => navigate(`/character/templateBuilder?campaignId=${campaign.id}`)}
-						>
-							<DocumentPlusIcon className='h-5 w-5' />
-							{t('character.templateBuilder.createTemplate') || 'Crear Plantilla'}
-						</Button>
-					)}
-				</div>
-			);
-		}
-
-		// Si ya es participante
-		if (relation === 'MEMBER') {
-			return (
-				<div className='text-center space-y-4'>
-					<Typography variant='small' className='text-gray-600 mb-4'>
-						{t('campaign.message.playerMessage')}
-					</Typography>
-
-					<Button
-						fullWidth
-						size='lg'
-						color='green'
-						variant='gradient'
-						className='flex items-center justify-center gap-2'
-						onClick={() => navigate(`/createCharacter?campaignId=${campaign.id}`)}
-					>
-						<DocumentPlusIcon className='h-5 w-5' />
-						{t('character.createCharacter') || 'Crear Personaje'}
-					</Button>
-				</div>
-			);
-		}
-
-		// Si es visitante o está pendiente (NONE o PENDING)
-		const isPending = relation === 'PENDING';
-		const getButtonText = () => {
-			if (isPending) {
-				return t('campaign.detail.pending') || 'Solicitud enviada';
-			}
-			if (isFull) {
-				return t('campaign.detail.joinFull') || 'Campaña llena';
-			}
-			return t('campaign.detail.join') || 'Solicitar unirse';
-		};
-		const buttonText = getButtonText();
-
-		return (
-			<div className='mb-0'>
-				<div className='flex justify-between items-center mb-2'>
-					<Typography variant='h6' color='blue-gray'>
-						{t('campaign.detail.players') || 'Jugadores'}
-					</Typography>
-					<Typography variant='small' className='font-bold text-gray-600'>
-						{campaign.currentPlayers} / {campaign.maxPlayers}
-					</Typography>
-				</div>
-				<Progress value={progress} color={isFull ? 'red' : 'green'} className='h-2 mb-4' />
-				<Typography variant='small' className='text-gray-500 mb-6 text-center'>
-					{isFull
-						? t('campaign.detail.fullMessage') || 'La campaña está llena'
-						: t('campaign.detail.spotsLeft', { count: campaign.maxPlayers - campaign.currentPlayers }) ||
-							`Quedan ${campaign.maxPlayers - campaign.currentPlayers} plazas`}
-				</Typography>
-
-				<Button
-					fullWidth
-					size='lg'
-					color={isPending ? 'blue-gray' : themeColor.primary}
-					disabled={isFull || isPending}
-					className='flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all text-base'
-					onClick={() => {
-						// lógica de la API
-						console.log('Solicitando unirse a la campaña', campaign.id);
-					}}
-				>
-					{isPending && <ClockOutlineIcon className='h-5 w-5' />}
-					{buttonText}
-				</Button>
-			</div>
-		);
-	};
-
-	return (
-		<Card className='shadow-lg border border-gray-100 sticky top-4'>
-			<CardBody className='p-6'>{renderCardContent()}</CardBody>
-		</Card>
-	);
-};
-
-// --- COMPONENTE PRINCIPAL ---
 export default function CampaignDetailPage() {
 	const { t } = useTranslation('global');
 	const { id } = useParams();
@@ -266,10 +32,30 @@ export default function CampaignDetailPage() {
 
 	const [userProfile, setUserProfile] = useState(null);
 	const [openAccordion, setOpenAccordion] = useState(0);
-
 	const [campaign, setCampaign] = useState(null);
 	const [campaignTemplate, setCampaignTemplate] = useState(null);
 	const [loading, setLoading] = useState(true);
+
+	const fetchCampaignAndTemplate = useCallback(
+		async (showLoading = true) => {
+			try {
+				if (showLoading) setLoading(true);
+				const campaignData = await CampaignService.getCampaignById(id);
+				setCampaign(campaignData);
+
+				if (campaignData?.userRelation === 'OWNER') {
+					const templates = await CharacterService.getCampaignTemplates(id);
+					if (templates?.[0]) setCampaignTemplate(templates[0]);
+				}
+			} catch (error) {
+				console.error('Error al obtener la campaña:', error);
+				setCampaign(null);
+			} finally {
+				if (showLoading) setLoading(false);
+			}
+		},
+		[id],
+	);
 
 	useEffect(() => {
 		const storedProfile = localStorage.getItem('activeProfile');
@@ -281,34 +67,8 @@ export default function CampaignDetailPage() {
 			}
 		}
 
-		const fetchCampaignAndTemplate = async () => {
-			try {
-				setLoading(true);
-
-				const campaignData = await CampaignService.getCampaignById(id);
-				console.log('Datos de campaña obtenidos:', campaignData);
-				setCampaign(campaignData);
-
-				if (campaignData?.userRelation === 'OWNER') {
-					try {
-						const templates = await CharacterService.getCampaignTemplates(id);
-						if (templates?.[0]) {
-							setCampaignTemplate(templates[0]);
-						}
-					} catch (templateError) {
-						console.error('Error al obtener plantillas de la campaña:', templateError);
-					}
-				}
-			} catch (error) {
-				console.error('Error al obtener la campaña:', error);
-				setCampaign(null);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchCampaignAndTemplate();
-	}, [id]);
+		fetchCampaignAndTemplate(true);
+	}, [fetchCampaignAndTemplate]);
 
 	if (loading) {
 		return (
@@ -327,9 +87,7 @@ export default function CampaignDetailPage() {
 	}
 
 	const isOwner = campaign.userRelation === 'OWNER';
-	const isParticipant = campaign.userRelation === 'MEMBER';
-	const hasInsideAccess = isOwner || isParticipant;
-
+	const hasInsideAccess = isOwner || campaign.userRelation === 'MEMBER';
 	const isWritten = campaign.type === 'WRITTEN';
 	const progress = (campaign.currentPlayers / campaign.maxPlayers) * 100;
 	const isFull = campaign.currentPlayers >= campaign.maxPlayers;
@@ -364,90 +122,37 @@ export default function CampaignDetailPage() {
 
 	return (
 		<div className='max-w-7xl mx-auto px-4 py-8 animate-fade-in'>
-			{/* Header / Botones Superiores */}
+			{/* Header / Botón Volver */}
 			<div className='flex justify-between items-center mb-6'>
 				<Button
 					variant='text'
 					className={`flex items-center gap-2 pl-0 ${theme.textSecondary}`}
-					onClick={() => navigate('/campaigns')}
+					onClick={() => navigate('/find-campaign')}
 				>
 					<ArrowLeftIcon className='h-4 w-4' /> {t('common.back') || 'Volver'}
 				</Button>
 			</div>
 
 			<div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
-				{/* COLUMNA IZQUIERDA: Imagen y Descripción */}
+				{/* COLUMNA IZQUIERDA: Refactorizada en su propio componente */}
 				<div className='lg:col-span-2 space-y-8'>
-					<div className='relative rounded-2xl overflow-hidden shadow-lg h-[300px] md:h-[400px]'>
-						<img
-							src={campaign.image || '/default_image.png'}
-							alt={campaign.name}
-							className='w-full h-full object-cover'
-							onError={e => {
-								e.target.onerror = null;
-								e.target.src = '/default_image.png';
-							}}
-						/>
-						<div className='absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 md:p-8'>
-							<div className='flex gap-2 mb-3'>
-								<Chip
-									value={
-										campaign.status === 'OPEN' || campaign.status === 'ACTIVE'
-											? t('status.open') || 'Abierta'
-											: t('status.full') || 'Cerrada'
-									}
-									color={isFull ? 'red' : 'green'}
-									className='rounded-full'
-									size='sm'
-								/>
-								<Chip
-									value={campaign.type}
-									color={isWritten ? 'indigo' : 'orange'}
-									className='rounded-full border-none bg-white/20 text-white'
-									size='sm'
-									variant='filled'
-								/>
-							</div>
-							<Typography variant='h2' color='white' className='font-bold text-3xl md:text-4xl'>
-								{campaign.name}
-							</Typography>
-						</div>
-					</div>
-
-					{/* Description Section */}
-					<Card className='shadow-sm border border-gray-200'>
-						<CardBody className='p-6 md:p-8'>
-							<Typography variant='h5' color='blue-gray' className='mb-4 font-bold flex items-center gap-2'>
-								<BookOpenIcon className='h-6 w-6 text-gray-600' /> {t('campaign.detail.about') || 'Sobre la campaña'}
-							</Typography>
-							<Typography className='text-gray-600 text-lg leading-relaxed whitespace-pre-line'>
-								{campaign.description}
-							</Typography>
-							<div className='mt-8'>
-								<Typography variant='h6' color='blue-gray' className='mb-3'>
-									{t('campaign.detail.tags') || 'Etiquetas'}
-								</Typography>
-								<div className='flex flex-wrap gap-2'>
-									{campaign.themes.map((tag, i) => (
-										<span
-											key={i}
-											className='bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm font-medium border border-gray-200'
-										>
-											#{tag}
-										</span>
-									))}
-								</div>
-							</div>
-						</CardBody>
-					</Card>
+					<CampaignAbout campaign={campaign} isWritten={isWritten} isFull={isFull} t={t} />
 				</div>
 
 				{/* COLUMNA DERECHA: Actions, Characters e Info */}
 				<div className='space-y-6'>
-					{/* Lógica Condicional: Eres de la campaña VS Eres Visitante */}
 					{hasInsideAccess ? (
 						<>
 							<CampaignCharacterList campaignId={campaign.id} />
+							{/* SI ES EL DUEÑO, MOSTRAMOS EL PANEL DE GESTIÓN DE SOLICITUDES Y MIEMBROS */}
+							{isOwner && (
+								<CampaignMembersManager
+									campaignId={campaign.id}
+									t={t}
+									themeColor={theme}
+									onMemberChange={() => fetchCampaignAndTemplate(false)}
+								/>
+							)}
 							<Card className='shadow-sm border border-gray-200'>
 								<Accordion
 									open={openAccordion === 1}
@@ -480,9 +185,9 @@ export default function CampaignDetailPage() {
 						</Card>
 					)}
 
-					{/* Botón Principal de Acción */}
+					{/* Botón Principal de Acción Refactorizado */}
 					<div className='sticky top-4 z-10'>
-						<ActionCard
+						<CampaignActionCard
 							campaign={campaign}
 							campaignTemplate={campaignTemplate}
 							t={t}
@@ -490,6 +195,7 @@ export default function CampaignDetailPage() {
 							isFull={isFull}
 							progress={progress}
 							themeColor={theme}
+							onRefreshData={() => fetchCampaignAndTemplate(false)}
 						/>
 					</div>
 				</div>
@@ -497,36 +203,3 @@ export default function CampaignDetailPage() {
 		</div>
 	);
 }
-
-CampaignInfoList.propTypes = {
-	campaign: PropTypes.object.isRequired,
-	isWritten: PropTypes.bool.isRequired,
-	t: PropTypes.func.isRequired,
-};
-
-ActionCard.propTypes = {
-	campaign: PropTypes.object.isRequired,
-	campaignTemplate: PropTypes.object,
-	t: PropTypes.func.isRequired,
-	navigate: PropTypes.func.isRequired,
-	isFull: PropTypes.bool.isRequired,
-	progress: PropTypes.number.isRequired,
-	themeColor: PropTypes.object.isRequired,
-};
-
-AccessDeniedView.propTypes = {
-	t: PropTypes.func.isRequired,
-	navigate: PropTypes.func.isRequired,
-};
-
-InfoRow.propTypes = {
-	icon: PropTypes.elementType.isRequired,
-	color: PropTypes.string.isRequired,
-	title: PropTypes.string.isRequired,
-	value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-};
-
-NotFoundView.propTypes = {
-	t: PropTypes.func.isRequired,
-	navigate: PropTypes.func.isRequired,
-};

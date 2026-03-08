@@ -45,7 +45,10 @@
     "minimum": "Mínimo",
     "maximum": "Máximo",
     "yes": "Sí",
-    "no": "No"
+    "no": "No",
+    "send": "Enviar",
+    "reject": "Rechazar",
+    "accept": "Aceptar"
   },
 
   "dayWeek": {
@@ -154,7 +157,8 @@
     "message":{
       "manageCampaign":"Gestionar Campaña",
       "technicalDetails":"Detalles Técnicos y DM",
-      "playerMessage":"Eres jugador en esta aventura."
+      "playerMessage":"Eres jugador en esta aventura.",
+      "needsCharacter": "Aún no tienes un personaje asociado a esta campaña."
     },
     "detail": {
       "about": "Sobre la Campaña",
@@ -167,6 +171,28 @@
       "contactGM": "Mensaje al Master",
       "infoTitle": "Detalles de la Partida",
       "pending": "Solicitud Pendiente"
+    },
+    "join": {
+      "title": "Solicitar Unirse a la Campaña",
+      "description": "Envía un mensaje al Master para expresar tu interés en unirte a esta campaña. Esto les ayudará a entender tus motivaciones y decidir si eres un buen candidato para la aventura.",
+      "messageLabel": "Mensaje para el Master (opcional)",
+      "submit": "Enviar Solicitud",
+      "error": "Hubo un error al enviar tu solicitud. Por favor, inténtalo de nuevo más tarde."
+    },
+    "members": {
+      "title": "Gestión de Miembros",
+      "pendingRequests": "Solicitudes Pendientes",
+      "currentMembers": "Miembros Actuales",
+      "accept": "Aceptar",
+      "reject": "Rechazar",
+      "remove": "Eliminar",
+      "noPending": "No hay solicitudes pendientes.",
+      "noMembers": "No hay miembros en esta campaña.",
+      "kickConfirm": "¿Estás seguro de que deseas eliminar a este miembro?",
+      "kick": "Eliminar Miembro",
+      "kickConfirmTitle": "Confirmación de Eliminación",
+      "kickConfirmDesc1": "Estás a punto de eliminar a ",
+      "kickConfirmDesc2": " de la campaña. Esta acción no se puede deshacer y el jugador tendrá que enviar una nueva solicitud si desea unirse nuevamente."
     }
   },
 
