@@ -45,8 +45,8 @@ public class CharacterSheet {
     private Campaign campaign;
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable=false)
-    private User owner;
+    @JoinColumn(name="profile_id", nullable=false)
+    private Profile owner;
     
     
 }

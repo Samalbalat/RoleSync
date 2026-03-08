@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class OwnerProfileDTO {
     private String profileName;
-    private byte[] profileImage;
+    private String profileImage;
 }

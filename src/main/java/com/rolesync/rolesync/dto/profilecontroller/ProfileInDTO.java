@@ -8,7 +8,7 @@ import lombok.Data;
 public class ProfileInDTO {
 
     String profileName;
-    byte[] image;
+    String image;
     String description;
     
 }

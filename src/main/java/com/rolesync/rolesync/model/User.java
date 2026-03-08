@@ -25,9 +25,6 @@ public class User {
     private String password;
     private String timeZone;
 
-    @OneToMany(mappedBy = "owner")
-    private Set<CharacterSheet> sheets;
-
     public User(String email, String password, String timeZone) {
         this.email = email;
         this.password = password;

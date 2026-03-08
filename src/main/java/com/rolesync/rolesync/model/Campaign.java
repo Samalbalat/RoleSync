@@ -41,6 +41,9 @@ public class Campaign {
     @OneToMany(mappedBy="campaign")
     private Set<CharacterSheet> sheets;
 
+    @OneToMany(mappedBy="campaign")
+    private Set<CampaignRequest> requests;
+
     private String name;
     private String image;
     private String description;

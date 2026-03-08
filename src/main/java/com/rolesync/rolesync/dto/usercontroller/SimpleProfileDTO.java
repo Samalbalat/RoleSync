@@ -11,6 +11,6 @@ public class SimpleProfileDTO {
 
     private Long id;
     private String profileName;
-    private byte[] image;
+    private String image;
     
 }

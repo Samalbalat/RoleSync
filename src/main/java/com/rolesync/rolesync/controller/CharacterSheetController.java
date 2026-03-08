@@ -13,7 +13,6 @@ import com.rolesync.rolesync.dto.charactersheetcontroller.CharacterTemplateOutPo
 import com.rolesync.rolesync.model.Campaign;
 import com.rolesync.rolesync.model.CharacterSheet;
 import com.rolesync.rolesync.model.Profile;
-import com.rolesync.rolesync.model.User;
 import com.rolesync.rolesync.repository.CampaignRepository;
 import com.rolesync.rolesync.repository.CharacterSheetRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
@@ -90,19 +89,21 @@ public class CharacterSheetController {
     @GetMapping("/characters/{id}")
     public ResponseEntity<?> getCharacterById(
             Authentication authentication,
-            @PathVariable Long id
+            @PathVariable Long id,
+            @RequestHeader("X-Profile-Name") String profileName
     ) 
     {   
-        return getSheetById(authentication, id);
+        return getSheetById(authentication, id, profileName);
     }
 
     @GetMapping("/templates/{id}")
     public ResponseEntity<?> getTemplateById(
             Authentication authentication,
-            @PathVariable Long id
+            @PathVariable Long id,
+            @RequestHeader("X-Profile-Name") String profileName
     ) 
     {   
-        return getSheetById(authentication, id);
+        return getSheetById(authentication, id, profileName);
     }
 
     // ---------- PUT CHARACTER BY ID ----------
@@ -110,26 +111,28 @@ public class CharacterSheetController {
     public ResponseEntity<?> updateCharacter(
             Authentication authentication,
             @PathVariable Long id,
-            @RequestBody CharacterSheetInPostDTO dto
+            @RequestBody CharacterSheetInPostDTO dto,
+            @RequestHeader("X-Profile-Name") String profileName
     ) 
     {   
-        return updateSheet(authentication, id, dto);
+        return updateSheet(authentication, id, dto, profileName);
     }
 
      @PutMapping("/templates/{id}")
     public ResponseEntity<?> updateTemplate(
             Authentication authentication,
             @PathVariable Long id,
-            @RequestBody CharacterSheetInPostDTO dto
+            @RequestBody CharacterSheetInPostDTO dto,
+            @RequestHeader("X-Profile-Name") String profileName
     ) 
     {   
-        return updateSheet(authentication, id, dto);
+        return updateSheet(authentication, id, dto, profileName);
     }
 
     // ---------- GET MY CHARACTERS ----------
     @GetMapping("/characters/me")
-    public ResponseEntity<?> getMyCharacters(Authentication authentication) 
-    {   return getMySheets(authentication, false);
+    public ResponseEntity<?> getMyCharacters(Authentication authentication, @RequestHeader("X-Profile-Name") String profileName) 
+    {   return getMySheets(authentication, false, profileName);
     }
 
     // ---------- GET CHARACTERS ----------
@@ -146,16 +149,22 @@ public class CharacterSheetController {
 
     // ---------- GET MY TEMPLATES ----------
     @GetMapping("/templates/me")
-    public ResponseEntity<?> getMyTemplates(Authentication authentication) 
-    { return getMySheets(authentication, true);
+    public ResponseEntity<?> getMyTemplates(Authentication authentication, @RequestHeader("X-Profile-Name") String profileName)
+    { return getMySheets(authentication, true, profileName);
     }
 
     private ResponseEntity<?> postMySheets(Authentication authentication, CharacterSheetInPostDTO dto, boolean isTemplate, String profileName) {
         CharacterSheet characterSheet = new CharacterSheet();
         CharacterTemplateOutPostDTO response = new CharacterTemplateOutPostDTO();
+        if(!utilsCalls.checkAuthAndProfile(authentication, profileName)){
+            return ResponseEntity.status(403).body("User not authenticated or profile not found");
+        }
 
-        Optional<User> userOpt = utilsCalls.getUserFromUsername(authentication);
-        characterSheet.setOwner(userOpt.get());
+        Optional<Profile> profileOpt = profileRepository.findByProfilename(profileName);
+        if(profileOpt.isEmpty()){
+            return ResponseEntity.status(403).body("Profile not found");
+        }
+        characterSheet.setOwner(profileOpt.get());
 
         if(dto.getCampaign_id()!=null){
             Optional<Campaign> campaignOpt = campaignRepository.findById(dto.getCampaign_id());
@@ -211,13 +220,16 @@ public class CharacterSheetController {
         return ResponseEntity.ok(response);
     }
 
-    private ResponseEntity<?> getMySheets(Authentication authentication, boolean isTemplate) {
-        Optional<User> userOpt = utilsCalls.getUserFromUsername(authentication);
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.status(403).body("User not found");
+    private ResponseEntity<?> getMySheets(Authentication authentication, boolean isTemplate, @RequestHeader("X-Profile-Name") String profileName) {
+        if(!utilsCalls.checkAuthAndProfile(authentication, profileName)){
+            return ResponseEntity.status(403).body("User not authenticated or profile not found");
         }
-        User user = userOpt.get();
-        List<CharacterSheet> sheets = characterSheetRepository.findByOwnerAndIsTemplate(user, isTemplate);
+        Optional<Profile> profileOpt = profileRepository.findByProfilename(profileName);
+        if(profileOpt.isEmpty()){
+            return ResponseEntity.status(403).body("Profile not found");
+        }
+        Profile profile = profileOpt.get();
+        List<CharacterSheet> sheets = characterSheetRepository.findByOwnerAndIsTemplate(profile, isTemplate);
         List<CharacterTemplateOutPostDTO> response = sheets.stream().map(sheet -> {
             CharacterTemplateOutPostDTO dto = new CharacterTemplateOutPostDTO();
             dto.setId(sheet.getId());
@@ -261,9 +273,12 @@ public class CharacterSheetController {
         return ResponseEntity.ok(response);
     }
 
-    private ResponseEntity<?> getSheetById(Authentication authentication, Long id){
-        Optional<User> userOpt = utilsCalls.getUserFromUsername(authentication);
+    private ResponseEntity<?> getSheetById(Authentication authentication, Long id, @RequestHeader ("X-Profile-Name") String profileName) {
+        if(!utilsCalls.checkAuthAndProfile(authentication, profileName)){
+            return ResponseEntity.status(403).body("User not authenticated or profile not found");
+        }
         Optional<CharacterSheet> character = characterSheetRepository.findById(id);
+        Optional<Profile> userOpt = profileRepository.findByProfilename(profileName);
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(403).body("User not found");
         }else{
@@ -277,13 +292,15 @@ public class CharacterSheetController {
         return ResponseEntity.ok(character.get());
     }
 
-    private ResponseEntity<?> updateSheet(Authentication authentication, Long id, CharacterSheetInPostDTO dto){
-        Optional<User> userOpt = utilsCalls.getUserFromUsername(authentication);
+    private ResponseEntity<?> updateSheet(Authentication authentication, Long id, CharacterSheetInPostDTO dto, @RequestHeader ("X-Profile-Name") String profileName) {
+        if(!utilsCalls.checkAuthAndProfile(authentication, profileName)){
+            return ResponseEntity.status(403).body("User not authenticated or profile not found");
+        }
+        Optional<Profile> userOpt = profileRepository.findByProfilename(profileName);
         Optional<CharacterSheet> character = characterSheetRepository.findById(id);
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(403).body("User not found");
         }else{
-        
             if(character.isEmpty()){
                 return ResponseEntity.status(404).body("Character not found");
             }else if(!character.get().getOwner().equals(userOpt.get())){

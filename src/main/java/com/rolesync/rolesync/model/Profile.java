@@ -1,5 +1,7 @@
 package com.rolesync.rolesync.model;
 
+import java.util.Set;
+
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,10 +29,12 @@ public class Profile {
     @Enumerated(EnumType.STRING)
     private ProfileType profileType;
 
-    @Lob
-    private byte[] image; // JSON string to hold profile attributes
+    private String image; // JSON string to hold profile attributes
 
-    public Profile(String username, String profilename, String profileType, byte[] image) {
+    @OneToMany(mappedBy = "owner")
+    private Set<CharacterSheet> sheets;
+
+    public Profile(String username, String profilename, String profileType, String image) {
         this.username = username;
         this.profilename = profilename;
         this.profileType = ProfileType.valueOf(profileType);
@@ -38,12 +42,13 @@ public class Profile {
         this.description = "";
     }
 
-    public Profile(String username, String profilename, String profileType, String description, byte[] image) {
+    public Profile(String username, String profilename, String profileType, String description, String image, Set<CharacterSheet> sheets) {
         this.username = username;
         this.profilename = profilename;
         this.profileType = ProfileType.valueOf(profileType);
         this.description = description;
         this.image = image;
+        this.sheets = sheets;
         
     }
 }

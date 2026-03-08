@@ -1,5 +1,6 @@
 package com.rolesync.rolesync.utils;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,5 +36,17 @@ public class UtilsCalls {
             }
         }
         return "NONE";
+    }
+
+    public boolean checkAuthAndProfile(Authentication authentication, String profileName) {
+        Optional<User> userOpt = getUserFromUsername(authentication);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            List<Profile> userProfiles = profileRepository.findAllByUsername(user.getEmail());
+                if (userProfiles.stream().anyMatch(p -> p.getProfilename().equals(profileName))) {
+                return true;
+            }
+        }
+        return false;
     }
 }
