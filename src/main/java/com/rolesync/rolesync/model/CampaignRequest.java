@@ -27,6 +27,7 @@ public class CampaignRequest {
     @ManyToOne
     @JoinColumn(name="campaign_id", nullable=true)
     private Campaign campaign;
+    
     private String message;
     private CampaignRequestStatus status;
 

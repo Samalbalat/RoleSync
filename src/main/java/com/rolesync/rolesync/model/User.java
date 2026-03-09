@@ -1,7 +1,5 @@
 package com.rolesync.rolesync.model;
 
-import java.util.Set;
-
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;

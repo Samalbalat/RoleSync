@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class CampaignRequestPutInDTO {
-    private Long profileId;
+    private String profileName;
     private String status;
     
 }
