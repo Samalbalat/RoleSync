@@ -45,7 +45,10 @@
     "minimum": "Minimum",
     "maximum": "Maximum",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "send": "Send",
+    "reject": "Reject",
+    "accept": "Accept"
   },
 
   "dayWeek": {
@@ -154,7 +157,8 @@
     "message":{
       "manageCampaign":"Manage Campaign",
       "technicalDetails":"Technical Details and DM",
-      "playerMessage":"You are a player in this adventure"
+      "playerMessage":"You are a player in this adventure",
+      "needsCharacter": "You don't have a character associated with this campaign yet."
     },
     "detail": {
       "about": "About the Campaign",
@@ -167,6 +171,27 @@
       "contactGM": "Message the GM",
       "infoTitle": "Game Details",
       "pending": "Request Pending"
+    },
+    "join": {
+      "title": "Request to Join Campaign",
+      "description": "Send a message to the GM to express your interest in joining this campaign. This will help them understand your motivations and decide if you're a good fit for the adventure.",
+      "messageLabel": "Message to the GM (optional)",
+      "submit": "Send Request",
+      "error": "There was an error sending your request. Please try again later."
+    },
+    "members": {
+      "title": "Manage Campaign Members",
+      "currentMembers": "Current Members",
+      "pendingRequests": "Pending Requests",
+      "accept": "Accept",
+      "reject": "Reject",
+      "remove": "Remove",
+      "noMembers": "No members in this campaign yet.",
+      "noRequests": "No pending requests at the moment.",
+      "kick": "Remove Member",
+      "kickConfirmTitle": "Kick Confirmation",
+      "kickConfirmDesc1": "You are about to remove ",
+      "kickConfirmDesc2": " from the campaign. This action cannot be undone and the player will have to send a new request if they want to join again."
     }
   },
 

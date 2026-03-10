@@ -2,13 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Card, CardBody, Typography, Chip, Badge } from '@material-tailwind/react';
 import { UserIcon, BellAlertIcon } from '@heroicons/react/24/outline';
+import { useNavigate } from 'react-router-dom';
 
-export default function CampaignMiniCard({ campaign, isMaster, theme, onClick }) {
+export default function CampaignMiniCard({ campaign, isMaster, theme }) {
+	const navigate = useNavigate();
 	return (
 		<Card
 			className={`w-full overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer border group 
                 ${theme.isDark ? 'bg-blue-gray-900 border-blue-gray-800' : 'bg-white border-gray-100'}`}
-			onClick={onClick}
+			onClick={() => navigate(`/campaign/${campaign.id}`)}
 		>
 			<div className='relative h-32 overflow-hidden'>
 				<img
@@ -78,5 +80,4 @@ CampaignMiniCard.propTypes = {
 	theme: PropTypes.shape({
 		isDark: PropTypes.bool,
 	}).isRequired,
-	onClick: PropTypes.func,
 };

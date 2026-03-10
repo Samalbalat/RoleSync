@@ -18,6 +18,8 @@ export const getTheme = () => {
             primary: 'indigo', // Morado/Azul para narrativo
             secondary: 'blue',
             bgLight: 'bg-indigo-50',
+            bgMiddle: 'bg-indigo-100',
+            bgDark: 'bg-indigo-200',
             textPrimary: 'text-indigo-900',
             textSecondary: 'text-indigo-500',
             border: 'border-t-indigo-500',
@@ -30,6 +32,8 @@ export const getTheme = () => {
         primary: 'red', // Rojo para mesa (D&D vibes)
         secondary: 'orange',
         bgLight: 'bg-red-50',
+        bgMiddle: 'bg-red-100',
+        bgDark: 'bg-red-200',
         textPrimary: 'text-red-900',
         textSecondary: 'text-red-500',
         border: 'border-t-red-500',

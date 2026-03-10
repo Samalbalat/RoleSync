@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Typography, Spinner, Button } from '@material-tailwind/react';
 import { getTheme } from '../utils/themeUtils';
@@ -7,31 +7,8 @@ import CampaignDashboardSection from '../components/campaign/CampaignDashboardSe
 import UserCharacterCarousel from '../components/character/UserCharacterCarousel';
 import { ArrowRightIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
-
-// Mock Data (Simulado)
-const mockMyCampaigns = {
-	asMaster: [
-		{
-			id: 'c-101',
-			name: 'La Maldición de Strahd',
-			image: 'https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?ixlib=rb-4.0.3',
-			system: 'D&D 5e',
-			status: 'OPEN',
-			pendingRequests: 3,
-		},
-	],
-	asPlayer: [
-		{
-			id: 'c-205',
-			name: 'Las Máscaras de Nyarlathotep',
-			image: 'https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?ixlib=rb-4.0.3',
-			system: 'CoC 7e',
-			status: 'ACTIVE',
-			ownerName: 'LovecraftFan',
-			ownerAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Lovecraft',
-		},
-	],
-};
+// Asegúrate de importar tu servicio (ajusta la ruta si es necesario)
+import campaignService from '../services/CampaignService';
 
 export default function HomePage() {
 	const location = useLocation();
@@ -42,7 +19,7 @@ export default function HomePage() {
 	const [loading, setLoading] = useState(true);
 	const [myCampaigns, setMyCampaigns] = useState({ asMaster: [], asPlayer: [] });
 
-	// Toast
+	// Toast (Mensajes flotantes)
 	useEffect(() => {
 		if (location.state?.message) {
 			toast.success(location.state.message, { style: { background: '#333', color: '#fff' } });
@@ -50,16 +27,36 @@ export default function HomePage() {
 		}
 	}, [location.state]);
 
-	//Carga de datos
+	// Carga de datos real desde el Backend
 	useEffect(() => {
-		setTimeout(() => {
-			setMyCampaigns(mockMyCampaigns);
-			setLoading(false);
-		}, 800);
-	}, []);
+		const fetchCampaigns = async () => {
+			try {
+				// Llamamos a tu método de Axios
+				const data = await campaignService.getMyCampaigns();
 
-	const activeMasterCampaigns = myCampaigns.asMaster.filter(c => ['OPEN', 'ACTIVE'].includes(c.status));
-	const activePlayerCampaigns = myCampaigns.asPlayer.filter(c => ['OPEN', 'ACTIVE'].includes(c.status));
+				// data tendrá la forma: { asMaster: [...], asPlayer: [...] }
+				// pero si el backend devuelve un null o items vacíos, nos protegemos
+				setMyCampaigns({
+					asMaster: data.asMaster || [],
+					asPlayer: data.asPlayer || [],
+				});
+			} catch (error) {
+				console.error('Error cargando las campañas del home:', error);
+				toast.error(t('common.errorLoadingData') || 'Error al cargar las campañas');
+				// Si falla, dejamos las listas vacías para que no explote el render
+				setMyCampaigns({ asMaster: [], asPlayer: [] });
+			} finally {
+				// Tanto si va bien como si falla, quitamos el spinner
+				setLoading(false);
+			}
+		};
+
+		fetchCampaigns();
+	}, [t]);
+
+	// Ojo: Filtramos las campañas que no tengan ID nulo, por cómo está tu mapeo en el Backend
+	const activeMasterCampaigns = myCampaigns.asMaster.filter(c => c.id && ['OPEN', 'ACTIVE'].includes(c.status));
+	const activePlayerCampaigns = myCampaigns.asPlayer.filter(c => c.id && ['OPEN', 'ACTIVE'].includes(c.status));
 
 	if (loading) {
 		return (
@@ -71,6 +68,7 @@ export default function HomePage() {
 
 	return (
 		<div className={`min-h-screen ${theme.background} transition-colors duration-300`}>
+			{/* El header estaba vacío, pero mantengo tu estructura */}
 			<header
 				className={`${theme.isDark ? 'bg-blue-gray-900/50 border-b border-blue-gray-800' : 'bg-white shadow-sm'} sticky top-0 z-10 backdrop-blur-md`}
 			></header>
@@ -85,14 +83,17 @@ export default function HomePage() {
 							{t('home.campaignPhrase')}
 						</Typography>
 					</div>
-					<Button
-						variant='text'
-						color={theme.secondary}
-						className='hidden sm:flex items-center gap-2'
-						onClick={() => navigate('/campaigns')}
-					>
-						{t('common.viewAll')} <ArrowRightIcon className='h-4 w-4' />
-					</Button>
+					{/* Movemos los botones aquí para agrupar tu lógica de JSX original */}
+					<div className='flex gap-4'>
+						<Button
+							variant='text'
+							color={theme.secondary}
+							className='hidden sm:flex items-center gap-2'
+							onClick={() => navigate('/campaigns')}
+						>
+							{t('common.viewAll')} <ArrowRightIcon className='h-4 w-4' />
+						</Button>
+					</div>
 				</div>
 
 				{/* Grid de 2 columnas para PC */}
@@ -105,7 +106,7 @@ export default function HomePage() {
 					</div>
 				</div>
 
-				{/* Botón móvil global de campañas (opcional, si quieres que se vea en móvil) */}
+				{/* Botón móvil global de campañas */}
 				<div className='mb-12 sm:hidden flex justify-center px-2'>
 					<Button variant='outlined' color={theme.secondary} fullWidth onClick={() => navigate('/campaigns')}>
 						{t('common.viewAll')} {t('home.yourCampaigns')}

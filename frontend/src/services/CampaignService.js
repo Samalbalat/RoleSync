@@ -4,23 +4,20 @@ const getActiveProfileType = () => {
     const profileString = localStorage.getItem('activeProfile');
     if (profileString) {
         const profileData = JSON.parse(profileString);
-        return profileData.type; // Retornará 'TABLETOP' o 'WRITTEN'
+        return profileData.type; 
     }
     throw new Error("No hay un perfil activo seleccionado");
 };
 
 const CampaignService = {
-    /**
-     *  Listar las campañas
-     * @param {Object} filters - Objeto con los filtros opcionales (system, search, etc.)
-     */
+    // ---------------------------------------------------------
+    // BÚSQUEDA Y DETALLES BÁSICOS
+    // ---------------------------------------------------------
+    
     getCampaigns: async (filters = {}) => {
         try {
-            
             const activeType = getActiveProfileType();
-            
             const params = { type: activeType, ...filters };
-
             const response = await api.get('/campaigns', { params });
             return response.data;
         } catch (error) {
@@ -29,10 +26,6 @@ const CampaignService = {
         }
     },
 
-    /**
-     * Detalles de una campaña por ID
-     * @param {number|string} id - El ID de la campaña
-     */
     getCampaignById: async (id) => {
         try {
             const response = await api.get(`/campaigns/${id}`);
@@ -43,19 +36,24 @@ const CampaignService = {
         }
     },
 
-    /**
-     * Crear una nueva campaña
-     * @param {Object} campaignData - Datos del formulario
-     */
+    getMyCampaigns: async () => {
+        try {
+            const response = await api.get('/campaigns/me');
+            return response.data;
+        } catch (error) {
+            console.error("Error fetching my campaigns:", error);
+            throw error;
+        }
+    },
+
+    // ---------------------------------------------------------
+    // CREACIÓN Y EDICIÓN DE CAMPAÑAS
+    // ---------------------------------------------------------
+
     createCampaign: async (campaignData) => {
         try {
             const activeType = getActiveProfileType();
-            
-            const payload = { 
-                ...campaignData, 
-                type: activeType 
-            };
-
+            const payload = { ...campaignData, type: activeType };
             const response = await api.post('/campaigns', payload);
             return response.data;
         } catch (error) {
@@ -64,29 +62,96 @@ const CampaignService = {
         }
     },
 
-    /**
-     * Actualizar una campaña existente
-     * @param {number|string} id - El ID de la campaña
-     * @param {Object} campaignData - Datos actualizados del formulario
-     */
     updateCampaign: async (id, campaignData) => {
         try {
             const activeType = getActiveProfileType();
-            
             const payload = { 
                 ...campaignData, 
                 type: activeType,
                 maxPlayers: Number.parseInt(campaignData.maxPlayers, 10) || 0,
             };
-
             const response = await api.put(`/campaigns/${id}`, payload);
             return response.data;
         } catch (error) {
             console.error(`Error updating campaign with id ${id}:`, error);
             throw error;
         }
+    },
+
+    changeCampaignStatus: async (id, status) => {
+        try {
+            const response = await api.put(`/campaigns/${id}/status`, { status });
+            return response.data;
+        } catch (error) {
+            console.error(`Error changing status for campaign ${id}:`, error);
+            throw error;
+        }
+    },
+
+    deleteCampaign: async (id) => {
+        try {
+            const response = await api.delete(`/campaigns/${id}`);
+            return response.data;
+        } catch (error) {
+            console.error(`Error deleting campaign ${id}:`, error);
+            throw error;
+        }
+    },
+
+    // ---------------------------------------------------------
+    // GESTIÓN DE SOLICITUDES Y MIEMBROS
+    // ---------------------------------------------------------
+
+    applyToCampaign: async (id, message) => {
+        try {
+            const response = await api.post(`/campaigns/${id}/join`, { message });
+            return response.data;
+        } catch (error) {
+            console.error(`Error applying to campaign ${id}:`, error);
+            throw error;
+        }
+    },
+
+    getCampaignRequests: async (id) => {
+        try {
+            const response = await api.get(`/campaigns/${id}/requests`);
+            return response.data;
+        } catch (error) {
+            console.error(`Error fetching requests for campaign ${id}:`, error);
+            throw error;
+        }
+    },
+
+    updateRequestStatus: async (id, profileName, status) => {
+        try {
+            // status debe ser 'ACCEPTED' o 'REJECTED' según el backend
+            const response = await api.put(`/campaigns/${id}/requests`, { profileName, status });
+            return response.data;
+        } catch (error) {
+            console.error(`Error updating request status for profile ${profileName}:`, error);
+            throw error;
+        }
+    },
+
+    getCampaignParticipants: async (id) => {
+        try {
+            const response = await api.get(`/campaigns/${id}/participants`);
+            return response.data;
+        } catch (error) {
+            console.error(`Error fetching participants for campaign ${id}:`, error);
+            throw error;
+        }
+    },
+
+    kickMember: async (id, profileName) => {
+        try {
+            const response = await api.put(`/campaigns/${id}/kick`, { profileName });
+            return response.data;
+        } catch (error) {
+            console.error(`Error kicking member ${profileName} from campaign ${id}:`, error);
+            throw error;
+        }
     }
 };
-
 
 export default CampaignService;
