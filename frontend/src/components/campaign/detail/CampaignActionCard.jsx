@@ -197,5 +197,5 @@ CampaignActionCard.propTypes = {
 	isFull: PropTypes.bool.isRequired,
 	progress: PropTypes.number.isRequired,
 	themeColor: PropTypes.object.isRequired,
-	onRefreshData: PropTypes.func.isRequired, // <-- Nueva prop para recargar los datos tras enviar la solicitud
+	onRefreshData: PropTypes.func.isRequired,
 };

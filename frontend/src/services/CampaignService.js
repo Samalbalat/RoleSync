@@ -122,13 +122,13 @@ const CampaignService = {
         }
     },
 
-    updateRequestStatus: async (id, profileId, status) => {
+    updateRequestStatus: async (id, profileName, status) => {
         try {
             // status debe ser 'ACCEPTED' o 'REJECTED' según el backend
-            const response = await api.put(`/campaigns/${id}/requests`, { profileId, status });
+            const response = await api.put(`/campaigns/${id}/requests`, { profileName, status });
             return response.data;
         } catch (error) {
-            console.error(`Error updating request status for profile ${profileId}:`, error);
+            console.error(`Error updating request status for profile ${profileName}:`, error);
             throw error;
         }
     },
@@ -143,12 +143,12 @@ const CampaignService = {
         }
     },
 
-    kickMember: async (id, profileId) => {
+    kickMember: async (id, profileName) => {
         try {
-            const response = await api.put(`/campaigns/${id}/kick`, { profileId });
+            const response = await api.put(`/campaigns/${id}/kick`, { profileName });
             return response.data;
         } catch (error) {
-            console.error(`Error kicking member ${profileId} from campaign ${id}:`, error);
+            console.error(`Error kicking member ${profileName} from campaign ${id}:`, error);
             throw error;
         }
     }

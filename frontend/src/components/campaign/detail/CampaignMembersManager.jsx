@@ -24,7 +24,6 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 
 	const [kickModal, setKickModal] = useState({
 		isOpen: false,
-		profileId: null,
 		profileName: '',
 	});
 
@@ -35,10 +34,11 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 				CampaignService.getCampaignParticipants(campaignId),
 				CampaignService.getCampaignRequests(campaignId),
 			]);
+			console.log('Participantes:', participantsData);
+			console.log('Solicitudes:', requestsData);
 			const normalizedParticipants = (participantsData || []).map(item => item.participants || item);
 			setParticipants(normalizedParticipants);
 			setRequests(requestsData || []);
-			console.log('Peticiones: ', requests);
 		} catch (error) {
 			console.error('Error al cargar miembros y solicitudes:', error);
 		} finally {
@@ -51,13 +51,14 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 	}, [fetchMembersAndRequests]);
 
 	// Manejar Aceptar o Rechazar
-	const handleRequestAction = async (profileId, status) => {
+	const handleRequestAction = async (profileName, status) => {
 		try {
-			setActionLoading(profileId);
-			await CampaignService.updateRequestStatus(campaignId, profileId, status);
+			setActionLoading(profileName);
+			await CampaignService.updateRequestStatus(campaignId, profileName, status);
 			await fetchMembersAndRequests(); // Recargamos las listas
-			if (onMemberChange && status === 'ACCEPTED') {
-				onMemberChange(); // Le avisa al padre para que actualice la barra de progreso de jugadores
+
+			if (onMemberChange && status === 'ACCEPT') {
+				onMemberChange(); // Avisa al padre
 			}
 		} catch (error) {
 			console.error(`Error al actualizar estado a ${status}:`, error);
@@ -66,22 +67,25 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 		}
 	};
 
-	const handleOpenKickModal = (profileId, profileName) => {
-		setKickModal({ isOpen: true, profileId, profileName });
+	const handleOpenKickModal = profileName => {
+		setKickModal({ isOpen: true, profileName });
 	};
 
 	const handleCloseKickModal = () => {
-		setKickModal({ isOpen: false, profileId: null, profileName: '' });
+		setKickModal({ isOpen: false, profileName: '' });
 	};
 
+	// Manejar la Expulsión
 	const confirmKick = async () => {
-		const { profileId } = kickModal;
-		if (!profileId) return;
+		const { profileName } = kickModal;
+		if (!profileName) return;
 
 		try {
-			setActionLoading(profileId);
-			handleCloseKickModal(); // Cerramos el modal inmediatamente para mejor UX
-			await CampaignService.kickMember(campaignId, profileId);
+			setActionLoading(profileName);
+			handleCloseKickModal();
+
+			await CampaignService.kickMember(campaignId, profileName);
+
 			await fetchMembersAndRequests();
 			if (onMemberChange) onMemberChange();
 		} catch (error) {
@@ -141,8 +145,8 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 												color='green'
 												variant='text'
 												className='px-2'
-												disabled={actionLoading === req.profileId}
-												onClick={() => handleRequestAction(req.profileId, 'ACCEPTED')}
+												disabled={actionLoading === req.profileName}
+												onClick={() => handleRequestAction(req.profileName, 'ACCEPT')}
 											>
 												<CheckIcon className='h-5 w-5' />
 											</Button>
@@ -153,8 +157,8 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 												color='red'
 												variant='text'
 												className='px-2'
-												disabled={actionLoading === req.profileId}
-												onClick={() => handleRequestAction(req.profileId, 'REJECTED')}
+												disabled={actionLoading === req.profileName}
+												onClick={() => handleRequestAction(req.profileName, 'REJECT')}
 											>
 												<XMarkIcon className='h-5 w-5' />
 											</Button>
@@ -201,9 +205,8 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 											color='red'
 											variant='text'
 											className='px-2'
-											disabled={actionLoading === player.profileId}
-											// <-- NUEVO: Llamamos a la función que abre el modal pasando también el nombre
-											onClick={() => handleOpenKickModal(player.profileId, player.profileName)}
+											disabled={actionLoading === player.profileName}
+											onClick={() => handleOpenKickModal(player.profileName)}
 										>
 											<UserMinusIcon className='h-4 w-4' />
 										</Button>
