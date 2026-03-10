@@ -312,8 +312,8 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 						>
 							{[
 								isWritten ? (
-									<Option key='here' value='here'>
-										{t('communication.here')}
+									<Option key='rolesync' value='RoleSync'>
+										RoleSync
 									</Option>
 								) : null,
 								<Option key='discord' value='Discord'>
