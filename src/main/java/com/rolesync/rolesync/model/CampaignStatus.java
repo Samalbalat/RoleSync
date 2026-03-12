@@ -5,5 +5,6 @@ public enum CampaignStatus {
     OPEN,
     ACTIVE,
     BREAK,
-    FINISHED
+    FINISHED,
+    DELETED
 }

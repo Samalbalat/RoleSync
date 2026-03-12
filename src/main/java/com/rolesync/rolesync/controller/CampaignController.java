@@ -11,15 +11,26 @@ import org.springframework.security.core.Authentication;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignGetByIdOutDTO;
+import com.rolesync.rolesync.dto.campaigncontroller.CampaignGetMeOutDTO;
+import com.rolesync.rolesync.dto.campaigncontroller.CampaignGetMeOutItemDTO;
+import com.rolesync.rolesync.dto.campaigncontroller.CampaignParticipantsDTO;
+import com.rolesync.rolesync.dto.campaigncontroller.CampaignParticipantsItemDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignPostInDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignPutInDTO;
+import com.rolesync.rolesync.dto.campaigncontroller.CampaignRequestInDTO;
+import com.rolesync.rolesync.dto.campaigncontroller.CampaignRequestPutInDTO;
+import com.rolesync.rolesync.dto.campaigncontroller.CampaignRequestsByIdOutDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.OwnerProfileDTO;
 import com.rolesync.rolesync.model.Campaign;
+import com.rolesync.rolesync.model.CampaignRequest;
+import com.rolesync.rolesync.model.CampaignRequestStatus;
 import com.rolesync.rolesync.model.CampaignStatus;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.ProfileType;
 import com.rolesync.rolesync.model.QCampaign;
 import com.rolesync.rolesync.repository.CampaignRepository;
+import com.rolesync.rolesync.repository.CampaignRequestRepository;
+import com.rolesync.rolesync.repository.CharacterSheetRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
 import com.rolesync.rolesync.utils.UtilsCalls;
 
@@ -38,16 +49,22 @@ public class CampaignController {
 
     private final CampaignRepository campaignRepository;
     private final ProfileRepository profileRepository;
+    private final CampaignRequestRepository campaignRequestRepository;
+    private final CharacterSheetRepository characterSheetRepository;
     private final UtilsCalls utilsCalls;
     private static final QCampaign Q = QCampaign.campaign;
 
     public CampaignController(
             CampaignRepository campaignRepository,
             UtilsCalls utilsCalls,
-            ProfileRepository profileRepository) {
+            ProfileRepository profileRepository,
+            CampaignRequestRepository campaignRequestRepository,
+            CharacterSheetRepository characterSheetRepository) {
         this.campaignRepository = campaignRepository;
         this.utilsCalls = utilsCalls;
         this.profileRepository = profileRepository;
+        this.campaignRequestRepository = campaignRequestRepository;
+        this.characterSheetRepository = characterSheetRepository;
     }
 
     // ---------- FILTERED GET ----------
@@ -94,6 +111,7 @@ public class CampaignController {
 
         if (status != null && !status.isBlank()) {
             predicate = predicate.and(Q.status.eq(CampaignStatus.valueOf(status.toUpperCase())));
+            predicate = predicate.and(Q.status.ne(CampaignStatus.DELETED));
         }
         if (themes != null && !themes.isBlank()) {
             predicate = predicate.and(
@@ -117,6 +135,115 @@ public class CampaignController {
                 (List<Campaign>) campaignRepository.findAll(predicate));
     }
 
+    // ---------- MINE GET ----------
+    @GetMapping("/me")
+    public ResponseEntity<CampaignGetMeOutDTO> getMyCampaigns(
+            @RequestHeader("X-Profile-Name") String profileName) {
+        CampaignGetMeOutDTO response = new CampaignGetMeOutDTO();
+        List<CampaignGetMeOutItemDTO> asMaster = campaignRepository.findByOwnerName(profileName).stream().map(c -> {
+            CampaignGetMeOutItemDTO item = new CampaignGetMeOutItemDTO();
+            if (c.getStatus() != CampaignStatus.DELETED) {
+                item.setId(c.getId());
+                item.setName(c.getName());
+                item.setImage(c.getImage());
+                item.setSystem(c.getSystem());
+                item.setStatus(c.getStatus().name());
+                item.setPendingRequests(c.getRequests().size());
+            }
+            return item;
+        }).toList();
+        response.setAsMaster(asMaster);
+
+        List<CampaignGetMeOutItemDTO> asPlayer = campaignRepository.findAll().stream()
+                .filter(c -> c.getMembers() != null && c.getMembers().contains(profileName))
+                .map(c -> {
+                    CampaignGetMeOutItemDTO item = new CampaignGetMeOutItemDTO();
+                    if (c.getStatus() != CampaignStatus.DELETED) {
+                        item.setId(c.getId());
+                        item.setName(c.getName());
+                        item.setImage(c.getImage());
+                        item.setSystem(c.getSystem());
+                        item.setStatus(c.getStatus().name());
+                        item.setOwnerName(c.getOwnerName());
+                    }
+                    return item;
+                }).toList();
+
+        response.setAsPlayer(asPlayer);
+        return ResponseEntity.ok(response);
+    }
+
+    // ---------- GET REQUESTS ----------
+    @GetMapping("/{id}/requests")
+    public ResponseEntity<?> getCampaignRequests(
+            @RequestHeader("X-Profile-Name") String profileName,
+            Authentication authentication,
+            @PathVariable Long id) {
+        boolean isAuthorized = utilsCalls.checkAuthAndProfile(authentication, profileName);
+        if (!isAuthorized) {
+            return ResponseEntity.status(403).body("User is not authorized");
+        }
+        Optional<Campaign> campaignOpt = campaignRepository.findById(id);
+        if (campaignOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Campaign campaign = campaignOpt.get();
+        if (!campaign.getOwnerName().equals(profileName)) {
+            return ResponseEntity.status(403).body("User is not authorized");
+        }
+        List<CampaignRequest> requests = campaignRequestRepository.findAllByCampaignAndStatus(campaign,
+                CampaignRequestStatus.PENDING);
+        List<CampaignRequestsByIdOutDTO> response = requests.stream().map(r -> {
+            CampaignRequestsByIdOutDTO dto = new CampaignRequestsByIdOutDTO();
+            dto.setId(r.getId());
+            dto.setMessage(r.getMessage());
+            Profile p = r.getProfile();
+            if (p != null) {
+                dto.setProfileImage(p.getImage());
+                dto.setProfileName(p.getProfilename());
+            }
+            return dto;
+        }).toList();
+        return ResponseEntity.ok(response);
+    }
+
+    // ---------- GET PARTICIPANTS ----------
+    @GetMapping("/{id}/participants")
+    public ResponseEntity<?> getCampaignParticipants(
+            @RequestHeader("X-Profile-Name") String profileName,
+            Authentication authentication,
+            @PathVariable Long id) {
+        boolean isAuthorized = utilsCalls.checkAuthAndProfile(authentication, profileName);
+        if (!isAuthorized) {
+            return ResponseEntity.status(403).body("User is not authorized");
+        }
+        Optional<Campaign> campaignOpt = campaignRepository.findById(id);
+        if (campaignOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Campaign campaign = campaignOpt.get();
+        if (!campaign.getOwnerName().equals(profileName)
+                && (campaign.getMembers() == null || !campaign.getMembers().contains(profileName))) {
+            return ResponseEntity.status(403).body("User is not authorized");
+        }
+        List<CampaignParticipantsDTO> participants = campaign.getMembers() != null
+                ? campaign.getMembers().stream().map(m -> {
+                    CampaignParticipantsDTO dto = new CampaignParticipantsDTO();
+                    Profile p = profileRepository.findByProfilename(m).orElse(null);
+                    if (p != null) {
+                        CampaignParticipantsItemDTO item = new CampaignParticipantsItemDTO();
+                        item.setProfileId(p.getId());
+                        item.setProfileName(p.getProfilename());
+                        item.setProfileImage(p.getImage());
+                        dto.setParticipants(item);
+                    }
+                    return dto;
+                }).toList()
+                : List.of();
+
+        return ResponseEntity.ok(participants);
+    }
+
     // ---------- DETAIL ----------
     @GetMapping("/{id}")
     public ResponseEntity<CampaignGetByIdOutDTO> getCampaign(
@@ -127,10 +254,21 @@ public class CampaignController {
             return ResponseEntity.badRequest().build();
         }
         Campaign campaign = campaignRepository.findById(id).get();
-        if (campaign != null) {
+        if (campaign != null && campaign.getStatus() != CampaignStatus.DELETED) {
             CampaignGetByIdOutDTO response = new CampaignGetByIdOutDTO();
             formFindByIdResponse(campaign, response);
-            response.setUserRelation(utilsCalls.getProfileRelationToCampaign(profileName, campaign));
+            String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
+            response.setUserRelation(relation);
+            if (relation.equals("MEMBER")) {
+                profileRepository.findByProfilename(profileName).ifPresent(profile -> {
+                    characterSheetRepository.findByCampaignAndOwnerAndIsTemplate(campaign, profile, false).stream()
+                            .findFirst().ifPresent(sheet -> {
+                                response.setCharacterId(sheet.getId());
+                                response.setCharacterName(sheet.getName());
+                                response.setCharacterImage(sheet.getImage());
+                            });
+                });
+            }
             return ResponseEntity.ok(response);
         }
         return ResponseEntity.notFound().build();
@@ -160,49 +298,177 @@ public class CampaignController {
             @PathVariable Long id,
             @RequestBody CampaignPutInDTO dto,
             @RequestHeader("X-Profile-Name") String profileName) {
-        Profile activeProfile = profileRepository.findByProfilename(profileName)
-                .orElseThrow(() -> new IllegalStateException("Active profile not found"));
-        if (id == null) {
-            return ResponseEntity.badRequest().build();
+        boolean isAuthorized = utilsCalls.checkAuthAndProfile(authentication, profileName);
+        if (!isAuthorized) {
+            return ResponseEntity.status(403).body("User is not authorized to update this campaign");
         }
         Optional<Campaign> campaignOpt = campaignRepository.findById(id);
         if (campaignOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         Campaign campaign = campaignOpt.get();
-        if (!campaign.getOwnerName().equals(activeProfile.getProfilename())) {
-            return ResponseEntity.status(403).body("User is not the campaign owner");
-        }
-
         applyUpdates(campaign, dto);
         campaignRepository.save(campaign);
 
         return ResponseEntity.ok("Campaign updated");
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteCampaign(
+    // ---------- CHANGE STATUS CAMPAIGN ----------
+    @PutMapping("/{id}/status")
+    public ResponseEntity<String> changeCampaignStatus(
             Authentication authentication,
             @PathVariable Long id,
+            @RequestBody CampaignPutInDTO dto,
             @RequestHeader("X-Profile-Name") String profileName) {
+        boolean isAuthorized = utilsCalls.checkAuthAndProfile(authentication, profileName);
+        if (!isAuthorized) {
+            return ResponseEntity.status(403).body("User is not authorized to update this campaign");
+        }
         Optional<Campaign> campaignOpt = campaignRepository.findById(id);
         if (campaignOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         Campaign campaign = campaignOpt.get();
+        campaign.setStatus(CampaignStatus.valueOf(dto.getStatus().toUpperCase()));
+        campaignRepository.save(campaign);
 
-        Profile activeProfile = profileRepository.findByProfilename(profileName)
-                .orElseThrow(() -> new IllegalStateException("Active profile not found"));
+        return ResponseEntity.ok("Campaign updated");
+    }
 
-        if (!campaign.getOwnerName().equals(activeProfile.getProfilename())) {
-            return ResponseEntity.status(403).body("User is not the campaign owner");
+    // ---------- ACCEPT REJECT REQUEST----------
+    @PutMapping("/{campaignId}/requests")
+    public ResponseEntity<?> updateRequest(
+            Authentication authentication,
+            @PathVariable Long campaignId,
+            @RequestBody CampaignRequestPutInDTO dto,
+            @RequestHeader("X-Profile-Name") String profileName) {
+        Optional<Campaign> campaignOpt = campaignRepository.findById(campaignId);
+        boolean isAuthorized = utilsCalls.checkAuthAndProfile(authentication, profileName);
+        Profile profile = profileRepository.findByProfilename(dto.getProfileName()).orElse(null);
+        ResponseEntity<?> viabilityCheck = checkChangeRequestStatusViability(isAuthorized, campaignOpt, profile, dto.getProfileName());
+        if (viabilityCheck != null) {
+            return viabilityCheck;
         }
+        Campaign campaign = campaignOpt.get();
+        List<CampaignRequest> requestOpt = campaignRequestRepository.findAllByCampaignAndProfile(campaign, profile);
+        CampaignRequest pendingRequest = requestOpt.stream().filter(r -> r.getStatus() == CampaignRequestStatus.PENDING).findFirst().orElse(null);
+        if (requestOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else if (dto.getStatus().equalsIgnoreCase("ACCEPT") && pendingRequest != null) {
+            List<String> members = campaign.getMembers();
+            if (members == null) {
+                members = List.of(dto.getProfileName());
+            } else if (!members.contains(dto.getProfileName())) {
+                members.add(dto.getProfileName());
+            }
+            campaign.setMembers(members);
+            campaignRepository.save(campaign);
+        }
+        pendingRequest.setStatus(CampaignRequestStatus.valueOf(dto.getStatus().toUpperCase()));
+        campaignRequestRepository.save(pendingRequest);
+        return ResponseEntity.ok("Campaign updated");
+    }
 
-        campaignRepository.delete(campaign);
+    private ResponseEntity<?> checkChangeRequestStatusViability(boolean isAuthorized, Optional<Campaign> campaignOpt,
+            Profile profile, String profileName) {
+        if (!isAuthorized || !campaignOpt.get().getOwnerName().equals(profileName)) {
+            return ResponseEntity.status(403).body("User is not authorized to update this request");
+        }        if (profile == null) {
+            return ResponseEntity.badRequest().body("Profile not found");
+        }
+        if (campaignOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return null;
+    }
+
+    @PutMapping("/{id}/kick")
+    public ResponseEntity<?> kickMember(
+            Authentication authentication,
+            @PathVariable Long id,
+            @RequestBody CampaignRequestPutInDTO dto,
+            @RequestHeader("X-Profile-Name") String profileName) {
+        boolean isAuthorized = utilsCalls.checkAuthAndProfile(authentication, profileName);
+        if (!isAuthorized) {
+            return ResponseEntity.status(403).body("User is not authorized to update this request");
+        }
+        Optional<Campaign> campaignOpt = campaignRepository.findById(id);
+        if (campaignOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else if (!campaignOpt.get().getOwnerName().equals(profileName)) {
+            return ResponseEntity.status(403).body("User is not authorized to kick members from this campaign");
+        }
+        Campaign campaign = campaignOpt.get();
+        List<String> members = campaign.getMembers();
+        if (members != null && members.contains(dto.getProfileName())) {
+            members.remove(dto.getProfileName());
+            campaign.setMembers(members);
+            campaignRepository.save(campaign);
+        }
+        return ResponseEntity.ok("Member kicked");
+    }
+
+    // ---------- GREY OUT ----------
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteCampaign(
+            Authentication authentication,
+            @PathVariable Long id,
+            @RequestHeader("X-Profile-Name") String profileName) {
+        boolean isAuthorized = utilsCalls.checkAuthAndProfile(authentication, profileName);
+        if (!isAuthorized) {
+            return ResponseEntity.status(403).body("User is not authorized to delete this campaign");
+        }
+        Optional<Campaign> campaignOpt = campaignRepository.findById(id);
+        if (campaignOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Campaign campaign = campaignOpt.get();
+        campaign.setStatus(CampaignStatus.DELETED);
+        campaignRepository.save(campaign);
         return ResponseEntity.ok("Campaign deleted");
     }
 
+    @PostMapping("/{id}/join")
+    public ResponseEntity<String> applyToCampaign(
+            Authentication authentication,
+            @PathVariable Long id,
+            @RequestBody CampaignRequestInDTO dto,
+            @RequestHeader("X-Profile-Name") String profileName) {
+        boolean isAuthorized = utilsCalls.checkAuthAndProfile(authentication, profileName);
+        if (!isAuthorized) {
+            return ResponseEntity.status(403).body("User is not properly authorized to join this campaign");
+        }
+        Optional<Campaign> campaignOpt = campaignRepository.findById(id);
+        if(campaignOpt.get().getMembers() != null && campaignOpt.get().getMembers().contains(profileName) || campaignOpt.get().getOwnerName().equals(profileName)) {
+            return ResponseEntity.badRequest().body("User is already a member/owner of this campaign");
+        }
+        ResponseEntity<String> viabilityCheck = checkApplyViability(campaignOpt, profileName);
+        if (viabilityCheck != null) {
+            return viabilityCheck;
+        }
+        CampaignRequest request = new CampaignRequest();
+        request.setCampaign(campaignOpt.get());
+        request.setProfile(profileRepository.findByProfilename(profileName).orElse(null));
+        request.setStatus(CampaignRequestStatus.PENDING);
+        request.setMessage(dto.getMessage());
+
+        campaignRequestRepository.save(request);
+
+        return ResponseEntity.ok("Campaign request submitted");
+    }
+
     // ---------- Helpers ----------
+
+    private ResponseEntity<String> checkApplyViability(Optional<Campaign> campaignOpt, String profileName) {
+        if (campaignOpt.isEmpty() || campaignOpt.get().getStatus() == CampaignStatus.DELETED) {
+            return ResponseEntity.notFound().build();
+        }
+        Optional<CampaignRequest> existingRequest = campaignRequestRepository.findAll().stream().filter(r -> r.getCampaign().getId().equals(campaignOpt.get().getId()) && r.getProfile().getProfilename().equals(profileName)).findFirst();
+        if(existingRequest.isPresent() && existingRequest.get().getStatus() == CampaignRequestStatus.PENDING) {
+                return ResponseEntity.badRequest().body("There is already a pending request for this user in this campaign");
+        }
+        return null;
+    }
 
     private void applyUpdates(Campaign campaign, CampaignPutInDTO dto) {
         campaign.setName(dto.getName());

@@ -13,6 +13,7 @@ public class CampaignGetByIdOutDTO {
 
     private OwnerProfileDTO owner;
 
+    // Campaign details
     private String status;
     private String communication;
     private String description;
@@ -26,6 +27,12 @@ public class CampaignGetByIdOutDTO {
     private String dayWeek;
     private String duration;
 
+    // Character info for the requesting user, if they have one in the campaign
+    private String characterName;
+    private Long characterId;
+    private String characterImage;
+
+    // Player count info
     private int currentPlayers;
     private int maxPlayers;
 

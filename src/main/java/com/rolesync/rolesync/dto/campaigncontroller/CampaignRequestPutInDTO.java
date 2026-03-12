@@ -3,7 +3,8 @@ package com.rolesync.rolesync.dto.campaigncontroller;
 import lombok.Data;
 
 @Data
-public class OwnerProfileDTO {
+public class CampaignRequestPutInDTO {
     private String profileName;
-    private String profileImage;
+    private String status;
+    
 }
