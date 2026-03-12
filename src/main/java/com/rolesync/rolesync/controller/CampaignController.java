@@ -439,7 +439,10 @@ public class CampaignController {
             return ResponseEntity.status(403).body("User is not properly authorized to join this campaign");
         }
         Optional<Campaign> campaignOpt = campaignRepository.findById(id);
-        ResponseEntity<String> viabilityCheck = checkApplyViability(isAuthorized, campaignOpt, profileName);
+        if(campaignOpt.get().getMembers() != null && campaignOpt.get().getMembers().contains(profileName) || campaignOpt.get().getOwnerName().equals(profileName)) {
+            return ResponseEntity.badRequest().body("User is already a member/owner of this campaign");
+        }
+        ResponseEntity<String> viabilityCheck = checkApplyViability(campaignOpt, profileName);
         if (viabilityCheck != null) {
             return viabilityCheck;
         }
@@ -456,16 +459,13 @@ public class CampaignController {
 
     // ---------- Helpers ----------
 
-    private ResponseEntity<String> checkApplyViability(boolean isAuthorized, Optional<Campaign> campaignOpt, String profileName) {
+    private ResponseEntity<String> checkApplyViability(Optional<Campaign> campaignOpt, String profileName) {
         if (campaignOpt.isEmpty() || campaignOpt.get().getStatus() == CampaignStatus.DELETED) {
             return ResponseEntity.notFound().build();
         }
         Optional<CampaignRequest> existingRequest = campaignRequestRepository.findAll().stream().filter(r -> r.getCampaign().getId().equals(campaignOpt.get().getId()) && r.getProfile().getProfilename().equals(profileName)).findFirst();
         if(existingRequest.isPresent() && existingRequest.get().getStatus() == CampaignRequestStatus.PENDING) {
                 return ResponseEntity.badRequest().body("There is already a pending request for this user in this campaign");
-            }
-        if(campaignOpt.get().getMembers() != null && campaignOpt.get().getMembers().contains(profileName) || campaignOpt.get().getOwnerName().equals(profileName)) {
-            return ResponseEntity.badRequest().body("User is already a member/owner of this campaign");
         }
         return null;
     }
