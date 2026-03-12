@@ -435,6 +435,9 @@ public class CampaignController {
             @RequestBody CampaignRequestInDTO dto,
             @RequestHeader("X-Profile-Name") String profileName) {
         boolean isAuthorized = utilsCalls.checkAuthAndProfile(authentication, profileName);
+        if (!isAuthorized) {
+            return ResponseEntity.status(403).body("User is not properly authorized to join this campaign");
+        }
         Optional<Campaign> campaignOpt = campaignRepository.findById(id);
         ResponseEntity<String> viabilityCheck = checkApplyViability(isAuthorized, campaignOpt, profileName);
         if (viabilityCheck != null) {
@@ -454,9 +457,6 @@ public class CampaignController {
     // ---------- Helpers ----------
 
     private ResponseEntity<String> checkApplyViability(boolean isAuthorized, Optional<Campaign> campaignOpt, String profileName) {
-        if (!isAuthorized) {
-            return ResponseEntity.status(403).body("User is not properly authorized to join this campaign");
-        }
         if (campaignOpt.isEmpty() || campaignOpt.get().getStatus() == CampaignStatus.DELETED) {
             return ResponseEntity.notFound().build();
         }
