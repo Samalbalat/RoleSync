@@ -16,8 +16,10 @@ import {
 	Tab,
 	TabPanel,
 	Chip,
+	Spinner,
 } from '@material-tailwind/react';
 import { ArrowLeftIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import toast from 'react-hot-toast';
 import { getTheme } from '../../utils/themeUtils';
 import CampaignCharacterList from '../../components/character/CampaignCharacterList';
 import CampaignActionCard from '../../components/campaign/detail/CampaignActionCard';
@@ -39,6 +41,7 @@ export default function CampaignDetailPage() {
 	const [openAccordion, setOpenAccordion] = useState(0);
 	const [campaign, setCampaign] = useState(null);
 	const [campaignTemplate, setCampaignTemplate] = useState(null);
+	const [characters, setCharacters] = useState([]);
 	const [loading, setLoading] = useState(true);
 
 	const fetchCampaignAndTemplate = useCallback(
@@ -75,9 +78,27 @@ export default function CampaignDetailPage() {
 		fetchCampaignAndTemplate(true);
 	}, [fetchCampaignAndTemplate]);
 
+	useEffect(() => {
+		const fetchCharacters = async () => {
+			try {
+				setLoading(true);
+				const data = await CharacterService.getCampaignCharacters(id);
+				setCharacters(data || []);
+			} catch (error) {
+				console.error('Error fetching campaign characters:', error);
+				toast.error('Error al cargar los personajes de la campaña');
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchCharacters();
+	}, [id]);
+
 	if (loading) {
 		return (
 			<div className='flex justify-center items-center h-screen'>
+				<Spinner className={`h-8 w-8 text-${theme.primary}-500`} />
 				<Typography variant='h5' color='blue-gray'>
 					Cargando campaña...
 				</Typography>
@@ -98,6 +119,23 @@ export default function CampaignDetailPage() {
 	const isTabletop = campaign.type === 'TABLETOP';
 	const progress = (campaign.currentPlayers / campaign.maxPlayers) * 100;
 	const isFull = campaign.currentPlayers >= campaign.maxPlayers;
+
+	let myCharacter = null;
+
+	if (isOwner) {
+		myCharacter = {
+			id: 'dm',
+			name: 'Master', // O puedes usar campaign.owner?.profileName si lo prefieres
+			avatar: campaign.owner?.profileImage || 'https://ui-avatars.com/api/?name=DM&background=1e3a8a&color=fff',
+		};
+	} else if (isParticipant && campaign.characterId) {
+		// Si es jugador y YA tiene personaje creado
+		myCharacter = {
+			id: campaign.characterId,
+			name: campaign.characterName,
+			avatar: campaign.characterImage || `https://ui-avatars.com/api/?name=${campaign.characterName}`,
+		};
+	}
 
 	const hasForum = hasInsideAccess && (isTabletop || (isWritten && campaign.communication === 'RoleSync'));
 
@@ -141,15 +179,23 @@ export default function CampaignDetailPage() {
 		tabsData.push({
 			label: isWritten ? 'Rol en Vivo' : 'Foro de Campaña',
 			value: 'roleplay',
-			content: <CampaignTimeline campaignId={id} isOwner={isOwner} isTabletop={isTabletop} />,
-			className: theme.textPrimary, // Mantenemos el estilo que tenías
+			content: (
+				<CampaignTimeline
+					campaignId={id}
+					isOwner={isOwner}
+					isTabletop={isTabletop}
+					myCharacter={myCharacter}
+					characters={characters}
+				/>
+			),
+			className: theme.textPrimary,
 		});
 	}
 
 	return (
-		<div className='max-w-7xl mx-auto px-4 py-8 animate-fade-in'>
+		<div className='max-w-7xl mx-auto px-4 py-4 animate-fade-in'>
 			{/* Header / Botón Volver */}
-			<div className='flex justify-between items-center mb-6'>
+			<div className='flex justify-between items-center mb-2'>
 				<Button
 					variant='text'
 					className={`flex items-center gap-2 pl-0 ${theme.textSecondary}`}
@@ -229,7 +275,7 @@ export default function CampaignDetailPage() {
 				<div className='space-y-6'>
 					{hasInsideAccess ? (
 						<>
-							<CampaignCharacterList campaignId={campaign.id} />
+							<CampaignCharacterList characters={characters} />
 							{/* SI ES EL DUEÑO, MOSTRAMOS EL PANEL DE GESTIÓN DE SOLICITUDES Y MIEMBROS */}
 							{isOwner && (
 								<CampaignMembersManager

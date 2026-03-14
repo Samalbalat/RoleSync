@@ -34,8 +34,6 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 				CampaignService.getCampaignParticipants(campaignId),
 				CampaignService.getCampaignRequests(campaignId),
 			]);
-			console.log('Participantes:', participantsData);
-			console.log('Solicitudes:', requestsData);
 			const normalizedParticipants = (participantsData || []).map(item => item.participants || item);
 			setParticipants(normalizedParticipants);
 			setRequests(requestsData || []);

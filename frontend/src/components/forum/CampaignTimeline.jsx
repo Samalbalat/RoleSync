@@ -8,7 +8,7 @@ import { mockPosts } from '../../data/mockPosts';
 import ThreadDialog from './ThreadDialog';
 import PostEditor from './PostEditor';
 
-const CampaignTimeline = ({ campaignId, isOwner, isTabletop }) => {
+const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, characters }) => {
 	const [posts, setPosts] = useState(mockPosts);
 	const pinnedPosts = posts.filter(post => post.isPinned);
 	const regularPosts = posts.filter(post => !post.isPinned);
@@ -39,23 +39,11 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop }) => {
 		setPosts(currentPosts => currentPosts.map(p => (p.id === postId ? { ...p, isLocked: !p.isLocked } : p)));
 	};
 
-	const myMockCharacter = {
-		id: 'char-mifo',
-		name: 'Mifo',
-		avatar: 'https://ui-avatars.com/api/?name=Mifo&background=ffe4e6&color=be123c',
-	};
-
-	const mockOtherCharacters = [
-		{ id: 'char-elara', name: 'Elara' },
-		{ id: 'char-rogue', name: 'El Pícaro' },
-	];
-
 	return (
 		<div className='flex flex-col gap-4'>
 			<Typography variant='h5' color='blue-gray' className='mb-2 font-bold'>
 				{isTabletop ? 'Foro de la Campaña' : 'Mesa de Juego (Timeline)'}
 			</Typography>
-
 			{/* SECCIÓN DE MENSAJES FIJADOS (Acordeón) */}
 			{pinnedPosts.length > 0 && (
 				<Accordion
@@ -94,15 +82,26 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop }) => {
 					</AccordionBody>
 				</Accordion>
 			)}
-
-			<PostEditor
-				campaignId={campaignId}
-				myCharacter={myMockCharacter}
-				otherCharacters={mockOtherCharacters}
-				isOwner={isOwner}
-				isTabletop={isTabletop}
-			/>
-
+			{/* POST EDITOR O AVISO DE SIN PERSONAJE */}
+			{myCharacter ? (
+				<PostEditor
+					campaignId={campaignId}
+					myCharacter={myCharacter}
+					otherCharacters={characters}
+					isOwner={isOwner}
+					isTabletop={isTabletop}
+				/>
+			) : (
+				<div className='p-4 bg-grey-100 border border-orange-200 text-grey-800 rounded-xl shadow-sm flex flex-col items-center justify-center text-center gap-2'>
+					<Typography variant='h6' color='blue-gray' className='font-bold'>
+						¡Necesitas un personaje!
+					</Typography>
+					<Typography variant='small' className='font-medium opacity-80 max-w-md'>
+						Para poder publicar mensajes en {isTabletop ? 'el foro' : 'la partida'}, primero debes crear un personaje y
+						asignarlo a esta campaña.
+					</Typography>
+				</div>
+			)}
 			{/* SECCIÓN DE MENSAJES NORMALES */}
 			<div className='space-y-4'>
 				{regularPosts.map(post => (
@@ -124,7 +123,6 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop }) => {
 					</Typography>
 				)}
 			</div>
-
 			{!isTabletop && <ThreadDialog open={isDialogOpen} handleClose={handleCloseThread} post={selectedPost} />}
 		</div>
 	);
@@ -134,6 +132,8 @@ CampaignTimeline.propTypes = {
 	campaignId: PropTypes.string.isRequired,
 	isOwner: PropTypes.bool.isRequired,
 	isTabletop: PropTypes.bool,
+	myCharacter: PropTypes.object.isRequired,
+	characters: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 export default CampaignTimeline;

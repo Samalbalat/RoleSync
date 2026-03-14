@@ -22,7 +22,7 @@ import {
 	LinkIcon,
 } from '@heroicons/react/24/outline';
 
-const PostEditor = ({ campaignId, currentUser, myCharacter, otherCharacters = [], isOwner, isTabletop = false }) => {
+const PostEditor = ({ campaignId, myCharacter, otherCharacters = [], isOwner, isTabletop = false }) => {
 	const [content, setContent] = useState('');
 	const [isOoc, setIsOoc] = useState(false);
 	const [visibleToIds, setVisibleToIds] = useState([]);

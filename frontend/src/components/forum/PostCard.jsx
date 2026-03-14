@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
@@ -24,6 +24,8 @@ const PostCard = ({
 	// 2. Limpiar el HTML para evitar inyecciones maliciosas (XSS)
 	const cleanContent = DOMPurify.sanitize(rawHtml);
 
+	const [isRevealed, setIsRevealed] = useState(false);
+
 	const formattedDate = new Intl.DateTimeFormat('es-ES', {
 		day: '2-digit',
 		month: 'short',
@@ -36,6 +38,10 @@ const PostCard = ({
 	const isDmAnnouncement = post.isOoc && post.isDm;
 	const isRegularOoc = post.isOoc && !post.isDm;
 
+	// LÓGICA DE OCULTAMIENTO OOC
+	const hideInTimeline = isTimelineView && isRegularOoc;
+	const blurInThread = !isTimelineView && isRegularOoc && !isRevealed;
+
 	// Estilos segun tipo de mensaje
 	let cardStyles = 'p-4 mb-4 rounded-lg shadow-sm border transition-all duration-200 text-left w-full block';
 
@@ -43,17 +49,14 @@ const PostCard = ({
 		cardStyles += ' hover:shadow-md cursor-pointer';
 	}
 
-	if (isTimelineView) cardStyles += ' hover:shadow-md cursor-pointer';
-
-	// Aplicamos los colores según el tipo
 	if (isDmAnnouncement) {
-		cardStyles += ' bg-blue-50 border-blue-300 text-blue-900 border-l-4 border-l-blue-600'; // Azul llamativo para el DM
+		cardStyles += ' bg-blue-50 border-blue-300 text-blue-900 border-l-4 border-l-blue-600';
 	} else if (isRegularOoc) {
-		cardStyles += ' bg-gray-100 border-gray-300 text-gray-600 italic'; // Gris apagado para OOC de jugadores
+		cardStyles += ' bg-gray-100 border-gray-300 text-gray-600 italic';
 	} else if (isSecret) {
-		cardStyles += ' bg-purple-50 border-purple-200'; // Morado para susurros
+		cardStyles += ' bg-purple-50 border-purple-200';
 	} else {
-		cardStyles += ' bg-white border-gray-200 text-gray-800'; // Blanco para rol normal
+		cardStyles += ' bg-white border-gray-200 text-gray-800';
 	}
 
 	// Recopilar imágenes: Soporta tanto el formato nuevo del editor (imageUrl) como el array antiguo (mediaUrls)
@@ -144,21 +147,48 @@ const PostCard = ({
 			</div>
 
 			{/* CONTENIDO DEL MENSAJE */}
-			<div
-				className={`prose prose-sm max-w-none mt-2 break-words ${post.isOoc ? 'prose-p:text-gray-600' : 'prose-p:text-gray-800'} prose-blockquote:border-l-indigo-500 prose-blockquote:bg-indigo-50/50 prose-blockquote:py-1 prose-blockquote:px-3 prose-blockquote:rounded-r-lg prose-blockquote:not-italic prose-blockquote:text-gray-700`}
-				dangerouslySetInnerHTML={{ __html: cleanContent }}
-			/>
+			{hideInTimeline ? (
+				// VISTA TIMELINE: Caja resumen en lugar del texto
+				<div className='mt-2 p-3 bg-white/50 border border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center gap-1 text-gray-500'>
+					<span className='text-sm font-medium'>Mensaje OOC</span>
+					<span className='text-xs'>Haz clic en la tarjeta para abrir el hilo y leerlo</span>
+				</div>
+			) : (
+				// VISTA DENTRO DEL HILO: Contenido normal o difuminado
+				<div
+					className={`relative mt-2 transition-all duration-300 rounded-md ${blurInThread ? 'cursor-pointer group overflow-hidden' : ''}`}
+					onClick={() => blurInThread && setIsRevealed(true)}
+				>
+					{/* Texto del post */}
+					<div
+						className={`prose prose-sm max-w-none break-words ${post.isOoc ? 'prose-p:text-gray-600' : 'prose-p:text-gray-800'} prose-blockquote:border-l-indigo-500 prose-blockquote:bg-indigo-50/50 prose-blockquote:py-1 prose-blockquote:px-3 prose-blockquote:rounded-r-lg prose-blockquote:not-italic prose-blockquote:text-gray-700 ${blurInThread ? 'blur-[5px] opacity-60 select-none pointer-events-none' : ''}`}
+						dangerouslySetInnerHTML={{ __html: cleanContent }}
+					/>
 
-			{imagesToDisplay.length > 0 && (
-				<div className={`mt-4 grid gap-2 ${imagesToDisplay.length > 1 ? 'grid-cols-2' : 'grid-cols-1 sm:w-2/3'}`}>
-					{imagesToDisplay.map((url, index) => (
-						<img
-							key={index}
-							src={url}
-							alt={`Adjunto ${index + 1}`}
-							className='rounded-lg object-cover w-full max-h-64 border border-gray-200 shadow-sm transition-transform hover:opacity-95'
-						/>
-					))}
+					{/* Imágenes del post */}
+					{imagesToDisplay.length > 0 && (
+						<div
+							className={`mt-4 grid gap-2 ${imagesToDisplay.length > 1 ? 'grid-cols-2' : 'grid-cols-1 sm:w-2/3'} ${blurInThread ? 'blur-[5px] opacity-60 select-none pointer-events-none' : ''}`}
+						>
+							{imagesToDisplay.map((url, index) => (
+								<img
+									key={index}
+									src={url}
+									alt={`Adjunto ${index + 1}`}
+									className='rounded-lg object-cover w-full max-h-64 border border-gray-200 shadow-sm transition-transform hover:opacity-95'
+								/>
+							))}
+						</div>
+					)}
+
+					{/* Capa/Botón para revelar el contenido (Solo visible si está en modo blur) */}
+					{blurInThread && (
+						<div className='absolute inset-0 bg-gray-100/20 flex items-center justify-center'>
+							<div className='bg-white text-gray-700 px-4 py-2 rounded-full text-sm font-bold shadow-md border border-gray-200 flex items-center gap-2 group-hover:scale-105 transition-transform'>
+								<EyeSlashIcon className='w-4 h-4' /> Revelar mensaje OOC
+							</div>
+						</div>
+					)}
 				</div>
 			)}
 
@@ -177,12 +207,12 @@ const PostCard = ({
 
 PostCard.propTypes = {
 	post: PropTypes.object.isRequired,
-    isTimelineView: PropTypes.bool,
-    onClickThread: PropTypes.func,
-    isCurrentUserDM: PropTypes.bool,
-    onTogglePin: PropTypes.func,
-    onToggleLock: PropTypes.func,
-    isTabletop: PropTypes.bool,
+	isTimelineView: PropTypes.bool,
+	onClickThread: PropTypes.func,
+	isCurrentUserDM: PropTypes.bool,
+	onTogglePin: PropTypes.func,
+	onToggleLock: PropTypes.func,
+	isTabletop: PropTypes.bool,
 };
 
 export default PostCard;
