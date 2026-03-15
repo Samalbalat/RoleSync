@@ -10,19 +10,26 @@ import {
 	CardBody,
 	Typography,
 	Avatar,
+	Tabs,
+	TabsHeader,
+	TabsBody,
+	Tab,
+	TabPanel,
+	Chip,
+	Spinner,
 } from '@material-tailwind/react';
 import { ArrowLeftIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import toast from 'react-hot-toast';
 import { getTheme } from '../../utils/themeUtils';
-
 import CampaignCharacterList from '../../components/character/CampaignCharacterList';
 import CampaignActionCard from '../../components/campaign/detail/CampaignActionCard';
 import CampaignInfoList from '../../components/campaign/detail/CampaignInfoList';
 import CampaignAbout from '../../components/campaign/detail/CampaignAbout';
 import { NotFoundView, AccessDeniedView } from '../../components/campaign/detail/CampaignErrorViews';
-
 import CampaignService from '../../services/CampaignService';
 import CharacterService from '../../services/CharacterService';
 import CampaignMembersManager from '../../components/campaign/detail/CampaignMembersManager';
+import CampaignTimeline from '../../components/forum/CampaignTimeline';
 
 export default function CampaignDetailPage() {
 	const { t } = useTranslation('global');
@@ -34,6 +41,7 @@ export default function CampaignDetailPage() {
 	const [openAccordion, setOpenAccordion] = useState(0);
 	const [campaign, setCampaign] = useState(null);
 	const [campaignTemplate, setCampaignTemplate] = useState(null);
+	const [characters, setCharacters] = useState([]);
 	const [loading, setLoading] = useState(true);
 
 	const fetchCampaignAndTemplate = useCallback(
@@ -70,9 +78,27 @@ export default function CampaignDetailPage() {
 		fetchCampaignAndTemplate(true);
 	}, [fetchCampaignAndTemplate]);
 
+	useEffect(() => {
+		const fetchCharacters = async () => {
+			try {
+				setLoading(true);
+				const data = await CharacterService.getCampaignCharacters(id);
+				setCharacters(data || []);
+			} catch (error) {
+				console.error('Error fetching campaign characters:', error);
+				toast.error('Error al cargar los personajes de la campaña');
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchCharacters();
+	}, [id]);
+
 	if (loading) {
 		return (
 			<div className='flex justify-center items-center h-screen'>
+				<Spinner className={`h-8 w-8 text-${theme.primary}-500`} />
 				<Typography variant='h5' color='blue-gray'>
 					Cargando campaña...
 				</Typography>
@@ -87,10 +113,31 @@ export default function CampaignDetailPage() {
 	}
 
 	const isOwner = campaign.userRelation === 'OWNER';
-	const hasInsideAccess = isOwner || campaign.userRelation === 'MEMBER';
+	const isParticipant = campaign.userRelation === 'MEMBER';
+	const hasInsideAccess = isOwner || isParticipant;
 	const isWritten = campaign.type === 'WRITTEN';
+	const isTabletop = campaign.type === 'TABLETOP';
 	const progress = (campaign.currentPlayers / campaign.maxPlayers) * 100;
 	const isFull = campaign.currentPlayers >= campaign.maxPlayers;
+
+	let myCharacter = null;
+
+	if (isOwner) {
+		myCharacter = {
+			id: 'dm',
+			name: 'Master', // O puedes usar campaign.owner?.profileName si lo prefieres
+			avatar: campaign.owner?.profileImage || 'https://ui-avatars.com/api/?name=DM&background=1e3a8a&color=fff',
+		};
+	} else if (isParticipant && campaign.characterId) {
+		// Si es jugador y YA tiene personaje creado
+		myCharacter = {
+			id: campaign.characterId,
+			name: campaign.characterName,
+			avatar: campaign.characterImage || `https://ui-avatars.com/api/?name=${campaign.characterName}`,
+		};
+	}
+
+	const hasForum = hasInsideAccess && (isTabletop || (isWritten && campaign.communication === 'RoleSync'));
 
 	const handleOpenAccordion = value => setOpenAccordion(openAccordion === value ? 0 : value);
 
@@ -120,10 +167,35 @@ export default function CampaignDetailPage() {
 		</div>
 	);
 
+	const tabsData = [
+		{
+			label: 'Información',
+			value: 'info',
+			content: <CampaignAbout campaign={campaign} isWritten={isWritten} isFull={isFull} t={t} />,
+		},
+	];
+
+	if (hasForum) {
+		tabsData.push({
+			label: isWritten ? 'Rol en Vivo' : 'Foro de Campaña',
+			value: 'roleplay',
+			content: (
+				<CampaignTimeline
+					campaignId={id}
+					isOwner={isOwner}
+					isTabletop={isTabletop}
+					myCharacter={myCharacter}
+					characters={characters}
+				/>
+			),
+			className: theme.textPrimary,
+		});
+	}
+
 	return (
-		<div className='max-w-7xl mx-auto px-4 py-8 animate-fade-in'>
+		<div className='max-w-7xl mx-auto px-4 py-4 animate-fade-in'>
 			{/* Header / Botón Volver */}
-			<div className='flex justify-between items-center mb-6'>
+			<div className='flex justify-between items-center mb-2'>
 				<Button
 					variant='text'
 					className={`flex items-center gap-2 pl-0 ${theme.textSecondary}`}
@@ -136,14 +208,74 @@ export default function CampaignDetailPage() {
 			<div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
 				{/* COLUMNA IZQUIERDA: Refactorizada en su propio componente */}
 				<div className='lg:col-span-2 space-y-8'>
-					<CampaignAbout campaign={campaign} isWritten={isWritten} isFull={isFull} t={t} />
+					{/* Imagen y Cabecera */}
+					<div className='relative rounded-2xl overflow-hidden shadow-lg h-[300px] md:h-[400px]'>
+						<img
+							src={campaign.image || '/default_image.png'}
+							alt={campaign.name}
+							className='w-full h-full object-cover'
+							onError={e => {
+								e.target.onerror = null;
+								e.target.src = '/default_image.png';
+							}}
+						/>
+						{/* ESTE DIV (Gradiente y Título) VUELVE ADENTRO */}
+						<div className='absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 md:p-8'>
+							<div className='flex gap-2 mb-3'>
+								<Chip
+									value={
+										campaign.status === 'OPEN' || campaign.status === 'ACTIVE'
+											? t('status.open') || 'Abierta'
+											: t('status.full') || 'Cerrada'
+									}
+									color={isFull ? 'red' : 'green'}
+									className='rounded-full'
+									size='sm'
+								/>
+								<Chip
+									value={campaign.type}
+									color={isWritten ? 'indigo' : 'orange'}
+									className='rounded-full border-none bg-white/20 text-white'
+									size='sm'
+									variant='filled'
+								/>
+							</div>
+							<Typography variant='h2' color='white' className='font-bold text-3xl md:text-4xl'>
+								{campaign.name}
+							</Typography>
+						</div>
+					</div>
+
+					{/* --- INICIO ZONA DE PESTAÑAS (TABS) --- */}
+					<Tabs value='info' className='w-full'>
+						{/* Cabecera de las pestañas */}
+						<TabsHeader
+							className='bg-transparent border-b border-gray-200 rounded-none p-0'
+							indicatorProps={{ className: 'bg-transparent border-b-2 border-blue-gray-900 shadow-none rounded-none' }}
+						>
+							{tabsData.map(({ label, value, className = '' }) => (
+								<Tab key={value} value={value} className={`py-3 font-medium ${className}`}>
+									{label}
+								</Tab>
+							))}
+						</TabsHeader>
+
+						{/* Contenido de las pestañas */}
+						<TabsBody className='pt-6'>
+							{tabsData.map(({ value, content }) => (
+								<TabPanel key={value} value={value} className='p-0 animate-fade-in'>
+									{content}
+								</TabPanel>
+							))}
+						</TabsBody>
+					</Tabs>
 				</div>
 
 				{/* COLUMNA DERECHA: Actions, Characters e Info */}
 				<div className='space-y-6'>
 					{hasInsideAccess ? (
 						<>
-							<CampaignCharacterList campaignId={campaign.id} />
+							<CampaignCharacterList characters={characters} />
 							{/* SI ES EL DUEÑO, MOSTRAMOS EL PANEL DE GESTIÓN DE SOLICITUDES Y MIEMBROS */}
 							{isOwner && (
 								<CampaignMembersManager

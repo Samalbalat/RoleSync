@@ -1,42 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { EyeIcon } from '@heroicons/react/24/solid';
-import { Button, List, ListItem, ListItemPrefix, Avatar, Card, Typography, Spinner } from '@material-tailwind/react';
+import { Button, List, ListItem, ListItemPrefix, Avatar, Card, Typography } from '@material-tailwind/react';
 import { useTranslation } from 'react-i18next';
 import CharacterDetailDialog from './CharacterDetailDialog';
 import { getTheme } from '../../utils/themeUtils';
-import CharacterService from '../../services/CharacterService'; // <-- Ajusta la ruta a tu servicio
-import toast from 'react-hot-toast';
 
-export default function CampaignCharacterList({ campaignId }) {
+export default function CampaignCharacterList({ characters }) {
 	const { t } = useTranslation('global');
 	const theme = getTheme();
 
 	// Estados del componente
 	const [open, setOpen] = useState(false);
 	const [selectedCharacterId, setSelectedCharacterId] = useState(null);
-	const [characters, setCharacters] = useState([]);
-	const [loading, setLoading] = useState(true);
-
-	// Efecto para cargar los personajes cuando el componente se monta o cambia el campaignId
-	useEffect(() => {
-		if (!campaignId) return;
-
-		const fetchCharacters = async () => {
-			try {
-				setLoading(true);
-				const data = await CharacterService.getCampaignCharacters(campaignId);
-				setCharacters(data || []);
-			} catch (error) {
-				console.error('Error fetching campaign characters:', error);
-				toast.error('Error al cargar los personajes de la campaña');
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchCharacters();
-	}, [campaignId]);
 
 	const handleOpen = id => {
 		setSelectedCharacterId(id);
@@ -46,15 +22,6 @@ export default function CampaignCharacterList({ campaignId }) {
 	const handleClose = () => {
 		setOpen(false);
 	};
-
-	// Estado de carga (Spinner)
-	if (loading) {
-		return (
-			<Card className='w-full max-w-md shadow-sm border border-blue-gray-50 p-10 flex justify-center items-center'>
-				<Spinner className={`h-8 w-8 text-${theme.primary}-500`} />
-			</Card>
-		);
-	}
 
 	// Estado vacío (Sin personajes)
 	if (!characters || characters.length === 0) {
@@ -116,5 +83,5 @@ export default function CampaignCharacterList({ campaignId }) {
 }
 
 CampaignCharacterList.propTypes = {
-	campaignId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+	characters: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
