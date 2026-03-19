@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import {
 	Button,
@@ -22,16 +22,91 @@ import {
 	LinkIcon,
 } from '@heroicons/react/24/outline';
 
-const PostEditor = ({ campaignId, myCharacter, otherCharacters = [], isOwner, isTabletop = false }) => {
+// HELPERS EXTERNOS
+
+const getAuthorDisplayData = (isGeneralForum, user, character) => {
+	if (isGeneralForum) {
+		return {
+			name: user?.profileName || 'Usuario',
+			avatar: user?.profileImage || `https://ui-avatars.com/api/?name=${user?.profileName || 'User'}&background=f3f4f6`,
+			id: user?.id,
+		};
+	}
+	return {
+		name: character?.name || 'Dungeon Master',
+		avatar: character?.avatar || 'https://ui-avatars.com/api/?name=DM&background=E0E7FF&color=3730A3',
+		id: character?.id || null,
+	};
+};
+
+const getButtonColor = (isDm, isOoc, isSecret) => {
+	if (isDm) return 'blue';
+	if (isOoc) return 'gray';
+	if (isSecret) return 'purple';
+	return 'indigo';
+};
+
+const getTextareaStyles = (isDm, isOoc, isSecret) => {
+	if (isDm)
+		return 'bg-blue-50 border-blue-300 focus:border-blue-500 focus:ring-blue-200 text-blue-900 border-l-4 border-l-blue-600';
+	if (isOoc) return 'bg-gray-50 border-gray-300 focus:border-gray-500 focus:ring-gray-200 text-gray-700 italic';
+	if (isSecret) return 'bg-purple-50 border-purple-200 focus:border-purple-500 focus:ring-purple-100 text-gray-900';
+	return 'bg-gray-50 border-gray-200 focus:border-indigo-500 focus:ring-indigo-100 text-gray-900';
+};
+
+const getContainerStyles = (isDm, isOoc) => {
+	if (isDm) return 'bg-blue-50/50 border-blue-200';
+	if (isOoc) return 'bg-gray-100 border-gray-300';
+	return 'bg-white border-gray-200';
+};
+
+const getPlaceholder = (isGeneralForum, isTabletop, isDm, isOoc, isSecret) => {
+	if (isGeneralForum) return 'Escribe tu respuesta al hilo...';
+	if (isTabletop) return isDm ? 'Escribe un aviso para el foro de la mesa...' : 'Escribe tu mensaje en el foro...';
+	if (isDm) return 'Escribe un aviso oficial para la partida...';
+	if (isOoc) return 'Escribe un mensaje fuera de rol para el grupo...';
+	if (isSecret) return 'Escribe tu susurro secreto...';
+	return 'Describe tu acción, palabras o pensamientos...';
+};
+
+// COMPONENTE PRINCIPAL
+
+const PostEditor = ({
+	campaignId,
+	currentUser,
+	myCharacter,
+	otherCharacters = [],
+	isOwner,
+	isTabletop = false,
+	isGeneralForum = false,
+}) => {
 	const [content, setContent] = useState('');
 	const [isOoc, setIsOoc] = useState(false);
 	const [visibleToIds, setVisibleToIds] = useState([]);
-	const isDm = isOwner;
 	const [showFormatMenu, setShowFormatMenu] = useState(false);
 	const [showImageInput, setShowImageInput] = useState(false);
 	const [imageUrl, setImageUrl] = useState('');
 
 	const textareaRef = useRef(null);
+
+	// Variables de estado lógicas
+	const effectiveIsDm = !isGeneralForum && isOwner;
+	const canUseRoleplayFeatures = !isTabletop && !isGeneralForum;
+	const isSecret = canUseRoleplayFeatures && visibleToIds.length > 0;
+	const effectiveIsOoc = canUseRoleplayFeatures && isOoc;
+	const isSubmitDisabled = !content.trim() && !imageUrl.trim();
+	const hasOtherCharacters = otherCharacters.length > 0;
+
+	// Uso de los helpers externos
+	const {
+		name: displayName,
+		avatar: displayAvatar,
+		id: authorId,
+	} = getAuthorDisplayData(isGeneralForum, currentUser, myCharacter);
+	const containerClasses = getContainerStyles(effectiveIsDm, effectiveIsOoc);
+	const textareaStyles = getTextareaStyles(effectiveIsDm, effectiveIsOoc, isSecret);
+	const buttonColor = getButtonColor(effectiveIsDm, effectiveIsOoc, isSecret);
+	const textareaPlaceholder = getPlaceholder(isGeneralForum, isTabletop, effectiveIsDm, effectiveIsOoc, isSecret);
 
 	const toggleVisibility = characterId => {
 		setVisibleToIds(prev => (prev.includes(characterId) ? prev.filter(id => id !== characterId) : [...prev, characterId]));
@@ -44,15 +119,10 @@ const PostEditor = ({ campaignId, myCharacter, otherCharacters = [], isOwner, is
 		const start = textarea.selectionStart;
 		const end = textarea.selectionEnd;
 		const text = content;
-
-		const before = text.substring(0, start);
 		const selected = text.substring(start, end);
-		const after = text.substring(end);
-
 		const insertedText = selected || 'texto';
-		const newText = before + prefix + insertedText + suffix + after;
 
-		setContent(newText);
+		setContent(text.substring(0, start) + prefix + insertedText + suffix + text.substring(end));
 
 		setTimeout(() => {
 			textarea.focus();
@@ -61,19 +131,18 @@ const PostEditor = ({ campaignId, myCharacter, otherCharacters = [], isOwner, is
 	};
 
 	const handleSubmit = () => {
-		if (!content.trim() && !imageUrl.trim()) return;
+		if (isSubmitDisabled) return;
 
 		console.log('Enviando post:', {
-			campaignId,
+			campaignId: isGeneralForum ? null : campaignId,
 			content,
 			imageUrl,
-			isOoc: isTabletop ? false : isOoc, // Forzamos a false si es foro
-			isDm,
-			authorCharacterId: myCharacter?.id || null,
-			visibleToCharacterIds: isTabletop ? [] : visibleToIds, // Forzamos a vacío si es foro
+			isOoc: effectiveIsOoc,
+			isDm: effectiveIsDm,
+			authorId,
+			visibleToCharacterIds: canUseRoleplayFeatures ? visibleToIds : [],
 		});
 
-		// Limpiar el editor tras enviar
 		setContent('');
 		setImageUrl('');
 		setShowImageInput(false);
@@ -82,84 +151,29 @@ const PostEditor = ({ campaignId, myCharacter, otherCharacters = [], isOwner, is
 		setVisibleToIds([]);
 	};
 
-	const isSecret = !isTabletop && visibleToIds.length > 0;
-
-	const buttonColor = useMemo(() => {
-		if (isDm) return 'blue';
-		if (isOoc && !isTabletop) return 'gray';
-		if (isSecret) return 'purple';
-		return 'indigo';
-	}, [isOoc, isSecret, isDm, isTabletop]);
-
-	const textareaStyles = useMemo(() => {
-		if (isDm) {
-			return 'bg-blue-50 border-blue-300 focus:border-blue-500 focus:ring-blue-200 text-blue-900 border-l-4 border-l-blue-600';
-		}
-		if (isOoc && !isTabletop) {
-			return 'bg-gray-50 border-gray-300 focus:border-gray-500 focus:ring-gray-200 text-gray-700 italic';
-		}
-		if (isSecret) {
-			return 'bg-purple-50 border-purple-200 focus:border-purple-500 focus:ring-purple-100 text-gray-900';
-		}
-		return 'bg-gray-50 border-gray-200 focus:border-indigo-500 focus:ring-indigo-100 text-gray-900';
-	}, [isOoc, isSecret, isDm, isTabletop]);
-
-	const textareaPlaceholder = useMemo(() => {
-		if (isTabletop) {
-			return isDm ? 'Escribe un aviso para el foro de la mesa...' : 'Escribe tu mensaje en el foro...';
-		}
-		if (isDm) {
-			return 'Escribe un aviso oficial para la partida...';
-		}
-		if (isOoc) {
-			return 'Escribe un mensaje fuera de rol para el grupo...';
-		}
-		if (isSecret) {
-			return 'Escribe tu susurro secreto...';
-		}
-		return 'Describe tu acción, palabras o pensamientos...';
-	}, [isOoc, isSecret, isDm, isTabletop]);
-
 	return (
-		<div
-			className={`mb-6 p-4 rounded-xl border shadow-sm transition-colors duration-200 ${
-				isDm
-					? 'bg-blue-50/50 border-blue-200'
-					: isOoc && !isTabletop
-						? 'bg-gray-100 border-gray-300'
-						: 'bg-white border-gray-200'
-			}`}
-		>
-			{/* CABECERA DEL EDITOR: Info del personaje y Switch OOC */}
+		<div className={`mb-6 p-4 rounded-xl border shadow-sm transition-colors duration-200 ${containerClasses}`}>
+			{/* CABECERA DEL EDITOR */}
 			<div className='flex justify-between items-center mb-3'>
 				<div className='flex items-center gap-3'>
-					<Avatar
-						src={myCharacter?.avatar || 'https://ui-avatars.com/api/?name=DM&background=E0E7FF&color=3730A3'}
-						alt='Avatar'
-						size='sm'
-						className='border border-gray-300 shadow-sm'
-					/>
+					<Avatar src={displayAvatar} alt='Avatar' size='sm' className='border border-gray-300 shadow-sm' />
 					<div className='flex flex-col'>
 						<Typography variant='small' className='font-bold text-gray-800'>
-							{myCharacter ? myCharacter.name : 'Dungeon Master'}
+							{displayName}
 						</Typography>
 
-						{/* Indicador visual de visibilidad (oculto en foro porque todo es público) */}
-						{!isTabletop &&
-							(isSecret ? (
-								<Typography variant='small' className='text-purple-600 text-[10px] font-bold uppercase tracking-wider'>
-									Susurro ({visibleToIds.length})
-								</Typography>
-							) : (
-								<Typography variant='small' className='text-gray-500 text-[10px] font-bold uppercase tracking-wider'>
-									Público
-								</Typography>
-							))}
+						{canUseRoleplayFeatures && (
+							<Typography
+								variant='small'
+								className={`text-[10px] font-bold uppercase tracking-wider ${isSecret ? 'text-purple-600' : 'text-gray-500'}`}
+							>
+								{isSecret ? `Susurro (${visibleToIds.length})` : 'Público'}
+							</Typography>
+						)}
 					</div>
 				</div>
 
-				{/* Switch OOC (oculto en el foro) */}
-				{!isTabletop && (
+				{canUseRoleplayFeatures && (
 					<div className='flex items-center gap-2'>
 						<Typography variant='small' className={`text-xs font-bold ${isOoc ? 'text-gray-700' : 'text-gray-400'}`}>
 							MODO OOC
@@ -231,9 +245,9 @@ const PostEditor = ({ campaignId, myCharacter, otherCharacters = [], isOwner, is
 				></textarea>
 			</div>
 
-			{/* INPUT DE IMAGEN */}
+			{/* INPUT Y VISTA PREVIA DE IMAGEN */}
 			{showImageInput && (
-				<div className='flex items-center gap-2 mb-3 animate-fade-in'>
+				<div className='flex items-center gap-2 mb-3 animate-fade-in mt-3'>
 					<Input
 						type='url'
 						label='Pega la URL de la imagen aquí...'
@@ -255,7 +269,6 @@ const PostEditor = ({ campaignId, myCharacter, otherCharacters = [], isOwner, is
 				</div>
 			)}
 
-			{/* VISTA PREVIA DE LA IMAGEN */}
 			{imageUrl && (
 				<div className='mt-3 relative inline-block'>
 					<img
@@ -296,8 +309,8 @@ const PostEditor = ({ campaignId, myCharacter, otherCharacters = [], isOwner, is
 						<AdjustmentsHorizontalIcon className='h-5 w-5' />
 					</IconButton>
 
-					{/* MENÚ DE SUSURROS (Oculto en el foro) */}
-					{!isTabletop && (
+					{/* MENÚ DE SUSURROS */}
+					{canUseRoleplayFeatures && (
 						<Menu dismiss={{ itemPress: false }}>
 							<MenuHandler>
 								<IconButton
@@ -313,9 +326,7 @@ const PostEditor = ({ campaignId, myCharacter, otherCharacters = [], isOwner, is
 								<Typography variant='small' color='blue-gray' className='mb-2 font-bold px-3'>
 									¿Quién puede ver esto?
 								</Typography>
-								{otherCharacters.length === 0 ? (
-									<MenuItem disabled>No hay más personajes</MenuItem>
-								) : (
+								{hasOtherCharacters ? (
 									otherCharacters.map(char => (
 										<MenuItem key={char.id} className='p-0'>
 											<label className='flex w-full cursor-pointer items-center px-3 py-2'>
@@ -332,6 +343,8 @@ const PostEditor = ({ campaignId, myCharacter, otherCharacters = [], isOwner, is
 											</label>
 										</MenuItem>
 									))
+								) : (
+									<MenuItem disabled>No hay más personajes</MenuItem>
 								)}
 								{isSecret && (
 									<div className='p-2 border-t mt-2'>
@@ -345,13 +358,12 @@ const PostEditor = ({ campaignId, myCharacter, otherCharacters = [], isOwner, is
 					)}
 				</div>
 
-				{/* Botón de Enviar */}
 				<Button
 					size='md'
 					color={buttonColor}
 					className='flex items-center gap-2 px-6'
 					onClick={handleSubmit}
-					disabled={!content.trim() && !imageUrl.trim()}
+					disabled={isSubmitDisabled}
 				>
 					<PaperAirplaneIcon className='h-4 w-4' />
 					Enviar
@@ -362,12 +374,13 @@ const PostEditor = ({ campaignId, myCharacter, otherCharacters = [], isOwner, is
 };
 
 PostEditor.propTypes = {
-	campaignId: PropTypes.string.isRequired,
+	campaignId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 	currentUser: PropTypes.object,
 	myCharacter: PropTypes.object,
 	otherCharacters: PropTypes.array,
 	isOwner: PropTypes.bool,
 	isTabletop: PropTypes.bool,
+	isGeneralForum: PropTypes.bool,
 };
 
 export default PostEditor;

@@ -23,6 +23,7 @@ export const getTheme = () => {
             textPrimary: 'text-indigo-900',
             textSecondary: 'text-indigo-500',
             border: 'border-t-indigo-500',
+            lightborder: 'border-indigo-300',
             buttonColor: 'indigo',
             badge: 'purple'
         };
@@ -37,6 +38,7 @@ export const getTheme = () => {
         textPrimary: 'text-red-900',
         textSecondary: 'text-red-500',
         border: 'border-t-red-500',
+        lightborder: 'border-red-300',
         buttonColor: 'red',
         badge: 'red'
     };

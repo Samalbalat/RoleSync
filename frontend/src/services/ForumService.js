@@ -1,8 +1,78 @@
 import api from '../utils/backendApi';
 
-const PostService = {
+const ForumService = {
     // ==========================================
-    // SECCIÓN: POSTS (Hilos y Respuestas)
+    // SECCIÓN A: FORO GENERAL (Comunidad)
+    // ==========================================
+
+    /**
+     * Obtener el listado de hilos del foro general (estilo Reddit)
+     * @param {number} page - Página actual
+     * @param {number} limit - Cantidad por página
+     * @param {string} search - Término de búsqueda (opcional)
+     * @param {string} tags - Tags separados por coma (opcional)
+     */
+    getGeneralThreads: async (page = 1, limit = 20, search = '', tags = '') => {
+        try {
+            const params = { page, limit };
+            if (search) params.search = search;
+            if (tags) params.tags = tags;
+
+            const response = await api.get('/api/forums/threads', { params });
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching general threads:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Obtener el detalle de un hilo principal (post padre) del foro general
+     * @param {number|string} postId 
+     */
+    getGeneralThreadDetail: async (postId) => {
+        try {
+            const response = await api.get(`/api/forums/threads/${postId}`);
+            return response.data;
+        } catch (error) {
+            console.error(`Error fetching thread detail for post ${postId}:`, error);
+            throw error;
+        }
+    },
+
+    /**
+     * Crear un nuevo hilo (post principal) en el foro general
+     * @param {Object} threadData - { title, tags, content, mediaUrls }
+     */
+    createGeneralThread: async (threadData) => {
+        try {
+            const response = await api.post('/api/forums/threads', threadData);
+            return response.data;
+        } catch (error) {
+            console.error('Error creating general thread:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Obtener los hilos creados por el usuario actual
+     * @param {number} page - Página actual
+     * @param {number} limit - Cantidad por página
+     */
+    getMyThreads: async (page = 1, limit = 20) => {
+        try {
+            const params = { page, limit };
+            // Según indicas, el endpoint es /forums/myPosts
+            const response = await api.get('/api/forums/myPosts', { params });
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching my threads:', error);
+            throw error;
+        }
+    },
+
+    // ==========================================
+    // SECCIÓN B: CAMPAÑAS (Rol y Foro Interno)
     // ==========================================
 
     /**
@@ -39,8 +109,13 @@ const PostService = {
         }
     },
 
+    // ==========================================
+    // SECCIÓN C: ENDPOINTS COMPARTIDOS (Interacciones con Posts)
+    // ==========================================
+    // Estos sirven tanto para la campaña como para el foro general
+
     /**
-     * Obtener los mensajes de un hilo para la vista de Dialog "Chat"
+     * Obtener las respuestas de un hilo (ya sea un hilo de campaña o del foro general)
      * @param {number|string} postId - ID del post padre
      * @param {string|null} cursor 
      * @param {number} limit 
@@ -59,7 +134,7 @@ const PostService = {
     },
 
     /**
-     * Actualizar el contenido de un post
+     * Actualizar el contenido de un post (o título/tags si es el hilo principal)
      * @param {number|string} postId 
      * @param {Object} updateData 
      */
@@ -74,7 +149,7 @@ const PostService = {
     },
 
     /**
-     * Moderar un post (Solo DM: Bloquear hilo o Fijarlo)
+     * Moderar un post (Bloquear hilo o Fijarlo)
      * @param {number|string} postId 
      * @param {Object} moderationData - { isPinned, isLocked }
      */
@@ -89,7 +164,7 @@ const PostService = {
     },
 
     /**
-     * Eliminar un post (Soft delete recomendado en backend)
+     * Eliminar un post (Soft delete)
      * @param {number|string} postId 
      */
     deletePost: async (postId) => {
@@ -103,4 +178,4 @@ const PostService = {
     }
 };
 
-export default PostService;
+export default ForumService;

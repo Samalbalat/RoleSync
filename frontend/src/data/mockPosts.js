@@ -184,3 +184,112 @@ export const mockReplies = [
         visibleToCharacterIds: []
     }
 ];
+
+export const mockGeneralThreads = [
+    {
+        id: "gen-1",
+        type: "THREAD_START",
+        title: "¿Mejores sistemas para Sci-Fi duro?",
+        tags: ["duda", "sci-fi", "sistemas"],
+        content: "Hola a todos, estoy buscando recomendaciones para dirigir una partida de naves con físicas realistas. Vengo de jugar mucho D&D y quiero cambiar un poco de aires. He mirado Traveller y The Expanse RPG, pero me gustaría saber vuestras opiniones y si hay algún sistema indie que merezca la pena probar. ¡Gracias!",
+        author: {
+            id: "prof-123",
+            profileName: "AlexRolero",
+            profileImage: "https://ui-avatars.com/api/?name=Alex&background=0D8ABC&color=fff"
+        },
+        createdAt: "2026-03-15T10:30:00Z",
+        isEdited: false,
+        isLocked: false,
+        replyCount: 14,
+        mediaUrls: []
+    },
+    {
+        id: "gen-2",
+        type: "THREAD_START",
+        title: "Busco mesa para jugar D&D 5e los domingos",
+        tags: ["lfg", "dnd5e", "online"],
+        content: "Buenas, tengo algo de experiencia y busco un grupo que acepte a un Bardo un poco caótico. Prometo no seducir al dragón (o al menos intentarlo). Tengo disponibilidad los domingos por la tarde, zona horaria GMT+1.",
+        author: {
+            id: "prof-456",
+            profileName: "LidiaD20",
+            profileImage: null
+        },
+        createdAt: "2026-03-14T18:15:00Z",
+        isEdited: true,
+        isLocked: false,
+        replyCount: 3,
+        mediaUrls: []
+    },
+    {
+        id: "gen-3",
+        type: "THREAD_START",
+        title: "¿Cómo gestionáis a los 'Murder Hobos'?",
+        tags: ["mastering", "debate"],
+        content: "Tengo un grupo que, literalmente, intenta matar a todos los NPCs que les pongo delante. El tabernero les cobra 1 cobre de más por la cerveza -> Puñalada. El guardia les pide identificación -> Bola de fuego. ¿Algún consejo para reconducir esto sin ser un DM tirano?",
+        author: {
+            id: "prof-789",
+            profileName: "DMSufriendo",
+            profileImage: "https://ui-avatars.com/api/?name=DM&background=ef4444&color=fff"
+        },
+        createdAt: "2026-03-16T09:00:00Z",
+        isEdited: false,
+        isLocked: true, // Bloqueado por salseo
+        replyCount: 42,
+        mediaUrls: []
+    },
+    {
+        id: 'thread-101',
+        title: '¿Qué sistema de magia prefieren para fantasía oscura?',
+        content: 'Hola a todos. Estoy creando una campaña de fantasía oscura y dudo si usar un sistema de magia vanciano clásico o algo más libre y peligroso, tipo tiradas que puedan salir muy mal (magia corrupta). ¿Qué os ha funcionado mejor a vosotros para dar sensación de peligro?\n\nCualquier consejo es bienvenido.',
+        tags: ['dudas', 'rol', 'mastering'],
+        author: {
+            id: 'user-1',
+            profileName: 'MiUsuario',
+            profileImage: null,
+        },
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), // Hace 2 días
+        isLocked: false,
+        replyCount: 5
+    },
+    {
+        id: 'thread-102',
+        title: 'Busco jugadores para campaña corta de Cyberpunk RED',
+        content: '¡Buenas! Tengo mono de dirigir algo de Cyberpunk RED. Sería una minicampaña de 3-4 sesiones centrada en un atraco a una corpo. \n\n**Horario:** Viernes por la tarde (hora España).\n**Plataforma:** Discord + Roll20.\n\nNo hace falta experiencia previa con el sistema, yo enseño a jugar. ¡Dejad comentario si os interesa!',
+        tags: ['busco-grupo', 'cyberpunk', 'online'],
+        author: {
+            id: 'user-1',
+            profileName: 'MiUsuario',
+            profileImage: 'https://ui-avatars.com/api/?name=MiUsuario&background=6366f1&color=fff',
+        },
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // Hace 5 horas
+        isLocked: false,
+        replyCount: 12
+    }
+];
+
+export const mockGeneralReplies = [
+    {
+        id: "rep-1",
+        parentPostId: "gen-1", // Pertenece al primer hilo de Sci-Fi
+        content: "Yo he probado The Expanse RPG y el sistema AGE está bastante bien, aunque si buscas físicas orbitales súper realistas igual se te queda algo corto y narrativo.",
+        author: {
+            id: "prof-999",
+            profileName: "MasterGalactico",
+            profileImage: null
+        },
+        createdAt: "2026-03-15T11:00:00Z",
+        isEdited: false
+    },
+    {
+        id: "rep-2",
+        parentPostId: "gen-1",
+        content: "Échale un ojo a **Traveller**. Es el abuelo de la ciencia ficción dura. El sistema de creación de personajes es un minijuego en sí mismo donde tu personaje puede morir antes de empezar a jugar jajaja.",
+        author: {
+            id: "prof-444",
+            profileName: "ViejoRolero",
+            profileImage: "https://ui-avatars.com/api/?name=VR&background=fbbf24&color=fff"
+        },
+        createdAt: "2026-03-15T12:30:00Z",
+        isEdited: true
+    }
+];

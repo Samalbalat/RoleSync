@@ -26,7 +26,8 @@
   "menu": {
     "findCampaign": "Buscar Campaña", 
     "createCampaign": "Crear Campaña",
-    "createCharacter": "Crear Personaje"
+    "createCharacter": "Crear Personaje",
+    "forum": "Foro"
   },
 
   "common": {
