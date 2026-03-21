@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardBody, Typography } from '@material-tailwind/react';
+import { Card, CardBody, Typography, Avatar } from '@material-tailwind/react';
 import { UserIcon, BookOpenIcon, TableCellsIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../../utils/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +23,8 @@ export function ProfileSelectionPage() {
 	const handleSelectProfile = profile => {
 		const activeData = {
 			name: profile.profileName,
-			type: profile.profileType,
+			type: profile.roleType,
+			image: profile.image || null,
 		};
 
 		localStorage.setItem('activeProfile', JSON.stringify(activeData));
@@ -35,7 +36,9 @@ export function ProfileSelectionPage() {
 		navigate('/');
 	};
 
-	const getIcon = type => {
+	const getIcon = (type, image) => {
+		if (image) return <Avatar src={image} alt='profile' size='xl' variant='circular' />;
+
 		if (type === 'WRITTEN') return <BookOpenIcon className='h-12 w-12 text-blue-500' />;
 		if (type === 'TABLETOP') return <TableCellsIcon className='h-12 w-12 text-red-500' />;
 		return <UserIcon className='h-12 w-12 text-gray-500' />;
@@ -49,38 +52,43 @@ export function ProfileSelectionPage() {
 
 	return (
 		<div
-			className='flex min-h-screen w-full bg-cover bg-center bg-no-repeat'
+			className='flex min-h-screen w-full bg-cover bg-center bg-no-repeat bg-fixed'
 			style={{ backgroundImage: "url('/papire-background.jpg')" }}
 		>
-			<div className='min-h-screen flex flex-col justify-center items-center p-4'>
-				<div className='w-full flex justify-center mt-4 md:mt-6'>
-					<img src='/logo.png' alt='Logo' className='h-40 md:h-72 w-auto object-contain' />
+			{/* Overlay para que el fondo no distraiga tanto de las cards */}
+			<div className='absolute inset-0 bg-black/30' />
+
+			<div className='relative z-10 min-h-screen w-full flex flex-col justify-center items-center p-4'>
+				<div className='flex justify-center mb-8'>
+					<img src='/logo.png' alt='Logo' className='h-32 md:h-56 w-auto object-contain drop-shadow-2xl' />
 				</div>
 
-				<Typography variant='h2' color='blue-gray' className='mt-8mb-8 text-center'>
+				<Typography variant='h2' color='white' className='mb-12 text-center drop-shadow-md'>
 					{t('auth.whoAreYou')}
 				</Typography>
 
-				<div className='flex flex-wrap gap-6 justify-center max-w-4xl'>
+				<div className='flex flex-wrap gap-8 justify-center max-w-5xl'>
 					{profiles.map(profile => (
-						<Card
-							key={`${profile.profileName}-${profile.profileType}`}
-							className='w-48 h-48 cursor-pointer hover:scale-105 transition-transform hover:shadow-xl border border-gray-200'
-							onClick={() => handleSelectProfile(profile)}
-						>
-							<CardBody className='flex flex-col items-center justify-center h-full gap-4'>
-								<div className='p-4 bg-gray-50 rounded-full'>{getIcon(profile.profileType)}</div>
-
-								<div className='text-center'>
-									<Typography variant='h5' color='blue-gray' className='font-bold capitalize'>
+						<div key={`${profile.profileName}-${profile.roleType}`} className='group'>
+							<Card
+								className='w-44 h-44 md:w-52 md:h-52 cursor-pointer bg-white/90 backdrop-blur-sm 
+                                           hover:bg-white border-2 border-transparent hover:border-orange-500 
+                                           transition-all duration-300 shadow-xl'
+								onClick={() => handleSelectProfile(profile)}
+							>
+								<CardBody className='flex flex-col items-center justify-center h-full p-4'>
+									<div className='p-4 bg-gray-100 rounded-full group-hover:bg-orange-50 transition-colors'>
+										{getIcon(profile.roleType, profile.image)}
+									</div>
+									<Typography variant='h5' color='blue-gray' className='mt-4 font-bold capitalize'>
 										{profile.profileName}
 									</Typography>
-									<Typography variant='small' color='gray' className='font-normal'>
-										{getLabel(profile.profileType)}
+									<Typography variant='small' className='font-medium text-orange-700 uppercase tracking-tighter'>
+										{getLabel(profile.roleType)}
 									</Typography>
-								</div>
-							</CardBody>
-						</Card>
+								</CardBody>
+							</Card>
+						</div>
 					))}
 				</div>
 			</div>

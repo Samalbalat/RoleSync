@@ -5,7 +5,6 @@ import MainLayout from './components/layout/MainLayout';
 import HomePage from './pages/HomePage';
 import RegisterPage from './pages/auth/RegisterPage';
 import LoginPage from './pages/auth/LoginPage';
-import AccountSettings from './pages/account/AccountSettings';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import PublicRoute from './components/auth/PublicRoute';
 import { AuthProvider } from './utils/AuthContext';
@@ -50,9 +49,6 @@ function App() {
 					<Route element={<ProtectedRoute />}>
 						<Route path='/' element={<MainLayout />}>
 							<Route index element={<HomePage />} />
-
-							{/* Rutas de Cuenta */}
-							<Route path='account/settings' element={<AccountSettings />} />
 
 							{/* Rutas de Campañas */}
 							<Route path='find-campaign' element={<FindCampaignPage />} />
