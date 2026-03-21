@@ -29,7 +29,7 @@ public class UtilsCalls {
 
     public String getProfileRelationToCampaign(String profileName, Campaign campaign) {
         Optional<Profile> profileOpt = profileRepository.findByProfilename(profileName);
-        if (profileOpt.isPresent()) {
+        if (profileOpt.isPresent() && campaign != null) {
             String profileNameRetrieved = profileOpt.get().getProfilename();
             Profile profile = profileOpt.get();
             if (profileNameRetrieved.equals(campaign.getOwnerName())) {
