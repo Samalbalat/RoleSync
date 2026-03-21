@@ -16,6 +16,10 @@ import CreateCampaignPage from './pages/campaign/CreateCampaignPage';
 import EditCampaignPage from './pages/campaign/EditCampaignPage';
 import TemplateBuilder from './components/character/TemplateBuilder';
 import CreateCharacterPage from './pages/character/CreateCharacterPage';
+import GeneralForumPage from './pages/forum/GeneralForumPage';
+import ThreadDetailPage from './pages/forum/ThreadDetailPage';
+import CreateGeneralPost from './components/forum/CreateGeneralPost';
+import MyPostsPage from './pages/forum/MyPostsPage';
 
 function App() {
 	return (
@@ -66,9 +70,14 @@ function App() {
 								}
 							/>
 							{/* onClick={() => navigate(`/character/templateBuilder?campaignId=${campaign.id}`)} /> */}
-
 							<Route path='createCharacter' element={<CreateCharacterPage />} />
 							{/* onClick={() => navigate(`/createCharacter?campaignId=${campaign.id}`)} */}
+
+							{/* Rutas de Foros generales */}
+							<Route path='forum' element={<GeneralForumPage />} />
+							<Route path='forum/my-posts' element={<MyPostsPage />} />
+							<Route path='forum/:id' element={<ThreadDetailPage />} />
+							<Route path='postForum' element={<CreateGeneralPost />} />
 						</Route>
 					</Route>
 					<Route path='*' element={<Navigate to='/' replace />} />

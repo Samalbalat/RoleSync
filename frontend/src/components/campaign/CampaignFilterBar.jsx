@@ -49,7 +49,7 @@ export default function CampaignFilterBar({ filters, setFilters, onClean, onSear
 				</div>
 				<Button color={theme.primary} onClick={onSearch} className='flex items-center gap-2'>
 					<MagnifyingGlassIcon className='h-4 w-4' />
-					<span className='hidden md:inline'>Buscar</span>
+					<span className='hidden md:inline'>{t('common.search')}</span>
 				</Button>
 
 				<Button
@@ -78,7 +78,7 @@ export default function CampaignFilterBar({ filters, setFilters, onClean, onSear
 				<div className='absolute top-full left-0 w-full mt-2 bg-white p-6 rounded-xl shadow-2xl border border-gray-100 z-50 animate-fade-in-down'>
 					<div className='flex justify-between items-center mb-4'>
 						<Typography variant='h6' color='blue-gray'>
-							{t('filter.filter')} {isWritten ? 'Narrativos' : 'de Mesa'}
+							{t('filter.filter')} {isWritten ? t('campaign.campaignNarrative') : t('campaign.campaignTable')}
 						</Typography>
 						<Button variant='text' size='sm' color='red' className='flex items-center gap-2' onClick={onClean}>
 							<TrashIcon className='h-4 w-4' /> {t('filter.cleanFilters')}
@@ -139,6 +139,10 @@ export default function CampaignFilterBar({ filters, setFilters, onClean, onSear
 							<Option value='Español'>Español</Option>
 							<Option value='English'>English</Option>
 							<Option value='Français'>Français</Option>
+							<Option value='Deutsch'>Deutsch</Option>
+							<Option value='Italiano'>Italiano</Option>
+							<Option value='Português'>Português</Option>
+							<Option value='Other'>Other</Option>
 						</Select>
 
 						<Select
@@ -180,13 +184,13 @@ export default function CampaignFilterBar({ filters, setFilters, onClean, onSear
 									color={theme.primary}
 									menuProps={fixedMenuProps}
 								>
-									<Option value='Lunes'>Lunes</Option>
-									<Option value='Martes'>Martes</Option>
-									<Option value='Miercoles'>Miercoles</Option>
-									<Option value='Jueves'>Jueves</Option>
-									<Option value='Viernes'>Viernes</Option>
-									<Option value='Sabado'>Sabado</Option>
-									<Option value='Domingo'>Domingo</Option>
+									<Option value='monday'>{t('dayWeek.monday')}</Option>
+									<Option value='tuesday'>{t('dayWeek.tuesday')}</Option>
+									<Option value='wednesday'>{t('dayWeek.wednesday')}</Option>
+									<Option value='thursday'>{t('dayWeek.thursday')}</Option>
+									<Option value='friday'>{t('dayWeek.friday')}</Option>
+									<Option value='saturday'>{t('dayWeek.saturday')}</Option>
+									<Option value='sunday'>{t('dayWeek.sunday')}</Option>
 								</Select>
 
 								<Input
@@ -201,7 +205,7 @@ export default function CampaignFilterBar({ filters, setFilters, onClean, onSear
 
 					<div className='mt-6 flex justify-end gap-2'>
 						<Button variant='text' color='gray' onClick={() => setOpenFilters(false)}>
-							Cancelar
+							{t('common.cancel')}
 						</Button>
 						<Button
 							className='w-full md:w-auto'
@@ -225,6 +229,6 @@ CampaignFilterBar.propTypes = {
 	filters: PropTypes.object.isRequired,
 	setFilters: PropTypes.func.isRequired,
 	onClean: PropTypes.func.isRequired,
-	onSearch: PropTypes.func.isRequired, // <-- Añade esta línea
+	onSearch: PropTypes.func.isRequired,
 	theme: PropTypes.object.isRequired,
 };

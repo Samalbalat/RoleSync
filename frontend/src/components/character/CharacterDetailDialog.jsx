@@ -19,7 +19,7 @@ import toast from 'react-hot-toast';
 const LoadingContent = ({ theme, t }) => (
 	<div className='flex flex-col items-center justify-center h-64 gap-4'>
 		<Spinner className={`h-12 w-12 text-${theme.primary}-500`} />
-		<Typography color='gray'>{t('character.message.loadingCharacter', 'Cargando personaje...')}</Typography>
+		<Typography color='gray'>{t('character.message.loadingCharacter')}</Typography>
 	</div>
 );
 
@@ -41,7 +41,7 @@ const CharacterHeader = ({ character, theme, t }) => (
 				{character.name}
 			</Typography>
 			<Typography variant='small' color='blue-gray' className='font-normal'>
-				{t('campaign.campaign')}: {character.campaign?.name || t('home.playerCharacters.noCampaign', 'Sin campaña')}
+				{t('campaign.campaign')}: {character.campaign?.name || t('home.playerCharacters.noCampaign')}
 			</Typography>
 		</div>
 	</DialogHeader>
@@ -72,7 +72,7 @@ const CharacterBody = ({ character, theme, t }) => {
 
 	const getDisplayValue = value => {
 		if (typeof value === 'boolean') {
-			return value ? t('common.yes', 'Sí') : t('common.no', 'No');
+			return value ? t('common.yes') : t('common.no');
 		}
 		// Si el valor está vacío, mostramos un guion para que no quede el hueco en blanco
 		return value !== null && value !== undefined && value !== '' ? value : '-';
@@ -83,7 +83,7 @@ const CharacterBody = ({ character, theme, t }) => {
 			{history && (
 				<div className='mb-6'>
 					<Typography variant='h6' color='blue-gray' className='mb-2'>
-						{t('character.history', 'Historia')}
+						{t('character.history')}
 					</Typography>
 					<Typography className='font-normal text-gray-600 whitespace-pre-line'>{history}</Typography>
 				</div>
@@ -92,7 +92,7 @@ const CharacterBody = ({ character, theme, t }) => {
 			{description && (
 				<div className='mb-6'>
 					<Typography variant='h6' color='blue-gray' className='mb-2'>
-						{t('character.description', 'Descripción')}
+						{t('character.description')}
 					</Typography>
 					<Typography className='font-normal text-gray-600 whitespace-pre-line'>{description}</Typography>
 				</div>
@@ -101,7 +101,7 @@ const CharacterBody = ({ character, theme, t }) => {
 			{standardAttributes.length > 0 && (
 				<>
 					<Typography variant='h6' color='blue-gray' className='mb-4'>
-						{t('character.attributes', 'Atributos')}
+						{t('character.attributes')}
 					</Typography>
 
 					<div className='grid grid-cols-2 gap-4'>
@@ -131,7 +131,7 @@ const CharacterBody = ({ character, theme, t }) => {
 			{!history && !description && standardAttributes.length === 0 && (
 				<div className='text-center py-10'>
 					<Typography color='gray' className='italic'>
-						{t('character.noAttributes', 'Este personaje aún no tiene detalles.')}
+						{t('character.noAttributes')}
 					</Typography>
 				</div>
 			)}
@@ -173,7 +173,7 @@ export default function CharacterDetailDialog({ open, handleClose, characterId }
 					<CharacterBody character={character} theme={theme} t={t} />
 					<DialogFooter className='border-t border-gray-200'>
 						<Button variant='text' color='blue-gray' onClick={handleClose}>
-							{t('common.close', 'Cerrar')}
+							{t('common.close')}
 						</Button>
 					</DialogFooter>
 				</>

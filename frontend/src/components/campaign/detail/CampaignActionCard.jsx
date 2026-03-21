@@ -29,7 +29,7 @@ export default function CampaignActionCard({
 			return (
 				<div className='text-center space-y-4'>
 					<Typography variant='h5' className={`${themeColor.textPrimary}`}>
-						{t('campaign.message.manageCampaign') || 'Gestionar Campaña'}
+						{t('campaign.message.manageCampaign')}
 					</Typography>
 
 					<Button
@@ -41,7 +41,7 @@ export default function CampaignActionCard({
 						onClick={() => navigate(`/campaigns/edit/${campaign.id}`)}
 					>
 						<PencilSquareIcon className='h-5 w-5' />
-						{t('common.edit') || 'Editar'}
+						{t('common.edit')}
 					</Button>
 
 					{campaignTemplate ? (
@@ -56,7 +56,7 @@ export default function CampaignActionCard({
 							}
 						>
 							<DocumentCheckIcon className='h-5 w-5' />
-							{t('character.templateBuilder.editTemplate') || 'Editar Plantilla'}
+							{t('character.templateBuilder.editTemplate')}
 						</Button>
 					) : (
 						<Button
@@ -68,7 +68,7 @@ export default function CampaignActionCard({
 							onClick={() => navigate(`/character/templateBuilder?campaignId=${campaign.id}`)}
 						>
 							<DocumentPlusIcon className='h-5 w-5' />
-							{t('character.templateBuilder.createTemplate') || 'Crear Plantilla'}
+							{t('character.templateBuilder.createTemplate')}
 						</Button>
 					)}
 				</div>
@@ -82,7 +82,7 @@ export default function CampaignActionCard({
 			return (
 				<div className='text-center space-y-4'>
 					<Typography variant='h6' color='blue-gray' className='mb-2'>
-						{t('campaign.message.playerMessage') || 'Eres miembro de esta campaña'}
+						{t('campaign.message.playerMessage')}
 					</Typography>
 
 					{hasCharacter ? (
@@ -106,13 +106,13 @@ export default function CampaignActionCard({
 								onClick={() => navigate(`/character/edit/${campaign.characterId}`)}
 							>
 								<PencilSquareIcon className='h-4 w-4' />
-								{t('character.editCharacter') || 'Editar Personaje'}
+								{t('character.editCharacter')}
 							</Button>
 						</div>
 					) : (
 						<div className={`${themeColor.bgLight} p-5 rounded-xl border ${themeColor.border} mb-4 shadow-inner`}>
 							<Typography variant='small' className={`${themeColor.textPrimary} mb-4 font-medium`}>
-								{t('campaign.message.needsCharacter') || 'Aún no tienes un personaje asociado a esta campaña.'}
+								{t('campaign.message.needsCharacter')}
 							</Typography>
 							<Button
 								fullWidth
@@ -123,7 +123,7 @@ export default function CampaignActionCard({
 								onClick={() => navigate(`/createCharacter?campaignId=${campaign.id}`)}
 							>
 								<DocumentPlusIcon className='h-5 w-5' />
-								{t('character.createCharacter') || 'Crear Personaje'}
+								{t('character.createCharacter')}
 							</Button>
 						</div>
 					)}
@@ -134,16 +134,16 @@ export default function CampaignActionCard({
 		// VISITANTE O PENDIENTE
 		const isPending = relation === 'PENDING';
 		const getButtonText = () => {
-			if (isPending) return t('campaign.detail.pending') || 'Solicitud enviada';
-			if (isFull) return t('campaign.detail.joinFull') || 'Campaña llena';
-			return t('campaign.detail.join') || 'Solicitar unirse';
+			if (isPending) return t('campaign.detail.pending');
+			if (isFull) return t('campaign.detail.joinFull');
+			return t('campaign.detail.join');
 		};
 
 		return (
 			<div className='mb-0'>
 				<div className='flex justify-between items-center mb-2'>
 					<Typography variant='h6' color='blue-gray'>
-						{t('campaign.detail.players') || 'Jugadores'}
+						{t('campaign.detail.players')}
 					</Typography>
 					<Typography variant='small' className='font-bold text-gray-600'>
 						{campaign.currentPlayers} / {campaign.maxPlayers}
@@ -152,9 +152,8 @@ export default function CampaignActionCard({
 				<Progress value={progress} color={isFull ? 'red' : 'green'} className='h-2 mb-4' />
 				<Typography variant='small' className='text-gray-500 mb-6 text-center'>
 					{isFull
-						? t('campaign.detail.fullMessage') || 'La campaña está llena'
-						: t('campaign.detail.spotsLeft', { count: campaign.maxPlayers - campaign.currentPlayers }) ||
-							`Quedan ${campaign.maxPlayers - campaign.currentPlayers} plazas`}
+						? t('campaign.detail.fullMessage')
+						: t('campaign.detail.spotsLeft', { count: campaign.maxPlayers - campaign.currentPlayers })}
 				</Typography>
 
 				<Button

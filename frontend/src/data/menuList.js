@@ -1,5 +1,4 @@
-import { UserPlusIcon } from '@heroicons/react/24/outline';
-import { DocumentMagnifyingGlassIcon, PencilSquareIcon } from '@heroicons/react/24/solid';
+import { ChatBubbleLeftRightIcon, DocumentMagnifyingGlassIcon, PencilSquareIcon, UserPlusIcon } from '@heroicons/react/24/solid';
 
 export const menuItems = [
 	{
@@ -17,5 +16,10 @@ export const menuItems = [
 		path: '/createCharacter',
 		icon: UserPlusIcon,
 	},
+	{
+		label: 'menu.forum',
+		path: '/forum',
+		icon: ChatBubbleLeftRightIcon,
+	}
 	
 ];

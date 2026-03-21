@@ -74,11 +74,11 @@ export default function FreeStyleCharacterForm() {
 		// 3. Llamada a la API
 		try {
 			await CharacterService.createCharacter(payload);
-			toast.success(`¡Personaje ${data.name} creado con éxito!`);
+			toast.success(t('character.message.successCreating', { name: payload.name }));
 			setTimeout(() => navigate('/characters'), 1500);
 		} catch (error) {
 			console.error('Error al guardar el personaje:', error);
-			toast.error('Hubo un error al guardar el personaje.');
+			toast.error(t('character.message.errorCreating'));
 		}
 	};
 

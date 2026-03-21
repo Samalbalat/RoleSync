@@ -86,21 +86,21 @@ export default function CampaignDetailPage() {
 				setCharacters(data || []);
 			} catch (error) {
 				console.error('Error fetching campaign characters:', error);
-				toast.error('Error al cargar los personajes de la campaña');
+				toast.error(t('campaign.errors.fetchCharacters'));
 			} finally {
 				setLoading(false);
 			}
 		};
 
 		fetchCharacters();
-	}, [id]);
+	}, [id, t]);
 
 	if (loading) {
 		return (
 			<div className='flex justify-center items-center h-screen'>
 				<Spinner className={`h-8 w-8 text-${theme.primary}-500`} />
 				<Typography variant='h5' color='blue-gray'>
-					Cargando campaña...
+					{t('common.loading')}
 				</Typography>
 			</div>
 		);
@@ -155,10 +155,10 @@ export default function CampaignDetailPage() {
 						/>
 						<div>
 							<Typography variant='small' className='text-gray-500 font-medium'>
-								Game Master
+								{t('profile.master')}
 							</Typography>
 							<Typography variant='h6' color='blue-gray'>
-								{campaign.owner?.profileName || 'Dungeon Master'}
+								{campaign.owner?.profileName}
 							</Typography>
 						</div>
 					</CardBody>
@@ -169,7 +169,7 @@ export default function CampaignDetailPage() {
 
 	const tabsData = [
 		{
-			label: 'Información',
+			label: t('campaign.generalInfo'),
 			value: 'info',
 			content: <CampaignAbout campaign={campaign} isWritten={isWritten} isFull={isFull} t={t} />,
 		},
@@ -177,7 +177,7 @@ export default function CampaignDetailPage() {
 
 	if (hasForum) {
 		tabsData.push({
-			label: isWritten ? 'Rol en Vivo' : 'Foro de Campaña',
+			label: isWritten ? t('forum.campaignc.roleplay') : t('forum.forum'),
 			value: 'roleplay',
 			content: (
 				<CampaignTimeline
@@ -201,7 +201,7 @@ export default function CampaignDetailPage() {
 					className={`flex items-center gap-2 pl-0 ${theme.textSecondary}`}
 					onClick={() => navigate('/find-campaign')}
 				>
-					<ArrowLeftIcon className='h-4 w-4' /> {t('common.back') || 'Volver'}
+					<ArrowLeftIcon className='h-4 w-4' /> {t('common.back')}
 				</Button>
 			</div>
 
@@ -223,11 +223,7 @@ export default function CampaignDetailPage() {
 						<div className='absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 md:p-8'>
 							<div className='flex gap-2 mb-3'>
 								<Chip
-									value={
-										campaign.status === 'OPEN' || campaign.status === 'ACTIVE'
-											? t('status.open') || 'Abierta'
-											: t('status.full') || 'Cerrada'
-									}
+									value={campaign.status === 'OPEN' || campaign.status === 'ACTIVE' ? t('status.open') : t('status.full')}
 									color={isFull ? 'red' : 'green'}
 									className='rounded-full'
 									size='sm'

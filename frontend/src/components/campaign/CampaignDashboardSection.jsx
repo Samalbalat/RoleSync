@@ -85,11 +85,7 @@ export default function CampaignDashboardSection({ campaigns, role }) {
 			</div>
 
 			{campaigns.length > 0 ? (
-				<div
-					ref={scrollRef}
-					// IMPORTANTE: Quitamos "scrollbar-hide" y añadimos "custom-scrollbar"
-					className='flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 pt-1 px-1 custom-scrollbar'
-				>
+				<div ref={scrollRef} className='flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 pt-1 px-1 custom-scrollbar'>
 					{campaigns.map(campaign => (
 						<div key={campaign.id} className='min-w-[260px] sm:min-w-[280px] snap-start flex-shrink-0'>
 							<CampaignMiniCard

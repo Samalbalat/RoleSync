@@ -5,10 +5,11 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import PostCard from './PostCard';
 import PostEditor from './PostEditor';
 import { mockReplies } from '../../data/mockPosts';
+import { useTranslation } from 'react-i18next';
 
 const ThreadDialog = ({ open, handleClose, post }) => {
+	const { t } = useTranslation('global');
 	if (!post) return null;
-
 	const replies = mockReplies;
 
 	const myMockCharacter = {
@@ -31,7 +32,7 @@ const ThreadDialog = ({ open, handleClose, post }) => {
 			{/* CABECERA DEL DIALOG */}
 			<DialogHeader className='flex justify-between items-center border-b border-gray-200 bg-white p-4 rounded-t-lg shrink-0'>
 				<Typography variant='h5' color='blue-gray' className='font-bold'>
-					Hilo de conversación
+					{t('forum.dialog.title')}
 				</Typography>
 				<IconButton variant='text' color='blue-gray' onClick={handleClose}>
 					<XMarkIcon className='h-6 w-6 stroke-2' />
@@ -44,7 +45,7 @@ const ThreadDialog = ({ open, handleClose, post }) => {
 					{/* 1. MENSAJE PRINCIPAL (Padre) */}
 					<div>
 						<Typography variant='small' className='text-gray-500 font-bold uppercase tracking-wider mb-2 ml-1'>
-							Mensaje Original
+							{t('forum.dialog.originalMessage')}
 						</Typography>
 						<PostCard post={post} isTimelineView={false} />
 					</div>
@@ -53,7 +54,7 @@ const ThreadDialog = ({ open, handleClose, post }) => {
 					<div className='flex items-center gap-4 py-2'>
 						<div className='h-px bg-gray-300 flex-1'></div>
 						<Typography variant='small' className='text-gray-500 font-medium'>
-							{replies.length} respuestas
+							{replies.length} {t('forum.replies')}
 						</Typography>
 						<div className='h-px bg-gray-300 flex-1'></div>
 					</div>
@@ -65,7 +66,7 @@ const ThreadDialog = ({ open, handleClose, post }) => {
 						))}
 
 						{replies.length === 0 && (
-							<Typography className='text-center text-gray-400 py-4 italic'>Nadie ha respondido aún. ¡Anímate!</Typography>
+							<Typography className='text-center text-gray-400 py-4 italic'>{t('forum.noReplies')}</Typography>
 						)}
 					</div>
 				</div>
@@ -73,12 +74,12 @@ const ThreadDialog = ({ open, handleClose, post }) => {
 				{/* 3. ZONA PARA RESPONDER (Fijada abajo) */}
 				{post.isLocked ? (
 					<div className='p-4 bg-gray-100 border-t border-gray-200 text-center italic text-gray-500 shrink-0'>
-						Este hilo ha sido bloqueado por el DM. No se pueden agregar nuevas respuestas.
+						{t('forum.dialog.locked')}
 					</div>
 				) : (
 					<div className='p-4 bg-white border-t border-gray-200 shrink-0'>
 						<Typography variant='small' className='text-gray-600 font-bold mb-2 ml-1'>
-							Tu respuesta
+							{t('forum.dialog.replyToThread')}
 						</Typography>
 
 						<PostEditor campaignId={post.campaignId} myCharacter={myMockCharacter} otherCharacters={[]} />

@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardBody, Typography } from '@material-tailwind/react';
 import { UserIcon, BookOpenIcon, TableCellsIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../../utils/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 export function ProfileSelectionPage() {
 	const navigate = useNavigate();
+	const { t } = useTranslation('global');
 	const { setActiveProfile, setAccount } = useAuth();
 	const [profiles, setProfiles] = useState([]);
 
@@ -40,8 +42,8 @@ export function ProfileSelectionPage() {
 	};
 
 	const getLabel = type => {
-		if (type === 'WRITTEN') return 'Rol Narrativo';
-		if (type === 'TABLETOP') return 'Rol de Mesa';
+		if (type === 'WRITTEN') return t('profile.narrative');
+		if (type === 'TABLETOP') return t('profile.table');
 		return type;
 	};
 
@@ -56,7 +58,7 @@ export function ProfileSelectionPage() {
 				</div>
 
 				<Typography variant='h2' color='blue-gray' className='mt-8mb-8 text-center'>
-					¿Quién eres hoy?
+					{t('auth.whoAreYou')}
 				</Typography>
 
 				<div className='flex flex-wrap gap-6 justify-center max-w-4xl'>

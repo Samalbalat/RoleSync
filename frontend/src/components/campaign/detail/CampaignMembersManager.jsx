@@ -113,7 +113,7 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 								></span>
 								<span className={`relative inline-flex rounded-full h-3 w-3 ${themeColor.bgDark}`}></span>
 							</span>
-							{t('campaign.members.pendingRequests') || 'Solicitudes Pendientes'} ({requests.length})
+							{t('campaign.members.pendingRequests')} {requests.length}
 						</Typography>
 						<div className='space-y-3'>
 							{requests.map((req, index) => (
@@ -132,12 +132,12 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 												{req.profileName}
 											</Typography>
 											<Typography variant='small' className='text-gray-500 italic text-xs mt-1'>
-												"{req.message || 'Sin mensaje'}"
+												"{req.message}"
 											</Typography>
 										</div>
 									</div>
 									<div className='flex items-center gap-2 self-end sm:self-auto'>
-										<Tooltip content={t('common.accept') || 'Aceptar'}>
+										<Tooltip content={t('common.accept')}>
 											<Button
 												size='sm'
 												color='green'
@@ -149,7 +149,7 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 												<CheckIcon className='h-5 w-5' />
 											</Button>
 										</Tooltip>
-										<Tooltip content={t('common.reject') || 'Rechazar'}>
+										<Tooltip content={t('common.reject')}>
 											<Button
 												size='sm'
 												color='red'
@@ -173,12 +173,12 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 			<Card className='shadow-sm border border-gray-200'>
 				<CardBody className='p-4'>
 					<Typography variant='h6' color='blue-gray' className='mb-4'>
-						{t('campaign.members.currentMembers') || 'Jugadores Actuales'} ({participants.length})
+						{t('campaign.members.currentMembers')} ({participants.length})
 					</Typography>
 
 					{participants.length === 0 ? (
 						<Typography variant='small' className='text-gray-500 text-center py-4'>
-							{t('campaign.members.noMembers') || 'Aún no hay jugadores en esta campaña.'}
+							{t('campaign.members.noMembers')}
 						</Typography>
 					) : (
 						<div className='space-y-2'>
@@ -197,7 +197,7 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 											{player.profileName}
 										</Typography>
 									</div>
-									<Tooltip content={t('campaign.members.kick') || 'Expulsar'}>
+									<Tooltip content={t('campaign.members.kick')}>
 										<Button
 											size='sm'
 											color='red'
@@ -222,7 +222,7 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 						<ExclamationTriangleIcon className='h-8 w-8' />
 					</div>
 					<Typography variant='h5' color='blue-gray' className='text-center'>
-						{t('campaign.members.kickConfirmTitle') || '¿Expulsar jugador?'}
+						{t('campaign.members.kickConfirmTitle')}
 					</Typography>
 				</DialogHeader>
 				<DialogBody className='text-center pt-0 pb-6 px-6'>
@@ -234,10 +234,10 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 				</DialogBody>
 				<DialogFooter className='flex justify-center gap-3 pb-6'>
 					<Button variant='text' color='gray' onClick={handleCloseKickModal}>
-						{t('common.cancel') || 'Cancelar'}
+						{t('common.cancel')}
 					</Button>
 					<Button variant='gradient' color='red' onClick={confirmKick}>
-						{t('campaign.members.kick') || 'Sí, expulsar'}
+						{t('campaign.members.kick')}
 					</Button>
 				</DialogFooter>
 			</Dialog>

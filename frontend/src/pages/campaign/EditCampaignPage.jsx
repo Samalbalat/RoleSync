@@ -30,7 +30,6 @@ const AccessDeniedView = ({ t, navigate }) => (
 AccessDeniedView.propTypes = {
 	t: PropTypes.func.isRequired,
 	navigate: PropTypes.func.isRequired,
-	id: PropTypes.string.isRequired,
 };
 
 export default function EditCampaignPage() {

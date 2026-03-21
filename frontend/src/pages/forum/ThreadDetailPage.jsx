@@ -1,0 +1,171 @@
+import React from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
+import { Typography, Avatar, Button, Chip } from '@material-tailwind/react';
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { mockGeneralThreads, mockGeneralReplies } from '../../data/mockPosts';
+import PostEditor from '../../components/forum/PostEditor';
+import { useTranslation } from 'react-i18next';
+
+const renderMarkdown = content => {
+	const rawHtml = marked.parse(content || '');
+	const cleanHtml = DOMPurify.sanitize(rawHtml);
+	return { __html: cleanHtml };
+};
+
+const ThreadDetailPage = () => {
+	const { t } = useTranslation('global');
+	const { id } = useParams();
+	const navigate = useNavigate();
+
+	// Simulamos la llamada a la API: GET /forums/threads/{threadId}
+	const thread = mockGeneralThreads.find(t => t.id === id);
+
+	// Simulamos la llamada a la API: GET /posts/{threadId}/replies
+	const replies = mockGeneralReplies.filter(r => r.parentPostId === id);
+
+	if (!thread) {
+		return <div className='p-8 text-center text-gray-500'>Hilo no encontrado.</div>;
+	}
+
+	// Función de ayuda para la fecha
+	const formatDate = isoString => {
+		return new Date(isoString).toLocaleDateString('es-ES', {
+			day: 'numeric',
+			month: 'long',
+			year: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit',
+		});
+	};
+
+	return (
+		<div className='max-w-4xl mx-auto py-8 px-4 w-full flex flex-col gap-6'>
+			{/* BOTÓN VOLVER */}
+			<div>
+				<Button
+					variant='text'
+					color='blue-gray'
+					className='flex items-center gap-2 px-3 py-2'
+					onClick={() => navigate('/forum')}
+				>
+					<ArrowLeftIcon className='w-4 h-4' strokeWidth={2.5} />
+					{t('common.back')}
+				</Button>
+			</div>
+
+			{/* HILO ORIGINAL (POST PADRE) */}
+			<div className='bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-indigo-100 relative overflow-hidden'>
+				{/* Decoración de fondo */}
+				<div className='absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-full -z-0 opacity-50'></div>
+
+				<div className='relative z-10'>
+					<Typography variant='h3' color='blue-gray' className='font-black mb-3 leading-tight'>
+						{thread.title}
+					</Typography>
+
+					{/* TAGS */}
+					{thread.tags && (
+						<div className='flex gap-2 mb-6'>
+							{thread.tags.map(tag => (
+								<Chip
+									key={tag}
+									value={`#${tag}`}
+									size='sm'
+									variant='ghost'
+									className='rounded-full bg-indigo-50 text-indigo-700 lowercase'
+								/>
+							))}
+						</div>
+					)}
+
+					{/* AUTOR DEL HILO */}
+					<div className='flex items-center gap-3 mb-6 pb-6 border-b border-gray-100'>
+						<Avatar
+							src={thread.author.profileImage || `https://ui-avatars.com/api/?name=${thread.author.profileName}`}
+							alt={thread.author.profileName}
+							size='md'
+						/>
+						<div>
+							<Typography variant='h6' color='blue-gray' className='text-sm'>
+								{thread.author.profileName}
+							</Typography>
+							<Typography variant='small' className='text-gray-500 text-xs'>
+								{t('forum.campaign.publishedOn')} {formatDate(thread.createdAt)}
+							</Typography>
+						</div>
+					</div>
+
+					{/* CONTENIDO DEL HILO */}
+					<Typography
+						as='div'
+						className='text-gray-800 leading-relaxed prose prose-sm max-w-none'
+						dangerouslySetInnerHTML={renderMarkdown(thread.content)}
+					/>
+				</div>
+			</div>
+
+			{/* RESPUESTAS */}
+			<div className='flex flex-col gap-4 mt-4'>
+				<Typography variant='h5' color='blue-gray' className='font-bold border-b border-gray-200 pb-2'>
+					{t('forum.replies')} ({replies.length})
+				</Typography>
+
+				{replies.length > 0 ? (
+					replies.map(reply => (
+						<div key={reply.id} className='bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex gap-4'>
+							{/* Avatar lateral (estilo foro clásico) */}
+							<div className='flex flex-col items-center shrink-0 w-16'>
+								<Avatar
+									src={
+										reply.author.profileImage ||
+										`https://ui-avatars.com/api/?name=${reply.author.profileName}&background=f3f4f6`
+									}
+									alt={reply.author.profileName}
+									size='sm'
+								/>
+							</div>
+
+							{/* Contenido de la respuesta */}
+							<div className='flex-1'>
+								<div className='flex justify-between items-start mb-2'>
+									<Typography variant='small' color='blue-gray' className='font-bold'>
+										{reply.author.profileName}
+									</Typography>
+									<Typography variant='small' className='text-gray-400 text-[10px]'>
+										{formatDate(reply.createdAt)} {reply.isEdited && '(editado)'}
+									</Typography>
+								</div>
+								<Typography
+									as='div'
+									className='text-gray-700 text-sm whitespace-pre-wrap prose prose-sm max-w-none'
+									dangerouslySetInnerHTML={renderMarkdown(reply.content)}
+								/>
+							</div>
+						</div>
+					))
+				) : (
+					<Typography className='text-gray-500 italic py-4 text-center'>{t('forum.campaign.noReplies')}</Typography>
+				)}
+			</div>
+
+			{/* EDITOR PARA RESPONDER */}
+			{thread.isLocked ? (
+				<div className='mt-8 p-4 bg-red-50 text-red-800 rounded-xl text-center border border-red-200'>
+					<Typography className='font-bold'>{t('forum.campaign.lockedThread')}</Typography>
+					<Typography variant='small'>{t('forum.campaign.noNewReplies')}</Typography>
+				</div>
+			) : (
+				<div className='mt-8'>
+					<Typography variant='h6' color='blue-gray' className='mb-4'>
+						{t('forum.yourReply')}
+					</Typography>
+					<PostEditor isGeneralForum={true} currentUser={{ id: 'user-1', profileName: 'MiUsuario', profileImage: null }} />
+				</div>
+			)}
+		</div>
+	);
+};
+
+export default ThreadDetailPage;

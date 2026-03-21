@@ -22,13 +22,12 @@
       "noCampaign": "Sin campaña"
     }
   },
-
   "menu": {
-    "findCampaign": "Buscar Campaña", 
+    "findCampaign": "Buscar Campaña",
     "createCampaign": "Crear Campaña",
-    "createCharacter": "Crear Personaje"
+    "createCharacter": "Crear Personaje",
+    "forum": "Foro"
   },
-
   "common": {
     "welcome": "Bienvenido a RoleSync",
     "name": "Nombre",
@@ -48,9 +47,13 @@
     "no": "No",
     "send": "Enviar",
     "reject": "Rechazar",
-    "accept": "Aceptar"
+    "accept": "Aceptar",
+    "sending": "Enviando",
+    "search": "Buscar",
+    "loading": "Cargando...",
+    "enter": "Entrar",
+    "other": "Otro"
   },
-
   "dayWeek": {
     "monday": "Lunes",
     "tuesday": "Martes",
@@ -60,20 +63,17 @@
     "saturday": "Sábado",
     "sunday": "Domingo"
   },
-
   "frequency": {
     "oneShot": "One-Shot",
     "weekly": "Semanal",
     "biweekly": "Quincenal",
     "monthly": "Mensual"
   },
-
   "communication": {
     "inPerson": "En persona",
     "here": "Aquí en RoleSync",
     "other": "Otro (mencionar en la descripción)"
   },
-
   "errors": {
     "required": "Este campo es obligatorio",
     "invalidEmail": "El formato del correo no es válido",
@@ -84,13 +84,16 @@
     "maxTags": "No puedes agregar más de 6 etiquetas",
     "tooLong1000": "No puede exceder los 1000 caracteres",
     "invalidMinMax": "Los valores mínimo y máximo deben ser números válidos",
-    "minMaxOrder": "El valor mínimo no puede ser mayor que el máximo"
+    "minMaxOrder": "El valor mínimo no puede ser mayor que el máximo",
+    "fetchCharacter": "No se ha encontrado el personaje.",
+    "fetchCharacters": "Error al cargar los personajes"
   },
-
   "auth": {
     "login": "Iniciar Sesión",
     "signUp": "Registrarse",
     "logout": "Cerrar Sesión",
+    "whoAreYou": "¿Qué te apetece hacer hoy?",
+    "alreadyRegistered": "¿Ya tienes cuenta?",
     "enterEmailPassword": "Ingrese su correo electrónico y contraseña para iniciar sesión",
     "notRegistered": "No está registrado",
     "createAccount": "Crear cuenta",
@@ -105,7 +108,6 @@
     "successRegistration": "¡Registro exitoso! Ahora puedes iniciar sesión.",
     "successLogin": "¡Inicio de sesión exitoso!"
   },
-
   "account": {
     "name": "Nombre",
     "email": "Correo Electrónico",
@@ -113,52 +115,59 @@
     "confirmPassword": "Confirmar Contraseña",
     "timeZone": "Zona Horaria"
   },
-
   "profile": {
     "profileName": "Nombre del Perfil",
     "description": "Descripción",
     "rolType": "Tipo de Rol",
     "narrative": "Narrativo",
-    "table": "Mesa"
+    "table": "Mesa",
+    "master": "Master",
+    "masterYou": "Master (tú)"
   },
-
-  "campaign": { 
+  "campaign": {
     "campaign": "Campaña",
-    "name": "Nombre", 
+    "campaignNarrative": "Campaña Narrativa",
+    "campaignTable": "Campaña de Mesa",
+    "name": "Nombre",
     "image": "Imagen",
     "description": "Descripción",
-    "type": "Tipo", 
+    "type": "Tipo",
     "system": "Sistema",
     "language": "Idioma",
-    "timeZone": "Zona Horaria", 
+    "timeZone": "Zona Horaria",
     "theme": "Temática",
     "themes": "Temáticas",
     "frequency": "Frecuencia",
     "tagHelper": "Presiona",
     "location": "Lugar",
-    "dayWeek": "Día de la Semana", 
+    "dayWeek": "Día de la Semana",
     "duration": "Duración",
     "communication": "Comunicación",
     "maxPlayers": "Máximo de Jugadores",
     "logistics": "Logística",
     "accessDeniedMessage": "No estás autorizado para ver esta campaña.",
-    "fraseFinder": "Encuentra tu próxima ", 
-    "adventure": "Aventura", 
-    "fraseCreator": "Crea tu propia campaña" ,
-    "cleanFilters": "Limpiar filtros", 
+    "fraseFinder": "Encuentra tu próxima ",
+    "adventure": "Aventura",
+    "fraseCreator": "Crea tu propia campaña",
+    "cleanFilters": "Limpiar filtros",
     "noResultsFound": "No se encontraron resultados.",
     "createTitle": "Crear Nueva Campaña",
     "generalInfo": "Información General",
     "placeholder": {
-      "theme": "E.j.: Vampiros, Sci-Fi...",
+      "themes": "E.j.: Vampiros, Sci-Fi...",
       "location": "E.j.: Sevilla, Online...",
-      "communication": "E.j.: Discord, Twitter..." 
+      "communication": "E.j.: Discord, Twitter...",
+      "duration": "1 hora, 3 horas, etc"
     },
-    "message":{
-      "manageCampaign":"Gestionar Campaña",
-      "technicalDetails":"Detalles Técnicos y DM",
-      "playerMessage":"Eres jugador en esta aventura.",
-      "needsCharacter": "Aún no tienes un personaje asociado a esta campaña."
+    "message": {
+      "manageCampaign": "Gestionar Campaña",
+      "technicalDetails": "Detalles Técnicos y DM",
+      "playerMessage": "Eres jugador en esta aventura.",
+      "needsCharacter": "Aún no tienes un personaje asociado a esta campaña.",
+      "currentMaxPlayers": "Jugadores actuales / Máximos",
+      "successCreate": "¡Campaña creada con éxito!",
+      "successUpdate": "¡Campaña actualizada con éxito!",
+      "errorCreate": "Hubo un error al crear la campaña. Por favor, inténtalo de nuevo más tarde."
     },
     "detail": {
       "about": "Sobre la Campaña",
@@ -193,10 +202,13 @@
       "kickConfirmTitle": "Confirmación de Eliminación",
       "kickConfirmDesc1": "Estás a punto de eliminar a ",
       "kickConfirmDesc2": " de la campaña. Esta acción no se puede deshacer y el jugador tendrá que enviar una nueva solicitud si desea unirse nuevamente."
-    }
+    },
+    "errors": {
+      "fetchCharacters": "Error al cargar los personajes de la campaña"
+    },
+    "roleplay": "Rol en vivo"
   },
-
-  "character":{
+  "character": {
     "characters": "Personajes",
     "history": "Historia y Trasfondo",
     "description": "Descripción",
@@ -234,8 +246,11 @@
       "successUpdate": "¡Plantilla actualizada correctamente!",
       "errorNoFields": "Debes añadir al menos un campo a la plantilla.",
       "errorNoCampaignId": "Error: No se encontró el ID de la campaña.",
+      "errorLoadCharacter": "Error al cargar los datos de la plantilla.",
       "errorSave": "Hubo un error al guardar la plantilla.",
-      "errorNoName": "Debes darle un nombre a la plantilla."
+      "errorNoName": "Debes darle un nombre a la plantilla.",
+      "loadigData": "Cargando datos de la plantilla...",
+      "range": "| Rango: "
     },
     "form": {
       "title": "Crear Personaje",
@@ -255,24 +270,129 @@
     "message": {
       "loadingCharacter": "Cargando perfil del personaje...",
       "complete": "Completa la ficha según las reglas de esta campaña.",
-      "errorLoading": "Error al cargar la plantilla de la campaña. Por favor, inténtalo de nuevo más tarde."
+      "errorLoading": "Error al cargar la plantilla de la campaña. Por favor, inténtalo de nuevo más tarde.",
+      "errorCreating": "Error creando al personaje",
+      "successCreating": "¡Personaje {{name}} creado con éxito!"
     },
     "list": {
       "withoutCharacters": "Aún no hay jugadores en esta campaña."
-    }
+    },
+    "editCharacter": "Editar Personaje",
+    "noAttributes": "Este personaje aún no tiene detalles."
   },
-
   "status": {
     "open": "Abierta",
-    "full": "Completa"
+    "full": "Completa",
+    "closed": "Cerrada",
+    "ongoing": "En Curso"
   },
-
-  "filter": { 
+  "filter": {
     "filter": "Filtrar",
     "searchLabel": "Buscar por nombre",
     "close": "Cerrar",
     "cleanFilters": "Limpiar filtros",
     "applyFilters": "Aplicar filtros"
-}
-
+  },
+  "forum": {
+    "forum": "Foro",
+    "reply": "Respuesta",
+    "replies": "Respuestas",
+    "noticeMaster": "Aviso Master",
+    "campaign": {
+      "table": "Foro de la Campaña",
+      "narrative": "Timeline de la Partida",
+      "pinned": "Mensajes Fijados del Master",
+      "needCharacter": "¡Necesitas un personaje!",
+      "needCharacterDescTable": "Para poder publicar mensajes en el foro primero debes crear un personaje y asignarlo a esta campaña.",
+      "needCharacterDescNarrative": "Para poder publicar mensajes en la timeline primero debes crear un personaje y asignarlo a esta campaña.",
+      "emptyTable": "El foro está vacío.",
+      "emptyNarrative": "El rol está vacío. ¡Sé el primero en hablar!",
+      "oocMessage": "Mensaje OOC",
+      "oocDescription": "Haz clic en la tarjeta para abrir el hilo y leerlo",
+      "revealOoc": "Revelar mensaje OOC",
+      "openThread": "Abrir Hilo",
+      "publishedOn": "Publicado el",
+      "noReplies": "Aún no hay respuestas. ¡Sé el primero en aportar algo!",
+      "lockedThread": "Este hilo ha sido bloqueado.",
+      "noNewReplies": "Ya no se admiten nuevas respuestas en este debate."
+    },
+    "general": {
+      "comunityForum": "Foro de la Comunidad",
+      "myPosts": "Mis Posts",
+      "newThread": "Nuevo Post",
+      "create": {
+        "success": "¡Hilo creado con éxito!",
+        "error": "Hubo un problema al crear el hilo.",
+        "newThread": "Crear Nuevo Hilo",
+        "newThreadDesc": "Abre un nuevo hilo en el foro general para la comunidad.",
+        "title": "Título del debate",
+        "titleRequired": "El título es obligatorio",
+        "titleMinLength": "El título debe tener al menos 5 caracteres",
+        "titleMaxLength": "El título no puede exceder los 100 caracteres",
+        "tags": "Etiquetas (separadas por comas)",
+        "tagsPlaceholder": "ej. dudas, reglas, off-topic",
+        "content": "Contenido de tu publicación (Soporta Markdown)",
+        "contentPlaceholder": "Escribe aquí el contenido de tu publicación...",
+        "contentRequired": "El contenido es obligatorio",
+        "contentMinLength": "El contenido debe tener al menos 10 caracteres",
+        "addImage": "Añadir Imagen",
+        "hideImage": "Ocultar Imagen",
+        "imageUrl": "Pega la URL de la imagen aquí...",
+        "invalidImageUrl": "La URL de imagen no parece válida.",
+        "submitting": "Publicando...",
+        "submit": "Publicar hilo"
+      },
+      "searchThreads": "Buscar Posts",
+      "noResults": "No se encontraron resultados.",
+      "tryDifferentKeywords": "Prueba con otras palabras o crea un hilo nuevo."
+    },
+    "whisper": "Susurro",
+    "public": "Público",
+    "occMode": "Modo OOC",
+    "quote": "Cita",
+    "secretMessage": "Mensaje Secreto",
+    "unpinMessage": "Desfijar post",
+    "pinMessage": "Fijar post",
+    "unlockResponses": "Desbloquear respuestas",
+    "lockResponses": "Bloquear respuestas",
+    "pinned": "Fijado",
+    "blocked": "Bloqueado",
+    "noReplies": "Nadie ha respondido aún. ¡Anímate!",
+    "postEditor": {
+      "generalPlaceholder": "Escribe tu respuesta al hilo...",
+      "tabletopDmPlaceholder": "Escribe un aviso para el foro de la mesa...",
+      "tabletopPlayerPlaceholder": "Escribe tu mensaje en la timeline...",
+      "dmPlaceholder": "Escribe un aviso oficial para la partida...",
+      "oocPlaceholder": "Escribe un mensaje fuera de rol para el grupo...",
+      "secretPlaceholder": "Escribe tu susurro secreto...",
+      "defaultPlaceholder": "Describe tu acción, palabras o pensamientos...",
+      "imagePlaceholder": "Pega la URL de la imagen aquí...",
+      "addImage": "Añadir Imagen",
+      "format": "Formato",
+      "whoCanSee": "¿Quién puede verlo?",
+      "noMoreCharacters": "No hay más personajes"
+    },
+    "dialog": {
+      "title": "Hilo de conversación",
+      "originalMessage": "Mensaje Original",
+      "close": "Cerrar",
+      "locked": "Este hilo ha sido bloqueado por el DM. No se pueden agregar nuevas respuestas.",
+      "replyToThread": "Tu respuesta"
+    },
+    "campaignc": {
+      "roleplay": "Rol en vivo"
+    },
+    "myPosts": {
+      "title": "Mis Posts",
+      "subtitle": "Historial de los hilos que has iniciado en la comunidad.",
+      "emptyTitle": "Aún no has publicado nada",
+      "emptySubtitle": "Anímate a abrir tu primer debate en la comunidad.",
+      "emptyButton": "Ir al Foro General"
+    },
+    "yourReply": "Tu respuesta"
+  },
+  "footer": {
+    "copyright": "My Application. All rights reserved",
+    "madeWithLove": "Made with ❤️ by Samu A.O. and Alex S.H."
+  }
 }

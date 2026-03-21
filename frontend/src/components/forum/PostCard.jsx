@@ -4,6 +4,7 @@ import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import { LockClosedIcon, LockOpenIcon, ChatBubbleLeftIcon, EyeSlashIcon, MegaphoneIcon } from '@heroicons/react/24/outline';
 import { TbPinnedFilled, TbPinned } from 'react-icons/tb';
+import { useTranslation } from 'react-i18next';
 
 marked.use({
 	breaks: true,
@@ -19,6 +20,7 @@ const PostCard = ({
 	onToggleLock,
 	isTabletop,
 }) => {
+	const { t } = useTranslation('global');
 	// 1. Convertir el contenido Markdown a HTML puro
 	const rawHtml = marked.parse(post.content || '');
 	// 2. Limpiar el HTML para evitar inyecciones maliciosas (XSS)
@@ -83,7 +85,7 @@ const PostCard = ({
 						)}
 					</div>
 					<div className='flex flex-col items-start'>
-						<span className='font-bold text-sm text-gray-900'>{post.authorCharacterName || 'Dungeon Master'}</span>
+						<span className='font-bold text-sm text-gray-900'>{post.authorCharacterName || 'Master'}</span>
 						<div className='flex items-center gap-2 text-xs text-gray-500 font-medium mt-0.5'>
 							<span>{formattedDate}</span>
 							{post.isEdited && <span className='italic'>(Editado)</span>}
@@ -95,17 +97,17 @@ const PostCard = ({
 							{isDmAnnouncement && (
 								<span className='bg-blue-600 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase flex items-center gap-1 shadow-sm'>
 									<MegaphoneIcon className='w-3 h-3 text-white' />
-									Aviso DM
+									{t('forum.noticeMaster')}
 								</span>
 							)}
-							{isSecret && <span className='text-purple-600 font-bold text-[10px] uppercase'>Susurro</span>}
+							{isSecret && <span className='text-purple-600 font-bold text-[10px] uppercase'>{t('forum.whisper')}</span>}
 						</div>
 					</div>
 				</div>
 
 				{/* ICONOS DE ESTADO (Pineado, Bloqueado, Secreto) */}
 				<div className='flex items-center gap-1.5 text-gray-400'>
-					{isSecret && <EyeSlashIcon className='w-5 h-5 text-purple-500' title='Mensaje Secreto' />}
+					{isSecret && <EyeSlashIcon className='w-5 h-5 text-purple-500' title={t('forum.secretMessage')} />}
 
 					{isCurrentUserDM ? (
 						<>
@@ -116,7 +118,7 @@ const PostCard = ({
 									onTogglePin?.(e, post.id);
 								}}
 								className={`flex items-center justify-center p-1.5 rounded-full transition-colors ${post.isPinned ? 'text-orange-500 hover:bg-orange-50' : 'text-gray-500 hover:text-orange-500 hover:bg-gray-100'}`}
-								title={post.isPinned ? 'Desfijar mensaje' : 'Fijar mensaje'}
+								title={post.isPinned ? t('forum.unpinMessage') : t('forum.pinMessage')}
 							>
 								{post.isPinned ? <TbPinnedFilled className='w-5 h-5' /> : <TbPinned className='w-5 h-5' />}
 							</button>
@@ -129,7 +131,7 @@ const PostCard = ({
 										onToggleLock?.(e, post.id);
 									}}
 									className={`flex items-center justify-center p-1.5 rounded-full transition-colors ${post.isLocked ? 'text-red-500 hover:bg-red-50' : 'text-gray-500 hover:text-red-500 hover:bg-gray-100'}`}
-									title={post.isLocked ? 'Desbloquear respuestas' : 'Bloquear respuestas'}
+									title={post.isLocked ? t('forum.unlockResponses') : t('forum.lockResponses')}
 								>
 									{post.isLocked ? <LockClosedIcon className='w-5 h-5' /> : <LockOpenIcon className='w-5 h-5' />}
 								</button>
@@ -138,9 +140,11 @@ const PostCard = ({
 					) : (
 						/* VISTA PARA JUGADORES NORMALES */
 						<>
-							{post.isPinned && <TbPinnedFilled className='w-5 h-5 text-orange-500' title='Fijado' />}
+							{post.isPinned && <TbPinnedFilled className='w-5 h-5 text-orange-500' title={t('forum.pinned')} />}
 							{/* Oculto el icono del candado si es Tabletop */}
-							{!isTabletop && post.isLocked && <LockClosedIcon className='w-5 h-5 text-red-500' title='Bloqueado' />}
+							{!isTabletop && post.isLocked && (
+								<LockClosedIcon className='w-5 h-5 text-red-500' title={t('forum.blocked')} />
+							)}
 						</>
 					)}
 				</div>
@@ -150,8 +154,8 @@ const PostCard = ({
 			{hideInTimeline ? (
 				// VISTA TIMELINE: Caja resumen en lugar del texto
 				<div className='mt-2 p-3 bg-white/50 border border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center gap-1 text-gray-500'>
-					<span className='text-sm font-medium'>Mensaje OOC</span>
-					<span className='text-xs'>Haz clic en la tarjeta para abrir el hilo y leerlo</span>
+					<span className='text-sm font-medium'>{t('forum.campaign.oocMessage')}</span>
+					<span className='text-xs'>{t('forum.campaign.oocDescription')}</span>
 				</div>
 			) : (
 				// VISTA DENTRO DEL HILO: Contenido normal o difuminado
@@ -185,7 +189,7 @@ const PostCard = ({
 					{blurInThread && (
 						<div className='absolute inset-0 bg-gray-100/20 flex items-center justify-center'>
 							<div className='bg-white text-gray-700 px-4 py-2 rounded-full text-sm font-bold shadow-md border border-gray-200 flex items-center gap-2 group-hover:scale-105 transition-transform'>
-								<EyeSlashIcon className='w-4 h-4' /> Revelar mensaje OOC
+								<EyeSlashIcon className='w-4 h-4' /> {t('forum.campaign.revealOoc')}
 							</div>
 						</div>
 					)}
@@ -197,7 +201,9 @@ const PostCard = ({
 				<div className='mt-4 pt-3 border-t border-gray-100 flex justify-end'>
 					<div className='flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-800 font-bold transition-colors'>
 						<ChatBubbleLeftIcon className='w-5 h-5' />
-						<span>Abrir Hilo {post.isLocked && '(Bloqueado)'}</span>
+						<span>
+							{t('forum.campaign.openThread')} {post.isLocked && '(Bloqueado)'}
+						</span>
 					</div>
 				</div>
 			)}
