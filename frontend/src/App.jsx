@@ -19,6 +19,7 @@ import GeneralForumPage from './pages/forum/GeneralForumPage';
 import ThreadDetailPage from './pages/forum/ThreadDetailPage';
 import CreateGeneralPost from './components/forum/CreateGeneralPost';
 import MyPostsPage from './pages/forum/MyPostsPage';
+import { ProfileDetailsPage } from './pages/profile/ProfileDetailsPage';
 
 function App() {
 	return (
@@ -49,6 +50,9 @@ function App() {
 					<Route element={<ProtectedRoute />}>
 						<Route path='/' element={<MainLayout />}>
 							<Route index element={<HomePage />} />
+
+							{/* Rutas de Perfil */}
+							<Route path='profile' element={<ProfileDetailsPage />} />
 
 							{/* Rutas de Campañas */}
 							<Route path='find-campaign' element={<FindCampaignPage />} />

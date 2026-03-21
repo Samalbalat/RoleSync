@@ -99,7 +99,7 @@
     "accessDenied": "Access Denied",
     "errorInvalidCredentials": "Invalid email or password",
     "errorEmailInUse": "Email is already in use",
-    "errorConnection": "Connection error. Please try again later.",
+    "errorConnection": "Connection error. \nMaybe the email or password is wrong, if not, try again later.",
     "errorNoProfilesFound": "Error: No associated profiles were found.",
     "errorNotAuthenticated": "You must be logged in to access this page.",
     "errorAuthenticated": "You are already logged in.",
