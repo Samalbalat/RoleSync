@@ -254,7 +254,7 @@ export function RegisterPage() {
 					</Button>
 
 					<Typography variant='small' color='gray' className='!mt-4 text-center font-normal'>
-						¿Ya tienes cuenta?{' '}
+						{t('auth.alreadyRegistered')}{' '}
 						<a href='/login' className='font-medium text-gray-900 transition-colors hover:text-blue-500'>
 							{t('auth.login')}
 						</a>

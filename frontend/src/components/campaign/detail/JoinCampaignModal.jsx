@@ -20,7 +20,7 @@ export default function JoinCampaignModal({ isOpen, onClose, campaignId, onSucce
 			onClose();
 		} catch (err) {
 			console.error('Error al solicitar unirse:', err);
-			setError(t('campaign.join.error') || 'Ocurrió un error al enviar la solicitud.');
+			setError(t('campaign.join.error'));
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -30,16 +30,13 @@ export default function JoinCampaignModal({ isOpen, onClose, campaignId, onSucce
 		<Dialog open={isOpen} handler={onClose} size='sm'>
 			<DialogHeader className='flex flex-col items-start gap-1'>
 				<Typography variant='h4' color='blue-gray'>
-					{t('campaign.join.title') || 'Unirse a la campaña'}
+					{t('campaign.join.title')}
 				</Typography>
 			</DialogHeader>
 			<DialogBody>
-				<Typography className='mb-4 text-gray-600 font-normal'>
-					{t('campaign.join.description') ||
-						'Escribe un mensaje para el Master explicándole por qué te gustaría unirte y qué tipo de personaje tienes en mente.'}
-				</Typography>
+				<Typography className='mb-4 text-gray-600 font-normal'>{t('campaign.join.description')}</Typography>
 				<Textarea
-					label={t('campaign.join.messageLabel') || 'Tu mensaje'}
+					label={t('campaign.join.messageLabel')}
 					value={message}
 					onChange={e => setMessage(e.target.value)}
 					rows={4}
@@ -53,7 +50,7 @@ export default function JoinCampaignModal({ isOpen, onClose, campaignId, onSucce
 			</DialogBody>
 			<DialogFooter className='space-x-2'>
 				<Button variant='text' color='gray' onClick={onClose} disabled={isSubmitting}>
-					{t('common.cancel') || 'Cancelar'}
+					{t('common.cancel')}
 				</Button>
 				<Button
 					variant='gradient'
@@ -62,7 +59,7 @@ export default function JoinCampaignModal({ isOpen, onClose, campaignId, onSucce
 					disabled={isSubmitting || !message.trim()}
 					className='flex items-center gap-2'
 				>
-					{isSubmitting ? t('common.sending') || 'Enviando...' : t('common.send') || 'Enviar Solicitud'}
+					{isSubmitting ? t('common.sending') : t('common.send')}
 				</Button>
 			</DialogFooter>
 		</Dialog>

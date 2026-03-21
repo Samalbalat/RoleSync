@@ -4,9 +4,11 @@ import { ArrowLeftIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
 import GeneralListCard from '../../components/forum/GeneralListCard';
 import { mockGeneralThreads } from '../../data/mockPosts';
+import { useTranslation } from 'react-i18next';
 
 const MyPostsPage = () => {
 	const navigate = useNavigate();
+	const { t } = useTranslation('global');
 	const [myPosts, setMyPosts] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 
@@ -15,18 +17,11 @@ const MyPostsPage = () => {
 		const fetchMyPosts = async () => {
 			setIsLoading(true);
 			try {
-				// AQUÍ IRÍA LA LLAMADA REAL:
-				// const data = await ForumService.getMyThreads(1, 20);
-				// setMyPosts(data.threads);
-
-				// SIMULACIÓN: Filtramos los mockPosts asumiendo que el "user-1" es el actual
-				// o simplemente cogemos un par para demostrar la UI.
-				await new Promise(resolve => setTimeout(resolve, 800)); // Fake delay
+				await new Promise(resolve => setTimeout(resolve, 800));
 				const filteredPosts = mockGeneralThreads.filter(
 					t => t.author.id === 'user-1' || t.author.profileName === 'MiUsuario',
 				);
 
-				// Si no hay ninguno de 'user-1' en el mock, metemos un par al azar para que se vea algo en pruebas
 				setMyPosts(filteredPosts.length > 0 ? filteredPosts : [mockGeneralThreads[0]]);
 			} catch (error) {
 				console.error('Error cargando mis posts:', error);
@@ -49,7 +44,7 @@ const MyPostsPage = () => {
 					onClick={() => navigate('/forum')}
 				>
 					<ArrowLeftIcon className='w-4 h-4' strokeWidth={2.5} />
-					Volver al foro general
+					{t('common.back')}
 				</Button>
 
 				<div className='flex items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100'>
@@ -58,9 +53,9 @@ const MyPostsPage = () => {
 					</div>
 					<div>
 						<Typography variant='h3' color='blue-gray' className='font-black'>
-							Mis Publicaciones
+							{t('forum.myPosts.title')}
 						</Typography>
-						<Typography className='text-gray-500 mt-1'>Historial de los hilos que has iniciado en la comunidad.</Typography>
+						<Typography className='text-gray-500 mt-1'>{t('forum.myPosts.subtitle')}</Typography>
 					</div>
 				</div>
 			</div>
@@ -70,7 +65,7 @@ const MyPostsPage = () => {
 				{isLoading ? (
 					<div className='flex flex-col items-center justify-center py-12'>
 						<Spinner className='h-10 w-10 text-indigo-500' />
-						<Typography className='mt-4 text-gray-500'>Cargando tus publicaciones...</Typography>
+						<Typography className='mt-4 text-gray-500'>{t('common.loading')}</Typography>
 					</div>
 				) : myPosts.length > 0 ? (
 					myPosts.map(thread => <GeneralListCard key={thread.id} thread={thread} />)
@@ -78,13 +73,13 @@ const MyPostsPage = () => {
 					<div className='py-16 text-center text-gray-500 bg-white rounded-2xl border border-dashed border-gray-300 shadow-sm'>
 						<DocumentTextIcon className='w-12 h-12 mx-auto text-gray-300 mb-3' />
 						<Typography variant='h5' color='blue-gray'>
-							Aún no has publicado nada
+							{t('forum.myPosts.emptyTitle')}
 						</Typography>
 						<Typography variant='small' className='mb-6 mt-1'>
-							Anímate a abrir tu primer debate en la comunidad.
+							{t('forum.myPosts.emptySubtitle')}
 						</Typography>
 						<Button color='indigo' variant='outlined' onClick={() => navigate('/forum')}>
-							Ir al Foro General
+							{t('forum.myPosts.emptyButton')}
 						</Button>
 					</div>
 				)}

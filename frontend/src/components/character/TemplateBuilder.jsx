@@ -76,7 +76,7 @@ export default function TemplateBuilder() {
 					}
 				} catch (error) {
 					console.error('Error al cargar la plantilla:', error);
-					toast.error('Error al cargar los datos de la plantilla.');
+					toast.error(t('character.templateBuilder.errorLoadCharacter'));
 				} finally {
 					setIsLoading(false);
 				}
@@ -84,7 +84,7 @@ export default function TemplateBuilder() {
 
 			fetchTemplateData();
 		}
-	}, [templateId, isEditMode]);
+	}, [templateId, isEditMode, t]);
 
 	const generateInternalKey = label => {
 		const cleanLabel = label
@@ -202,7 +202,7 @@ export default function TemplateBuilder() {
 			// --- DECISIÓN: ¿CREAR O ACTUALIZAR? ---
 			if (isEditMode) {
 				await CharacterService.updateTemplate(templateId, payload);
-				toast.success(t('character.templateBuilder.successUpdate') || 'Plantilla actualizada con éxito');
+				toast.success(t('character.templateBuilder.successUpdate'));
 			} else {
 				await CharacterService.createTemplate(payload);
 				toast.success(t('character.templateBuilder.successSave'));
@@ -213,7 +213,7 @@ export default function TemplateBuilder() {
 			}, 1000);
 		} catch (error) {
 			console.error('Error al guardar la plantilla:', error);
-			toast.error(t('character.templateBuilder.errorSave') || 'Error al procesar la plantilla');
+			toast.error(t('character.templateBuilder.errorSave'));
 		}
 	};
 
@@ -222,19 +222,19 @@ export default function TemplateBuilder() {
 			<div className='flex flex-col items-center justify-center h-[60vh] gap-4'>
 				<Spinner className={`h-10 w-10 ${theme.primary}`} />
 				<Typography variant='h5' color='blue-gray'>
-					Cargando datos de la plantilla...
+					{t('character.templateBuilder.loadigData')}
 				</Typography>
 			</div>
 		);
 	}
+	const rangeMin = field => (field.min !== '' && field.min !== null ? field.min : '-');
+	const rangeMax = field => (field.max !== '' && field.max !== null ? field.max : '-');
 
 	return (
 		<div className='w-full max-w-4xl mx-auto p-4 space-y-6'>
 			<div className='text-center'>
 				<Typography variant='h3' color='blue-gray'>
-					{isEditMode
-						? t('character.templateBuilder.titleEdit') || 'Editar Plantilla de Personaje'
-						: t('character.templateBuilder.title')}
+					{isEditMode ? t('character.templateBuilder.titleEdit') : t('character.templateBuilder.title')}
 				</Typography>
 				<Typography color='gray' className='mt-1 font-normal'>
 					{t('character.templateBuilder.description')}
@@ -244,7 +244,7 @@ export default function TemplateBuilder() {
 			<Card className='w-full shadow-sm border border-blue-gray-100'>
 				<CardBody>
 					<Input
-						label={t('character.templateBuilder.templateName') || 'Nombre de la Plantilla (ej: Ficha D&D 5e)'}
+						label={t('character.templateBuilder.templateName')}
 						value={templateName}
 						onChange={e => setTemplateName(e.target.value)}
 						required
@@ -272,8 +272,11 @@ export default function TemplateBuilder() {
 									<Typography variant='small' color='gray' className='font-mono'>
 										{t('character.templateBuilder.type')}: {fieldTypes.find(t => t.value === field.type)?.label}
 										{field.type === 'number' &&
-											(field.min !== '' || field.max !== '') &&
-											` | Rango: [${field.min !== '' && field.min !== null ? field.min : '-'} a ${field.max !== '' && field.max !== null ? field.max : '-'}]`}
+											(field.min !== '' || field.max !== '')(
+												<>
+													{t('character.templateBuilder.range')}: {rangeMin(field)} - {rangeMax(field)}
+												</>,
+											)}
 									</Typography>
 								</div>
 								<div className='flex gap-2'>
@@ -384,9 +387,7 @@ export default function TemplateBuilder() {
 
 			<form onSubmit={handleSubmitTemplate} className='flex justify-end mt-8 border-t pt-6'>
 				<Button type='submit' color='green' size='lg' disabled={fields.length === 0}>
-					{isEditMode
-						? t('character.templateBuilder.updateTemplate') || 'Actualizar Plantilla'
-						: t('character.templateBuilder.saveTemplate')}
+					{isEditMode ? t('character.templateBuilder.updateTemplate') : t('character.templateBuilder.saveTemplate')}
 				</Button>
 			</form>
 		</div>

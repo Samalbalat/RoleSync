@@ -1,4 +1,4 @@
-{ 
+{
   "home": {
     "yourCampaigns": "Your campaigns",
     "campaignPhrase": "The worlds you lead and the adventures you explore.",
@@ -22,14 +22,12 @@
       "noCampaign": "No campaign"
     }
   },
-  
   "menu": {
-    "findCampaign": "Find Campaign", 
+    "findCampaign": "Find Campaign",
     "createCampaign": "Create Campaign",
     "createCharacter": "Create Character",
     "forum": "Forum"
   },
-
   "common": {
     "welcome": "Welcome to RoleSync",
     "name": "Name",
@@ -49,9 +47,13 @@
     "no": "No",
     "send": "Send",
     "reject": "Reject",
-    "accept": "Accept"
+    "accept": "Accept",
+    "sending": "Sending",
+    "search": "Search",
+    "loading": "Loading...",
+    "enter": "Enter",
+    "other": "Other"
   },
-
   "dayWeek": {
     "monday": "Monday",
     "tuesday": "Tuesday",
@@ -61,20 +63,17 @@
     "saturday": "Saturday",
     "sunday": "Sunday"
   },
-
   "frequency": {
     "oneShot": "One-Shot",
     "weekly": "Weekly",
     "biweekly": "Biweekly",
     "monthly": "Monthly"
   },
-
   "communication": {
     "inPerson": "In person",
     "here": "Here in RoleSync",
     "other": "Other (mention in description)"
   },
-
   "errors": {
     "required": "This field is required",
     "invalidEmail": "The email format is not valid",
@@ -85,9 +84,10 @@
     "maxTags": "You cannot add more than 6 tags",
     "tooLong1000": "Cannot exceed 1000 characters",
     "invalidMinMax": "Minimum and maximum values must be valid numbers",
-    "minMaxOrder": "Minimum value cannot be greater than maximum value"
+    "minMaxOrder": "Minimum value cannot be greater than maximum value",
+    "fetchCharacter": "The character has not been found.",
+    "fetchCharacters": "Error loading characters"
   },
-
   "auth": {
     "login": "Login",
     "signUp": "Sign Up",
@@ -104,9 +104,9 @@
     "errorNotAuthenticated": "You must be logged in to access this page.",
     "errorAuthenticated": "You are already logged in.",
     "successRegistration": "Registration successful! You can now log in.",
-    "successLogin": "Login successful!"
+    "successLogin": "Login successful!",
+    "whoAreYou": "What do you feel like doing today?"
   },
-
   "account": {
     "name": "Name",
     "email": "Email",
@@ -114,30 +114,32 @@
     "confirmPassword": "Confirm Password",
     "timeZone": "Time Zone"
   },
-
   "profile": {
     "profileName": "Profile Name",
     "description": "Description",
     "rolType": "Role Type",
     "narrative": "Narrative",
-    "table": "Table"
+    "table": "Table",
+    "master": "Master",
+    "masterYou": "Master (you)"
   },
-
   "campaign": {
     "campaign": "Campaign",
-    "name": "Name", 
+    "campaignNarrative": "Narrative Campaign",
+    "campaignTable": "Table Campaign",
+    "name": "Name",
     "image": "Image",
     "description": "Description",
-    "type": "Type", 
+    "type": "Type",
     "system": "System",
     "language": "Language",
-    "timeZone": "Time Zone", 
+    "timeZone": "Time Zone",
     "theme": "Theme",
     "themes": "Themes",
     "frequency": "Frequency",
     "tagHelper": "Press",
     "location": "Location",
-    "dayWeek": "Week Day", 
+    "dayWeek": "Week Day",
     "duration": "Duration",
     "communication": "Communication",
     "maxPlayers": "Maximum Players",
@@ -145,21 +147,25 @@
     "accessDeniedMessage": "You are not authorized to view this campaign.",
     "fraseFinder": "Find your next ",
     "adventure": "Adventure",
-    "fraseCreator": "Create your own campaign" ,
-    "cleanFilters": "Clear filters", 
+    "fraseCreator": "Create your own campaign",
+    "cleanFilters": "Clear filters",
     "noResultsFound": "No results found.",
     "createTitle": "Create New Campaign",
     "generalInfo": "General Information",
     "placeholder": {
-      "theme": "E.g.: Vampires, Sci-Fi...",
+      "themes": "E.g.: Vampires, Sci-Fi...",
       "location": "E.g.: Seville, Online...",
-      "communication": "E.g.: Discord, Twitter..." 
+      "communication": "E.g.: Discord, Twitter...",
+      "duration": "1 hour, 3 hour, etc"
     },
-    "message":{
-      "manageCampaign":"Manage Campaign",
-      "technicalDetails":"Technical Details and DM",
-      "playerMessage":"You are a player in this adventure",
-      "needsCharacter": "You don't have a character associated with this campaign yet."
+    "message": {
+      "manageCampaign": "Manage Campaign",
+      "technicalDetails": "Technical Details and DM",
+      "playerMessage": "You are a player in this adventure",
+      "needsCharacter": "You don't have a character associated with this campaign yet.",
+      "currentMaxPlayers": "Current Players / Max",
+      "successCreate": "Campaign created successfully!",
+      "errorCreate": "There was an error creating the campaign. \nPlease try again later."
     },
     "detail": {
       "about": "About the Campaign",
@@ -193,9 +199,9 @@
       "kickConfirmTitle": "Kick Confirmation",
       "kickConfirmDesc1": "You are about to remove ",
       "kickConfirmDesc2": " from the campaign. This action cannot be undone and the player will have to send a new request if they want to join again."
-    }
+    },
+    "roleplay": "live role"
   },
-
   "character": {
     "characters": "Characters",
     "history": "History and Background",
@@ -235,7 +241,10 @@
       "errorNoFields": "You must add at least one field to the template.",
       "errorNoCampaignId": "Error: Campaign ID not found.",
       "errorSave": "There was an error saving the template.",
-      "errorNoName": "You must give the template a name."
+      "errorNoName": "You must give the template a name.",
+      "errorLoadCharacter": "Error loading template data.",
+      "loadigData": "Loading template data...",
+      "range": "| \nRange:"
     },
     "form": {
       "title": "Create Character",
@@ -255,24 +264,126 @@
     "message": {
       "loadingCharacter": "Loading character profile...",
       "complete": "Complete the character sheet according to the rules of this campaign.",
-      "errorLoading": "Error loading campaign template. Try again later."
+      "errorLoading": "Error loading campaign template. Try again later.",
+      "errorCreating": "Error creating character",
+      "successCreating": "Character {{name}} successfully created!"
     },
     "list": {
       "withoutCharacters": "There are no adventurers forged in this campaign yet."
-    }
+    },
+    "editCharacter": "Edit Character",
+    "noAttributes": "This character still has no details."
   },
-
   "status": {
     "open": "Open",
-    "full": "Full"
+    "full": "Full",
+    "closed": "Closed",
+    "ongoing": "Ongoing"
   },
-
-  "filter": { 
-    "filter":"Filter",
+  "filter": {
+    "filter": "Filter",
     "searchLabel": "Search by name",
-    "close":"Close",
+    "close": "Close",
     "cleanFilters": "Clear filters",
     "applyFilters": "Apply Filters"
-    }
-
+  },
+  "forum": {
+    "campaign": {
+      "table": "Campaign Forum",
+      "narrative": "Game Timeline",
+      "pinned": "Master's Pinned Messages",
+      "needCharacter": "You need a character!",
+      "needCharacterDescTable": "In order to post messages on the forum you must first create a character and assign them to this campaign.",
+      "needCharacterDescNarrative": "In order to publish messages on the timeline you must first create a character and assign them to this campaign.",
+      "emptyTable": "The forum is empty.",
+      "emptyNarrative": "The role is empty. \nBe the first to speak!",
+      "oocMessage": "OOC message",
+      "oocDescription": "Click on the card to open the thread and read it",
+      "revealOoc": "Reveal OOC message",
+      "openThread": "Open Thread",
+      "publishedOn": "Published on",
+      "noReplies": "There are no answers yet. \nBe the first to contribute something!",
+      "lockedThread": "This thread has been blocked.",
+      "noNewReplies": "New responses are no longer allowed in this debate."
+    },
+    "general": {
+      "create": {
+        "success": "Thread created successfully!",
+        "error": "There was a problem creating the thread.",
+        "newThread": "Create New Thread",
+        "newThreadDesc": "Open a new thread in the general community forum.",
+        "title": "Debate title",
+        "titleRequired": "Title is required",
+        "titleMinLength": "Title must be at least 5 characters",
+        "titleMaxLength": "Title cannot exceed 100 characters",
+        "tags": "Tags (separated by commas)",
+        "tagsPlaceholder": "e.g. \ndoubts, rules, off-topic",
+        "content": "Content of your publication (Supports Markdown)",
+        "hideImage": "Hide Image",
+        "addImage": "Add Image",
+        "contentMinLength": "Content must be at least 10 characters",
+        "contentRequired": "Content is required",
+        "contentPlaceholder": "Write the content of your publication here...",
+        "imageUrl": "Paste the image URL here...",
+        "invalidImageUrl": "The image URL does not appear valid.",
+        "submit": "Post thread",
+        "submitting": "Posting..."
+      },
+      "comunityForum": "Community Forum",
+      "myPosts": "My Posts",
+      "newThread": "New Post",
+      "searchThreads": "Search Posts",
+      "noResults": "No results found.",
+      "tryDifferentKeywords": "Try other words or create a new thread."
+    },
+    "reply": "Reply",
+    "replies": "Replies",
+    "whisper": "Whisper",
+    "secretMessage": "Secret Message",
+    "unpinMessage": "Unpin post",
+    "pinMessage": "Pin post",
+    "unlockResponses": "Unlock answers",
+    "lockResponses": "Block responses",
+    "pinned": "Fixed",
+    "blocked": "Blocked",
+    "postEditor": {
+      "generalPlaceholder": "Write your response to the thread...",
+      "tabletopDmPlaceholder": "Write a notice for the table forum...",
+      "tabletopPlayerPlaceholder": "Write your message on the timeline...",
+      "dmPlaceholder": "Write an official notice for the game...",
+      "oocPlaceholder": "Write an out-of-role message for the group...",
+      "secretPlaceholder": "Write your secret whisper...",
+      "defaultPlaceholder": "Describe your action, words or thoughts...",
+      "imagePlaceholder": "Paste the image URL here...",
+      "addImage": "Add Image",
+      "format": "Format",
+      "noMoreCharacters": "There are no more characters",
+      "whoCanSee": "Who can see it?"
+    },
+    "public": "Public",
+    "occMode": "OOC mode",
+    "dialog": {
+      "title": "Conversation thread",
+      "originalMessage": "Original Message",
+      "locked": "This thread has been blocked by the DM. \nNew answers cannot be added.",
+      "replyToThread": "Your answer"
+    },
+    "noReplies": "Nobody has responded yet. \nCheer up!",
+    "forum": "Forum",
+    "campaignc": {
+      "roleplay": "live role"
+    },
+    "myPosts": {
+      "title": "My Posts",
+      "subtitle": "History of the threads you have started in the community.",
+      "emptyTitle": "You haven't published anything yet",
+      "emptySubtitle": "Dare to open your first debate in the community.",
+      "emptyButton": "Go to General Forum"
+    },
+    "yourReply": "Your answer"
+  },
+  "footer": {
+    "copyright": "My Application. \nAll rights reserved",
+    "madeWithLove": "Made with ❤️ by Samu A.O. \nand Alex S.H."
+  }
 }

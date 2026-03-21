@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import {
 	Dialog,
 	DialogHeader,
@@ -15,6 +16,7 @@ import {
 	IconButton,
 } from '@material-tailwind/react';
 import { PaperAirplaneIcon, XMarkIcon, ChatBubbleLeftEllipsisIcon, PhotoIcon, LinkIcon } from '@heroicons/react/24/outline';
+import { getTheme } from '../../utils/themeUtils';
 
 const formatTags = tagsString => {
 	if (!tagsString) return [];
@@ -36,6 +38,8 @@ const getErrorMessage = error => {
 const CreateGeneralPost = ({ open, handleClose }) => {
 	const [tagsPreview, setTagsPreview] = useState([]);
 	const [showImageInput, setShowImageInput] = useState(false);
+	const { t } = useTranslation('global');
+	const theme = getTheme();
 
 	// Configuración de React Hook Form
 	const {
@@ -68,7 +72,7 @@ const CreateGeneralPost = ({ open, handleClose }) => {
 				title: data.title,
 				content: data.content,
 				tags: formatTags(data.tagsInput),
-				imageUrl: data.imageUrl, // <-- Incluimos la imagen
+				imageUrl: data.imageUrl,
 			};
 
 			console.log('Enviando nuevo hilo a la API:', finalData);
@@ -76,14 +80,14 @@ const CreateGeneralPost = ({ open, handleClose }) => {
 			// Simulamos llamada a la API
 			await new Promise(resolve => setTimeout(resolve, 1000));
 
-			toast.success('¡Hilo creado con éxito!');
+			toast.success(t('forum.general.create.success'));
 
 			reset(); // Limpia los campos
 			setShowImageInput(false); // Oculta el input de imagen
 			handleClose(); // Cierra el modal
 		} catch (error) {
 			console.error('Error creando el post:', error);
-			toast.error('Hubo un problema al crear el hilo.');
+			toast.error(t('forum.general.create.error'));
 		}
 	};
 
@@ -101,14 +105,14 @@ const CreateGeneralPost = ({ open, handleClose }) => {
 			<DialogHeader className='flex justify-between items-center border-b border-gray-100 bg-indigo-50 rounded-t-lg p-4'>
 				<div className='flex items-center gap-3'>
 					<div className='p-2 bg-indigo-100 rounded-lg'>
-						<ChatBubbleLeftEllipsisIcon className='w-6 h-6 text-indigo-600' />
+						<ChatBubbleLeftEllipsisIcon className={`w-6 h-6 ${theme.textPrimary}`} />
 					</div>
 					<div>
 						<Typography variant='h5' color='blue-gray'>
-							Crear nuevo debate
+							{t('forum.general.create.newThread')}
 						</Typography>
 						<Typography variant='small' color='gray' className='font-normal'>
-							Abre un nuevo hilo en el foro general para la comunidad.
+							{t('forum.general.create.newThreadDesc')}
 						</Typography>
 					</div>
 				</div>
@@ -123,13 +127,13 @@ const CreateGeneralPost = ({ open, handleClose }) => {
 					<div>
 						<Input
 							size='lg'
-							label='Título del debate'
+							label={t('forum.general.create.title')}
 							error={!!errors.title}
-							color='indigo'
+							color={theme.primary}
 							{...register('title', {
-								required: 'El título es obligatorio',
-								minLength: { value: 5, message: 'El título debe tener al menos 5 caracteres' },
-								maxLength: { value: 100, message: 'El título no puede exceder los 100 caracteres' },
+								required: t('forum.general.create.titleRequired'),
+								minLength: { value: 5, message: t('forum.general.create.titleMinLength') },
+								maxLength: { value: 100, message: t('forum.general.create.titleMaxLength') },
 							})}
 						/>
 						{getErrorMessage(errors.title)}
@@ -139,9 +143,9 @@ const CreateGeneralPost = ({ open, handleClose }) => {
 					<div>
 						<Input
 							size='lg'
-							label='Etiquetas (separadas por comas)'
-							placeholder='ej. dudas, reglas, off-topic'
-							color='indigo'
+							label={t('forum.general.create.tags')}
+							placeholder={t('forum.general.create.tagsPlaceholder')}
+							color={theme.primary}
 							{...register('tagsInput')}
 						/>
 
@@ -152,7 +156,7 @@ const CreateGeneralPost = ({ open, handleClose }) => {
 										key={index}
 										value={`#${tag}`}
 										variant='ghost'
-										color='indigo'
+										color={theme.primary}
 										size='sm'
 										className='rounded-full lowercase'
 									/>
@@ -165,7 +169,7 @@ const CreateGeneralPost = ({ open, handleClose }) => {
 					<div>
 						<div className='flex justify-between items-center mb-2'>
 							<Typography variant='small' color='blue-gray' className='font-medium'>
-								Contenido de tu publicación (Soporta Markdown)
+								{t('forum.general.create.content')}
 							</Typography>
 							{/* Botón para activar/desactivar input de imagen */}
 							<Button
@@ -176,19 +180,19 @@ const CreateGeneralPost = ({ open, handleClose }) => {
 								onClick={() => setShowImageInput(!showImageInput)}
 							>
 								<PhotoIcon className='w-4 h-4' />
-								{showImageInput ? 'Ocultar Imagen' : 'Añadir Imagen'}
+								{showImageInput ? t('forum.general.create.hideImage') : t('forum.general.create.addImage')}
 							</Button>
 						</div>
 						<Textarea
 							size='lg'
 							rows={6}
-							placeholder='Escribe aquí el contenido de tu hilo...'
+							placeholder={t('forum.general.create.contentPlaceholder')}
 							error={!!errors.content}
-							color='indigo'
+							color={theme.primary}
 							className='resize-y'
 							{...register('content', {
-								required: 'El contenido es obligatorio',
-								minLength: { value: 10, message: 'Escribe un poco más, al menos 10 caracteres' },
+								required: t('forum.general.create.contentRequired'),
+								minLength: { value: 10, message: t('forum.general.create.contentMinLength') },
 							})}
 						/>
 						{getErrorMessage(errors.content)}
@@ -200,8 +204,8 @@ const CreateGeneralPost = ({ open, handleClose }) => {
 							<div className='flex items-center gap-2 mb-3'>
 								<Input
 									type='url'
-									label='Pega la URL de la imagen aquí...'
-									color='indigo'
+									label={t('forum.general.create.imageUrl')}
+									color={theme.primary}
 									className='bg-white'
 									icon={<LinkIcon className='h-5 w-5 text-gray-500' />}
 									{...register('imageUrl')}
@@ -224,7 +228,7 @@ const CreateGeneralPost = ({ open, handleClose }) => {
 										// Manejo básico de error de carga
 										onError={e => {
 											e.target.style.display = 'none';
-											toast.error('La URL de imagen no parece válida.');
+											toast.error(t('forum.general.create.invalidImageUrl'));
 										}}
 										onLoad={e => (e.target.style.display = 'block')}
 									/>
@@ -243,11 +247,11 @@ const CreateGeneralPost = ({ open, handleClose }) => {
 
 				<DialogFooter className='p-4 border-t border-gray-100 flex justify-between'>
 					<Button variant='text' color='blue-gray' onClick={handleClose} disabled={isSubmitting}>
-						Cancelar
+						{t('common.cancel')}
 					</Button>
 					<Button type='submit' color='indigo' className='flex items-center gap-2' loading={isSubmitting}>
 						<PaperAirplaneIcon className='h-4 w-4' />
-						{isSubmitting ? 'Publicando...' : 'Publicar hilo'}
+						{isSubmitting ? t('forum.general.create.submitting') : t('forum.general.create.submit')}
 					</Button>
 				</DialogFooter>
 			</form>

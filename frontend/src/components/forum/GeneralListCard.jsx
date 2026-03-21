@@ -4,10 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { Typography, Avatar, Chip } from '@material-tailwind/react';
 import { ChatBubbleLeftIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import { getTheme } from '../../utils/themeUtils';
+import { useTranslation } from 'react-i18next';
 
 const GeneralListCard = ({ thread }) => {
 	const theme = getTheme();
 	const navigate = useNavigate();
+	const { t } = useTranslation('global');
 
 	const handleOpenThread = threadId => {
 		navigate(`/forum/${threadId}`);
@@ -90,7 +92,7 @@ const GeneralListCard = ({ thread }) => {
 				<div className={`flex items-center gap-1.5 text-gray-500 group-hover:${theme.textPrimary} transition-colors`}>
 					<ChatBubbleLeftIcon className='w-5 h-5' />
 					<Typography variant='small' className='font-medium text-sm'>
-						{thread.replyCount} {thread.replyCount === 1 ? 'respuesta' : 'respuestas'}
+						{thread.replyCount} {thread.replyCount === 1 ? t('forum.reply') : t('forum.replies')}
 					</Typography>
 				</div>
 			</div>

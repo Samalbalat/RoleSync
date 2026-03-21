@@ -71,7 +71,7 @@ export default function FindCampaignPage() {
 
 		fetchData();
 		// 3. SOLO se ejecuta al montar el componente o cuando triggerSearch cambia
-	}, [triggerSearch]);
+	}, [triggerSearch, filters]);
 
 	const handleClean = () => {
 		setFilters({

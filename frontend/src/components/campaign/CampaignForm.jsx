@@ -271,6 +271,10 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 							<Option value='Español'>Español</Option>
 							<Option value='English'>English</Option>
 							<Option value='Français'>Français</Option>
+							<Option value='Deutsch'>Deutsch</Option>
+							<Option value='Italiano'>Italiano</Option>
+							<Option value='Português'>Português</Option>
+							<Option value='Other'>{t('common.other')}</Option>
 						</Select>
 						{errors.language && (
 							<Typography variant='small' color='red' className='mt-1'>
@@ -363,7 +367,9 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 					</div>
 					<Typography variant='small' className='text-gray-500 mt-1.5 ml-1 flex items-center gap-1'>
 						{t('campaign.tagHelper')}
-						<span className='bg-gray-200 px-1.5 py-0.5 rounded text-xs font-mono text-gray-700'>Enter</span>{' '}
+						<span className='bg-gray-200 px-1.5 py-0.5 rounded text-xs font-mono text-gray-700'>
+							{t('common.enter')}
+						</span>{' '}
 						<span className='text-xs'>{formData.themes.length}/6</span>
 					</Typography>
 
@@ -385,7 +391,7 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 				{!isWritten && (
 					<div className='grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-gray-50 rounded-lg border border-gray-100'>
 						<Typography variant='small' className='col-span-full font-bold text-gray-500 uppercase'>
-							Detalles de Partida
+							{t('campaign.detail.infoTitle')}
 						</Typography>
 
 						<div>
@@ -409,7 +415,7 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 							<Input
 								label={t('campaign.location')}
 								name='location'
-								placeholder='Roll20, Foundry, Casa de Juan...'
+								placeholder={t('campaign.placeholder.location')}
 								value={formData.location}
 								onChange={handleChange}
 								maxLength={LIMITS.SHORT_TEXT}
@@ -474,7 +480,7 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 						<Input
 							label={t('campaign.duration')}
 							name='duration'
-							placeholder='Ej. 1 hora, 3 horas...'
+							placeholder={t('campaign.placeholder.duration')}
 							value={formData.duration}
 							onChange={handleChange}
 							maxLength={LIMITS.SHORT_TEXT}
@@ -484,7 +490,7 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 				)}
 
 				<Button type='submit' fullWidth color={theme.primary} disabled={loading} className='mt-4 flex justify-center'>
-					{loading ? 'Guardando...' : initialValues ? t('common.save') : t('common.create')}
+					{loading ? t('common.loading') : initialValues ? t('common.save') : t('common.create')}
 				</Button>
 			</form>
 		</Card>

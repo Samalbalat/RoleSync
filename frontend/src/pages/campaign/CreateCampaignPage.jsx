@@ -33,10 +33,11 @@ export default function CreateCampaignPage() {
 		try {
 			const result = await CampaignService.createCampaign(formData);
 			console.log('Campaña creada:', result);
-			toast.success(`¡Campaña creada con éxito!`);
+			toast.success(t('campaign.message.successCreate'));
 			setTimeout(() => navigate('/campaigns'), 1500);
 		} catch (error) {
 			console.error('Error al crear:', error);
+			toast.error(t('campaign.message.errorCreate'));
 		} finally {
 			setLoading(false);
 		}
@@ -47,7 +48,7 @@ export default function CreateCampaignPage() {
 			<div className='max-w-4xl mx-auto'>
 				<div className='mb-8 text-center'>
 					<Typography variant='h2' color='blue-gray' className='font-bold'>
-						{t('campaign.createTitle') || 'Nueva Aventura'}
+						{t('campaign.createTitle')}
 						{campaignType === 'WRITTEN' && <span className='text-sm ml-2 text-gray-500'>(Narrativa)</span>}
 					</Typography>
 				</div>

@@ -1,11 +1,13 @@
 import React from 'react';
-import { Card, CardBody, Typography, Chip, Avatar, Tooltip } from '@material-tailwind/react';
+import { Card, CardBody, Typography, Chip, Tooltip } from '@material-tailwind/react';
 import { UserGroupIcon, CalendarIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 
 export default function CampaignCard({ campana, theme }) {
 	const navigate = useNavigate();
+	const { t } = useTranslation('global');
 	return (
 		<Card
 			className='w-full overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer group border border-gray-100'
@@ -26,7 +28,7 @@ export default function CampaignCard({ campana, theme }) {
 				<div className='absolute top-3 right-3'>
 					<Chip
 						size='sm'
-						value={campana.status === 'OPEN' ? 'ABIERTA' : 'EN CURSO'}
+						value={campana.status === 'OPEN' ? t('status.open') : t('status.ongoing')}
 						color={campana.status === 'OPEN' ? 'green' : 'blue-gray'}
 						className='font-bold shadow-md border-white border'
 					/>
@@ -64,7 +66,7 @@ export default function CampaignCard({ campana, theme }) {
 				{/* ----------------------------------------------- */}
 
 				<div className='flex items-center justify-between pt-2 border-t border-gray-100'>
-					<Tooltip content='Jugadores actuales / Máximos'>
+					<Tooltip content={t('campaign.message.currentMaxPlayers')}>
 						<div className='flex items-center gap-1.5 text-gray-600 font-medium text-xs'>
 							<UserGroupIcon className={`h-4 w-4 text-${theme.primary}-500`} />
 							{campana.members.length}/{campana.maxPlayers}
@@ -74,12 +76,12 @@ export default function CampaignCard({ campana, theme }) {
 					{campana.type === 'TABLETOP' ? (
 						<div className='flex items-center gap-1.5 text-gray-600 font-medium text-xs'>
 							<CalendarIcon className={`h-4 w-4 text-${theme.primary}-500`} />
-							{campana.schedule || 'Sin fecha'}
+							{campana.schedule}
 						</div>
 					) : (
 						<div className='flex items-center gap-1.5 text-gray-600 font-medium text-xs'>
 							<ChatBubbleLeftRightIcon className={`h-4 w-4 text-${theme.primary}-500`} />
-							{campana.communication || ''}
+							{campana.communication}
 						</div>
 					)}
 				</div>

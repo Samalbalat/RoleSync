@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 import { Card, CardBody, Typography, Chip, Badge } from '@material-tailwind/react';
 import { UserIcon, BellAlertIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function CampaignMiniCard({ campaign, isMaster, theme }) {
 	const navigate = useNavigate();
+	const { t } = useTranslation('global');
 	return (
 		<Card
 			className={`w-full overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer border group 
@@ -52,7 +54,7 @@ export default function CampaignMiniCard({ campaign, isMaster, theme }) {
 				>
 					{isMaster ? (
 						<Typography variant='small' className='text-xs text-gray-400 flex items-center gap-1'>
-							<UserIcon className='h-3 w-3' /> Master (Tú)
+							<UserIcon className='h-3 w-3' /> {t('profile.masterYou')}
 						</Typography>
 					) : (
 						<div className='flex items-center gap-2'>
@@ -69,6 +71,7 @@ export default function CampaignMiniCard({ campaign, isMaster, theme }) {
 
 CampaignMiniCard.propTypes = {
 	campaign: PropTypes.shape({
+		id: PropTypes.string.isRequired,
 		image: PropTypes.string.isRequired,
 		name: PropTypes.string.isRequired,
 		status: PropTypes.string.isRequired,

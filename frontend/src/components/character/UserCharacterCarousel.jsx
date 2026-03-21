@@ -5,7 +5,7 @@ import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import { useTranslation } from 'react-i18next';
 import { getTheme } from '../../utils/themeUtils';
 import CharacterDetailDialog from './CharacterDetailDialog';
-import CharacterService from '../../services/CharacterService'; // <-- Asegúrate de que la ruta es correcta
+import CharacterService from '../../services/CharacterService';
 import toast from 'react-hot-toast';
 
 export default function UserCharacterCarousel() {
@@ -28,7 +28,7 @@ export default function UserCharacterCarousel() {
 				setCharacters(data || []);
 			} catch (error) {
 				console.error('Error fetching characters:', error);
-				toast.error(t('errors.fetchCharacters') || 'Error al cargar los personajes');
+				toast.error(t('errors.fetchCharacters'));
 			} finally {
 				setLoading(false);
 			}

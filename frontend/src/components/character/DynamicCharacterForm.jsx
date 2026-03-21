@@ -66,7 +66,7 @@ export default function DynamicCharacterForm({ templateData }) {
 
 		try {
 			await CharacterService.createCharacter(payload);
-			toast.success(`¡Personaje ${data.name} creado con éxito!`);
+			toast.success(t('character.message.successCreating', { name: data.name }));
 			setTimeout(() => navigate(`/campaign/${campaign_id}`), 1500);
 		} catch (error) {
 			console.error('Error al crear personaje:', error);
@@ -171,7 +171,7 @@ export default function DynamicCharacterForm({ templateData }) {
 															max={field.max}
 															{...register(fieldPath, {
 																required: field.required ? t('errors.required') : false,
-																valueAsNumber: true, // Crucial para que el JSON envíe un número y no un string
+																valueAsNumber: true,
 																min: { value: field.min, message: `${t('common.minimum')} ${field.min}` },
 																max: { value: field.max, message: `${t('common.maximum')} ${field.max}` },
 															})}

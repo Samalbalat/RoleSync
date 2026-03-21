@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import {
 	Button,
 	Switch,
@@ -33,7 +34,7 @@ const getAuthorDisplayData = (isGeneralForum, user, character) => {
 		};
 	}
 	return {
-		name: character?.name || 'Dungeon Master',
+		name: character?.name || 'Master',
 		avatar: character?.avatar || 'https://ui-avatars.com/api/?name=DM&background=E0E7FF&color=3730A3',
 		id: character?.id || null,
 	};
@@ -60,13 +61,14 @@ const getContainerStyles = (isDm, isOoc) => {
 	return 'bg-white border-gray-200';
 };
 
-const getPlaceholder = (isGeneralForum, isTabletop, isDm, isOoc, isSecret) => {
-	if (isGeneralForum) return 'Escribe tu respuesta al hilo...';
-	if (isTabletop) return isDm ? 'Escribe un aviso para el foro de la mesa...' : 'Escribe tu mensaje en el foro...';
-	if (isDm) return 'Escribe un aviso oficial para la partida...';
-	if (isOoc) return 'Escribe un mensaje fuera de rol para el grupo...';
-	if (isSecret) return 'Escribe tu susurro secreto...';
-	return 'Describe tu acción, palabras o pensamientos...';
+const getPlaceholder = (isGeneralForum, isTabletop, isDm, isOoc, isSecret, t) => {
+	if (isGeneralForum) return t('forum.postEditor.generalPlaceholder');
+	if (isTabletop)
+		return isDm ? t('forum.postEditor.tabletopDmPlaceholder') : t('forum.postEditor.tabletopPlayerPlaceholder');
+	if (isDm) return t('forum.postEditor.dmPlaceholder');
+	if (isOoc) return t('forum.postEditor.oocPlaceholder');
+	if (isSecret) return t('forum.postEditor.secretPlaceholder');
+	return t('forum.postEditor.defaultPlaceholder');
 };
 
 // COMPONENTE PRINCIPAL
@@ -86,6 +88,7 @@ const PostEditor = ({
 	const [showFormatMenu, setShowFormatMenu] = useState(false);
 	const [showImageInput, setShowImageInput] = useState(false);
 	const [imageUrl, setImageUrl] = useState('');
+	const { t } = useTranslation();
 
 	const textareaRef = useRef(null);
 
@@ -106,7 +109,7 @@ const PostEditor = ({
 	const containerClasses = getContainerStyles(effectiveIsDm, effectiveIsOoc);
 	const textareaStyles = getTextareaStyles(effectiveIsDm, effectiveIsOoc, isSecret);
 	const buttonColor = getButtonColor(effectiveIsDm, effectiveIsOoc, isSecret);
-	const textareaPlaceholder = getPlaceholder(isGeneralForum, isTabletop, effectiveIsDm, effectiveIsOoc, isSecret);
+	const textareaPlaceholder = getPlaceholder(isGeneralForum, isTabletop, effectiveIsDm, effectiveIsOoc, isSecret, t);
 
 	const toggleVisibility = characterId => {
 		setVisibleToIds(prev => (prev.includes(characterId) ? prev.filter(id => id !== characterId) : [...prev, characterId]));
@@ -167,7 +170,7 @@ const PostEditor = ({
 								variant='small'
 								className={`text-[10px] font-bold uppercase tracking-wider ${isSecret ? 'text-purple-600' : 'text-gray-500'}`}
 							>
-								{isSecret ? `Susurro (${visibleToIds.length})` : 'Público'}
+								{isSecret ? `${t('forum.whisper')}` : `${t('forum.public')}`}
 							</Typography>
 						)}
 					</div>
@@ -176,7 +179,7 @@ const PostEditor = ({
 				{canUseRoleplayFeatures && (
 					<div className='flex items-center gap-2'>
 						<Typography variant='small' className={`text-xs font-bold ${isOoc ? 'text-gray-700' : 'text-gray-400'}`}>
-							MODO OOC
+							{t('forum.occMode')}
 						</Typography>
 						<Switch
 							id='ooc-switch'
@@ -229,7 +232,7 @@ const PostEditor = ({
 						className='px-3 py-1 flex items-center gap-1'
 						onClick={() => insertFormatting('> ')}
 					>
-						Cita
+						{t('forum.quote')}
 					</Button>
 				</div>
 			)}
@@ -250,7 +253,7 @@ const PostEditor = ({
 				<div className='flex items-center gap-2 mb-3 animate-fade-in mt-3'>
 					<Input
 						type='url'
-						label='Pega la URL de la imagen aquí...'
+						label={t('forum.postEditor.imagePlaceholder')}
 						value={imageUrl}
 						onChange={e => setImageUrl(e.target.value)}
 						className='bg-white'
@@ -294,7 +297,7 @@ const PostEditor = ({
 						variant={showImageInput ? 'filled' : 'text'}
 						color={showImageInput ? 'indigo' : 'blue-gray'}
 						className='rounded-full transition-colors'
-						title='Añadir Imagen'
+						title={t('forum.postEditor.addImage')}
 						onClick={() => setShowImageInput(!showImageInput)}
 					>
 						<PhotoIcon className='h-5 w-5' />
@@ -303,7 +306,7 @@ const PostEditor = ({
 						variant={showFormatMenu ? 'filled' : 'text'}
 						color={showFormatMenu ? 'indigo' : 'blue-gray'}
 						className='rounded-full transition-colors'
-						title='Formato'
+						title={t('forum.postEditor.format')}
 						onClick={() => setShowFormatMenu(!showFormatMenu)}
 					>
 						<AdjustmentsHorizontalIcon className='h-5 w-5' />
@@ -317,14 +320,14 @@ const PostEditor = ({
 									variant={isSecret ? 'filled' : 'text'}
 									color={isSecret ? 'purple' : 'blue-gray'}
 									className='rounded-full transition-colors'
-									title='Mensaje Secreto (Susurro)'
+									title={t('forum.whisper')}
 								>
 									<EyeSlashIcon className='h-5 w-5' />
 								</IconButton>
 							</MenuHandler>
 							<MenuList className='max-h-72'>
 								<Typography variant='small' color='blue-gray' className='mb-2 font-bold px-3'>
-									¿Quién puede ver esto?
+									{t('forum.postEditor.whoCanSee')}
 								</Typography>
 								{hasOtherCharacters ? (
 									otherCharacters.map(char => (
@@ -344,12 +347,12 @@ const PostEditor = ({
 										</MenuItem>
 									))
 								) : (
-									<MenuItem disabled>No hay más personajes</MenuItem>
+									<MenuItem disabled>{t('forum.postEditor.noMoreCharacters')}</MenuItem>
 								)}
 								{isSecret && (
 									<div className='p-2 border-t mt-2'>
 										<Button size='sm' color='red' variant='text' fullWidth onClick={() => setVisibleToIds([])}>
-											Hacer Público
+											{t('forum.public')}
 										</Button>
 									</div>
 								)}
@@ -366,7 +369,7 @@ const PostEditor = ({
 					disabled={isSubmitDisabled}
 				>
 					<PaperAirplaneIcon className='h-4 w-4' />
-					Enviar
+					{t('common.send')}
 				</Button>
 			</div>
 		</div>

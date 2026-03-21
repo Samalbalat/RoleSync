@@ -6,6 +6,7 @@ import { Typography, Avatar, Button, Chip } from '@material-tailwind/react';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { mockGeneralThreads, mockGeneralReplies } from '../../data/mockPosts';
 import PostEditor from '../../components/forum/PostEditor';
+import { useTranslation } from 'react-i18next';
 
 const renderMarkdown = content => {
 	const rawHtml = marked.parse(content || '');
@@ -14,6 +15,7 @@ const renderMarkdown = content => {
 };
 
 const ThreadDetailPage = () => {
+	const { t } = useTranslation('global');
 	const { id } = useParams();
 	const navigate = useNavigate();
 
@@ -49,7 +51,7 @@ const ThreadDetailPage = () => {
 					onClick={() => navigate('/forum')}
 				>
 					<ArrowLeftIcon className='w-4 h-4' strokeWidth={2.5} />
-					Volver al foro
+					{t('common.back')}
 				</Button>
 			</div>
 
@@ -90,7 +92,7 @@ const ThreadDetailPage = () => {
 								{thread.author.profileName}
 							</Typography>
 							<Typography variant='small' className='text-gray-500 text-xs'>
-								Publicado el {formatDate(thread.createdAt)}
+								{t('forum.campaign.publishedOn')} {formatDate(thread.createdAt)}
 							</Typography>
 						</div>
 					</div>
@@ -107,7 +109,7 @@ const ThreadDetailPage = () => {
 			{/* RESPUESTAS */}
 			<div className='flex flex-col gap-4 mt-4'>
 				<Typography variant='h5' color='blue-gray' className='font-bold border-b border-gray-200 pb-2'>
-					Respuestas ({replies.length})
+					{t('forum.replies')} ({replies.length})
 				</Typography>
 
 				{replies.length > 0 ? (
@@ -144,22 +146,20 @@ const ThreadDetailPage = () => {
 						</div>
 					))
 				) : (
-					<Typography className='text-gray-500 italic py-4 text-center'>
-						Aún no hay respuestas. ¡Sé el primero en aportar algo!
-					</Typography>
+					<Typography className='text-gray-500 italic py-4 text-center'>{t('forum.campaign.noReplies')}</Typography>
 				)}
 			</div>
 
 			{/* EDITOR PARA RESPONDER */}
 			{thread.isLocked ? (
 				<div className='mt-8 p-4 bg-red-50 text-red-800 rounded-xl text-center border border-red-200'>
-					<Typography className='font-bold'>Este hilo ha sido bloqueado.</Typography>
-					<Typography variant='small'>Ya no se admiten nuevas respuestas en este debate.</Typography>
+					<Typography className='font-bold'>{t('forum.campaign.lockedThread')}</Typography>
+					<Typography variant='small'>{t('forum.campaign.noNewReplies')}</Typography>
 				</div>
 			) : (
 				<div className='mt-8'>
 					<Typography variant='h6' color='blue-gray' className='mb-4'>
-						Tu respuesta
+						{t('forum.yourReply')}
 					</Typography>
 					<PostEditor isGeneralForum={true} currentUser={{ id: 'user-1', profileName: 'MiUsuario', profileImage: null }} />
 				</div>

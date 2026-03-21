@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Typography, Accordion, AccordionHeader, AccordionBody } from '@material-tailwind/react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { TbPinnedFilled } from 'react-icons/tb';
+import { useTranslation } from 'react-i18next';
 import PostCard from './PostCard';
 import { mockPosts } from '../../data/mockPosts';
 import ThreadDialog from './ThreadDialog';
@@ -12,6 +13,7 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 	const [posts, setPosts] = useState(mockPosts);
 	const pinnedPosts = posts.filter(post => post.isPinned);
 	const regularPosts = posts.filter(post => !post.isPinned);
+	const { t } = useTranslation('global');
 
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [selectedPost, setSelectedPost] = useState(null);
@@ -42,7 +44,7 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 	return (
 		<div className='flex flex-col gap-4'>
 			<Typography variant='h5' color='blue-gray' className='mb-2 font-bold'>
-				{isTabletop ? 'Foro de la Campaña' : 'Mesa de Juego (Timeline)'}
+				{isTabletop ? t('forum.campaign.table') : t('forum.campaign.narrative')}
 			</Typography>
 			{/* SECCIÓN DE MENSAJES FIJADOS (Acordeón) */}
 			{pinnedPosts.length > 0 && (
@@ -61,7 +63,7 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 					>
 						<div className='flex items-center gap-2 text-sm font-bold text-orange-800'>
 							<TbPinnedFilled className='w-5 h-5' />
-							Mensajes Fijados del DM ({pinnedPosts.length})
+							{t('forum.campaign.pinned')} ({pinnedPosts.length})
 						</div>
 					</AccordionHeader>
 					<AccordionBody className='px-5 pb-5 pt-0'>
@@ -94,11 +96,10 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 			) : (
 				<div className='p-4 bg-grey-100 border border-orange-200 text-grey-800 rounded-xl shadow-sm flex flex-col items-center justify-center text-center gap-2'>
 					<Typography variant='h6' color='blue-gray' className='font-bold'>
-						¡Necesitas un personaje!
+						{t('forum.campaign.needCharacter')}
 					</Typography>
 					<Typography variant='small' className='font-medium opacity-80 max-w-md'>
-						Para poder publicar mensajes en {isTabletop ? 'el foro' : 'la partida'}, primero debes crear un personaje y
-						asignarlo a esta campaña.
+						{isTabletop ? t('forum.campaign.needCharacterDescTable') : t('forum.campaign.needCharacterDescNarrative')}
 					</Typography>
 				</div>
 			)}
@@ -119,7 +120,7 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 
 				{regularPosts.length === 0 && (
 					<Typography className='text-center text-gray-500 py-8 italic'>
-						{isTabletop ? 'El foro está vacío.' : 'La rol está vacío. ¡Sé el primero en hablar!'}
+						{isTabletop ? t('forum.campaign.emptyTable') : t('forum.campaign.emptyNarrative')}
 					</Typography>
 				)}
 			</div>
