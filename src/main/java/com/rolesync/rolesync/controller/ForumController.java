@@ -2,7 +2,6 @@ package com.rolesync.rolesync.controller;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,27 +54,26 @@ public class ForumController {
                     return ResponseEntity.status(403).build();
                 }
                 Campaign campaign = campaignRepository.findById(id).orElse(null);
-                if(utilsCalls.getProfileRelationToCampaign(profileName, campaign) == "NONE" 
-                || utilsCalls.getProfileRelationToCampaign(profileName, campaign) == "PENDING") {
+                String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
+                if("NONE".equals(relation) || "PENDING".equals(relation)) {
                     return ResponseEntity.status(403).build();
                 }
+
                 // Fetch posts with pagination
-                List<Post> posts = postRepository.findByCampaignId(id);
-                posts.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt())); // Sort by createdAt descending
-                List<Post> page = posts.stream().filter(post -> post.getCreatedAt().isAfter(cursor)).limit(limit != null ? limit : Integer.MAX_VALUE).collect(Collectors.toList());
+                int effectiveLimit = Math.min((limit != null && limit > 0) ? limit : 20, 100); // Default to 20 if not provided or invalid
+                List<Post> page = postRepository.findCampaignPosts(id, cursor, effectiveLimit);
 
                 // Prepare response additional info for pagination
                 Instant nextCursor = null;
                 Boolean hasMore = false;
-                if (posts.size() > page.size()) {
-                    nextCursor = page.get(page.size() - 1).getCreatedAt();
-                    hasMore = true; 
+                if (page.size() > effectiveLimit) {
+                    nextCursor = page.get(effectiveLimit - 1).getCreatedAt();
+                    hasMore = true;
+                    page = page.subList(0, effectiveLimit);
                 }
 
                 List<GetCampaignPostsOutResponseItemDTO> dtoList = page.stream().map(GetCampaignPostsOutMapper::toDTO).toList();
                 return ResponseEntity.ok().body(new GetCampaignPostsOutResponseDTO(dtoList, nextCursor, hasMore));
-                
-
             }
                 
     }
