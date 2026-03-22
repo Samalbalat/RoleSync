@@ -75,8 +75,6 @@ const CreateGeneralPost = ({ open, handleClose }) => {
 				imageUrl: data.imageUrl,
 			};
 
-			console.log('Enviando nuevo hilo a la API:', finalData);
-
 			// Simulamos llamada a la API
 			await new Promise(resolve => setTimeout(resolve, 1000));
 

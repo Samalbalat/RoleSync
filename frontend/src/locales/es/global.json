@@ -26,7 +26,13 @@
     "findCampaign": "Buscar Campaña",
     "createCampaign": "Crear Campaña",
     "createCharacter": "Crear Personaje",
-    "forum": "Foro"
+    "forum": "Foro",
+    "narrativeRoleplay": "Rol Narrativo",
+    "tabletopRoleplay": "Rol de Mesa",
+    "profile": "Perfil",
+    "myCampaigns": "Mis Campañas",
+    "myCharacters": "Mis Personajes",
+    "myPosts": "Mis Posts"
   },
   "common": {
     "welcome": "Bienvenido a RoleSync",

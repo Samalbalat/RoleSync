@@ -24,7 +24,7 @@ export default function UserCharacterCarousel() {
 			try {
 				setLoading(true);
 				const data = await CharacterService.getMyCharacters();
-				console.log('Fetched characters:', data);
+
 				setCharacters(data || []);
 			} catch (error) {
 				console.error('Error fetching characters:', error);

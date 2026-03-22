@@ -31,8 +31,7 @@ export default function CreateCampaignPage() {
 	const handleCreate = async formData => {
 		setLoading(true);
 		try {
-			const result = await CampaignService.createCampaign(formData);
-			console.log('Campaña creada:', result);
+			await CampaignService.createCampaign(formData);
 			toast.success(t('campaign.message.successCreate'));
 			setTimeout(() => navigate('/campaigns'), 1500);
 		} catch (error) {

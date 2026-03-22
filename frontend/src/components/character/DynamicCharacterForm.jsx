@@ -62,8 +62,6 @@ export default function DynamicCharacterForm({ templateData }) {
 			attributes: formattedAttributes,
 		};
 
-		console.log('JSON enviado al backend:', JSON.stringify(payload, null, 2));
-
 		try {
 			await CharacterService.createCharacter(payload);
 			toast.success(t('character.message.successCreating', { name: data.name }));

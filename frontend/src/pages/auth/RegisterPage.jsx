@@ -68,8 +68,6 @@ export function RegisterPage() {
 					password: formData.password,
 				};
 
-				console.log('Enviando payload:', signupRequest);
-
 				await AuthService.register(signupRequest);
 
 				navigate('/login', { state: { message: t('auth.successRegistration') } });
