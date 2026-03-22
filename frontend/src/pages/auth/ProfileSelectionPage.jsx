@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardBody, Typography, Avatar } from '@material-tailwind/react';
-import { UserIcon, BookOpenIcon, TableCellsIcon } from '@heroicons/react/24/solid';
+import { UserIcon } from '@heroicons/react/24/solid';
+import { FaDiceD20 } from 'react-icons/fa';
+import { IoMdChatbubbles } from 'react-icons/io';
 import { useAuth } from '../../utils/AuthContext';
 import { useTranslation } from 'react-i18next';
 
@@ -39,8 +41,8 @@ export function ProfileSelectionPage() {
 	const getIcon = (type, image) => {
 		if (image) return <Avatar src={image} alt='profile' size='xl' variant='circular' />;
 
-		if (type === 'WRITTEN') return <BookOpenIcon className='h-12 w-12 text-blue-500' />;
-		if (type === 'TABLETOP') return <TableCellsIcon className='h-12 w-12 text-red-500' />;
+		if (type === 'WRITTEN') return <IoMdChatbubbles className='h-12 w-12 text-purple-500' />;
+		if (type === 'TABLETOP') return <FaDiceD20 className='h-12 w-12 text-red-500' />;
 		return <UserIcon className='h-12 w-12 text-gray-500' />;
 	};
 

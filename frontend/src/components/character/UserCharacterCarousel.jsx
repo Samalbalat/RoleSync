@@ -103,9 +103,7 @@ export default function UserCharacterCarousel() {
 					>
 						<CardBody className='flex flex-col items-center text-center p-6'>
 							<Avatar
-								src={
-									char.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(char.name)}&background=random`
-								}
+								src={char.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(char.name)}&background=random`}
 								alt={char.name}
 								className='h-24 w-24 mb-4 shadow-md border-2 border-white ring-2 ring-indigo-50'
 								onError={e => {

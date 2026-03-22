@@ -52,7 +52,7 @@ function App() {
 							<Route index element={<HomePage />} />
 
 							{/* Rutas de Perfil */}
-							<Route path='profile' element={<ProfileDetailsPage />} />
+							<Route path='/profile/:id' element={<ProfileDetailsPage />} />
 
 							{/* Rutas de Campañas */}
 							<Route path='find-campaign' element={<FindCampaignPage />} />

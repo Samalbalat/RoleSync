@@ -121,7 +121,34 @@
     "narrative": "Narrative",
     "table": "Table",
     "master": "Master",
-    "masterYou": "Master (you)"
+    "masterYou": "Master (you)",
+    "edit": {
+      "avatarPreview": "Avatar Preview",
+      "title": "Edit Identity",
+      "profileName": "Profile Name",
+      "profileNameRequired": "The name is required",
+      "image": "Image URL",
+      "description": "Description",
+      "descriptionMaxLength": "Maximum 255 characters",
+      "button": "Edit Profile",
+      "saveError": "Error saving profile data.",
+      "saveSuccess": "Updated profile data.",
+      "errorAlreadyExists": "The username already exists. \nTry another one."
+    },
+    "noDescription": "No description",
+    "accountInfo": "Account",
+    "email": "E-mail",
+    "yourProfiles": "Your Profiles",
+    "current": "Current",
+    "noCampaigns": "You are not participating in any campaign yet. \nIt's time to start one!",
+    "noCharacters": "You don't have characters yet.",
+    "account": {
+      "editTitle": "Edit account details",
+      "saveSuccess": "Updated account details!",
+      "saveError": "Data could not be updated"
+    },
+    "timeZone": "Time Zone",
+    "password": "Password"
   },
   "campaign": {
     "campaign": "Campaign",
@@ -200,7 +227,8 @@
       "kickConfirmDesc1": "You are about to remove ",
       "kickConfirmDesc2": " from the campaign. This action cannot be undone and the player will have to send a new request if they want to join again."
     },
-    "roleplay": "live role"
+    "roleplay": "live role",
+    "campaigns": "Campaigns"
   },
   "character": {
     "characters": "Characters",
@@ -278,7 +306,10 @@
     "open": "Open",
     "full": "Full",
     "closed": "Closed",
-    "ongoing": "Ongoing"
+    "ongoing": "Ongoing",
+    "active": "In progress",
+    "break": "at rest",
+    "finished": "Finished"
   },
   "filter": {
     "filter": "Filter",

@@ -260,8 +260,8 @@ const CreateGeneralPost = ({ open, handleClose }) => {
 };
 
 CreateGeneralPost.propTypes = {
-	open: PropTypes.bool.isRequired,
-	handleClose: PropTypes.func.isRequired,
+	open: PropTypes.bool,
+	handleClose: PropTypes.func,
 };
 
 export default CreateGeneralPost;

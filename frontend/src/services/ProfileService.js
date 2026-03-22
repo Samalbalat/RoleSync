@@ -43,7 +43,19 @@ const profileService = {
             console.error("Error fetching user info:", error);
             throw error;
         }
-    }
+    },
+
+    // Actualizar datos de la cuenta (email, timeZone, password)
+    // updateUserInfo: async (userData) => {
+    //     try {
+    //         // userData debe contener { email, timeZone, password }
+    //         const response = await api.put('/rolesync/user', userData);
+    //         return response.data;
+    //     } catch (error) {
+    //         console.error("Error updating user account info:", error);
+    //         throw error;
+    //     }
+    // }
 };
 
 export default profileService;

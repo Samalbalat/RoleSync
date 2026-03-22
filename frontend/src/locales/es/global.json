@@ -122,10 +122,38 @@
     "narrative": "Narrativo",
     "table": "Mesa",
     "master": "Master",
-    "masterYou": "Master (tú)"
+    "masterYou": "Master (tú)",
+    "edit": {
+      "avatarPreview": "Vista previa del Avatar",
+      "title": "Editar Identidad",
+      "profileName": "Nombre del Perfil",
+      "profileNameRequired": "El nombre es obligatorio",
+      "image": "URL de la Imagen",
+      "description": "Descripción",
+      "descriptionMaxLength": "Máximo 255 caracteres",
+      "button": "Editar Perfil",
+      "saveError": "Error guardando los datos del perfil.",
+      "saveSuccess": "Datos del perfil actualizados.",
+      "errorAlreadyExists": "El nombre de usuario ya existe. Prueba con otro."
+    },
+    "noDescription": "Sin descripción",
+    "accountInfo": "Cuenta",
+    "email": "Email",
+    "yourProfiles": "Tus Perfiles",
+    "current": "Actual",
+    "noCampaigns": "No participas en ninguna campaña aún. ¡Es hora de empezar una!",
+    "noCharacters": "Aun no tienes personajes.",
+    "account": {
+      "editTitle": "Editar datos de la cuenta",
+      "saveSuccess": "Datos de cuenta actualizados!",
+      "saveError": "No se han podido actualizar los datos"
+    },
+    "timeZone": "Zona Horaria",
+    "password": "Contraseña"
   },
   "campaign": {
     "campaign": "Campaña",
+    "campaigns": "Campañas",
     "campaignNarrative": "Campaña Narrativa",
     "campaignTable": "Campaña de Mesa",
     "name": "Nombre",
@@ -206,7 +234,10 @@
     "errors": {
       "fetchCharacters": "Error al cargar los personajes de la campaña"
     },
-    "roleplay": "Rol en vivo"
+    "roleplay": "Rol en vivo",
+    "status": {
+      "open": "Abierto"
+    }
   },
   "character": {
     "characters": "Personajes",
@@ -284,7 +315,10 @@
     "open": "Abierta",
     "full": "Completa",
     "closed": "Cerrada",
-    "ongoing": "En Curso"
+    "ongoing": "En Curso",
+    "active": "En curso",
+    "break": "En descanso",
+    "finished": "Terminado"
   },
   "filter": {
     "filter": "Filtrar",
