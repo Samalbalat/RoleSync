@@ -155,7 +155,20 @@
       "saveError": "No se han podido actualizar los datos"
     },
     "timeZone": "Zona Horaria",
-    "password": "Contraseña"
+    "password": "Contraseña",
+    "add": "Añadir Perfil",
+    "createType": "Crear perfil ->",
+    "create": {
+      "success": "Se ha creado el Perfil con exito",
+      "error": "Error al crear el perfil",
+      "errorAlreadyExists": "Ya existe un perfil con este nombre",
+      "title": "Crea un nuevo perfil",
+      "profileName": "Nombre del Perfil",
+      "nameRequired": "El nombre del perfil es obligatorio. No puede estar vacio",
+      "nameTooShort": "El nombre es demasiado corto. Debe ser superior a 3.",
+      "image": "URL de la Imagen",
+      "bio": "Bibliografia"
+    }
   },
   "campaign": {
     "campaign": "Campaña",

@@ -148,7 +148,20 @@
       "saveError": "Data could not be updated"
     },
     "timeZone": "Time Zone",
-    "password": "Password"
+    "password": "Password",
+    "add": "Add Profile",
+    "createType": "Create profile ->",
+    "create": {
+      "success": "Profile has been created successfully",
+      "error": "Error creating profile",
+      "errorAlreadyExists": "A profile with this name already exists",
+      "title": "Create a new profile",
+      "profileName": "Profile Name",
+      "nameRequired": "The profile name is required. \nIt can't be empty",
+      "nameTooShort": "The name is too short. \nIt must be greater than 3.",
+      "image": "Image URL",
+      "bio": "Literature"
+    }
   },
   "campaign": {
     "campaign": "Campaign",

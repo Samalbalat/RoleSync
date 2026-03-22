@@ -31,6 +31,7 @@ import { EditProfileModal } from '../../components/profile/EditProfileModal';
 import { ProfileCampaignList } from '../../components/profile/ProfileCampaignList';
 import { ProfileCharacterList } from '../../components/profile/ProfileCharacterList';
 import CharacterDetailDialog from '../../components/character/CharacterDetailDialog';
+import { CreateProfileModal } from '../../components/profile/CreateProfileModal';
 
 function LoadingScreen() {
 	const theme = getTheme();
@@ -50,6 +51,7 @@ export function ProfileDetailsPage() {
 
 	const [loading, setLoading] = useState(true);
 	const [openEdit, setOpenEdit] = useState(false);
+	const [openCreate, setOpenCreate] = useState(false);
 	const [selectedCharacterId, setSelectedCharacterId] = useState(null);
 	const [openCharacterDetail, setOpenCharacterDetail] = useState(false);
 	//const [openEditAccount, setOpenEditAccount] = useState(false);
@@ -116,6 +118,33 @@ export function ProfileDetailsPage() {
 		} catch (error) {
 			console.error('Error al guardar el perfil', error);
 			toast.error(t('profile.edit.saveError'));
+			throw error;
+		}
+	};
+
+	const hasTabletop = userData?.profiles?.some(p => p.roleType === 'TABLETOP');
+	const canCreateProfile = userData?.profiles?.length < 2;
+	const missingType = hasTabletop ? 'WRITTEN' : 'TABLETOP';
+
+	const handleCreateProfile = async formData => {
+		try {
+			// formData trae: { profileName, image, description }
+			// missingType es: 'WRITTEN' o 'TABLETOP'
+			const newProfile = await profileService.createProfile(missingType, formData);
+
+			setUserData(prev => ({
+				...prev,
+				profiles: [...prev.profiles, newProfile],
+			}));
+
+			const currentAvailable = JSON.parse(localStorage.getItem('availableProfiles') || '[]');
+			localStorage.setItem('availableProfiles', JSON.stringify([...currentAvailable, newProfile]));
+
+			setOpenCreate(false);
+			toast.success(t('profile.create.success'));
+		} catch (error) {
+			console.error('Error al crear:', error);
+			toast.error(t('profile.create.error'));
 			throw error;
 		}
 	};
@@ -206,13 +235,13 @@ export function ProfileDetailsPage() {
 										{t('profile.email')}
 									</Typography>
 									<Typography variant='small' className='text-blue-gray-800 break-all'>
-										{userData?.email}
+										{userData?.email || ''}
 									</Typography>
 								</div>
 								<div className='flex items-center gap-2'>
 									<GlobeAltIcon className='w-4 h-4 text-gray-400' />
 									<Typography variant='small' className='text-blue-gray-600'>
-										{userData?.timeZone}
+										{userData?.timeZone || ''}
 									</Typography>
 								</div>
 							</div>
@@ -222,14 +251,18 @@ export function ProfileDetailsPage() {
 					{/* Card de Otros Perfiles */}
 					<Card className='border border-blue-gray-50 shadow-sm'>
 						<CardBody className='p-4'>
-							<Typography variant='h6' color='blue-gray' className='mb-4 flex items-center gap-2'>
-								<ArrowsRightLeftIcon className={`w-5 h-5 ${theme.textSecondary}`} /> {t('profile.yourProfiles')}
-							</Typography>
+							<div className='flex justify-between items-center mb-4'>
+								<Typography variant='h6' color='blue-gray' className='flex items-center gap-2'>
+									<ArrowsRightLeftIcon className={`w-5 h-5 ${theme.textSecondary}`} />
+									{t('profile.yourProfiles')}
+								</Typography>
+							</div>
+
 							<div className='space-y-3'>
 								{userData?.profiles?.map(p => {
 									const isCurrent = p.profileName === activeProfile.name;
 									return (
-										<div
+										<button
 											key={p.id}
 											onClick={() => {
 												if (!isCurrent) {
@@ -237,26 +270,51 @@ export function ProfileDetailsPage() {
 													handleSwitchProfile(p);
 												}
 											}}
-											className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${isCurrent ? `${theme.bgLight} border ${theme.lightborder}` : 'hover:bg-gray-50 cursor-pointer'}`}
+											disabled={isCurrent}
+											className={`w-full flex items-center gap-3 p-2 rounded-lg transition-colors text-left ${
+												isCurrent
+													? `${theme.bgLight} border ${theme.lightborder} cursor-default`
+													: 'hover:bg-gray-50 cursor-pointer'
+											}`}
 										>
 											<Avatar src={p.image || '/default-avatar.png'} size='sm' />
 											<div className='flex-1 overflow-hidden'>
-												<Typography variant='small' className='font-bold text-blue-gray-800 truncate'>
-													{p.profileName}
-												</Typography>
+												<div className='flex items-center justify-between'>
+													<Typography variant='small' className='font-bold text-blue-gray-800 truncate'>
+														{p.profileName}
+													</Typography>
+													<Typography variant='small' className='text-[9px] text-gray-400 font-mono'>
+														{p.roleType}
+													</Typography>
+												</div>
 												{isCurrent && (
 													<Chip
 														value={t('profile.current')}
 														size='sm'
 														variant='ghost'
 														color={theme.primary}
-														className='py-0 px-2 text-[8px]'
+														className='py-0 px-2 text-[8px] inline-block'
 													/>
 												)}
 											</div>
-										</div>
+										</button>
 									);
 								})}
+
+								{/* OPCIONAL: Espacio vacío visual si falta un perfil para animar a crearlo */}
+								{canCreateProfile && (
+									<button
+										onClick={() => setOpenCreate(true)}
+										className='border-2 border-dashed border-gray-100 rounded-lg p-3 flex items-center gap-3 text-gray-400 hover:border-blue-200 hover:text-blue-300 transition-all cursor-pointer group w-full text-left bg-transparent'
+									>
+										<div className='w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-blue-50'>
+											<span className='text-xl'>+</span>
+										</div>
+										<Typography variant='small' className='font-medium italic'>
+											{t('profile.createType', { type: missingType })}
+										</Typography>
+									</button>
+								)}
 							</div>
 						</CardBody>
 					</Card>
@@ -311,6 +369,14 @@ export function ProfileDetailsPage() {
 				open={openCharacterDetail}
 				handleClose={() => setOpenCharacterDetail(false)}
 				characterId={selectedCharacterId}
+			/>
+
+			<CreateProfileModal
+				open={openCreate}
+				handler={() => setOpenCreate(!openCreate)}
+				type={missingType} // La lógica que calculamos antes
+				onCreate={handleCreateProfile}
+				theme={theme}
 			/>
 
 			{/* <EditAccountModal
