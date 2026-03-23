@@ -54,7 +54,7 @@ export default function CampaignCard({ campana, theme }) {
 						campana.themes.slice(0, 3).map((tag, index) => (
 							<span
 								key={index}
-								className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-${theme.primary}-50 text-${theme.primary}-700 border border-${theme.primary}-100`}
+								className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${theme.bgLight} text-${theme.primary}-700 border ${theme.lightborder}`}
 							>
 								{tag}
 							</span>

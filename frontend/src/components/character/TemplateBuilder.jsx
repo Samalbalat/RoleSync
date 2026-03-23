@@ -58,7 +58,6 @@ export default function TemplateBuilder() {
 			const fetchTemplateData = async () => {
 				try {
 					const data = await CharacterService.getTemplateById(templateId);
-					console.log('Datos brutos de la plantilla recibidos:', data);
 					setTemplateName(data.name || '');
 
 					// Mapeamos los atributos del backend a nuestro formato del frontend
@@ -197,8 +196,6 @@ export default function TemplateBuilder() {
 		};
 
 		try {
-			console.log('Enviando Payload al backend:', JSON.stringify(payload, null, 2));
-
 			// --- DECISIÓN: ¿CREAR O ACTUALIZAR? ---
 			if (isEditMode) {
 				await CharacterService.updateTemplate(templateId, payload);

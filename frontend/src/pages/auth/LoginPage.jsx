@@ -49,8 +49,6 @@ export function LoginPage() {
 		try {
 			const profiles = await login(email, passwordValue);
 
-			console.log('Perfiles recibidos:', profiles);
-
 			if (Array.isArray(profiles) && profiles.length > 0) {
 				const userEmail = profiles[0].email;
 				localStorage.setItem('accountEmail', JSON.stringify(userEmail));

@@ -15,17 +15,18 @@ export const getTheme = () => {
 
     if (type === 'WRITTEN') {
         return {
-            primary: 'indigo', // Morado/Azul para narrativo
-            secondary: 'blue',
-            bgLight: 'bg-indigo-50',
-            bgMiddle: 'bg-indigo-100',
-            bgDark: 'bg-indigo-200',
-            textPrimary: 'text-indigo-900',
-            textSecondary: 'text-indigo-500',
-            border: 'border-t-indigo-500',
-            lightborder: 'border-indigo-300',
-            buttonColor: 'indigo',
-            badge: 'purple'
+            primary: 'deep-purple', // Morado/Azul para narrativo
+            secondary: 'indigo',
+            bgLight: 'bg-purple-50',
+            bgMiddle: 'bg-purple-100',
+            bgDark: 'bg-purple-200',
+            textPrimary: 'text-purple-900',
+            textSecondary: 'text-purple-500',
+            border: 'border-purple-500',
+            lightborder: 'border-purple-300',
+            buttonColor: 'deep-purple',
+            badge: 'purple',
+            banner: 'from-purple-700 to-deep-purple-900'
         };
     } 
     
@@ -37,10 +38,11 @@ export const getTheme = () => {
         bgDark: 'bg-red-200',
         textPrimary: 'text-red-900',
         textSecondary: 'text-red-500',
-        border: 'border-t-red-500',
+        border: 'border-red-500',
         lightborder: 'border-red-300',
         buttonColor: 'red',
-        badge: 'red'
+        badge: 'red',
+        banner: 'from-red-700 to-red-900'
     };
     
 };

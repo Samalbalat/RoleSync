@@ -136,16 +136,6 @@ const PostEditor = ({
 	const handleSubmit = () => {
 		if (isSubmitDisabled) return;
 
-		console.log('Enviando post:', {
-			campaignId: isGeneralForum ? null : campaignId,
-			content,
-			imageUrl,
-			isOoc: effectiveIsOoc,
-			isDm: effectiveIsDm,
-			authorId,
-			visibleToCharacterIds: canUseRoleplayFeatures ? visibleToIds : [],
-		});
-
 		setContent('');
 		setImageUrl('');
 		setShowImageInput(false);

@@ -1,12 +1,11 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../utils/AuthContext';
-import { useTranslation } from 'react-i18next';
 import { Spinner } from '@material-tailwind/react';
 
 const ProtectedRoute = () => {
-	const { t } = useTranslation('global');
-	const { account, loading } = useAuth();
+	const { account, activeProfile, loading } = useAuth();
 	const location = useLocation();
+
 	if (loading) {
 		return (
 			<div className='flex h-screen w-full items-center justify-center bg-gray-50'>
@@ -16,10 +15,11 @@ const ProtectedRoute = () => {
 	}
 
 	if (!account) {
-		if (location.pathname === '/') {
-			return <Navigate to='/login' replace />;
-		}
-		return <Navigate to='/login' replace state={{ errorMessage: t('auth.errorNotAuthenticated') }} />;
+		return <Navigate to='/login' replace />;
+	}
+
+	if (!activeProfile && location.pathname !== '/profile-selection') {
+		return <Navigate to='/profile-selection' replace />;
 	}
 	return <Outlet />;
 };

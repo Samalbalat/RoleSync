@@ -46,7 +46,7 @@ export default function CampaignMiniCard({ campaign, isMaster, theme }) {
 				</div>
 
 				<Typography variant='small' className={`${theme.isDark ? 'text-gray-400' : 'text-gray-500'} font-medium mb-3`}>
-					{campaign.system}
+					{campaign.system || ' '}
 				</Typography>
 
 				<div
@@ -71,11 +71,11 @@ export default function CampaignMiniCard({ campaign, isMaster, theme }) {
 
 CampaignMiniCard.propTypes = {
 	campaign: PropTypes.shape({
-		id: PropTypes.string.isRequired,
+		id: PropTypes.number.isRequired,
 		image: PropTypes.string.isRequired,
 		name: PropTypes.string.isRequired,
 		status: PropTypes.string.isRequired,
-		system: PropTypes.string.isRequired,
+		system: PropTypes.string,
 		pendingRequests: PropTypes.number,
 		ownerName: PropTypes.string,
 	}).isRequired,
