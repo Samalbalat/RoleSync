@@ -3,8 +3,11 @@ package com.rolesync.rolesync.model;
 import java.util.Set;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * The Profile class represents a user profile in the RoleSync application.
@@ -15,7 +18,10 @@ import lombok.NoArgsConstructor;
 @Table(name = "profiles", uniqueConstraints = {
     @UniqueConstraint(columnNames={"username", "profileType"}), @UniqueConstraint(columnNames = "profilename")
 })
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@ToString(exclude = {"sheets"})
 @NoArgsConstructor
 public class Profile {
     @Id
