@@ -20,7 +20,7 @@ public interface CampaignRequestRepository extends JpaRepository<CampaignRequest
     @Query(value = """
         SELECT COUNT(r)
         FROM campaign_request r
-        WHERE r.campaign.id = :campaignId
+        WHERE r.campaign_id = :campaignId
         AND r.status = 'PENDING'
         """, nativeQuery = true)
     long countPendingRequestsByCampaignId(Long campaignId);
