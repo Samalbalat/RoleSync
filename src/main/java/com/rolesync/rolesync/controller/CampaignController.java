@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.core.Authentication;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.rolesync.rolesync.dto.campaigncontroller.CampaignGetByFilterDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignGetByIdOutDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignGetMeOutDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignGetMeOutItemDTO;
@@ -21,6 +22,7 @@ import com.rolesync.rolesync.dto.campaigncontroller.CampaignRequestInDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignRequestPutInDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignRequestsByIdOutDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.OwnerProfileDTO;
+import com.rolesync.rolesync.dto.campaigncontroller.mappers.CampaignMapper;
 import com.rolesync.rolesync.model.Campaign;
 import com.rolesync.rolesync.model.CampaignRequest;
 import com.rolesync.rolesync.model.CampaignRequestStatus;
@@ -70,7 +72,7 @@ public class CampaignController {
     // ---------- FILTERED GET ----------
 
     @GetMapping
-    public ResponseEntity<List<Campaign>> getCampaigns(
+    public ResponseEntity<List<CampaignGetByFilterDTO>> getCampaigns(
             @RequestParam ProfileType type,
             @RequestParam(required = false) String system,
             @RequestParam(required = false) String location,
@@ -130,9 +132,9 @@ public class CampaignController {
             }
             predicate = predicate.and(searchPredicate);
         }
-
-        return ResponseEntity.ok(
-                (List<Campaign>) campaignRepository.findAll(predicate));
+        List<Campaign> campaigns = (List<Campaign>) campaignRepository.findAll(predicate);
+        List<CampaignGetByFilterDTO> response = campaigns.stream().map(CampaignMapper::toGetByFilterDTO).toList();
+        return ResponseEntity.ok(response);
     }
 
     // ---------- MINE GET ----------
