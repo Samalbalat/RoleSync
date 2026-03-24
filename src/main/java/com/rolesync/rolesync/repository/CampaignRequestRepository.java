@@ -17,11 +17,11 @@ public interface CampaignRequestRepository extends JpaRepository<CampaignRequest
 
     List<CampaignRequest> findAllByCampaignAndProfile(Campaign campaign, Profile profile);
 
-    @Query("""
+    @Query(value = """
         SELECT COUNT(r)
         FROM CampaignRequest r
         WHERE r.campaign.id = :campaignId
         AND r.status = 'PENDING'
-        """)
+        """, nativeQuery = true)
     long countPendingRequestsByCampaignId(Long campaignId);
 }

@@ -15,10 +15,11 @@ public interface CampaignRepository extends JpaRepository<Campaign, Long>, Query
 
     List<Campaign> findByOwnerName(String owner);
 
-    @Query("""
-    SELECT c
-    FROM Campaign c
+    @Query(value = """
+    SELECT *
+    FROM campaign c
     WHERE :profileName = ANY(c.members)
-      AND c.status <> 'DELETED'""")
+      AND c.status <> 'DELETED'
+    """, nativeQuery = true)
     List<Campaign> findByMember(String profileName);
 }
