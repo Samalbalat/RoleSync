@@ -112,7 +112,8 @@ public class ForumController {
                     return ResponseEntity.status(403).build();
                 }
                 Post post = new Post();
-                return ResponseEntity.ok().body(createPostFromRequest(request, post, profile, character, campaign, relation));
+                createPostFromRequest(request, post, profile, character, campaign, relation);
+                return ResponseEntity.ok().build();
     }
 
     private Post createPostFromRequest(PostCampaignPostsIn request, Post post, Profile profile, CharacterSheet character, Campaign campaign, String relation) {
