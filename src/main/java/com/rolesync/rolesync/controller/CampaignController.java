@@ -36,6 +36,8 @@ import com.rolesync.rolesync.repository.CharacterSheetRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
 import com.rolesync.rolesync.utils.UtilsCalls;
 
+import jakarta.persistence.criteria.CriteriaBuilder.In;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -141,37 +143,46 @@ public class CampaignController {
     @GetMapping("/me")
     public ResponseEntity<CampaignGetMeOutDTO> getMyCampaigns(
             @RequestHeader("X-Profile-Name") String profileName) {
+
         CampaignGetMeOutDTO response = new CampaignGetMeOutDTO();
-        List<CampaignGetMeOutItemDTO> asMaster = campaignRepository.findByOwnerName(profileName).stream().map(c -> {
-            CampaignGetMeOutItemDTO item = new CampaignGetMeOutItemDTO();
-            if (c.getStatus() != CampaignStatus.DELETED) {
-                item.setId(c.getId());
-                item.setName(c.getName());
-                item.setImage(c.getImage());
-                item.setSystem(c.getSystem());
-                item.setStatus(c.getStatus().name());
-                item.setPendingRequests(c.getRequests().size());
-            }
-            return item;
-        }).toList();
+
+        // AS MASTER
+        List<CampaignGetMeOutItemDTO> asMaster =
+                campaignRepository.findByOwnerName(profileName).stream()
+                        .filter(c -> c.getStatus() != CampaignStatus.DELETED)
+                        .map(c -> {
+                            CampaignGetMeOutItemDTO item = new CampaignGetMeOutItemDTO();
+                            item.setId(c.getId());
+                            item.setName(c.getName());
+                            item.setImage(c.getImage());
+                            item.setSystem(c.getSystem());
+                            item.setStatus(c.getStatus().name());
+                            Integer pendingRequests = (int) campaignRequestRepository
+                                            .countPendingRequestsByCampaignId(c.getId());
+                            item.setPendingRequests(pendingRequests);
+
+                            return item;
+                        }).toList();
+
         response.setAsMaster(asMaster);
 
-        List<CampaignGetMeOutItemDTO> asPlayer = campaignRepository.findAll().stream()
-                .filter(c -> c.getMembers() != null && c.getMembers().contains(profileName))
-                .map(c -> {
-                    CampaignGetMeOutItemDTO item = new CampaignGetMeOutItemDTO();
-                    if (c.getStatus() != CampaignStatus.DELETED) {
-                        item.setId(c.getId());
-                        item.setName(c.getName());
-                        item.setImage(c.getImage());
-                        item.setSystem(c.getSystem());
-                        item.setStatus(c.getStatus().name());
-                        item.setOwnerName(c.getOwnerName());
-                    }
-                    return item;
-                }).toList();
+        // AS PLAYER
+        List<CampaignGetMeOutItemDTO> asPlayer =
+                campaignRepository.findByMember(profileName).stream()
+                        .filter(c -> c.getStatus() != CampaignStatus.DELETED)
+                        .map(c -> {
+                            CampaignGetMeOutItemDTO item = new CampaignGetMeOutItemDTO();
+                            item.setId(c.getId());
+                            item.setName(c.getName());
+                            item.setImage(c.getImage());
+                            item.setSystem(c.getSystem());
+                            item.setStatus(c.getStatus().name());
+                            item.setOwnerName(c.getOwnerName());
+                            return item;
+                        }).toList();
 
         response.setAsPlayer(asPlayer);
+
         return ResponseEntity.ok(response);
     }
 

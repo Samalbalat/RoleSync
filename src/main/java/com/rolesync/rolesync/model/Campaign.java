@@ -43,7 +43,7 @@ public class Campaign {
     private Set<CharacterSheet> sheets;
 
     
-    @OneToMany(mappedBy="campaign",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy="campaign")
     private Set<CampaignRequest> requests;
 
     private String name;
