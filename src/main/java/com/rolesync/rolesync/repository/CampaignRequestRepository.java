@@ -21,7 +21,7 @@ public interface CampaignRequestRepository extends JpaRepository<CampaignRequest
         SELECT COUNT(r)
         FROM campaign_request r
         WHERE r.campaign_id = :campaignId
-        AND r.status = 'PENDING'
+        AND r.status = 0
         """, nativeQuery = true)
     long countPendingRequestsByCampaignId(Long campaignId);
 }

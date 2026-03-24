@@ -19,7 +19,7 @@ public interface CampaignRepository extends JpaRepository<Campaign, Long>, Query
     SELECT *
     FROM campaign c
     WHERE :profileName = ANY(c.members)
-      AND c.status <> 'DELETED'
+      AND c.status <> 4
     """, nativeQuery = true)
     List<Campaign> findByMember(String profileName);
 }
