@@ -358,7 +358,7 @@ public class CampaignController {
         Optional<Campaign> campaignOpt = campaignRepository.findById(campaignId);
         boolean isAuthorized = utilsCalls.checkAuthAndProfile(authentication, profileName);
         Profile profile = profileRepository.findByProfilename(dto.getProfileName()).orElse(null);
-        ResponseEntity<?> viabilityCheck = checkChangeRequestStatusViability(isAuthorized, campaignOpt, profile, dto.getProfileName());
+        ResponseEntity<?> viabilityCheck = checkChangeRequestStatusViability(isAuthorized, campaignOpt, profile, profileName);
         if (viabilityCheck != null) {
             return viabilityCheck;
         }
