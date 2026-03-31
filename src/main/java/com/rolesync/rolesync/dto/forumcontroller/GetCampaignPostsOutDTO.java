@@ -7,8 +7,8 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class GetCampaignPostsOutResponseDTO {
-    private List<GetCampaignPostsOutResponseItemDTO> data;
+public class GetCampaignPostsOutDTO {
+    private List<GetCampaignPostsOutItemDTO> data;
     private Instant nextCursor;
     private boolean hasMore;
 

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostCampaignPostsIn {
+public class PostCampaignPostsInDTO {
     private String type;
     private String content;
     private Long authorCharacterId;
@@ -17,6 +17,4 @@ public class PostCampaignPostsIn {
     private Boolean isOoc;
     private List<String> mediaUrls;
     private List<Long> visibleToCharacterIds;
-
-    // getters & setters
 }

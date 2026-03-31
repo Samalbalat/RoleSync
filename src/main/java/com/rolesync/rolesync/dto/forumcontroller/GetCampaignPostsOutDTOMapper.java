@@ -2,10 +2,10 @@ package com.rolesync.rolesync.dto.forumcontroller;
 
 import com.rolesync.rolesync.model.Post;
 
-public class GetCampaignPostsOutMapper {
+public class GetCampaignPostsOutDTOMapper {
 
-    public static GetCampaignPostsOutResponseItemDTO toDTO(Post post) {
-        GetCampaignPostsOutResponseItemDTO dto = new GetCampaignPostsOutResponseItemDTO();
+    public static GetCampaignPostsOutItemDTO toDTO(Post post) {
+        GetCampaignPostsOutItemDTO dto = new GetCampaignPostsOutItemDTO();
 
         dto.setId(post.getId());
         dto.setType(post.getType().name());
