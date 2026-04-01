@@ -1,10 +1,14 @@
 package com.rolesync.rolesync.controller;
 
+import java.io.CharConversionException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+
+import javax.xml.stream.events.Characters;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.core.Authentication;
 import com.rolesync.rolesync.dto.forumcontroller.GetCampaignPostsOutDTOMapper;
+import com.rolesync.rolesync.dto.forumcontroller.CampaignPostDTO;
 import com.rolesync.rolesync.dto.forumcontroller.GetCampaignPostsOutDTO;
 import com.rolesync.rolesync.dto.forumcontroller.GetCampaignPostsOutItemDTO;
 import com.rolesync.rolesync.dto.forumcontroller.GetForumPostsOutDTO;
@@ -254,14 +259,23 @@ public class ForumController {
                 if("NONE".equals(relation) || "PENDING".equals(relation)) {
                     return ResponseEntity.status(403).build();
                 }
-                CharacterSheet character = characterRepository.findById(request.getAuthorCharacterId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-                // Ensure character belongs to profile
-                if (!character.getOwner().getId().equals(profile.getId())) {
-                    return ResponseEntity.status(403).build();
+
+                CharacterSheet character = null;
+                if(request.getIsOoc() == null || !request.getIsOoc()) { // if not explicitly OOC, treat as IC and require character info
+                    if(request.getAuthorCharacterId() == null) {
+                        return ResponseEntity.status(400).body("Character ID is required for IC posts");
+                    }else{
+                        character = characterRepository.findById(request.getAuthorCharacterId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                        // Ensure character belongs to profile
+                        if (!character.getOwner().getId().equals(profile.getId())) {
+                            return ResponseEntity.status(403).build();
+                            }
+                        }
                 }
+                
                 Post post = new Post();
-                createPostFromRequest(request, post, profile, character, campaign, relation);
-                return ResponseEntity.ok().build();
+                CampaignPostDTO campaignPostDto = new CampaignPostDTO(createPostFromRequest(request, post, profile, character, campaign, relation));
+                return ResponseEntity.ok().body(campaignPostDto);
     }
 
     @PostMapping("forum/posts")
@@ -275,8 +289,8 @@ public class ForumController {
                     return ResponseEntity.status(403).build();
                 }
                 Post post = new Post();
-                createPostFromRequest(request, post, profile);
-                return ResponseEntity.ok().build();
+                Post responsePost = createPostFromRequest(request, post, profile);
+                return ResponseEntity.ok().body(responsePost.getId());
     }
 
     private Post createPostFromRequest(PostCampaignPostsInDTO request, Post post, Profile profile, CharacterSheet character, Campaign campaign, String relation) {
@@ -284,11 +298,12 @@ public class ForumController {
         post.setContent(request.getContent());
 
         post.setAuthorProfileId(profile.getId());
-        post.setAuthorCharacterId(character.getId());
 
-        post.setAuthorCharacterName(character.getName());
-        post.setAuthorCharacterImage(character.getImage());
-
+        if ((request.getIsOoc() == null || !request.getIsOoc()) && character != null) { // if not explicitly OOC, treat as IC and require character info
+            post.setAuthorCharacterId(character.getId());
+            post.setAuthorCharacterName(character.getName());
+            post.setAuthorCharacterImage(character.getImage());
+        }
         post.setCampaign(campaign);
 
         post.setParentPost(
@@ -347,6 +362,7 @@ public class ForumController {
 
         post.setPinned(false);
         post.setLocked(false);
+        post.setTags(request.getTags()!= null ? request.getTags() : List.of());
         postRepository.save(post);
         return post;
     }
