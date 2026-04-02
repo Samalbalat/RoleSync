@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.core.Authentication;
 
+import com.rolesync.rolesync.dto.charactersheetcontroller.CharacterSheetGetOutDTO;
 import com.rolesync.rolesync.dto.charactersheetcontroller.CharacterSheetInPostDTO;
 import com.rolesync.rolesync.dto.charactersheetcontroller.CharacterTemplateOutPostDTO;
 import com.rolesync.rolesync.model.Campaign;
@@ -289,7 +290,7 @@ public class CharacterSheetController {
                 return ResponseEntity.status(403).body("User is not the owner of this character");
             }
         }
-        return ResponseEntity.ok(character.get());
+        return ResponseEntity.ok(new CharacterSheetGetOutDTO(character.get()));
     }
 
     private ResponseEntity<?> updateSheet(Authentication authentication, Long id, CharacterSheetInPostDTO dto, @RequestHeader ("X-Profile-Name") String profileName) {

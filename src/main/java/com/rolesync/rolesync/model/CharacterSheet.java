@@ -41,6 +41,10 @@ public class CharacterSheet {
     private Boolean isPublic;
     
     @ManyToOne
+    @JoinColumn(name="template_id", nullable=true)
+    private CharacterSheet template;
+    
+    @ManyToOne
     @JoinColumn(name="campaign_id", nullable=true)
     private Campaign campaign;
 

@@ -1,15 +1,10 @@
 package com.rolesync.rolesync.controller;
 
-import java.io.CharConversionException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-
-import javax.xml.stream.events.Characters;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -299,7 +294,7 @@ public class ForumController {
 
         post.setAuthorProfileId(profile.getId());
 
-        if ((request.getIsOoc() == null || !request.getIsOoc()) && character != null) { // if not explicitly OOC, treat as IC and require character info
+        if (character != null) { // if not explicitly OOC, treat as IC and require character info
             post.setAuthorCharacterId(character.getId());
             post.setAuthorCharacterName(character.getName());
             post.setAuthorCharacterImage(character.getImage());
@@ -328,12 +323,14 @@ public class ForumController {
 
         // Visibility (optional)
         if (request.getVisibleToCharacterIds() != null && !request.getVisibleToCharacterIds().isEmpty()) {
-            List<CharacterSheet> visibleCharacters =
-                characterRepository.findAllById(request.getVisibleToCharacterIds());
-
+            List<CharacterSheet> visibleCharacters = characterRepository.findAllById(request.getVisibleToCharacterIds());
+            if (visibleCharacters.size() != request.getVisibleToCharacterIds().size()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Some character IDs are invalid");
+            }
             post.setVisibleToCharacterIds((new HashSet<>(visibleCharacters.stream().map(CharacterSheet::getId).toList())));
+        }else{
+            post.setVisibleToCharacterIds(new HashSet<>()); // empty set means visible to all characters
         }
-        post.setVisibleToCharacterIds(new HashSet<>());
         postRepository.save(post);
         return post;
     }
