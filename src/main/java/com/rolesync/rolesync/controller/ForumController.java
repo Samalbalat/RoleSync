@@ -330,8 +330,10 @@ public class ForumController {
         if (request.getVisibleToCharacterIds() != null && !request.getVisibleToCharacterIds().isEmpty()) {
             List<CharacterSheet> visibleCharacters =
                 characterRepository.findAllById(request.getVisibleToCharacterIds());
+
             post.setVisibleToCharacterIds((new HashSet<>(visibleCharacters.stream().map(CharacterSheet::getId).toList())));
         }
+        post.setVisibleToCharacterIds(new HashSet<>());
         postRepository.save(post);
         return post;
     }
