@@ -52,7 +52,8 @@
     "search": "Search",
     "loading": "Loading...",
     "enter": "Enter",
-    "other": "Other"
+    "other": "Other",
+    "loadMore": "Load more"
   },
   "dayWeek": {
     "monday": "Monday",
@@ -402,7 +403,8 @@
       "addImage": "Add Image",
       "format": "Format",
       "noMoreCharacters": "There are no more characters",
-      "whoCanSee": "Who can see it?"
+      "whoCanSee": "Who can see it?",
+      "creationError": "Error sending message."
     },
     "public": "Public",
     "occMode": "OOC mode",

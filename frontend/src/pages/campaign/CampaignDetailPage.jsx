@@ -79,21 +79,26 @@ export default function CampaignDetailPage() {
 	}, [fetchCampaignAndTemplate]);
 
 	useEffect(() => {
+		if (!campaign) return;
+
+		const isOwner = campaign.userRelation === 'OWNER';
+		const isParticipant = campaign.userRelation === 'MEMBER';
+		const hasInsideAccess = isOwner || isParticipant;
+
+		if (!hasInsideAccess) return;
+
 		const fetchCharacters = async () => {
 			try {
-				setLoading(true);
 				const data = await CharacterService.getCampaignCharacters(id);
 				setCharacters(data || []);
 			} catch (error) {
 				console.error('Error fetching campaign characters:', error);
 				toast.error(t('campaign.errors.fetchCharacters'));
-			} finally {
-				setLoading(false);
 			}
 		};
 
 		fetchCharacters();
-	}, [id, t]);
+	}, [campaign, id, t]);
 
 	if (loading) {
 		return (
@@ -124,8 +129,8 @@ export default function CampaignDetailPage() {
 
 	if (isOwner) {
 		myCharacter = {
-			id: 'dm',
-			name: 'Master', // O puedes usar campaign.owner?.profileName si lo prefieres
+			id: null,
+			name: 'Master',
 			avatar: campaign.owner?.profileImage || 'https://ui-avatars.com/api/?name=DM&background=1e3a8a&color=fff',
 		};
 	} else if (isParticipant && campaign.characterId) {
@@ -167,29 +172,36 @@ export default function CampaignDetailPage() {
 		</div>
 	);
 
-	const tabsData = [
-		{
-			label: t('campaign.generalInfo'),
-			value: 'info',
-			content: <CampaignAbout campaign={campaign} isWritten={isWritten} isFull={isFull} t={t} />,
-		},
-	];
+	const infoTab = {
+		label: t('campaign.generalInfo'),
+		value: 'info',
+		content: <CampaignAbout campaign={campaign} isWritten={isWritten} isFull={isFull} t={t} />,
+	};
+
+	const roleplayTab = {
+		label: isWritten ? t('forum.campaignc.roleplay') : t('forum.forum'),
+		value: 'roleplay',
+		content: (
+			<CampaignTimeline
+				campaignId={id}
+				isOwner={isOwner}
+				isTabletop={isTabletop}
+				myCharacter={myCharacter}
+				characters={characters}
+			/>
+		),
+		className: theme?.textPrimary, // Ojo, he puesto theme?.textPrimary por si acaso theme es undefined
+	};
+
+	let tabsData = [];
+	let defaultTabValue = 'info';
 
 	if (hasForum) {
-		tabsData.push({
-			label: isWritten ? t('forum.campaignc.roleplay') : t('forum.forum'),
-			value: 'roleplay',
-			content: (
-				<CampaignTimeline
-					campaignId={id}
-					isOwner={isOwner}
-					isTabletop={isTabletop}
-					myCharacter={myCharacter}
-					characters={characters}
-				/>
-			),
-			className: theme.textPrimary,
-		});
+		tabsData = [infoTab, roleplayTab];
+		defaultTabValue = 'roleplay';
+	} else {
+		// Si es un visitante o aún no tiene ficha, primero la Info
+		tabsData = [infoTab];
 	}
 
 	return (
@@ -243,7 +255,7 @@ export default function CampaignDetailPage() {
 					</div>
 
 					{/* --- INICIO ZONA DE PESTAÑAS (TABS) --- */}
-					<Tabs value='info' className='w-full'>
+					<Tabs value={defaultTabValue} className='w-full'>
 						{/* Cabecera de las pestañas */}
 						<TabsHeader
 							className='bg-transparent border-b border-gray-200 rounded-none p-0'

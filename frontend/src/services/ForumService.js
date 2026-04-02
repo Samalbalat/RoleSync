@@ -18,7 +18,7 @@ const ForumService = {
             if (search) params.search = search;
             if (tags) params.tags = tags;
 
-            const response = await api.get('/api/forums/threads', { params });
+            const response = await api.get('/forums/posts', { params });
             return response.data;
         } catch (error) {
             console.error('Error fetching general threads:', error);
@@ -32,7 +32,7 @@ const ForumService = {
      */
     getGeneralThreadDetail: async (postId) => {
         try {
-            const response = await api.get(`/api/forums/threads/${postId}`);
+            const response = await api.get(`/forums/posts/${postId}`);
             return response.data;
         } catch (error) {
             console.error(`Error fetching thread detail for post ${postId}:`, error);
@@ -46,7 +46,7 @@ const ForumService = {
      */
     createGeneralThread: async (threadData) => {
         try {
-            const response = await api.post('/api/forums/threads', threadData);
+            const response = await api.post('/forums/posts', threadData);
             return response.data;
         } catch (error) {
             console.error('Error creating general thread:', error);
@@ -63,7 +63,7 @@ const ForumService = {
         try {
             const params = { page, limit };
             // Según indicas, el endpoint es /forums/myPosts
-            const response = await api.get('/api/forums/myPosts', { params });
+            const response = await api.get('/forums/myPosts', { params });
             return response.data;
         } catch (error) {
             console.error('Error fetching my threads:', error);
@@ -82,7 +82,7 @@ const ForumService = {
      */
     createPost: async (campaignId, postData) => {
         try {
-            const response = await api.post(`/api/campaigns/${campaignId}/posts`, postData);
+            const response = await api.post(`/campaigns/${campaignId}/posts`, postData);
             return response.data;
         } catch (error) {
             console.error(`Error creating post for campaign ${campaignId}:`, error);
@@ -101,7 +101,7 @@ const ForumService = {
             const params = { limit };
             if (cursor) params.cursor = cursor;
             
-            const response = await api.get(`/api/campaigns/${campaignId}/posts`, { params });
+            const response = await api.get(`/campaigns/${campaignId}/posts`, { params });
             return response.data;
         } catch (error) {
             console.error(`Error fetching timeline for campaign ${campaignId}:`, error);
@@ -125,7 +125,7 @@ const ForumService = {
             const params = { limit };
             if (cursor) params.cursor = cursor;
 
-            const response = await api.get(`/api/posts/${postId}/replies`, { params });
+            const response = await api.get(`/posts/${postId}/replies`, { params });
             return response.data;
         } catch (error) {
             console.error(`Error fetching replies for post ${postId}:`, error);
@@ -140,7 +140,7 @@ const ForumService = {
      */
     updatePost: async (postId, updateData) => {
         try {
-            const response = await api.put(`/api/posts/${postId}`, updateData);
+            const response = await api.put(`/posts/${postId}`, updateData);
             return response.data;
         } catch (error) {
             console.error(`Error updating post ${postId}:`, error);
@@ -155,7 +155,7 @@ const ForumService = {
      */
     moderatePost: async (postId, moderationData) => {
         try {
-            const response = await api.patch(`/api/posts/${postId}/moderate`, moderationData);
+            const response = await api.patch(`/posts/${postId}/moderate`, moderationData);
             return response.data;
         } catch (error) {
             console.error(`Error moderating post ${postId}:`, error);
@@ -169,7 +169,7 @@ const ForumService = {
      */
     deletePost: async (postId) => {
         try {
-            const response = await api.delete(`/api/posts/${postId}`);
+            const response = await api.delete(`/posts/${postId}`);
             return response.data;
         } catch (error) {
             console.error(`Error deleting post ${postId}:`, error);

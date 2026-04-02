@@ -35,7 +35,7 @@ export default function CampaignDashboardSection({ campaigns, role }) {
 			btnText: t('home.masterCampaigns.createButton'),
 			btnIcon: <PlusIcon className='h-4 w-4' />,
 			btnVariant: 'filled',
-			actionRoute: '/create-campaign',
+			actionRoute: '/campaigns/create',
 		},
 		player: {
 			title: t('home.playerCampaigns.title'),

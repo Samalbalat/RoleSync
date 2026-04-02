@@ -22,6 +22,8 @@ import {
 	XMarkIcon,
 	LinkIcon,
 } from '@heroicons/react/24/outline';
+import ForumService from '../../services/ForumService';
+import toast from 'react-hot-toast';
 
 // HELPERS EXTERNOS
 
@@ -81,6 +83,7 @@ const PostEditor = ({
 	isOwner,
 	isTabletop = false,
 	isGeneralForum = false,
+	onPostCreated,
 }) => {
 	const [content, setContent] = useState('');
 	const [isOoc, setIsOoc] = useState(false);
@@ -88,7 +91,7 @@ const PostEditor = ({
 	const [showFormatMenu, setShowFormatMenu] = useState(false);
 	const [showImageInput, setShowImageInput] = useState(false);
 	const [imageUrl, setImageUrl] = useState('');
-	const { t } = useTranslation();
+	const { t } = useTranslation('global');
 
 	const textareaRef = useRef(null);
 
@@ -133,15 +136,37 @@ const PostEditor = ({
 		}, 0);
 	};
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		if (isSubmitDisabled) return;
 
-		setContent('');
-		setImageUrl('');
-		setShowImageInput(false);
-		setShowFormatMenu(false);
-		setIsOoc(false);
-		setVisibleToIds([]);
+		const postData = {
+			type: 'THREAD_START', // Como estamos en la TL principal, iniciamos hilo
+			content: content,
+			authorCharacterId: authorId,
+			parentPostId: null, // No es una respuesta a otro post
+			isOoc: isOoc,
+			mediaUrls: imageUrl ? [imageUrl] : [],
+			visibleToCharacterIds: visibleToIds.length > 0 ? visibleToIds : null,
+		};
+
+		try {
+			console.log('Datos enviados al crear post:', postData);
+			const newPost = await ForumService.createPost(campaignId, postData);
+
+			if (onPostCreated) {
+				onPostCreated(newPost);
+			}
+
+			setContent('');
+			setImageUrl('');
+			setShowImageInput(false);
+			setShowFormatMenu(false);
+			setIsOoc(false);
+			setVisibleToIds([]);
+		} catch (error) {
+			console.error('Error al crear el post:', error);
+			toast.error(t('forum.postEditor.creationError'));
+		}
 	};
 
 	return (

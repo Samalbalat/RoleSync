@@ -17,7 +17,7 @@ const AuthService = {
     },
 
     checkSession: async () => {
-        const response = await api.get('/rolesync/profile/me');
+        const response = await api.get('/rolesync/me');
         return response.data;
     }
 };

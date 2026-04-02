@@ -58,7 +58,8 @@
     "search": "Buscar",
     "loading": "Cargando...",
     "enter": "Entrar",
-    "other": "Otro"
+    "other": "Otro",
+    "loadMore": "Cargar mas"
   },
   "dayWeek": {
     "monday": "Lunes",
@@ -423,7 +424,8 @@
       "addImage": "Añadir Imagen",
       "format": "Formato",
       "whoCanSee": "¿Quién puede verlo?",
-      "noMoreCharacters": "No hay más personajes"
+      "noMoreCharacters": "No hay más personajes",
+      "creationError": "Error al enviar el mensaje."
     },
     "dialog": {
       "title": "Hilo de conversación",
