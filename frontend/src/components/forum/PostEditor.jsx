@@ -84,6 +84,8 @@ const PostEditor = ({
 	isTabletop = false,
 	isGeneralForum = false,
 	onPostCreated,
+	typePost,
+	parentPostId = null,
 }) => {
 	const [content, setContent] = useState('');
 	const [isOoc, setIsOoc] = useState(false);
@@ -92,16 +94,7 @@ const PostEditor = ({
 	const [showImageInput, setShowImageInput] = useState(false);
 	const [imageUrl, setImageUrl] = useState('');
 	const { t } = useTranslation('global');
-
 	const textareaRef = useRef(null);
-
-	// Variables de estado lógicas
-	const effectiveIsDm = !isGeneralForum && isOwner;
-	const canUseRoleplayFeatures = !isTabletop && !isGeneralForum;
-	const isSecret = canUseRoleplayFeatures && visibleToIds.length > 0;
-	const effectiveIsOoc = canUseRoleplayFeatures && isOoc;
-	const isSubmitDisabled = !content.trim() && !imageUrl.trim();
-	const hasOtherCharacters = otherCharacters.length > 0;
 
 	// Uso de los helpers externos
 	const {
@@ -109,6 +102,16 @@ const PostEditor = ({
 		avatar: displayAvatar,
 		id: authorId,
 	} = getAuthorDisplayData(isGeneralForum, currentUser, myCharacter);
+
+	const whisperCharacters = otherCharacters.filter(char => char.id !== myCharacter?.id);
+
+	// Variables de estado lógicas
+	const effectiveIsDm = !isGeneralForum && isOwner;
+	const canUseRoleplayFeatures = !isTabletop && !isGeneralForum;
+	const isSecret = canUseRoleplayFeatures && visibleToIds.length > 0;
+	const effectiveIsOoc = canUseRoleplayFeatures && isOoc;
+	const isSubmitDisabled = !content.trim() && !imageUrl.trim();
+	const hasOtherCharacters = whisperCharacters.length > 0;
 	const containerClasses = getContainerStyles(effectiveIsDm, effectiveIsOoc);
 	const textareaStyles = getTextareaStyles(effectiveIsDm, effectiveIsOoc, isSecret);
 	const buttonColor = getButtonColor(effectiveIsDm, effectiveIsOoc, isSecret);
@@ -139,20 +142,27 @@ const PostEditor = ({
 	const handleSubmit = async () => {
 		if (isSubmitDisabled) return;
 
+		let finalVisibleIds = null;
+		if (visibleToIds.length > 0) {
+			// Usamos Set para evitar duplicados por si acaso
+			const idsSet = new Set(visibleToIds);
+			if (authorId) idsSet.add(authorId);
+			finalVisibleIds = Array.from(idsSet);
+		}
 		const postData = {
-			type: 'THREAD_START', // Como estamos en la TL principal, iniciamos hilo
+			type: typePost,
 			content: content,
 			authorCharacterId: authorId,
-			parentPostId: null, // No es una respuesta a otro post
+			parentPostId: parentPostId,
 			isOoc: isOoc,
+			isDm: isOwner,
 			mediaUrls: imageUrl ? [imageUrl] : [],
-			visibleToCharacterIds: visibleToIds.length > 0 ? visibleToIds : null,
+			visibleToCharacterIds: finalVisibleIds,
 		};
-
 		try {
-			console.log('Datos enviados al crear post:', postData);
+			console.log('Enviando datos al backend:', postData);
 			const newPost = await ForumService.createPost(campaignId, postData);
-
+			console.log('Post creado con éxito:', newPost);
 			if (onPostCreated) {
 				onPostCreated(newPost);
 			}
@@ -345,7 +355,7 @@ const PostEditor = ({
 									{t('forum.postEditor.whoCanSee')}
 								</Typography>
 								{hasOtherCharacters ? (
-									otherCharacters.map(char => (
+									whisperCharacters.map(char => (
 										<MenuItem key={char.id} className='p-0'>
 											<label className='flex w-full cursor-pointer items-center px-3 py-2'>
 												<Checkbox
@@ -399,6 +409,9 @@ PostEditor.propTypes = {
 	isOwner: PropTypes.bool,
 	isTabletop: PropTypes.bool,
 	isGeneralForum: PropTypes.bool,
+	onPostCreated: PropTypes.func,
+	type: PropTypes.string,
+	parentPostId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default PostEditor;

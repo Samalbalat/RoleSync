@@ -14,7 +14,7 @@ export function RegisterPage() {
 
 	const [formData, setFormData] = useState({
 		profileName: '',
-		profileType: '',
+		roleType: '',
 		timeZone: '',
 		email: '',
 		password: '',
@@ -42,7 +42,7 @@ export function RegisterPage() {
 		//Validaciones frontend
 		const newErrors = {};
 		newErrors.profileName = validateRequired(formData.profileName);
-		newErrors.profileType = validateRequired(formData.profileType);
+		newErrors.roleType = validateRequired(formData.roleType);
 		newErrors.timeZone = validateRequired(formData.timeZone);
 		newErrors.email = validateEmail(formData.email);
 		newErrors.password = validatePassword(formData.password);
@@ -62,7 +62,7 @@ export function RegisterPage() {
 			try {
 				const signupRequest = {
 					profilename: formData.profileName,
-					profileType: formData.profileType.toUpperCase(),
+					roleType: formData.roleType.toUpperCase(),
 					timeZone: formData.timeZone,
 					email: formData.email,
 					password: formData.password,
@@ -128,24 +128,24 @@ export function RegisterPage() {
 				{/* Tipo de Perfil Inicial */}
 				<div>
 					<Select
-						label={t('profile.rolType')}
+						label={t('profile.roleType')}
 						size='lg'
-						value={formData.profileType}
-						onChange={val => handleChange('profileType', val)}
+						value={formData.roleType}
+						onChange={val => handleChange('roleType', val)}
 						className='bg-white'
-						error={!!errors.profileType}
+						error={!!errors.roleType}
 					>
 						<Option value='WRITTEN'>{t('profile.narrative')}</Option>
 						<Option value='TABLETOP'>{t('profile.table')}</Option>
 					</Select>
-					{errors.profileType && (
+					{errors.roleType && (
 						<Typography variant='small' color='red' className='mt-1 text-xs'>
-							{t(errors.profileType)}
+							{t(errors.roleType)}
 						</Typography>
 					)}
 
 					<Typography variant='paragraph' className='mt-1 text-[12px] text-gray-500 italic'>
-						* {t('auth.profileTypeNote')}
+						* {t('auth.roleTypeNote')}
 					</Typography>
 				</div>
 

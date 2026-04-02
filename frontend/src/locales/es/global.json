@@ -104,7 +104,7 @@
     "enterEmailPassword": "Ingrese su correo electrónico y contraseña para iniciar sesión",
     "notRegistered": "No está registrado",
     "createAccount": "Crear cuenta",
-    "profileTypeNote": "No te preocupes: podrás crear un perfil del otro tipo más tarde con esta misma cuenta.",
+    "roleTypeNote": "No te preocupes: podrás crear un perfil del otro tipo más tarde con esta misma cuenta.",
     "accessDenied": "Acceso Denegado",
     "errorInvalidCredentials": "Correo electrónico o contraseña inválidos",
     "errorEmailInUse": "El email ya está en uso",
@@ -125,7 +125,7 @@
   "profile": {
     "profileName": "Nombre del Perfil",
     "description": "Descripción",
-    "rolType": "Tipo de Rol",
+    "roleType": "Tipo de Rol",
     "narrative": "Narrativo",
     "table": "Mesa",
     "master": "Master",
@@ -444,7 +444,10 @@
       "emptySubtitle": "Anímate a abrir tu primer debate en la comunidad.",
       "emptyButton": "Ir al Foro General"
     },
-    "yourReply": "Tu respuesta"
+    "yourReply": "Tu respuesta",
+    "errors": {
+      "fetchReplies": "Error al cargar las respuestas"
+    }
   },
   "footer": {
     "copyright": "My Application. All rights reserved",

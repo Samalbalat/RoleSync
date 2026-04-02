@@ -161,7 +161,11 @@ const ThreadDetailPage = () => {
 					<Typography variant='h6' color='blue-gray' className='mb-4'>
 						{t('forum.yourReply')}
 					</Typography>
-					<PostEditor isGeneralForum={true} currentUser={{ id: 'user-1', profileName: 'MiUsuario', profileImage: null }} />
+					<PostEditor
+						type='REPLY'
+						isGeneralForum={true}
+						currentUser={{ id: 'user-1', profileName: 'MiUsuario', profileImage: null }}
+					/>
 				</div>
 			)}
 		</div>

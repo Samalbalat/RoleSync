@@ -96,7 +96,7 @@
     "enterEmailPassword": "Enter your email and password to sign in",
     "notRegistered": "Not registered",
     "createAccount": "Create account",
-    "profileTypeNote": "Don't worry: you'll be able to create the other type of profile later with this same account.",
+    "roleTypeNote": "Don't worry: you'll be able to create the other type of profile later with this same account.",
     "accessDenied": "Access Denied",
     "errorInvalidCredentials": "Invalid email or password",
     "errorEmailInUse": "Email is already in use",
@@ -118,7 +118,7 @@
   "profile": {
     "profileName": "Profile Name",
     "description": "Description",
-    "rolType": "Role Type",
+    "roleType": "Role Type",
     "narrative": "Narrative",
     "table": "Table",
     "master": "Master",
@@ -426,7 +426,10 @@
       "emptySubtitle": "Dare to open your first debate in the community.",
       "emptyButton": "Go to General Forum"
     },
-    "yourReply": "Your answer"
+    "yourReply": "Your answer",
+    "errors": {
+      "fetchReplies": "Error loading responses"
+    }
   },
   "footer": {
     "copyright": "My Application. \nAll rights reserved",

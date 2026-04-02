@@ -19,6 +19,7 @@ const PostCard = ({
 	onTogglePin,
 	onToggleLock,
 	isTabletop,
+	ownerImage,
 }) => {
 	const { t } = useTranslation('global');
 	// 1. Convertir el contenido Markdown a HTML puro
@@ -70,22 +71,32 @@ const PostCard = ({
 		imagesToDisplay.push(post.imageUrl);
 	}
 
+	let imagen = ' ';
+	if (post.isDm) {
+		imagen = <img src={ownerImage} alt='Avatar' className='w-full h-full object-cover' />;
+	} else if (post.authorCharacterImage) {
+		imagen = <img src={post.authorCharacterImage} alt='Avatar' className='w-full h-full object-cover' />;
+	}
+
+	let name = 'ERROR';
+	if (post.isDm) {
+		name = 'Master';
+	} else if (post.authorCharacterImage) {
+		name = post.authorCharacterName;
+	}
+
 	return (
 		<div className={cardStyles} onClick={() => isTimelineView && !isTabletop && onClickThread?.(post)}>
 			{/* CABECERA DEL MENSAJE */}
 			<div className='flex justify-between items-start mb-3'>
 				<div className='flex items-center gap-3'>
 					<div
-						className={`w-10 h-10 rounded-full flex items-center justify-center font-bold shrink-0 overflow-hidden border ${isDmAnnouncement ? 'bg-blue-200 text-blue-800 border-blue-400' : 'bg-indigo-100 text-indigo-800 border-gray-200'}`}
+						className={`w-10 h-10 rounded-full flex items-center justify-center font-bold shrink-0 overflow-hidden border ${isDmAnnouncement ? 'bg-red-200 text-red-800 border-red-400' : 'bg-red-100 text-red-800 border-gray-200'}`}
 					>
-						{post.authorCharacterImage ? (
-							<img src={post.authorCharacterImage} alt='Avatar' className='w-full h-full object-cover' />
-						) : (
-							'DM'
-						)}
+						{imagen}
 					</div>
 					<div className='flex flex-col items-start'>
-						<span className='font-bold text-sm text-gray-900'>{post.authorCharacterName || 'Master'}</span>
+						<span className='font-bold text-sm text-gray-900'>{name}</span>
 						<div className='flex items-center gap-2 text-xs text-gray-500 font-medium mt-0.5'>
 							<span>{formattedDate}</span>
 							{post.isEdited && <span className='italic'>(Editado)</span>}

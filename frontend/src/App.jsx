@@ -20,6 +20,7 @@ import ThreadDetailPage from './pages/forum/ThreadDetailPage';
 import CreateGeneralPost from './components/forum/CreateGeneralPost';
 import MyPostsPage from './pages/forum/MyPostsPage';
 import { ProfileDetailsPage } from './pages/profile/ProfileDetailsPage';
+import EditCharacterPage from './pages/character/EditCharacterPage';
 
 function App() {
 	return (
@@ -72,6 +73,7 @@ function App() {
 							{/* onClick={() => navigate(`/character/templateBuilder?campaignId=${campaign.id}`)} /> */}
 							<Route path='createCharacter' element={<CreateCharacterPage />} />
 							{/* onClick={() => navigate(`/createCharacter?campaignId=${campaign.id}`)} */}
+							<Route path='/character/edit/:id' element={<EditCharacterPage />} />
 
 							{/* Rutas de Foros generales */}
 							<Route path='forum' element={<GeneralForumPage />} />

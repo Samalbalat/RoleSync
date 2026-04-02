@@ -188,6 +188,7 @@ export default function CampaignDetailPage() {
 				isTabletop={isTabletop}
 				myCharacter={myCharacter}
 				characters={characters}
+				ownerImage={campaign.owner?.profileImage}
 			/>
 		),
 		className: theme?.textPrimary, // Ojo, he puesto theme?.textPrimary por si acaso theme es undefined

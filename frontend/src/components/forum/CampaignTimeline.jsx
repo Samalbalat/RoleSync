@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Typography, Accordion, AccordionHeader, AccordionBody } from '@material-tailwind/react';
+import { Typography, Accordion, AccordionHeader, AccordionBody, Button } from '@material-tailwind/react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { TbPinnedFilled } from 'react-icons/tb';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +9,7 @@ import ThreadDialog from './ThreadDialog';
 import PostEditor from './PostEditor';
 import ForumService from '../../services/ForumService';
 
-const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, characters }) => {
+const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, characters, ownerImage }) => {
 	const { t } = useTranslation('global');
 
 	const [posts, setPosts] = useState([]);
@@ -120,6 +120,7 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 									onTogglePin={handleTogglePin}
 									onToggleLock={handleToggleLock}
 									isTabletop={isTabletop}
+									ownerImage={ownerImage}
 								/>
 							))}
 						</div>
@@ -135,6 +136,8 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 					isOwner={isOwner}
 					isTabletop={isTabletop}
 					onPostCreated={handlePostCreated}
+					typePost='THREAD_START'
+					parentPostId={null}
 				/>
 			) : (
 				<div className='p-4 bg-grey-100 border border-orange-200 text-grey-800 rounded-xl shadow-sm flex flex-col items-center justify-center text-center gap-2'>
@@ -148,6 +151,7 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 			)}
 			{/* SECCIÓN DE MENSAJES NORMALES */}
 			<div className='space-y-4'>
+				{loading && <Typography className='text-center text-gray-500 py-4'>Cargando posts...</Typography>}
 				{regularPosts.map(post => (
 					<PostCard
 						key={post.id}
@@ -158,6 +162,7 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 						onTogglePin={handleTogglePin}
 						onToggleLock={handleToggleLock}
 						isTabletop={isTabletop}
+						ownerImage={ownerImage}
 					/>
 				))}
 
@@ -175,17 +180,28 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 					</Typography>
 				)}
 			</div>
-			{!isTabletop && <ThreadDialog open={isDialogOpen} handleClose={handleCloseThread} post={selectedPost} />}
+			{!isTabletop && (
+				<ThreadDialog
+					open={isDialogOpen}
+					handleClose={handleCloseThread}
+					isOwner={isOwner}
+					isTabletop={isTabletop}
+					post={selectedPost}
+					myCharacter={myCharacter}
+					characters={characters}
+				/>
+			)}
 		</div>
 	);
 };
 
 CampaignTimeline.propTypes = {
-	campaignId: PropTypes.string.isRequired,
-	isOwner: PropTypes.bool.isRequired,
+	campaignId: PropTypes.string,
+	isOwner: PropTypes.bool,
 	isTabletop: PropTypes.bool,
-	myCharacter: PropTypes.object.isRequired,
-	characters: PropTypes.arrayOf(PropTypes.object).isRequired,
+	myCharacter: PropTypes.object,
+	characters: PropTypes.arrayOf(PropTypes.object),
+	ownerImage: PropTypes.string,
 };
 
 export default CampaignTimeline;
