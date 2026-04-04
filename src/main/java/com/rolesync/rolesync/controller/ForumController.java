@@ -65,25 +65,33 @@ public class ForumController {
     }
 
     @GetMapping("campaigns/{id}/posts")
-    public ResponseEntity<GetCampaignPostsOutDTO> getCampaignPosts(
+    public ResponseEntity<?> getCampaignPosts(
             @PathVariable Long id,
             Authentication authentication,
             @RequestHeader("X-Profile-Name") String profileName,
             @RequestParam(required = false) Integer limit,
-            @RequestParam(required = false) Instant cursor) {
+            @RequestParam(required = false) Instant cursor,
+            @RequestParam(required = false) Long characterId) {
                 //Security checks
                 if(!utilsCalls.checkAuthAndProfile(authentication, profileName)) {
-                    return ResponseEntity.status(403).build();
+                    return ResponseEntity.status(403).body("Unauthorized");
                 }
                 Campaign campaign = campaignRepository.findById(id).orElse(null);
                 String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
                 if("NONE".equals(relation) || "PENDING".equals(relation)) {
-                    return ResponseEntity.status(403).build();
+                    return ResponseEntity.status(403).body("Access denied");
                 }
-
+                if (characterId!=null) {
+                    CharacterSheet accessingCharacter = characterRepository.findById(characterId).orElse(null);
+                    if(accessingCharacter == null) {
+                        return ResponseEntity.status(400).body("Invalid character ID"); // Invalid character ID
+                    }else if(!accessingCharacter.getOwner().getProfilename().equals(profileName)) {
+                        return ResponseEntity.status(403).body("Access denied"); // Character does not belong to profile
+                    }
+                }
                 // Fetch posts with pagination
                 int effectiveLimit = Math.min((limit != null && limit > 0) ? limit : 20, 100); // Default to 20 if not provided or invalid
-                List<Post> page = postRepository.findCampaignPosts(id, cursor, effectiveLimit);
+                List<Post> page = postRepository.findCampaignPosts(id, cursor, effectiveLimit, characterId);
 
                 // Prepare response additional info for pagination
                 Instant nextCursor = null;
@@ -133,7 +141,7 @@ public class ForumController {
                 return ResponseEntity.ok().body(new GetCampaignPostsOutDTO(dtoList, nextCursor, hasMore));
             }
     
-    @GetMapping("forum/posts")
+    @GetMapping("forums/posts")
     public ResponseEntity<GetForumPostsOutDTO> getForumPosts(
             Authentication authentication,
             @RequestHeader("X-Profile-Name") String profileName,
@@ -172,8 +180,8 @@ public class ForumController {
                 return ResponseEntity.ok().body(new GetForumPostsOutDTO(dtoList, meta));
             }
 
-    @GetMapping("forum/posts/{id}")
-    public ResponseEntity<GetForumPostsOutItemDTO> getForumPostDetail(
+    @GetMapping("forums/posts/{id}")
+    public ResponseEntity<?> getForumPostDetail(
             @PathVariable Long id,
             Authentication authentication,
             @RequestHeader("X-Profile-Name") String profileName,
@@ -188,9 +196,9 @@ public class ForumController {
 
                 Post forumPost = postRepository.findById(id).orElse(null);
                 if(forumPost == null) {
-                    return ResponseEntity.status(404).build();
+                    return ResponseEntity.status(404).body("Post not found");
                 }else if(forumPost.getCampaign() != null) {
-                    return ResponseEntity.status(400).build(); // Not a forum post
+                    return ResponseEntity.status(400).body("Post is not a forum post");
                 }
                 GetForumPostsOutItemDTO dto = GetForumPostsOutDTOMapper.toDTO(forumPost);
                 Profile authorProfile = profileRepository.findById(forumPost.getAuthorProfileId()).orElse(null);
@@ -200,15 +208,15 @@ public class ForumController {
                 return ResponseEntity.ok().body(dto);
             }
 
-    @GetMapping("forum/myPosts")
-    public ResponseEntity<GetForumPostsOutDTO> getMyForumPosts(
+    @GetMapping("forums/myPosts")
+    public ResponseEntity<?> getMyForumPosts(
             Authentication authentication,
             @RequestHeader("X-Profile-Name") String profileName,
             @RequestParam(required = false) Integer limit,
             @RequestParam(required = false) Integer page) {
                 //Security checks
                 if(!utilsCalls.checkAuthAndProfile(authentication, profileName)) {
-                    return ResponseEntity.status(403).build();
+                    return ResponseEntity.status(403).body("Unauthorized");
                 }
                 Profile profile = profileRepository.findByProfilename(profileName).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -218,7 +226,7 @@ public class ForumController {
                 Integer totalPages = (int) Math.ceil((double) totalItems / effectiveLimit);
 
                 if (effectivePage > totalPages) {
-                    return ResponseEntity.status(400).body(null); // Invalid page number
+                    return ResponseEntity.status(400).body("Invalid page number"); // Invalid page number
                 }
 
                 // Fetch posts with pagination and optional filtering by tags 
@@ -273,7 +281,7 @@ public class ForumController {
                 return ResponseEntity.ok().body(campaignPostDto);
     }
 
-    @PostMapping("forum/posts")
+    @PostMapping("forums/posts")
     public ResponseEntity<?> postForumPost(
             @RequestHeader("X-Profile-Name") String profileName,
             Authentication authentication,
@@ -281,7 +289,7 @@ public class ForumController {
                 //Security checks
                 Profile profile = profileRepository.findByProfilename(profileName).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
                 if(!utilsCalls.checkAuthAndProfile(authentication, profileName)) {
-                    return ResponseEntity.status(403).build();
+                    return ResponseEntity.status(403).body("Unauthorized");
                 }
                 Post post = new Post();
                 Post responsePost = createPostFromRequest(request, post, profile);
@@ -301,16 +309,15 @@ public class ForumController {
         }
         post.setCampaign(campaign);
 
-        post.setParentPost(
-            request.getParentPostId() != null
-                ? postRepository.findById(request.getParentPostId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
-                : null
-        );
+        if(request.getParentPostId() != null) { // parentPostId is optional, only for replies
+            post.setParentPost(
+                postRepository.findById(request.getParentPostId()).orElse(null)
+            );
+        }
 
         post.setCreatedAt(Instant.now());
 
-        post.setOoc(Boolean.TRUE.equals(request.getIsOoc()));
+        post.setOoc(request.getIsOoc());
         post.setDm("OWNER".equals(relation)); // depends on your relation model
 
         post.setMediaUrls(request.getMediaUrls() != null ? request.getMediaUrls() : List.of());

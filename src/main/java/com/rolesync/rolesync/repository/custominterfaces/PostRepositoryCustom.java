@@ -6,7 +6,7 @@ import java.util.List;
 import com.rolesync.rolesync.model.Post;
 
 public interface PostRepositoryCustom {
-    List<Post> findCampaignPosts(Long campaignId, Instant cursor, int limit);
+    List<Post> findCampaignPosts(Long campaignId, Instant cursor, int limit, Long accessingCharacterId);
 
     List<Post> findForumPosts();
 

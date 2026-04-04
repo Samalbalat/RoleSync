@@ -4,8 +4,10 @@ import java.time.Instant;
 import java.util.List;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.rolesync.rolesync.model.Post;
+import com.rolesync.rolesync.model.PostType;
 import com.rolesync.rolesync.model.QPost;
 import com.rolesync.rolesync.repository.custominterfaces.PostRepositoryCustom;
 
@@ -17,16 +19,32 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Post> findCampaignPosts(Long campaignId, Instant cursor, int limit) {
+    public List<Post> findCampaignPosts(Long campaignId, Instant cursor, int limit, Long accessingCharacterId) {
         QPost post = QPost.post;
 
+        BooleanBuilder builder = new BooleanBuilder();
+
+        // 1. Campaign filter and cursor
+        builder.and(post.campaign.id.eq(campaignId));
+        builder.and(cursor != null ? post.createdAt.lt(cursor) : null);
+
+        // 2. Only THREAD_START
+        builder.and(post.type.eq(PostType.THREAD_START));
+
+        // 3. Visibility condition
+        BooleanExpression isPublic = post.visibleToCharacterIds.isEmpty();
+        if (accessingCharacterId!=null) {
+            BooleanExpression isVisibleToCharacter =
+                post.visibleToCharacterIds.any().eq(accessingCharacterId);
+                builder.and(isPublic.or(isVisibleToCharacter));
+        }else{
+            builder.and(isPublic);
+        }
         
+
         return queryFactory
                 .selectFrom(post)
-                .where(
-                        post.campaign.id.eq(campaignId),
-                        cursor != null ? post.createdAt.lt(cursor) : null
-                )
+                .where(builder)
                 .orderBy(
                     post.createdAt.desc(),
                     post.id.desc()) // 👈 REQUIRED for consistency)

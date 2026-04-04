@@ -27,9 +27,9 @@ public class CharacterSheetGetOutDTO {
         this.userId = sheet.getOwner().getId();
         this.name = sheet.getName();
         this.avatarUrl = sheet.getImage();
-        this.campaignId = sheet.getCampaign().getId();
-        this.campaignName = sheet.getCampaign().getName();
-        this.templateId = sheet.getTemplate().getId();
+        this.campaignId = sheet.getCampaign()!=null ? sheet.getCampaign().getId() : null;
+        this.campaignName = sheet.getCampaign()!=null ? sheet.getCampaign().getName() : null;
+        this.templateId = sheet.getTemplate()!=null ? sheet.getTemplate().getId() : null;
         this.schema = sheet.getSchema();
     }
     

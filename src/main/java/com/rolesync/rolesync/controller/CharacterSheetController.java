@@ -286,11 +286,15 @@ public class CharacterSheetController {
         
             if(character.isEmpty()){
                 return ResponseEntity.status(404).body("Character not found");
-            }else if(character.get().getIsPublic()==false && !character.get().getOwner().equals(userOpt.get())){
-                return ResponseEntity.status(403).body("User is not the owner of this character");
+            }else if(character.get().getCampaign()!=null){
+                Campaign campaign = character.get().getCampaign();
+                if(!campaign.getMembers().contains(profileName))
+                    return ResponseEntity.status(403).body("User is not a member of the campaign");
+            }else if(!character.get().getOwner().equals(userOpt.get()) && !character.get().getIsPublic()){
+                return ResponseEntity.status(403).body("User is not the owner of this character and it's not public");
             }
+            return ResponseEntity.ok(new CharacterSheetGetOutDTO(character.get()));
         }
-        return ResponseEntity.ok(new CharacterSheetGetOutDTO(character.get()));
     }
 
     private ResponseEntity<?> updateSheet(Authentication authentication, Long id, CharacterSheetInPostDTO dto, @RequestHeader ("X-Profile-Name") String profileName) {
