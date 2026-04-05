@@ -53,7 +53,9 @@
     "loading": "Loading...",
     "enter": "Enter",
     "other": "Other",
-    "loadMore": "Load more"
+    "loadMore": "Load more",
+    "previous": "Former",
+    "next": "Following"
   },
   "dayWeek": {
     "monday": "Monday",
@@ -428,7 +430,8 @@
     },
     "yourReply": "Your answer",
     "errors": {
-      "fetchReplies": "Error loading responses"
+      "fetchReplies": "Error loading responses",
+      "fetchThreads": "Error loading posts"
     }
   },
   "footer": {

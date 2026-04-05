@@ -189,6 +189,7 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 					post={selectedPost}
 					myCharacter={myCharacter}
 					characters={characters}
+					ownerImage={ownerImage}
 				/>
 			)}
 		</div>

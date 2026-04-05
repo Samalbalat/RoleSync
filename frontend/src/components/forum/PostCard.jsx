@@ -22,9 +22,7 @@ const PostCard = ({
 	ownerImage,
 }) => {
 	const { t } = useTranslation('global');
-	// 1. Convertir el contenido Markdown a HTML puro
 	const rawHtml = marked.parse(post.content || '');
-	// 2. Limpiar el HTML para evitar inyecciones maliciosas (XSS)
 	const cleanContent = DOMPurify.sanitize(rawHtml);
 
 	const [isRevealed, setIsRevealed] = useState(false);
@@ -37,9 +35,14 @@ const PostCard = ({
 	}).format(new Date(post.createdAt || Date.now()));
 
 	// TIPOS DE MENSAJE
+	const isMaster = post.dm || post.isDm;
+	const isOocMessage = post.ooc || post.isOoc;
 	const isSecret = post.visibleToCharacterIds && post.visibleToCharacterIds.length > 0;
-	const isDmAnnouncement = post.isOoc && post.isDm;
-	const isRegularOoc = post.isOoc && !post.isDm;
+	const isDmAnnouncement = isOocMessage && isMaster;
+	const isRegularOoc = isOocMessage && !isMaster;
+	const isPostPinned = post.pinned || post.isPinned;
+	const isPostLocked = post.locked || post.isLocked;
+	const isPostEdited = post.edited || post.isEdited;
 
 	// LÓGICA DE OCULTAMIENTO OOC
 	const hideInTimeline = isTimelineView && isRegularOoc;
@@ -62,7 +65,6 @@ const PostCard = ({
 		cardStyles += ' bg-white border-gray-200 text-gray-800';
 	}
 
-	// Recopilar imágenes: Soporta tanto el formato nuevo del editor (imageUrl) como el array antiguo (mediaUrls)
 	const imagesToDisplay = [];
 	if (post.mediaUrls && post.mediaUrls.length > 0) {
 		imagesToDisplay.push(...post.mediaUrls);
@@ -71,18 +73,24 @@ const PostCard = ({
 		imagesToDisplay.push(post.imageUrl);
 	}
 
-	let imagen = ' ';
-	if (post.isDm) {
-		imagen = <img src={ownerImage} alt='Avatar' className='w-full h-full object-cover' />;
-	} else if (post.authorCharacterImage) {
-		imagen = <img src={post.authorCharacterImage} alt='Avatar' className='w-full h-full object-cover' />;
-	}
-
+	// 🚨 LÓGICA DE NOMBRE E IMAGEN CON CONTROL DE ERRORES
+	let imagen = <span className='text-xs font-bold text-red-500'>ERROR</span>;
 	let name = 'ERROR';
-	if (post.isDm) {
+
+	if (isMaster) {
 		name = 'Master';
-	} else if (post.authorCharacterImage) {
-		name = post.authorCharacterName;
+		// Usamos un avatar por defecto en caso de que el Master no tenga foto de perfil
+		const fallbackMasterImg = 'https://ui-avatars.com/api/?name=DM&background=1e3a8a&color=fff';
+		imagen = <img src={ownerImage || fallbackMasterImg} alt='Master Avatar' className='w-full h-full object-cover' />;
+	} else if (post.authorCharacterName || post.authorCharacterImage) {
+		name = post.authorCharacterName || 'Sin Nombre';
+		imagen = (
+			<img
+				src={post.authorCharacterImage || `https://ui-avatars.com/api/?name=${name}`}
+				alt='Character Avatar'
+				className='w-full h-full object-cover'
+			/>
+		);
 	}
 
 	return (
@@ -91,15 +99,15 @@ const PostCard = ({
 			<div className='flex justify-between items-start mb-3'>
 				<div className='flex items-center gap-3'>
 					<div
-						className={`w-10 h-10 rounded-full flex items-center justify-center font-bold shrink-0 overflow-hidden border ${isDmAnnouncement ? 'bg-red-200 text-red-800 border-red-400' : 'bg-red-100 text-red-800 border-gray-200'}`}
+						className={`w-10 h-10 rounded-full flex items-center justify-center font-bold shrink-0 overflow-hidden border ${isDmAnnouncement ? 'bg-red-200 text-red-800 border-red-400' : 'bg-red-100 text-red-800 border-gray-200'} ${name === 'ERROR' ? 'bg-red-500 border-red-700' : ''}`}
 					>
 						{imagen}
 					</div>
 					<div className='flex flex-col items-start'>
-						<span className='font-bold text-sm text-gray-900'>{name}</span>
+						<span className={`font-bold text-sm ${name === 'ERROR' ? 'text-red-500' : 'text-gray-900'}`}>{name}</span>
 						<div className='flex items-center gap-2 text-xs text-gray-500 font-medium mt-0.5'>
 							<span>{formattedDate}</span>
-							{post.isEdited && <span className='italic'>(Editado)</span>}
+							{isPostEdited && <span className='italic'>(Editado)</span>}
 
 							{/* BADGES DINÁMICOS */}
 							{isRegularOoc && !isTabletop && (
@@ -122,40 +130,34 @@ const PostCard = ({
 
 					{isCurrentUserDM ? (
 						<>
-							{/* BOTÓN PIN - Sigue existiendo para los dos modos */}
 							<button
 								onClick={e => {
 									e.stopPropagation();
 									onTogglePin?.(e, post.id);
 								}}
-								className={`flex items-center justify-center p-1.5 rounded-full transition-colors ${post.isPinned ? 'text-orange-500 hover:bg-orange-50' : 'text-gray-500 hover:text-orange-500 hover:bg-gray-100'}`}
-								title={post.isPinned ? t('forum.unpinMessage') : t('forum.pinMessage')}
+								className={`flex items-center justify-center p-1.5 rounded-full transition-colors ${isPostPinned ? 'text-orange-500 hover:bg-orange-50' : 'text-gray-500 hover:text-orange-500 hover:bg-gray-100'}`}
+								title={isPostPinned ? t('forum.unpinMessage') : t('forum.pinMessage')}
 							>
-								{post.isPinned ? <TbPinnedFilled className='w-5 h-5' /> : <TbPinned className='w-5 h-5' />}
+								{isPostPinned ? <TbPinnedFilled className='w-5 h-5' /> : <TbPinned className='w-5 h-5' />}
 							</button>
 
-							{/* BOTÓN LOCK - Oculto si es Tabletop */}
 							{!isTabletop && (
 								<button
 									onClick={e => {
 										e.stopPropagation();
 										onToggleLock?.(e, post.id);
 									}}
-									className={`flex items-center justify-center p-1.5 rounded-full transition-colors ${post.isLocked ? 'text-red-500 hover:bg-red-50' : 'text-gray-500 hover:text-red-500 hover:bg-gray-100'}`}
-									title={post.isLocked ? t('forum.unlockResponses') : t('forum.lockResponses')}
+									className={`flex items-center justify-center p-1.5 rounded-full transition-colors ${isPostLocked ? 'text-red-500 hover:bg-red-50' : 'text-gray-500 hover:text-red-500 hover:bg-gray-100'}`}
+									title={isPostLocked ? t('forum.unlockResponses') : t('forum.lockResponses')}
 								>
-									{post.isLocked ? <LockClosedIcon className='w-5 h-5' /> : <LockOpenIcon className='w-5 h-5' />}
+									{isPostLocked ? <LockClosedIcon className='w-5 h-5' /> : <LockOpenIcon className='w-5 h-5' />}
 								</button>
 							)}
 						</>
 					) : (
-						/* VISTA PARA JUGADORES NORMALES */
 						<>
-							{post.isPinned && <TbPinnedFilled className='w-5 h-5 text-orange-500' title={t('forum.pinned')} />}
-							{/* Oculto el icono del candado si es Tabletop */}
-							{!isTabletop && post.isLocked && (
-								<LockClosedIcon className='w-5 h-5 text-red-500' title={t('forum.blocked')} />
-							)}
+							{isPostPinned && <TbPinnedFilled className='w-5 h-5 text-orange-500' title={t('forum.pinned')} />}
+							{!isTabletop && isPostLocked && <LockClosedIcon className='w-5 h-5 text-red-500' title={t('forum.blocked')} />}
 						</>
 					)}
 				</div>
@@ -163,24 +165,20 @@ const PostCard = ({
 
 			{/* CONTENIDO DEL MENSAJE */}
 			{hideInTimeline ? (
-				// VISTA TIMELINE: Caja resumen en lugar del texto
 				<div className='mt-2 p-3 bg-white/50 border border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center gap-1 text-gray-500'>
 					<span className='text-sm font-medium'>{t('forum.campaign.oocMessage')}</span>
 					<span className='text-xs'>{t('forum.campaign.oocDescription')}</span>
 				</div>
 			) : (
-				// VISTA DENTRO DEL HILO: Contenido normal o difuminado
 				<div
 					className={`relative mt-2 transition-all duration-300 rounded-md ${blurInThread ? 'cursor-pointer group overflow-hidden' : ''}`}
 					onClick={() => blurInThread && setIsRevealed(true)}
 				>
-					{/* Texto del post */}
 					<div
-						className={`prose prose-sm max-w-none break-words ${post.isOoc ? 'prose-p:text-gray-600' : 'prose-p:text-gray-800'} prose-blockquote:border-l-indigo-500 prose-blockquote:bg-indigo-50/50 prose-blockquote:py-1 prose-blockquote:px-3 prose-blockquote:rounded-r-lg prose-blockquote:not-italic prose-blockquote:text-gray-700 ${blurInThread ? 'blur-[5px] opacity-60 select-none pointer-events-none' : ''}`}
+						className={`prose prose-sm max-w-none break-words ${isOocMessage ? 'prose-p:text-gray-600' : 'prose-p:text-gray-800'} prose-blockquote:border-l-indigo-500 prose-blockquote:bg-indigo-50/50 prose-blockquote:py-1 prose-blockquote:px-3 prose-blockquote:rounded-r-lg prose-blockquote:not-italic prose-blockquote:text-gray-700 ${blurInThread ? 'blur-[5px] opacity-60 select-none pointer-events-none' : ''}`}
 						dangerouslySetInnerHTML={{ __html: cleanContent }}
 					/>
 
-					{/* Imágenes del post */}
 					{imagesToDisplay.length > 0 && (
 						<div
 							className={`mt-4 grid gap-2 ${imagesToDisplay.length > 1 ? 'grid-cols-2' : 'grid-cols-1 sm:w-2/3'} ${blurInThread ? 'blur-[5px] opacity-60 select-none pointer-events-none' : ''}`}
@@ -196,7 +194,6 @@ const PostCard = ({
 						</div>
 					)}
 
-					{/* Capa/Botón para revelar el contenido (Solo visible si está en modo blur) */}
 					{blurInThread && (
 						<div className='absolute inset-0 bg-gray-100/20 flex items-center justify-center'>
 							<div className='bg-white text-gray-700 px-4 py-2 rounded-full text-sm font-bold shadow-md border border-gray-200 flex items-center gap-2 group-hover:scale-105 transition-transform'>
@@ -207,13 +204,13 @@ const PostCard = ({
 				</div>
 			)}
 
-			{/* PIE DE TARJETA - Solo visible si NO es Tabletop */}
+			{/* PIE DE TARJETA */}
 			{isTimelineView && !isTabletop && (
 				<div className='mt-4 pt-3 border-t border-gray-100 flex justify-end'>
 					<div className='flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-800 font-bold transition-colors'>
 						<ChatBubbleLeftIcon className='w-5 h-5' />
 						<span>
-							{t('forum.campaign.openThread')} {post.isLocked && '(Bloqueado)'}
+							{t('forum.campaign.openThread')} {isPostLocked && '(Bloqueado)'}
 						</span>
 					</div>
 				</div>
@@ -230,6 +227,7 @@ PostCard.propTypes = {
 	onTogglePin: PropTypes.func,
 	onToggleLock: PropTypes.func,
 	isTabletop: PropTypes.bool,
+	ownerImage: PropTypes.string,
 };
 
 export default PostCard;

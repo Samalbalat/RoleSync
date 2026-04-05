@@ -22,6 +22,8 @@ const GeneralListCard = ({ thread }) => {
 		minute: '2-digit',
 	});
 
+	const replyCount = thread.replyCount || 0;
+
 	return (
 		<button
 			onClick={() => handleOpenThread(thread.id)}
@@ -32,20 +34,20 @@ const GeneralListCard = ({ thread }) => {
 				<div className='flex items-center gap-2'>
 					<Avatar
 						src={
-							thread.author.profileImage ||
-							`https://ui-avatars.com/api/?name=${thread.author.profileName}&background=f3f4f6&color=374151`
+							thread.author?.profileImage ||
+							`https://ui-avatars.com/api/?name=${thread.author?.profileName || 'User'}&background=f3f4f6&color=374151`
 						}
-						alt={thread.author.profileName}
+						alt={thread.author?.profileName || 'User'}
 						size='sm'
 						className='w-6 h-6 rounded-full'
 					/>
 					<Typography variant='small' className='font-semibold text-gray-700'>
-						{thread.author.profileName}
+						{thread.author?.profileName}
 					</Typography>
 					<Typography variant='small' className='text-gray-400 text-xs'>
 						• {formattedDate}
 					</Typography>
-					{thread.isEdited && (
+					{thread.edited && (
 						<Typography variant='small' className='text-gray-400 text-[10px] italic'>
 							(editado)
 						</Typography>
@@ -53,7 +55,7 @@ const GeneralListCard = ({ thread }) => {
 				</div>
 
 				<div className='flex gap-2'>
-					{thread.isLocked && <LockClosedIcon className='w-4 h-4 text-red-500' title='Bloqueado' />}
+					{thread.locked && <LockClosedIcon className='w-4 h-4 text-red-500' title='Bloqueado' />}
 				</div>
 			</div>
 
@@ -92,7 +94,7 @@ const GeneralListCard = ({ thread }) => {
 				<div className={`flex items-center gap-1.5 text-gray-500 group-hover:${theme.textPrimary} transition-colors`}>
 					<ChatBubbleLeftIcon className='w-5 h-5' />
 					<Typography variant='small' className='font-medium text-sm'>
-						{thread.replyCount} {thread.replyCount === 1 ? t('forum.reply') : t('forum.replies')}
+						{replyCount} {replyCount === 1 ? t('forum.reply') : t('forum.replies')}
 					</Typography>
 				</div>
 			</div>

@@ -108,6 +108,7 @@ const PostEditor = ({
 	// Variables de estado lógicas
 	const effectiveIsDm = !isGeneralForum && isOwner;
 	const canUseRoleplayFeatures = !isTabletop && !isGeneralForum;
+	const canOoc = canUseRoleplayFeatures && !isOwner;
 	const isSecret = canUseRoleplayFeatures && visibleToIds.length > 0;
 	const effectiveIsOoc = canUseRoleplayFeatures && isOoc;
 	const isSubmitDisabled = !content.trim() && !imageUrl.trim();
@@ -149,20 +150,21 @@ const PostEditor = ({
 			if (authorId) idsSet.add(authorId);
 			finalVisibleIds = Array.from(idsSet);
 		}
+
+		const finalIsOoc = isOwner || isGeneralForum || isOoc;
+
 		const postData = {
 			type: typePost,
 			content: content,
 			authorCharacterId: authorId,
 			parentPostId: parentPostId,
-			isOoc: isOoc,
+			isOoc: finalIsOoc,
 			isDm: isOwner,
 			mediaUrls: imageUrl ? [imageUrl] : [],
 			visibleToCharacterIds: finalVisibleIds,
 		};
 		try {
-			console.log('Enviando datos al backend:', postData);
 			const newPost = await ForumService.createPost(campaignId, postData);
-			console.log('Post creado con éxito:', newPost);
 			if (onPostCreated) {
 				onPostCreated(newPost);
 			}
@@ -201,7 +203,7 @@ const PostEditor = ({
 					</div>
 				</div>
 
-				{canUseRoleplayFeatures && (
+				{canOoc && (
 					<div className='flex items-center gap-2'>
 						<Typography variant='small' className={`text-xs font-bold ${isOoc ? 'text-gray-700' : 'text-gray-400'}`}>
 							{t('forum.occMode')}

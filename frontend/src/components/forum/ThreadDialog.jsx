@@ -8,7 +8,7 @@ import PostCard from './PostCard';
 import PostEditor from './PostEditor';
 import ForumService from '../../services/ForumService';
 
-const ThreadDialog = ({ open, handleClose, isOwner, isTabletop, post, myCharacter, characters = [] }) => {
+const ThreadDialog = ({ open, handleClose, isOwner, isTabletop, post, myCharacter, characters = [], ownerImage }) => {
 	const { t } = useTranslation('global');
 
 	const [replies, setReplies] = useState([]);
@@ -20,7 +20,6 @@ const ThreadDialog = ({ open, handleClose, isOwner, isTabletop, post, myCharacte
 				setLoading(true);
 				try {
 					const data = await ForumService.getReplies(post.id);
-					console.log('Respuestas obtenidas del servicio:', data.data);
 					const fetchedReplies = Array.isArray(data.data) ? data.data : [];
 					setReplies(fetchedReplies);
 				} catch (error) {
@@ -65,7 +64,7 @@ const ThreadDialog = ({ open, handleClose, isOwner, isTabletop, post, myCharacte
 						</IconButton>
 					</DialogHeader>
 
-					{/* CUERPO DEL DIALOG (Aquí está la magia del scroll) */}
+					{/* CUERPO DEL DIALOG */}
 					<DialogBody className='p-0 flex flex-col flex-1 overflow-hidden'>
 						<div className='flex-1 overflow-y-auto p-4 md:p-6 space-y-6'>
 							{/* 1. MENSAJE PRINCIPAL (Padre) */}
@@ -73,7 +72,13 @@ const ThreadDialog = ({ open, handleClose, isOwner, isTabletop, post, myCharacte
 								<Typography variant='small' className='text-gray-500 font-bold uppercase tracking-wider mb-2 ml-1'>
 									{t('forum.dialog.originalMessage')}
 								</Typography>
-								<PostCard post={post} isTimelineView={false} />
+								<PostCard
+									post={post}
+									isTimelineView={false}
+									isCurrentUserDM={isOwner}
+									isTabletop={isTabletop}
+									ownerImage={ownerImage}
+								/>
 							</div>
 
 							{/* SEPARADOR VISUAL */}
@@ -89,7 +94,14 @@ const ThreadDialog = ({ open, handleClose, isOwner, isTabletop, post, myCharacte
 							<div className='space-y-4 pl-4 md:pl-8 border-l-2 border-indigo-50'>
 								{loading && <Typography className='text-center text-gray-500 py-4'>Cargando respuestas...</Typography>}
 								{replies.map(reply => (
-									<PostCard key={reply.id} post={reply} isTimelineView={false} />
+									<PostCard
+										key={reply.id}
+										post={reply}
+										isTimelineView={false}
+										isCurrentUserDM={isOwner}
+										isTabletop={isTabletop}
+										ownerImage={ownerImage}
+									/>
 								))}
 
 								{replies.length === 0 && (
@@ -98,8 +110,8 @@ const ThreadDialog = ({ open, handleClose, isOwner, isTabletop, post, myCharacte
 							</div>
 						</div>
 
-						{/* 3. ZONA PARA RESPONDER (Fijada abajo) */}
-						{post.isLocked ? (
+						{/* 3. ZONA PARA RESPONDER */}
+						{post.locked || post.isLocked ? (
 							<div className='p-4 bg-gray-100 border-t border-gray-200 text-center italic text-gray-500 shrink-0'>
 								{t('forum.dialog.locked')}
 							</div>
@@ -124,7 +136,7 @@ const ThreadDialog = ({ open, handleClose, isOwner, isTabletop, post, myCharacte
 					</DialogBody>
 				</>
 			) : (
-				<div /> /* <-- ESTO ES LO QUE SOLUCIONA EL ERROR DE LA CONSOLA */
+				<div />
 			)}
 		</Dialog>
 	);
@@ -138,6 +150,7 @@ ThreadDialog.propTypes = {
 	post: PropTypes.object,
 	myCharacter: PropTypes.object.isRequired,
 	characters: PropTypes.array,
+	ownerImage: PropTypes.string,
 };
 
 export default ThreadDialog;
