@@ -17,6 +17,7 @@ import {
 } from '@material-tailwind/react';
 import { PaperAirplaneIcon, XMarkIcon, ChatBubbleLeftEllipsisIcon, PhotoIcon, LinkIcon } from '@heroicons/react/24/outline';
 import { getTheme } from '../../utils/themeUtils';
+import ForumService from '../../services/ForumService'; // <-- Importamos el servicio
 
 const formatTags = tagsString => {
 	if (!tagsString) return [];
@@ -35,13 +36,13 @@ const getErrorMessage = error => {
 	);
 };
 
-const CreateGeneralPost = ({ open, handleClose }) => {
+// Añadimos la prop onSuccess para recargar la lista al terminar
+const CreateGeneralPost = ({ open, handleClose, onSuccess }) => {
 	const [tagsPreview, setTagsPreview] = useState([]);
 	const [showImageInput, setShowImageInput] = useState(false);
 	const { t } = useTranslation('global');
 	const theme = getTheme();
 
-	// Configuración de React Hook Form
 	const {
 		register,
 		handleSubmit,
@@ -61,31 +62,38 @@ const CreateGeneralPost = ({ open, handleClose }) => {
 	const currentTagsInput = watch('tagsInput');
 	const currentImageUrl = watch('imageUrl');
 
-	// Actualizamos la previsualización de tags
 	useEffect(() => {
 		setTagsPreview(formatTags(currentTagsInput));
 	}, [currentTagsInput]);
 
 	const onSubmit = async data => {
 		try {
-			const finalData = {
+			const payload = {
+				type: 'THREAD_START',
 				title: data.title,
 				content: data.content,
 				tags: formatTags(data.tagsInput),
-				imageUrl: data.imageUrl,
+				mediaUrls: data.imageUrl ? [data.imageUrl] : [],
+				// parentPostId: Lo omitimos porque es un hilo principal, no una respuesta.
+				// Si el backend te obliga a pasarlo sí o sí, pon: parentPostId: null o 0
 			};
 
-			// Simulamos llamada a la API
-			await new Promise(resolve => setTimeout(resolve, 1000));
+			// Llamada real a la API
+			await ForumService.createGeneralThread(payload);
 
-			toast.success(t('forum.general.create.success'));
+			toast.success(t('forum.general.create.success') || 'Hilo creado con éxito');
 
-			reset(); // Limpia los campos
-			setShowImageInput(false); // Oculta el input de imagen
-			handleClose(); // Cierra el modal
+			reset();
+			setShowImageInput(false);
+			handleClose();
+
+			// Si nos pasaron la función para refrescar la lista, la llamamos
+			if (onSuccess) {
+				onSuccess();
+			}
 		} catch (error) {
 			console.error('Error creando el post:', error);
-			toast.error(t('forum.general.create.error'));
+			toast.error(t('forum.general.create.error') || 'Error al crear el hilo');
 		}
 	};
 
@@ -169,7 +177,6 @@ const CreateGeneralPost = ({ open, handleClose }) => {
 							<Typography variant='small' color='blue-gray' className='font-medium'>
 								{t('forum.general.create.content')}
 							</Typography>
-							{/* Botón para activar/desactivar input de imagen */}
 							<Button
 								size='sm'
 								variant={showImageInput ? 'filled' : 'text'}
@@ -208,7 +215,6 @@ const CreateGeneralPost = ({ open, handleClose }) => {
 									icon={<LinkIcon className='h-5 w-5 text-gray-500' />}
 									{...register('imageUrl')}
 								/>
-								{/* Botón para limpiar solo la imagen */}
 								{currentImageUrl && (
 									<IconButton variant='text' color='red' onClick={() => setValue('imageUrl', '')}>
 										<XMarkIcon className='h-5 w-5' />
@@ -223,10 +229,9 @@ const CreateGeneralPost = ({ open, handleClose }) => {
 										src={currentImageUrl}
 										alt='Preview'
 										className='h-28 object-cover rounded-lg border border-gray-200 shadow-sm'
-										// Manejo básico de error de carga
 										onError={e => {
 											e.target.style.display = 'none';
-											toast.error(t('forum.general.create.invalidImageUrl'));
+											toast.error(t('forum.general.create.invalidImageUrl') || 'URL de imagen no válida');
 										}}
 										onLoad={e => (e.target.style.display = 'block')}
 									/>
@@ -260,6 +265,7 @@ const CreateGeneralPost = ({ open, handleClose }) => {
 CreateGeneralPost.propTypes = {
 	open: PropTypes.bool,
 	handleClose: PropTypes.func,
+	onSuccess: PropTypes.func, // Añadido a las propTypes
 };
 
 export default CreateGeneralPost;

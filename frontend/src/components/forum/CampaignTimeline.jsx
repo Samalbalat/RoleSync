@@ -1,23 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Typography, Accordion, AccordionHeader, AccordionBody } from '@material-tailwind/react';
+import { Typography, Accordion, AccordionHeader, AccordionBody, Button } from '@material-tailwind/react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { TbPinnedFilled } from 'react-icons/tb';
 import { useTranslation } from 'react-i18next';
 import PostCard from './PostCard';
-import { mockPosts } from '../../data/mockPosts';
 import ThreadDialog from './ThreadDialog';
 import PostEditor from './PostEditor';
+import ForumService from '../../services/ForumService';
 
-const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, characters }) => {
-	const [posts, setPosts] = useState(mockPosts);
-	const pinnedPosts = posts.filter(post => post.isPinned);
-	const regularPosts = posts.filter(post => !post.isPinned);
+const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, characters, ownerImage }) => {
 	const { t } = useTranslation('global');
+
+	const [posts, setPosts] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [nextCursor, setNextCursor] = useState(null);
+	const [hasMore, setHasMore] = useState(false);
 
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [selectedPost, setSelectedPost] = useState(null);
 	const [isPinnedOpen, setIsPinnedOpen] = useState(false);
+
+	useEffect(() => {
+		const fetchInitialPosts = async () => {
+			try {
+				setLoading(true);
+				const response = await ForumService.getTimeline(campaignId, null, 20);
+				setPosts(response.data || []);
+				setNextCursor(response.nextCursor);
+				setHasMore(response.hasMore);
+			} catch (error) {
+				console.error('Error cargando la timeline:', error);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		if (campaignId) {
+			fetchInitialPosts();
+		}
+	}, [campaignId]);
+
+	const handleLoadMore = async () => {
+		if (!hasMore || !nextCursor) return;
+		try {
+			const response = await ForumService.getTimeline(campaignId, nextCursor, 20);
+			// Concatenamos los posts antiguos con los nuevos
+			setPosts(prevPosts => [...prevPosts, ...(response.data || [])]);
+			setNextCursor(response.nextCursor);
+			setHasMore(response.hasMore);
+		} catch (error) {
+			console.error('Error cargando más posts:', error);
+		}
+	};
+
+	const handlePostCreated = newPost => {
+		setPosts(prevPosts => [newPost, ...prevPosts]);
+	};
+
+	const pinnedPosts = posts.filter(post => post.isPinned);
+	const regularPosts = posts.filter(post => !post.isPinned);
 
 	const handleOpenThread = post => {
 		if (isTabletop) return; //Si es tipo Mesa, no habrá hilos
@@ -78,6 +120,7 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 									onTogglePin={handleTogglePin}
 									onToggleLock={handleToggleLock}
 									isTabletop={isTabletop}
+									ownerImage={ownerImage}
 								/>
 							))}
 						</div>
@@ -92,6 +135,9 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 					otherCharacters={characters}
 					isOwner={isOwner}
 					isTabletop={isTabletop}
+					onPostCreated={handlePostCreated}
+					typePost='THREAD_START'
+					parentPostId={null}
 				/>
 			) : (
 				<div className='p-4 bg-grey-100 border border-orange-200 text-grey-800 rounded-xl shadow-sm flex flex-col items-center justify-center text-center gap-2'>
@@ -105,6 +151,7 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 			)}
 			{/* SECCIÓN DE MENSAJES NORMALES */}
 			<div className='space-y-4'>
+				{loading && <Typography className='text-center text-gray-500 py-4'>Cargando posts...</Typography>}
 				{regularPosts.map(post => (
 					<PostCard
 						key={post.id}
@@ -115,8 +162,17 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 						onTogglePin={handleTogglePin}
 						onToggleLock={handleToggleLock}
 						isTabletop={isTabletop}
+						ownerImage={ownerImage}
 					/>
 				))}
+
+				{hasMore && (
+					<div className='flex justify-center mt-6'>
+						<Button variant='text' color='blue-gray' onClick={handleLoadMore}>
+							{t('common.loadMore')}
+						</Button>
+					</div>
+				)}
 
 				{regularPosts.length === 0 && (
 					<Typography className='text-center text-gray-500 py-8 italic'>
@@ -124,17 +180,29 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 					</Typography>
 				)}
 			</div>
-			{!isTabletop && <ThreadDialog open={isDialogOpen} handleClose={handleCloseThread} post={selectedPost} />}
+			{!isTabletop && (
+				<ThreadDialog
+					open={isDialogOpen}
+					handleClose={handleCloseThread}
+					isOwner={isOwner}
+					isTabletop={isTabletop}
+					post={selectedPost}
+					myCharacter={myCharacter}
+					characters={characters}
+					ownerImage={ownerImage}
+				/>
+			)}
 		</div>
 	);
 };
 
 CampaignTimeline.propTypes = {
-	campaignId: PropTypes.string.isRequired,
-	isOwner: PropTypes.bool.isRequired,
+	campaignId: PropTypes.string,
+	isOwner: PropTypes.bool,
 	isTabletop: PropTypes.bool,
-	myCharacter: PropTypes.object.isRequired,
-	characters: PropTypes.arrayOf(PropTypes.object).isRequired,
+	myCharacter: PropTypes.object,
+	characters: PropTypes.arrayOf(PropTypes.object),
+	ownerImage: PropTypes.string,
 };
 
 export default CampaignTimeline;

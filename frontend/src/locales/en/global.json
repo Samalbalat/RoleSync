@@ -52,7 +52,10 @@
     "search": "Search",
     "loading": "Loading...",
     "enter": "Enter",
-    "other": "Other"
+    "other": "Other",
+    "loadMore": "Load more",
+    "previous": "Former",
+    "next": "Following"
   },
   "dayWeek": {
     "monday": "Monday",
@@ -95,7 +98,7 @@
     "enterEmailPassword": "Enter your email and password to sign in",
     "notRegistered": "Not registered",
     "createAccount": "Create account",
-    "profileTypeNote": "Don't worry: you'll be able to create the other type of profile later with this same account.",
+    "roleTypeNote": "Don't worry: you'll be able to create the other type of profile later with this same account.",
     "accessDenied": "Access Denied",
     "errorInvalidCredentials": "Invalid email or password",
     "errorEmailInUse": "Email is already in use",
@@ -117,7 +120,7 @@
   "profile": {
     "profileName": "Profile Name",
     "description": "Description",
-    "rolType": "Role Type",
+    "roleType": "Role Type",
     "narrative": "Narrative",
     "table": "Table",
     "master": "Master",
@@ -402,7 +405,8 @@
       "addImage": "Add Image",
       "format": "Format",
       "noMoreCharacters": "There are no more characters",
-      "whoCanSee": "Who can see it?"
+      "whoCanSee": "Who can see it?",
+      "creationError": "Error sending message."
     },
     "public": "Public",
     "occMode": "OOC mode",
@@ -424,7 +428,11 @@
       "emptySubtitle": "Dare to open your first debate in the community.",
       "emptyButton": "Go to General Forum"
     },
-    "yourReply": "Your answer"
+    "yourReply": "Your answer",
+    "errors": {
+      "fetchReplies": "Error loading responses",
+      "fetchThreads": "Error loading posts"
+    }
   },
   "footer": {
     "copyright": "My Application. \nAll rights reserved",

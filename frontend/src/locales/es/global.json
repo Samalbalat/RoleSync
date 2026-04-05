@@ -58,7 +58,10 @@
     "search": "Buscar",
     "loading": "Cargando...",
     "enter": "Entrar",
-    "other": "Otro"
+    "other": "Otro",
+    "loadMore": "Cargar mas",
+    "previous": "Anterior",
+    "next": "Siguiente"
   },
   "dayWeek": {
     "monday": "Lunes",
@@ -103,7 +106,7 @@
     "enterEmailPassword": "Ingrese su correo electrónico y contraseña para iniciar sesión",
     "notRegistered": "No está registrado",
     "createAccount": "Crear cuenta",
-    "profileTypeNote": "No te preocupes: podrás crear un perfil del otro tipo más tarde con esta misma cuenta.",
+    "roleTypeNote": "No te preocupes: podrás crear un perfil del otro tipo más tarde con esta misma cuenta.",
     "accessDenied": "Acceso Denegado",
     "errorInvalidCredentials": "Correo electrónico o contraseña inválidos",
     "errorEmailInUse": "El email ya está en uso",
@@ -124,7 +127,7 @@
   "profile": {
     "profileName": "Nombre del Perfil",
     "description": "Descripción",
-    "rolType": "Tipo de Rol",
+    "roleType": "Tipo de Rol",
     "narrative": "Narrativo",
     "table": "Mesa",
     "master": "Master",
@@ -423,7 +426,8 @@
       "addImage": "Añadir Imagen",
       "format": "Formato",
       "whoCanSee": "¿Quién puede verlo?",
-      "noMoreCharacters": "No hay más personajes"
+      "noMoreCharacters": "No hay más personajes",
+      "creationError": "Error al enviar el mensaje."
     },
     "dialog": {
       "title": "Hilo de conversación",
@@ -442,7 +446,11 @@
       "emptySubtitle": "Anímate a abrir tu primer debate en la comunidad.",
       "emptyButton": "Ir al Foro General"
     },
-    "yourReply": "Tu respuesta"
+    "yourReply": "Tu respuesta",
+    "errors": {
+      "fetchReplies": "Error al cargar las respuestas",
+      "fetchThreads": "Error cargando los posts"
+    }
   },
   "footer": {
     "copyright": "My Application. All rights reserved",

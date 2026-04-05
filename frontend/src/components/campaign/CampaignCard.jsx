@@ -69,7 +69,7 @@ export default function CampaignCard({ campana, theme }) {
 					<Tooltip content={t('campaign.message.currentMaxPlayers')}>
 						<div className='flex items-center gap-1.5 text-gray-600 font-medium text-xs'>
 							<UserGroupIcon className={`h-4 w-4 text-${theme.primary}-500`} />
-							{campana.members.length}/{campana.maxPlayers}
+							{campana.currentPlayers}/{campana.maxPlayers}
 						</div>
 					</Tooltip>
 

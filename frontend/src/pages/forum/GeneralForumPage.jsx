@@ -1,24 +1,61 @@
-import React, { useState } from 'react';
-import { Typography, Button, Input } from '@material-tailwind/react';
+import React, { useState, useEffect } from 'react';
+import { Typography, Button, Input, Spinner } from '@material-tailwind/react';
 import { MagnifyingGlassIcon, PlusIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import GeneralListCard from '../../components/forum/GeneralListCard';
 import CreateGeneralPost from '../../components/forum/CreateGeneralPost';
-import { mockGeneralThreads } from '../../data/mockPosts';
+import ForumService from '../../services/ForumService';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import toast from 'react-hot-toast';
 
 const GeneralForumPage = () => {
 	const { t } = useTranslation('global');
-	const [searchQuery, setSearchQuery] = useState('');
-	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const navigate = useNavigate();
 
-	const filteredThreads = mockGeneralThreads.filter(thread => {
-		const matchesSearch =
-			thread.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			thread.content.toLowerCase().includes(searchQuery.toLowerCase());
-		return matchesSearch;
-	});
+	// Estados para los datos de la API
+	const [threads, setThreads] = useState([]);
+	const [loading, setLoading] = useState(true);
+
+	// Estados para paginación y búsqueda
+	const [page, setPage] = useState(1);
+	const [totalPages, setTotalPages] = useState(1);
+	const [searchInput, setSearchInput] = useState('');
+	const [activeSearch, setActiveSearch] = useState('');
+
+	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+	// Efecto principal: Se dispara al cargar, al cambiar de página o de búsqueda confirmada
+	useEffect(() => {
+		const fetchThreads = async () => {
+			setLoading(true);
+			try {
+				const response = await ForumService.getGeneralThreads(page, 20, activeSearch);
+				setThreads(response.data || []);
+				setTotalPages(response.meta?.totalPages || 1);
+			} catch (error) {
+				console.error('Error fetching general threads:', error);
+				toast.error(t('forum.errors.fetchThreads'));
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchThreads();
+	}, [page, activeSearch, t]);
+
+	const handleSearch = () => {
+		setPage(1); // Si buscamos algo nuevo, volvemos a la página 1
+		setActiveSearch(searchInput);
+	};
+
+	const handleKeyDown = e => {
+		if (e.key === 'Enter') {
+			handleSearch();
+		}
+	};
+
+	const handleNextPage = () => setPage(prev => Math.min(prev + 1, totalPages));
+	const handlePrevPage = () => setPage(prev => Math.max(prev - 1, 1));
 
 	return (
 		<div className='max-w-4xl mx-auto py-8 px-4 w-full flex flex-col gap-6'>
@@ -54,21 +91,25 @@ const GeneralForumPage = () => {
 					<Input
 						label={t('forum.general.searchThreads')}
 						icon={<MagnifyingGlassIcon className='h-5 w-5 text-gray-400' />}
-						value={searchQuery}
-						onChange={e => setSearchQuery(e.target.value)}
+						value={searchInput}
+						onChange={e => setSearchInput(e.target.value)}
+						onKeyDown={handleKeyDown}
 						className='bg-gray-50'
 					/>
-					<Button color='indigo' className='shrink-0' onClick={() => console.log('Buscando:', searchQuery)}>
+					<Button color='indigo' className='shrink-0' onClick={handleSearch}>
 						{t('common.search')}
 					</Button>
 				</div>
-				{/* Aquí podríamos añadir unos Chips clickeables para filtrar por tags populares */}
 			</div>
 
 			{/* LISTADO DE HILOS */}
-			<div className='flex flex-col gap-3'>
-				{filteredThreads.length > 0 ? (
-					filteredThreads.map(thread => <GeneralListCard key={thread.id} thread={thread} />)
+			<div className='flex flex-col gap-3 min-h-[300px]'>
+				{loading ? (
+					<div className='flex flex-col items-center justify-center py-12'>
+						<Spinner className='h-8 w-8 text-indigo-500' />
+					</div>
+				) : threads.length > 0 ? (
+					threads.map(thread => <GeneralListCard key={thread.id} thread={thread} />)
 				) : (
 					<div className='py-12 text-center text-gray-500 bg-gray-50 rounded-xl border border-dashed border-gray-300'>
 						<Typography variant='h6' color='blue-gray'>
@@ -79,8 +120,30 @@ const GeneralForumPage = () => {
 				)}
 			</div>
 
+			{/* PAGINACIÓN */}
+			{!loading && totalPages > 1 && (
+				<div className='flex justify-center items-center gap-4 mt-4'>
+					<Button variant='text' className='flex items-center gap-2' onClick={handlePrevPage} disabled={page === 1}>
+						{t('common.previous')}
+					</Button>
+					<Typography color='gray' className='font-normal'>
+						Página <strong className='text-blue-gray-900'>{page}</strong> de{' '}
+						<strong className='text-blue-gray-900'>{totalPages}</strong>
+					</Typography>
+					<Button variant='text' className='flex items-center gap-2' onClick={handleNextPage} disabled={page === totalPages}>
+						{t('common.next')}
+					</Button>
+				</div>
+			)}
+
 			{/* MODAL PARA CREAR HILO */}
-			<CreateGeneralPost open={isCreateModalOpen} handleClose={() => setIsCreateModalOpen(false)} />
+			<CreateGeneralPost
+				open={isCreateModalOpen}
+				handleClose={() => setIsCreateModalOpen(false)}
+				onSuccess={() => {
+					setPage(1);
+				}}
+			/>
 		</div>
 	);
 };

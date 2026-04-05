@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { Badge, Card, CardBody, Chip, Typography } from '@material-tailwind/react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { UserPlusIcon } from '@heroicons/react/24/outline';
 
 export function ProfileCampaignList({ campaigns, type }) {
 	const { t } = useTranslation('global');
