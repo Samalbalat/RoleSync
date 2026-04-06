@@ -93,6 +93,9 @@ public class UserController {
                 return ResponseEntity.status(400).body("Email, password and time zone cannot be blank");
                 
             }
+            if(!updatedUser.getPassword().equals(userPutInDTO.getOldPassword())){
+                return ResponseEntity.status(403).body("Old password is incorrect");
+            }
             if (!checkPassword(userPutInDTO.getPassword())) {
                 return ResponseEntity.status(400).body("Password must be 8-20 characters long, contain at least one digit,"+
                 "one lowercase letter, one uppercase letter, one special character (@#$%^&+=) and have no whitespace");
