@@ -1,7 +1,9 @@
 package com.rolesync.rolesync.controller;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.antlr.v4.runtime.misc.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -58,6 +60,24 @@ public class ProfileController {
         }
     }
 
+    @GetMapping("/{profileName}")
+    public ResponseEntity<?> getProfileByName(Authentication authentication,
+        @PathVariable String roleType,
+        @RequestHeader("X-Profile-Name") String profileName)
+        {
+        Optional<Profile> profile = profileRepository.findByProfilename(profileName);
+        if (profile.isPresent()) {
+            System.out.println("Profile found: " + profile.get());
+            ProfileInDTO response = profile.map(p -> 
+            new ProfileInDTO(p.getProfilename(), p.getImage(), p.getDescription())
+        ).orElse(null);
+        return ResponseEntity.ok()
+                .body(response);
+        }else{
+            return ResponseEntity.status(404).body("Profile not found");
+        }
+    }
+
     /**
      * Update the profile of the authenticated user with the given roleType. If the profile does not exist, return a 404 Not Found response.
      * @param authentication The authentication object containing the user's details
@@ -70,16 +90,21 @@ public class ProfileController {
         @RequestBody ProfileInDTO profilePutInDTO,
         @RequestHeader("X-Profile-Name") String profileName)
         {
+        if(!utilsCalls.checkAuthAndProfile(authentication, profileName)){
+             return ResponseEntity.status(403).body("Unauthorized to update this profile");
+        }
+        Profile activeProfile = profileRepository.findByProfilename(profilePutInDTO.getProfileName()).orElse(null);
+        if(profileRepository.findByProfilename(profilePutInDTO.getProfileName()).isPresent() && !activeProfile.getProfilename().equals(profileName)){
+            return ResponseEntity.status(403).body("Profile name already exists and is not the current profile");
+        }
         Optional<Profile> profile = profileRepository.findByProfilename(profileName);
         if (profile.isPresent()) {
-            System.out.println("Profile found: " + profile.get());
             Profile editable = profile.get();
             editable.setDescription(profilePutInDTO.getDescription());
             editable.setImage(profilePutInDTO.getImage());
             editable.setProfilename(profilePutInDTO.getProfileName());
             profileRepository.save(editable);
             return ResponseEntity.ok().build();
-
         }else{
             return ResponseEntity.status(404).body("Profile not found");
         }  
@@ -100,7 +125,17 @@ public class ProfileController {
         @RequestBody ProfileInDTO profilePostInDTO,
         @RequestHeader("X-Profile-Name") String profileName)
         {
+        if(!utilsCalls.checkAuthAndProfile(authentication, profileName)){
+            return ResponseEntity.status(403).body("Unauthorized to update this profile");
+        }
         Optional<Profile> profile = profileRepository.findByProfilename(profileName);
+        List<Profile> userProfiles = profileRepository.findAllByUsername(authentication.getName());
+        if (userProfiles.size()==2) {
+            return ResponseEntity.status(403).body("User already has profiles for both role types");
+        }
+        if(userProfiles.stream().anyMatch(p -> p.getProfileType().toString().equalsIgnoreCase(roleType))){
+            return ResponseEntity.status(403).body("User already has a profile for this role type");
+        }
         if (!profile.isPresent()) {
             String principal = authentication.getName();
             System.out.println("Profile creation available for user: " + principal + " and roleType: " + roleType);

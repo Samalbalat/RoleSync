@@ -2,6 +2,8 @@ package com.rolesync.rolesync.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -81,9 +83,21 @@ public class UserController {
      */
     @PutMapping("/user")
     public ResponseEntity<?> putUserInfo(Authentication authentication, @RequestBody UserPutInDTO userPutInDTO) {
-        Optional<User> user = utilsCalls.getUserFromUsername(authentication);;
+        Optional<User> user = utilsCalls.getUserFromUsername(authentication);
         if (user.isPresent()) {
             User updatedUser = user.get();
+            if(userRepository.findByEmail(userPutInDTO.getEmail()).isPresent() && !updatedUser.getEmail().equals(userPutInDTO.getEmail())){
+                return ResponseEntity.status(403).body("Email already exists and is not the current email");
+            }
+            if (userPutInDTO.getEmail().isBlank() || userPutInDTO.getPassword().isBlank() || userPutInDTO.getTimeZone().isBlank()) {
+                return ResponseEntity.status(400).body("Email, password and time zone cannot be blank");
+                
+            }
+            if (!checkPassword(userPutInDTO.getPassword())) {
+                return ResponseEntity.status(400).body("Password must be 8-20 characters long, contain at least one digit,"+
+                "one lowercase letter, one uppercase letter, one special character (@#$%^&+=) and have no whitespace");
+                
+            }
             updatedUser.setEmail(userPutInDTO.getEmail());
             updatedUser.setTimeZone(userPutInDTO.getTimeZone());
             updatedUser.setPassword(encoder.encode(userPutInDTO.getPassword()));
@@ -92,5 +106,13 @@ public class UserController {
         }else{
             return ResponseEntity.status(404).body("User not found");
         }
+    }
+
+    private boolean checkPassword(String password) {
+        String regExpn = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";
+
+        Pattern pattern = Pattern.compile(regExpn, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(password);
+        return matcher.matches();
     }
 }
