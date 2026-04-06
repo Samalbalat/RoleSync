@@ -318,7 +318,11 @@ public class ForumController {
         post.setCreatedAt(Instant.now());
 
         post.setOoc(request.getIsOoc());
-        post.setDm("OWNER".equals(relation)); // depends on your relation model
+        if (request.getIsDm() != null && "OWNER".equals(relation)) { // Only allow setting DM flag if explicitly provided and user is OWNER
+            post.setDm(request.getIsDm());
+        } else {
+            post.setDm(false); // default to false for non-OWNERs or if not provided
+        }
 
         post.setMediaUrls(request.getMediaUrls() != null ? request.getMediaUrls() : List.of());
 

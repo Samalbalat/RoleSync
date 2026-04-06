@@ -15,6 +15,7 @@ public class PostCampaignPostsInDTO {
     private Long authorCharacterId;
     private Long parentPostId; // nullable
     private Boolean isOoc;
+    private Boolean isDm;
     private List<String> mediaUrls;
     private List<Long> visibleToCharacterIds;
 }
