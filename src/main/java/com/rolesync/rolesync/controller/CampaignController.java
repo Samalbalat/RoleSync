@@ -155,7 +155,7 @@ public class CampaignController {
                             item.setImage(c.getImage());
                             item.setSystem(c.getSystem());
                             item.setStatus(c.getStatus().name());
-                            Integer pendingRequests = Integer.valueOf(campaignRequestRepository.countPendingRequestsByCampaignId(c.getId()));
+                            Integer pendingRequests = Integer.valueOf(campaignRequestRepository.countPendingRequestsByCampaignId(c.getId()).toString());
                             item.setPendingRequests(pendingRequests);
 
                             return item;
