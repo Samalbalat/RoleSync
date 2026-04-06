@@ -215,13 +215,20 @@ public class CharacterSheetController {
                 dto.setCampaign_id(null);
                 dto.setCampaign_name(null);
             }
+            if(template.getImage()!=null){
+                    dto.setImage(template.getImage());
+                }
             dto.setSchema_definition(template.getSchema());
             return dto;
         }).toList();
         return ResponseEntity.ok(response);
     }
 
-    private ResponseEntity<?> getMySheets(Authentication authentication, boolean isTemplate, @RequestHeader("X-Profile-Name") String profileName) {
+    private ResponseEntity<?> getMySheets
+            (Authentication authentication,
+            boolean isTemplate,
+            @RequestHeader("X-Profile-Name") String profileName)
+        {
         if(!utilsCalls.checkAuthAndProfile(authentication, profileName)){
             return ResponseEntity.status(403).body("User not authenticated or profile not found");
         }
@@ -241,6 +248,9 @@ public class CharacterSheetController {
                 dto.setCampaign_id(null);
                 dto.setCampaign_name(null);
             }
+            if(sheet.getImage()!=null){
+                    dto.setImage(sheet.getImage());
+                }
             dto.setSchema_definition(sheet.getSchema());
             dto.setName(sheet.getName());
             return dto;
@@ -266,6 +276,7 @@ public class CharacterSheetController {
             CharacterTemplateOutPostDTO dto = new CharacterTemplateOutPostDTO();
             dto.setId(sheet.getId());
             dto.setName(sheet.getName());
+            dto.setImage(sheet.getImage());
             dto.setCampaign_id(sheet.getCampaign().getId().toString());
             dto.setCampaign_name(sheet.getCampaign().getName());
             dto.setSchema_definition(sheet.getSchema());

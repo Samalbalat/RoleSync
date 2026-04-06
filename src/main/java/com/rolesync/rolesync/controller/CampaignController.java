@@ -155,8 +155,7 @@ public class CampaignController {
                             item.setImage(c.getImage());
                             item.setSystem(c.getSystem());
                             item.setStatus(c.getStatus().name());
-                            Integer pendingRequests = (int) campaignRequestRepository
-                                            .countPendingRequestsByCampaignId(c.getId());
+                            Integer pendingRequests = (int) campaignRequestRepository.countPendingRequestsByCampaignId(c.getId());
                             item.setPendingRequests(pendingRequests);
 
                             return item;
@@ -416,7 +415,51 @@ public class CampaignController {
             campaign.setMembers(members);
             campaignRepository.save(campaign);
         }
+        CampaignRequest request = campaignRequestRepository.findLastRequestByProfileAndCampaign(
+            profileRepository.findByProfilename(dto.getProfileName()).orElse(null).getId(),
+            campaign.getId()
+        ).orElse(null);
+        if(request != null) {
+            request.setStatus(CampaignRequestStatus.KICKED);
+            request.setMessage(request.getMessage() + " (Kicked from campaign)");
+            campaignRequestRepository.save(request);
+        }
         return ResponseEntity.ok("Member kicked");
+    }
+
+    @PutMapping("/{id}/block")
+    public ResponseEntity<?> blockMember(
+            Authentication authentication,
+            @PathVariable Long id,
+            @RequestBody CampaignRequestPutInDTO dto,
+            @RequestHeader("X-Profile-Name") String profileName) {
+        boolean isAuthorized = utilsCalls.checkAuthAndProfile(authentication, profileName);
+        if (!isAuthorized) {
+            return ResponseEntity.status(403).body("User is not authorized to update this request");
+        }
+        Optional<Campaign> campaignOpt = campaignRepository.findById(id);
+        if (campaignOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else if (!campaignOpt.get().getOwnerName().equals(profileName)) {
+            return ResponseEntity.status(403).body("User is not authorized to block members from this campaign");
+        }
+        Campaign campaign = campaignOpt.get();
+        List<String> members = campaign.getMembers();
+        if (members != null && members.contains(dto.getProfileName())) {
+            members.remove(dto.getProfileName());
+            campaign.setMembers(members);
+            campaignRepository.save(campaign);
+        }
+        CampaignRequest request = campaignRequestRepository.findLastRequestByProfileAndCampaign(
+            profileRepository.findByProfilename(dto.getProfileName()).orElse(null).getId(),
+            campaign.getId()
+        ).orElse(null);
+        if(request != null) {
+            request.setStatus(CampaignRequestStatus.BLOCKED);
+            request.setMessage(request.getMessage() + " (Blocked from campaign)");
+            campaignRequestRepository.save(request);
+        }
+        return ResponseEntity.ok("Member blocked");
     }
 
     // ---------- GREY OUT ----------
@@ -439,6 +482,8 @@ public class CampaignController {
         return ResponseEntity.ok("Campaign deleted");
     }
 
+
+    // ---------- APPLY TO CAMPAIGN ----------
     @PostMapping("/{id}/join")
     public ResponseEntity<String> applyToCampaign(
             Authentication authentication,
@@ -448,6 +493,13 @@ public class CampaignController {
         boolean isAuthorized = utilsCalls.checkAuthAndProfile(authentication, profileName);
         if (!isAuthorized) {
             return ResponseEntity.status(403).body("User is not properly authorized to join this campaign");
+        }
+        CampaignRequest lastRequest = campaignRequestRepository.findLastRequestByProfileAndCampaign(
+            profileRepository.findByProfilename(profileName).orElse(null).getId(),
+            id
+        ).orElse(null);
+        if(lastRequest != null && lastRequest.getStatus() == CampaignRequestStatus.BLOCKED) {
+            return ResponseEntity.status(403).body("User is blocked from joining this campaign");
         }
         Optional<Campaign> campaignOpt = campaignRepository.findById(id);
         if(campaignOpt.get().getMembers() != null && campaignOpt.get().getMembers().contains(profileName) || campaignOpt.get().getOwnerName().equals(profileName)) {

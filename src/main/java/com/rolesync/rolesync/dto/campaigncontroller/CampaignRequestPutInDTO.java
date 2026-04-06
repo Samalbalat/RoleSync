@@ -6,5 +6,5 @@ import lombok.Data;
 public class CampaignRequestPutInDTO {
     private String profileName;
     private String status;
-    
+    private String message;
 }

@@ -10,8 +10,9 @@ import com.rolesync.rolesync.model.Campaign;
 import com.rolesync.rolesync.model.CampaignRequest;
 import com.rolesync.rolesync.model.CampaignRequestStatus;
 import com.rolesync.rolesync.model.Profile;
+import com.rolesync.rolesync.repository.custominterfaces.CampaignRequestRepositoryCustom;
 
-public interface CampaignRequestRepository extends JpaRepository<CampaignRequest, Long>, QuerydslPredicateExecutor<CampaignRequest>{
+public interface CampaignRequestRepository extends JpaRepository<CampaignRequest, Long>, QuerydslPredicateExecutor<CampaignRequest>, CampaignRequestRepositoryCustom{
   
     List<CampaignRequest> findAllByCampaignAndStatus(Campaign campaign, CampaignRequestStatus status);
 
@@ -23,5 +24,5 @@ public interface CampaignRequestRepository extends JpaRepository<CampaignRequest
         WHERE r.campaign_id = :campaignId
         AND r.status = 0
         """, nativeQuery = true)
-    long countPendingRequestsByCampaignId(Long campaignId);
+    Long countPendingRequestsByCampaignId(Long campaignId);
 }
