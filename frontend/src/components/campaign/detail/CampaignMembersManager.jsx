@@ -16,7 +16,7 @@ import {
 import { CheckIcon, XMarkIcon, UserMinusIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import CampaignService from '../../../services/CampaignService';
 
-export default function CampaignMembersManager({ campaignId, t, themeColor, onMemberChange }) {
+export default function CampaignMembersManager({ campaignId, t, themeColor, onMemberChange, maxPlayers }) {
 	const [participants, setParticipants] = useState([]);
 	const [requests, setRequests] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -173,7 +173,7 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 			<Card className='shadow-sm border border-gray-200'>
 				<CardBody className='p-4'>
 					<Typography variant='h6' color='blue-gray' className='mb-4'>
-						{t('campaign.members.currentMembers')} ({participants.length})
+						{t('campaign.members.currentMembers')} ({participants.length}/{maxPlayers})
 					</Typography>
 
 					{participants.length === 0 ? (
@@ -250,4 +250,5 @@ CampaignMembersManager.propTypes = {
 	t: PropTypes.func.isRequired,
 	themeColor: PropTypes.object,
 	onMemberChange: PropTypes.func,
+	maxPlayers: PropTypes.number.isRequired,
 };

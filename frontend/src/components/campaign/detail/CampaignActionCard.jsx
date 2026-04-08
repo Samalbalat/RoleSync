@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Card, CardBody, Typography, Button, Progress, Avatar } from '@material-tailwind/react';
+import { Card, CardBody, Typography, Button, Progress, Avatar, Select, Option } from '@material-tailwind/react';
 import {
 	PencilSquareIcon,
 	DocumentCheckIcon,
@@ -19,9 +19,20 @@ export default function CampaignActionCard({
 	progress,
 	themeColor,
 	onRefreshData,
+	onStatusChange,
 }) {
 	const relation = campaign.userRelation;
 	const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+
+	const canRequestJoin = () => {
+		if (isFull) return false;
+
+		if (campaign.type === 'TABLETOP') {
+			return campaign.status === 'OPEN';
+		} else {
+			return campaign.status === 'OPEN' || campaign.status === 'ACTIVE';
+		}
+	};
 
 	const renderCardContent = () => {
 		// DUEÑO DE LA CAMPAÑA
@@ -32,45 +43,59 @@ export default function CampaignActionCard({
 						{t('campaign.message.manageCampaign')}
 					</Typography>
 
-					<Button
-						fullWidth
-						size='lg'
-						color='blue-gray'
-						variant='outlined'
-						className='flex items-center justify-center gap-2 border-2'
-						onClick={() => navigate(`/campaigns/edit/${campaign.id}`)}
-					>
-						<PencilSquareIcon className='h-5 w-5' />
-						{t('common.edit')}
-					</Button>
+					<div className='text-left'>
+						<Select label={t('campaign.status.status')} value={campaign.status} onChange={val => onStatusChange(val)}>
+							<Option value='OPEN'>{t('status.open') || 'Abierta'}</Option>
+							<Option value='ACTIVE'>{t('status.active') || 'Activa'}</Option>
+							<Option value='BREAK'>{t('status.break') || 'En Pausa'}</Option>
+							<Option value='FINISHED'>{t('status.finished') || 'Finalizada'}</Option>
+							<Option value='DELETED' className='text-red-500 font-medium'>
+								{t('status.deleted') || 'Eliminada'}
+							</Option>
+						</Select>
+					</div>
+					{/* Grupo de botones de edición */}
+					<div className='space-y-4'>
+						<Button
+							fullWidth
+							size='lg'
+							color='blue-gray'
+							variant='outlined'
+							className='flex items-center justify-center gap-2 border-2'
+							onClick={() => navigate(`/campaigns/edit/${campaign.id}`)}
+						>
+							<PencilSquareIcon className='h-5 w-5' />
+							{t('common.edit')}
+						</Button>
 
-					{campaignTemplate ? (
-						<Button
-							fullWidth
-							size='lg'
-							color='blue'
-							variant='gradient'
-							className='flex items-center justify-center gap-2'
-							onClick={() =>
-								navigate(`/character/templateBuilder?campaignId=${campaign.id}&templateId=${campaignTemplate.id}`)
-							}
-						>
-							<DocumentCheckIcon className='h-5 w-5' />
-							{t('character.templateBuilder.editTemplate')}
-						</Button>
-					) : (
-						<Button
-							fullWidth
-							size='lg'
-							color='green'
-							variant='gradient'
-							className='flex items-center justify-center gap-2'
-							onClick={() => navigate(`/character/templateBuilder?campaignId=${campaign.id}`)}
-						>
-							<DocumentPlusIcon className='h-5 w-5' />
-							{t('character.templateBuilder.createTemplate')}
-						</Button>
-					)}
+						{campaignTemplate ? (
+							<Button
+								fullWidth
+								size='lg'
+								color='blue'
+								variant='gradient'
+								className='flex items-center justify-center gap-2'
+								onClick={() =>
+									navigate(`/character/templateBuilder?campaignId=${campaign.id}&templateId=${campaignTemplate.id}`)
+								}
+							>
+								<DocumentCheckIcon className='h-5 w-5' />
+								{t('character.templateBuilder.editTemplate')}
+							</Button>
+						) : (
+							<Button
+								fullWidth
+								size='lg'
+								color='green'
+								variant='gradient'
+								className='flex items-center justify-center gap-2'
+								onClick={() => navigate(`/character/templateBuilder?campaignId=${campaign.id}`)}
+							>
+								<DocumentPlusIcon className='h-5 w-5' />
+								{t('character.templateBuilder.createTemplate')}
+							</Button>
+						)}
+					</div>
 				</div>
 			);
 		}
@@ -133,9 +158,13 @@ export default function CampaignActionCard({
 
 		// VISITANTE O PENDIENTE
 		const isPending = relation === 'PENDING';
+		const isJoinAllowed = canRequestJoin();
+
 		const getButtonText = () => {
 			if (isPending) return t('campaign.detail.pending');
 			if (isFull) return t('campaign.detail.joinFull');
+
+			if (!isJoinAllowed) return t('campaign.detail.closed');
 			return t('campaign.detail.join');
 		};
 
@@ -159,8 +188,8 @@ export default function CampaignActionCard({
 				<Button
 					fullWidth
 					size='lg'
-					color={isPending ? 'blue-gray' : themeColor.primary}
-					disabled={isFull || isPending}
+					color={isPending || !isJoinAllowed ? 'blue-gray' : themeColor.primary}
+					disabled={!isJoinAllowed || isPending}
 					className='flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all text-base'
 					onClick={() => setIsJoinModalOpen(true)}
 				>
@@ -197,4 +226,5 @@ CampaignActionCard.propTypes = {
 	progress: PropTypes.number.isRequired,
 	themeColor: PropTypes.object.isRequired,
 	onRefreshData: PropTypes.func.isRequired,
+	onStatusChange: PropTypes.func.isRequired,
 };

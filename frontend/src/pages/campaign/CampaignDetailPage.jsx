@@ -49,6 +49,7 @@ export default function CampaignDetailPage() {
 			try {
 				if (showLoading) setLoading(true);
 				const campaignData = await CampaignService.getCampaignById(id);
+				console.log('Campaign data fetched:', campaignData);
 				setCampaign(campaignData);
 
 				if (campaignData?.userRelation === 'OWNER') {
@@ -56,8 +57,14 @@ export default function CampaignDetailPage() {
 					if (templates?.[0]) setCampaignTemplate(templates[0]);
 				}
 			} catch (error) {
-				console.error('Error al obtener la campaña:', error);
-				setCampaign(null);
+				if (error.response?.status === 404) {
+					toast.error(t('campaign.message.deleted'));
+					navigate('/find-campaign');
+					return;
+				} else {
+					console.error('Error al obtener la campaña:', error);
+					setCampaign(null);
+				}
 			} finally {
 				if (showLoading) setLoading(false);
 			}
@@ -144,6 +151,19 @@ export default function CampaignDetailPage() {
 
 	const hasForum = hasInsideAccess && (isTabletop || (isWritten && campaign.communication === 'RoleSync'));
 
+	const handleStatusChange = async newStatus => {
+		try {
+			await CampaignService.changeCampaignStatus(id, newStatus);
+
+			setCampaign(prev => ({ ...prev, status: newStatus }));
+
+			toast.success(t('campaign.message.statusUpdated'));
+		} catch (error) {
+			console.error('Error updating status:', error);
+			toast.error(t('campaign.errors.updateStatus'));
+		}
+	};
+
 	const handleOpenAccordion = value => setOpenAccordion(openAccordion === value ? 0 : value);
 
 	const renderInfoBlock = () => (
@@ -189,9 +209,10 @@ export default function CampaignDetailPage() {
 				myCharacter={myCharacter}
 				characters={characters}
 				ownerImage={campaign.owner?.profileImage}
+				campaignStatus={campaign.status}
 			/>
 		),
-		className: theme?.textPrimary, // Ojo, he puesto theme?.textPrimary por si acaso theme es undefined
+		className: theme?.textPrimary,
 	};
 
 	let tabsData = [];
@@ -204,6 +225,28 @@ export default function CampaignDetailPage() {
 		// Si es un visitante o aún no tiene ficha, primero la Info
 		tabsData = [infoTab];
 	}
+	const campaignStatus = () => {
+		if (campaign.status === 'OPEN') {
+			return t('status.open');
+		} else if (campaign.status === 'ACTIVE') {
+			return t('status.active');
+		} else if (campaign.status === 'BREAK') {
+			return t('status.break');
+		} else if (campaign.status === 'FINISHED') {
+			return t('status.finished');
+		}
+	};
+	const campaignStatusColor = () => {
+		if (campaign.status === 'OPEN') {
+			return 'green';
+		} else if (campaign.status === 'ACTIVE') {
+			return 'blue';
+		} else if (campaign.status === 'BREAK') {
+			return 'yellow';
+		} else if (campaign.status === 'FINISHED') {
+			return 'gray';
+		}
+	};
 
 	return (
 		<div className='max-w-7xl mx-auto px-4 py-4 animate-fade-in'>
@@ -235,12 +278,7 @@ export default function CampaignDetailPage() {
 						{/* ESTE DIV (Gradiente y Título) VUELVE ADENTRO */}
 						<div className='absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 md:p-8'>
 							<div className='flex gap-2 mb-3'>
-								<Chip
-									value={campaign.status === 'OPEN' || campaign.status === 'ACTIVE' ? t('status.open') : t('status.full')}
-									color={isFull ? 'red' : 'green'}
-									className='rounded-full'
-									size='sm'
-								/>
+								<Chip value={campaignStatus()} color={campaignStatusColor()} className='rounded-full' size='sm' />
 								<Chip
 									value={campaign.type}
 									color={isWritten ? 'indigo' : 'orange'}
@@ -292,6 +330,7 @@ export default function CampaignDetailPage() {
 									t={t}
 									themeColor={theme}
 									onMemberChange={() => fetchCampaignAndTemplate(false)}
+									maxPlayers={campaign.maxPlayers}
 								/>
 							)}
 							<Card className='shadow-sm border border-gray-200'>
@@ -337,6 +376,7 @@ export default function CampaignDetailPage() {
 							progress={progress}
 							themeColor={theme}
 							onRefreshData={() => fetchCampaignAndTemplate(false)}
+							onStatusChange={handleStatusChange}
 						/>
 					</div>
 				</div>

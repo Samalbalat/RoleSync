@@ -57,7 +57,7 @@
     "sending": "Enviando",
     "search": "Buscar",
     "loading": "Cargando...",
-    "enter": "Entrar",
+    "enter": "Enter",
     "other": "Otro",
     "loadMore": "Cargar mas",
     "previous": "Anterior",
@@ -95,7 +95,9 @@
     "invalidMinMax": "Los valores mínimo y máximo deben ser números válidos",
     "minMaxOrder": "El valor mínimo no puede ser mayor que el máximo",
     "fetchCharacter": "No se ha encontrado el personaje.",
-    "fetchCharacters": "Error al cargar los personajes"
+    "fetchCharacters": "Error al cargar los personajes",
+    "maxLength50": "Máximo 50 caracteres",
+    "maxLength2000": "Máximo 2000 caracteres"
   },
   "auth": {
     "login": "Iniciar Sesión",
@@ -217,7 +219,9 @@
       "currentMaxPlayers": "Jugadores actuales / Máximos",
       "successCreate": "¡Campaña creada con éxito!",
       "successUpdate": "¡Campaña actualizada con éxito!",
-      "errorCreate": "Hubo un error al crear la campaña. Por favor, inténtalo de nuevo más tarde."
+      "errorCreate": "Hubo un error al crear la campaña. Por favor, inténtalo de nuevo más tarde.",
+      "statusUpdated": "Estado actualizado correctamente",
+      "deleted": "No se puede acceder a esta campaña."
     },
     "detail": {
       "about": "Sobre la Campaña",
@@ -229,7 +233,8 @@
       "joinFull": "Lista de Espera",
       "contactGM": "Mensaje al Master",
       "infoTitle": "Detalles de la Partida",
-      "pending": "Solicitud Pendiente"
+      "pending": "Solicitud Pendiente",
+      "closed": "Cerrada"
     },
     "join": {
       "title": "Solicitar Unirse a la Campaña",
@@ -254,10 +259,12 @@
       "kickConfirmDesc2": " de la campaña. Esta acción no se puede deshacer y el jugador tendrá que enviar una nueva solicitud si desea unirse nuevamente."
     },
     "errors": {
-      "fetchCharacters": "Error al cargar los personajes de la campaña"
+      "fetchCharacters": "Error al cargar los personajes de la campaña",
+      "updateStatus": "Error al actualizar el estado"
     },
     "roleplay": "Rol en vivo",
     "status": {
+      "status": "Estado de la Campaña",
       "open": "Abierto"
     }
   },
@@ -279,7 +286,7 @@
       "minValue": "Valor Mínimo (Opcional)",
       "maxValue": "Valor Máximo (Opcional)",
       "cancel": "Cancelar edición",
-      "addField": "Añadir Campo",
+      "addField": "Añadir Atributo Corto",
       "updateField": "Actualizar Campo",
       "saveTemplate": "Guardar Plantilla",
       "createTemplate": "Crear Plantilla",
@@ -303,7 +310,8 @@
       "errorSave": "Hubo un error al guardar la plantilla.",
       "errorNoName": "Debes darle un nombre a la plantilla.",
       "loadigData": "Cargando datos de la plantilla...",
-      "range": "| Rango: "
+      "range": "| Rango: ",
+      "addLongField": "Añadir Atributo Largo"
     },
     "form": {
       "title": "Crear Personaje",
@@ -340,7 +348,8 @@
     "ongoing": "En Curso",
     "active": "En curso",
     "break": "En descanso",
-    "finished": "Terminado"
+    "finished": "Terminado",
+    "deleted": "Eliminar"
   },
   "filter": {
     "filter": "Filtrar",
@@ -370,7 +379,9 @@
       "publishedOn": "Publicado el",
       "noReplies": "Aún no hay respuestas. ¡Sé el primero en aportar algo!",
       "lockedThread": "Este hilo ha sido bloqueado.",
-      "noNewReplies": "Ya no se admiten nuevas respuestas en este debate."
+      "noNewReplies": "Ya no se admiten nuevas respuestas en este debate.",
+      "readOnly": "Modo Lectura",
+      "pausedDesc": "La campaña está pausada o ha terminado. Solo el Master puede añadir nuevos mensajes."
     },
     "general": {
       "comunityForum": "Foro de la Comunidad",

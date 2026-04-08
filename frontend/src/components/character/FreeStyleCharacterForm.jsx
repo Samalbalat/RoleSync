@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardBody, Typography, Input, Button, IconButton } from '@material-tailwind/react';
-import { PlusIcon, TrashIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { Card, CardBody, Typography, Input, Button, IconButton, Textarea } from '@material-tailwind/react';
+import { PlusIcon, TrashIcon, CheckIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
@@ -25,11 +25,11 @@ export default function FreeStyleCharacterForm() {
 	});
 
 	// Atributos dinámicos
-	const [attributes, setAttributes] = useState([{ key: '', value: '' }]);
+	const [attributes, setAttributes] = useState([{ key: '', value: '', type: 'short_text' }]);
 
 	// Añadir una nueva fila
-	const handleAddAttribute = () => {
-		setAttributes([...attributes, { key: '', value: '' }]);
+	const handleAddAttribute = (fieldType = 'short_text') => {
+		setAttributes([...attributes, { key: '', value: '', type: fieldType }]);
 	};
 
 	// Eliminar una fila por su índice
@@ -57,15 +57,17 @@ export default function FreeStyleCharacterForm() {
 				return {
 					key: `${safeKey}_${randomSuffix}`,
 					label: attr.key.trim(),
-					type: 'short_text',
+					type: attr.type,
 					required: false,
-					value: attr.value,
+					min: 0,
+					max: 0,
+					value: attr.value || '',
 				};
 			});
 
 		const payload = {
 			name: data.name.trim(),
-			avatar_url: data.avatarUrl.trim() || null,
+			avatar_url: (data.avatarUrl || '').trim(),
 			campaign_id: null,
 			template_id: null,
 			attributes: formattedAttributes,
@@ -109,7 +111,10 @@ export default function FreeStyleCharacterForm() {
 										label={t('character.form.name')}
 										size='lg'
 										color='blue'
-										{...register('name', { required: t('errors.required') })}
+										{...register('name', {
+											required: t('errors.required'),
+											maxLength: { value: 50, message: t('errors.maxLength50', { max: 50 }) },
+										})}
 										error={!!errors.name}
 									/>
 									{errors.name && (
@@ -121,7 +126,14 @@ export default function FreeStyleCharacterForm() {
 
 								{/* INPUT AVATAR */}
 								<div className='flex flex-col'>
-									<Input label={t('character.form.image')} size='lg' color='blue' {...register('avatarUrl')} />
+									<Input
+										label={t('character.form.image')}
+										size='lg'
+										color='blue'
+										{...register('avatarUrl', {
+											maxLength: { value: 2000, message: t('errors.maxLength2000', { max: 2000 }) },
+										})}
+									/>
 								</div>
 							</div>
 						</div>
@@ -141,29 +153,47 @@ export default function FreeStyleCharacterForm() {
 							<div className='flex flex-col gap-4 ml-0 sm:ml-11'>
 								{attributes.map((attr, index) => (
 									<div key={index} className='flex flex-col sm:flex-row gap-4 items-start sm:items-center animate-fade-in'>
+										{/* INPUT KEY (Nombre del atributo) */}
 										<div className='w-full sm:w-1/3'>
 											<Input
 												label={t('character.form.attributeName')}
 												size='lg'
 												value={attr.key}
+												maxLength={50}
 												onChange={e => handleAttributeChange(index, 'key', e.target.value)}
 												color='blue'
 											/>
 										</div>
+
+										{/* CONDICIONAL: VALUE (Input vs Textarea) */}
 										<div className='w-full sm:w-2/3 flex-grow'>
-											<Input
-												label={t('character.form.value')}
-												size='lg'
-												value={attr.value}
-												onChange={e => handleAttributeChange(index, 'value', e.target.value)}
-												color='blue'
-											/>
+											{attr.type === 'long_text' ? (
+												<Textarea
+													label={t('character.form.value')}
+													size='lg'
+													value={attr.value}
+													maxLength={2000} // Límite amplio para historias/notas
+													onChange={e => handleAttributeChange(index, 'value', e.target.value)}
+													color='blue'
+												/>
+											) : (
+												<Input
+													label={t('character.form.value')}
+													size='lg'
+													value={attr.value}
+													maxLength={255} // Límite estándar para texto corto
+													onChange={e => handleAttributeChange(index, 'value', e.target.value)}
+													color='blue'
+												/>
+											)}
 										</div>
+
+										{/* BOTÓN ELIMINAR */}
 										<IconButton
 											variant='text'
 											color='red'
 											onClick={() => handleRemoveAttribute(index)}
-											className='shrink-0 self-end sm:self-auto mb-1 sm:mb-0'
+											className='shrink-0 self-end sm:self-auto mb-1 sm:mb-0 mt-2 sm:mt-0' // Ajuste de margen para alinear con Textarea
 											disabled={attributes.length === 1 && !attr.key && !attr.value}
 										>
 											<TrashIcon className='h-5 w-5' />
@@ -171,14 +201,26 @@ export default function FreeStyleCharacterForm() {
 									</div>
 								))}
 
-								<Button
-									variant='outlined'
-									color='blue'
-									className='flex items-center gap-2 w-fit mt-2'
-									onClick={handleAddAttribute}
-								>
-									<PlusIcon className='h-4 w-4' /> {t('character.templateBuilder.addField')}
-								</Button>
+								{/* BOTONERA PARA AÑADIR ATRIBUTOS */}
+								<div className='flex flex-wrap gap-3 mt-2'>
+									<Button
+										variant='outlined'
+										color='blue'
+										className='flex items-center gap-2'
+										onClick={() => handleAddAttribute('short_text')}
+									>
+										<PlusIcon className='h-4 w-4' /> {t('character.templateBuilder.addField') || 'Añadir Atributo Corto'}
+									</Button>
+									<Button
+										variant='outlined'
+										color='blue-gray'
+										className='flex items-center gap-2'
+										onClick={() => handleAddAttribute('long_text')}
+									>
+										<DocumentTextIcon className='h-4 w-4' />{' '}
+										{t('character.templateBuilder.addLongField') || 'Añadir Texto Largo'}
+									</Button>
+								</div>
 							</div>
 						</div>
 

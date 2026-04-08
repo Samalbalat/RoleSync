@@ -46,11 +46,27 @@ export default function DynamicCharacterForm({ templateData }) {
 	const { id: template_id, campaign_id, schema_definition } = templateData;
 
 	const onSubmit = async data => {
-		// 1. Transformamos los atributos rellenados al formato Array que espera el backend
+		const userAttributes = data.attributes || {};
+
 		const formattedAttributes = schema_definition.map(field => {
+			let val = userAttributes[field.key];
+
+			if (field.type === 'number' && Number.isNaN(val)) {
+				val = null;
+			} else if (field.type === 'boolean' && val === undefined) {
+				val = false;
+			} else if (val === undefined) {
+				val = '';
+			}
+
 			return {
-				...field,
-				value: data.attributes[field.key],
+				key: field.key,
+				label: field.label,
+				type: field.type,
+				required: !!field.required,
+				min: field.min || 0,
+				max: field.max || 0,
+				value: val,
 			};
 		});
 

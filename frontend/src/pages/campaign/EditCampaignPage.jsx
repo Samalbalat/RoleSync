@@ -76,7 +76,7 @@ export default function EditCampaignPage() {
 		setSaving(true);
 		try {
 			await CampaignService.updateCampaign(id, formData);
-			navigate(`/campaigns/${id}`);
+			navigate(`/campaign/${id}`);
 		} catch (error) {
 			console.error('Error al actualizar:', error);
 			toast.error('Error al actualizar la campaña');

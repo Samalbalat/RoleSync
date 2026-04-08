@@ -89,7 +89,9 @@
     "invalidMinMax": "Minimum and maximum values must be valid numbers",
     "minMaxOrder": "Minimum value cannot be greater than maximum value",
     "fetchCharacter": "The character has not been found.",
-    "fetchCharacters": "Error loading characters"
+    "fetchCharacters": "Error loading characters",
+    "maxLength50": "Maximum 50 characters",
+    "maxLength2000": "Maximum 2000 characters"
   },
   "auth": {
     "login": "Login",
@@ -208,7 +210,9 @@
       "needsCharacter": "You don't have a character associated with this campaign yet.",
       "currentMaxPlayers": "Current Players / Max",
       "successCreate": "Campaign created successfully!",
-      "errorCreate": "There was an error creating the campaign. \nPlease try again later."
+      "errorCreate": "There was an error creating the campaign. \nPlease try again later.",
+      "statusUpdated": "Status updated successfully",
+      "deleted": "This campaign cannot be accessed."
     },
     "detail": {
       "about": "About the Campaign",
@@ -220,7 +224,8 @@
       "joinFull": "Waiting List",
       "contactGM": "Message the GM",
       "infoTitle": "Game Details",
-      "pending": "Request Pending"
+      "pending": "Request Pending",
+      "closed": "Closed"
     },
     "join": {
       "title": "Request to Join Campaign",
@@ -244,7 +249,10 @@
       "kickConfirmDesc2": " from the campaign. This action cannot be undone and the player will have to send a new request if they want to join again."
     },
     "roleplay": "live role",
-    "campaigns": "Campaigns"
+    "campaigns": "Campaigns",
+    "errors": {
+      "updateStatus": "Error updating status"
+    }
   },
   "character": {
     "characters": "Characters",
@@ -264,7 +272,7 @@
       "minValue": "Minimum Value (Optional)",
       "maxValue": "Maximum Value (Optional)",
       "cancel": "Cancel editing",
-      "addField": "Add Field",
+      "addField": "Add Short Attribute",
       "updateField": "Update Field",
       "saveTemplate": "Save Template",
       "createTemplate": "Create Template",
@@ -288,7 +296,8 @@
       "errorNoName": "You must give the template a name.",
       "errorLoadCharacter": "Error loading template data.",
       "loadigData": "Loading template data...",
-      "range": "| \nRange:"
+      "range": "| \nRange:",
+      "addLongField": "Add Long Attribute"
     },
     "form": {
       "title": "Create Character",
@@ -325,7 +334,8 @@
     "ongoing": "Ongoing",
     "active": "In progress",
     "break": "at rest",
-    "finished": "Finished"
+    "finished": "Finished",
+    "deleted": "Eliminate"
   },
   "filter": {
     "filter": "Filter",
@@ -351,7 +361,9 @@
       "publishedOn": "Published on",
       "noReplies": "There are no answers yet. \nBe the first to contribute something!",
       "lockedThread": "This thread has been blocked.",
-      "noNewReplies": "New responses are no longer allowed in this debate."
+      "noNewReplies": "New responses are no longer allowed in this debate.",
+      "readOnly": "Reading Mode",
+      "pausedDesc": "The campaign is paused or has ended. \nOnly the Master can add new messages."
     },
     "general": {
       "create": {

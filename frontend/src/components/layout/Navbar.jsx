@@ -173,7 +173,7 @@ export default function Navbar() {
 									{t('menu.profile')}
 								</Typography>
 							</MenuItem>
-							<MenuItem onClick={() => navigate('/campaigns')} className='flex items-center gap-2'>
+							{/* <MenuItem onClick={() => navigate('/campaigns')} className='flex items-center gap-2'>
 								<MapIcon className='h-4 w-4 text-blue-gray-500' />
 								<Typography variant='small' className='font-medium'>
 									{t('menu.myCampaigns')}
@@ -184,7 +184,7 @@ export default function Navbar() {
 								<Typography variant='small' className='font-medium'>
 									{t('menu.myCharacters')}
 								</Typography>
-							</MenuItem>
+							</MenuItem> */}
 							<MenuItem onClick={() => navigate('/forum/my-posts')} className='flex items-center gap-2'>
 								<ChatBubbleLeftRightIcon className='h-4 w-4 text-blue-gray-500' />
 								<Typography variant='small' className='font-medium'>
