@@ -8,11 +8,24 @@ import PostCard from './PostCard';
 import PostEditor from './PostEditor';
 import ForumService from '../../services/ForumService';
 
-const ThreadDialog = ({ open, handleClose, isOwner, isTabletop, post, myCharacter, characters = [], ownerImage }) => {
+const ThreadDialog = ({
+	open,
+	handleClose,
+	isOwner,
+	isTabletop,
+	post,
+	myCharacter,
+	characters = [],
+	ownerImage,
+	campaignStatus,
+}) => {
 	const { t } = useTranslation('global');
 
 	const [replies, setReplies] = useState([]);
 	const [loading, setLoading] = useState(false);
+
+	const isPausedOrCompleted = campaignStatus === 'BREAK' || campaignStatus === 'FINISHED';
+	const canWrite = isOwner || (isTabletop ? true : !isPausedOrCompleted);
 
 	useEffect(() => {
 		if (open && post?.id) {
@@ -115,6 +128,15 @@ const ThreadDialog = ({ open, handleClose, isOwner, isTabletop, post, myCharacte
 							<div className='p-4 bg-gray-100 border-t border-gray-200 text-center italic text-gray-500 shrink-0'>
 								{t('forum.dialog.locked')}
 							</div>
+						) : !canWrite ? (
+							<div className='p-4 bg-gray-50 border-t border-gray-200 flex flex-col items-center justify-center text-center gap-2 shrink-0'>
+								<Typography variant='h6' color='blue-gray' className='font-bold'>
+									{t('forum.campaign.readOnly')}
+								</Typography>
+								<Typography variant='small' className='font-medium opacity-80 max-w-md text-gray-500'>
+									{t('forum.campaign.pausedDesc')}
+								</Typography>
+							</div>
 						) : (
 							<div className='p-4 bg-white border-t border-gray-200 shrink-0'>
 								<Typography variant='small' className='text-gray-600 font-bold mb-2 ml-1'>
@@ -151,6 +173,7 @@ ThreadDialog.propTypes = {
 	myCharacter: PropTypes.object.isRequired,
 	characters: PropTypes.array,
 	ownerImage: PropTypes.string,
+	campaignStatus: PropTypes.string,
 };
 
 export default ThreadDialog;

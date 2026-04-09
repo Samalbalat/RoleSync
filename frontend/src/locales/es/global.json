@@ -1,6 +1,6 @@
 {
   "home": {
-    "yourCampaigns": "Tus campañas",
+    "yourCampaigns": "Tus campañas Activas",
     "campaignPhrase": "Los mundos que diriges y las aventuras que exploras.",
     "masterCampaigns": {
       "title": "🛡️ Partidas que Diriges",
@@ -256,7 +256,11 @@
       "kick": "Eliminar Miembro",
       "kickConfirmTitle": "Confirmación de Eliminación",
       "kickConfirmDesc1": "Estás a punto de eliminar a ",
-      "kickConfirmDesc2": " de la campaña. Esta acción no se puede deshacer y el jugador tendrá que enviar una nueva solicitud si desea unirse nuevamente."
+      "kickConfirmDesc2": " de la campaña. Esta acción no se puede deshacer y el jugador tendrá que enviar una nueva solicitud si desea unirse nuevamente.",
+      "rejectReasonLabel": "Motivo del rechazo (opcional)",
+      "rejectConfirmTitle": "Rechazar solicitud",
+      "reasonLabel": "Motivo de expulsión (opcional)",
+      "rejectConfirmDesc1": "¿Estás seguro de querer rechazar a "
     },
     "errors": {
       "fetchCharacters": "Error al cargar los personajes de la campaña",

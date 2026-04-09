@@ -1,6 +1,6 @@
 {
   "home": {
-    "yourCampaigns": "Your campaigns",
+    "yourCampaigns": "Your active campaigns",
     "campaignPhrase": "The worlds you lead and the adventures you explore.",
     "masterCampaigns": {
       "title": "🛡️ Campaigns You Lead",
@@ -246,7 +246,11 @@
       "kick": "Remove Member",
       "kickConfirmTitle": "Kick Confirmation",
       "kickConfirmDesc1": "You are about to remove ",
-      "kickConfirmDesc2": " from the campaign. This action cannot be undone and the player will have to send a new request if they want to join again."
+      "kickConfirmDesc2": " from the campaign. This action cannot be undone and the player will have to send a new request if they want to join again.",
+      "rejectReasonLabel": "Reason for rejection (optional)",
+      "rejectConfirmTitle": "Reject request",
+      "reasonLabel": "Reason for expulsion (optional)",
+      "rejectConfirmDesc1": "Are you sure you want to reject"
     },
     "roleplay": "live role",
     "campaigns": "Campaigns",

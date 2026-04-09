@@ -12,6 +12,7 @@ import {
 	DialogHeader,
 	DialogBody,
 	DialogFooter,
+	Textarea,
 } from '@material-tailwind/react';
 import { CheckIcon, XMarkIcon, UserMinusIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import CampaignService from '../../../services/CampaignService';
@@ -25,6 +26,13 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 	const [kickModal, setKickModal] = useState({
 		isOpen: false,
 		profileName: '',
+		message: '',
+	});
+
+	const [rejectModal, setRejectModal] = useState({
+		isOpen: false,
+		profileName: '',
+		message: '',
 	});
 
 	const fetchMembersAndRequests = useCallback(async () => {
@@ -49,10 +57,11 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 	}, [fetchMembersAndRequests]);
 
 	// Manejar Aceptar o Rechazar
-	const handleRequestAction = async (profileName, status) => {
+	const handleRequestAction = async (profileName, status, message = '') => {
 		try {
 			setActionLoading(profileName);
-			await CampaignService.updateRequestStatus(campaignId, profileName, status);
+			// Pasamos el mensaje al servicio
+			await CampaignService.updateRequestStatus(campaignId, profileName, status, message);
 			await fetchMembersAndRequests(); // Recargamos las listas
 
 			if (onMemberChange && status === 'ACCEPT') {
@@ -65,24 +74,41 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 		}
 	};
 
+	// --- Controles Modal Rechazar ---
+	const handleOpenRejectModal = profileName => {
+		setRejectModal({ isOpen: true, profileName, message: '' });
+	};
+
+	const handleCloseRejectModal = () => {
+		setRejectModal({ isOpen: false, profileName: '', message: '' });
+	};
+
+	const confirmReject = async () => {
+		const { profileName, message } = rejectModal;
+		if (!profileName) return;
+
+		handleCloseRejectModal();
+		await handleRequestAction(profileName, 'REJECT', message);
+	};
+
+	// --- Controles Modal Expulsar ---
 	const handleOpenKickModal = profileName => {
-		setKickModal({ isOpen: true, profileName });
+		setKickModal({ isOpen: true, profileName, message: '' });
 	};
 
 	const handleCloseKickModal = () => {
-		setKickModal({ isOpen: false, profileName: '' });
+		setKickModal({ isOpen: false, profileName: '', message: '' });
 	};
 
-	// Manejar la Expulsión
 	const confirmKick = async () => {
-		const { profileName } = kickModal;
+		const { profileName, message } = kickModal;
 		if (!profileName) return;
 
 		try {
 			setActionLoading(profileName);
 			handleCloseKickModal();
 
-			await CampaignService.kickMember(campaignId, profileName);
+			await CampaignService.kickMember(campaignId, profileName, message);
 
 			await fetchMembersAndRequests();
 			if (onMemberChange) onMemberChange();
@@ -156,7 +182,7 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 												variant='text'
 												className='px-2'
 												disabled={actionLoading === req.profileName}
-												onClick={() => handleRequestAction(req.profileName, 'REJECT')}
+												onClick={() => handleOpenRejectModal(req.profileName)} // Abre el modal en lugar de rechazar directo
 											>
 												<XMarkIcon className='h-5 w-5' />
 											</Button>
@@ -216,6 +242,7 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 				</CardBody>
 			</Card>
 
+			{/* MODAL PARA EXPULSAR JUGADOR */}
 			<Dialog open={kickModal.isOpen} handler={handleCloseKickModal} size='xs'>
 				<DialogHeader className='flex flex-col items-center justify-center gap-2 pt-8 pb-2'>
 					<div className='p-3 bg-red-50 rounded-full text-red-500'>
@@ -225,12 +252,19 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 						{t('campaign.members.kickConfirmTitle')}
 					</Typography>
 				</DialogHeader>
-				<DialogBody className='text-center pt-0 pb-6 px-6'>
+				<DialogBody className='flex flex-col gap-4 text-center pt-0 pb-6 px-6'>
 					<Typography className='text-gray-600 font-normal'>
 						{t('campaign.members.kickConfirmDesc1')}
-						<span className='font-bold text-blue-gray-900'>{kickModal.profileName}</span>
+						<span className='font-bold text-blue-gray-900'> {kickModal.profileName} </span>
 						{t('campaign.members.kickConfirmDesc2')}
 					</Typography>
+					{/* Campo para el mensaje */}
+					<Textarea
+						label={t('campaign.members.reasonLabel')}
+						value={kickModal.message}
+						onChange={e => setKickModal({ ...kickModal, message: e.target.value })}
+						rows={3}
+					/>
 				</DialogBody>
 				<DialogFooter className='flex justify-center gap-3 pb-6'>
 					<Button variant='text' color='gray' onClick={handleCloseKickModal}>
@@ -238,6 +272,39 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 					</Button>
 					<Button variant='gradient' color='red' onClick={confirmKick}>
 						{t('campaign.members.kick')}
+					</Button>
+				</DialogFooter>
+			</Dialog>
+
+			{/* MODAL PARA RECHAZAR SOLICITUD */}
+			<Dialog open={rejectModal.isOpen} handler={handleCloseRejectModal} size='xs'>
+				<DialogHeader className='flex flex-col items-center justify-center gap-2 pt-8 pb-2'>
+					<div className='p-3 bg-orange-50 rounded-full text-orange-500'>
+						<UserMinusIcon className='h-8 w-8' />
+					</div>
+					<Typography variant='h5' color='blue-gray' className='text-center'>
+						{t('campaign.members.rejectConfirmTitle')}
+					</Typography>
+				</DialogHeader>
+				<DialogBody className='flex flex-col gap-4 text-center pt-0 pb-6 px-6'>
+					<Typography className='text-gray-600 font-normal'>
+						{t('campaign.members.rejectConfirmDesc1')}
+						<span className='font-bold text-blue-gray-900'>{rejectModal.profileName}</span>?
+					</Typography>
+					{/* Campo para el mensaje */}
+					<Textarea
+						label={t('campaign.members.rejectReasonLabel')}
+						value={rejectModal.message}
+						onChange={e => setRejectModal({ ...rejectModal, message: e.target.value })}
+						rows={3}
+					/>
+				</DialogBody>
+				<DialogFooter className='flex justify-center gap-3 pb-6'>
+					<Button variant='text' color='gray' onClick={handleCloseRejectModal}>
+						{t('common.cancel')}
+					</Button>
+					<Button variant='gradient' color='orange' onClick={confirmReject}>
+						{t('common.reject')}
 					</Button>
 				</DialogFooter>
 			</Dialog>

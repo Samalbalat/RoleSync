@@ -49,7 +49,6 @@ export default function CampaignDetailPage() {
 			try {
 				if (showLoading) setLoading(true);
 				const campaignData = await CampaignService.getCampaignById(id);
-				console.log('Campaign data fetched:', campaignData);
 				setCampaign(campaignData);
 
 				if (campaignData?.userRelation === 'OWNER') {
@@ -69,7 +68,7 @@ export default function CampaignDetailPage() {
 				if (showLoading) setLoading(false);
 			}
 		},
-		[id],
+		[id, navigate, t],
 	);
 
 	useEffect(() => {
