@@ -129,7 +129,8 @@ export function ProfileDetailsPage() {
 	const handleCreateProfile = async formData => {
 		try {
 			// formData trae: { profileName, image, description }
-			// missingType es: 'WRITTEN' o 'TABLETOP'
+			// roleType es: 'WRITTEN' o 'TABLETOP'
+			console.log('tipo de perfil creado:', missingType, 'con data:', formData);
 			const newProfile = await profileService.createProfile(missingType, formData);
 
 			setUserData(prev => ({

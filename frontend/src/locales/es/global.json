@@ -88,7 +88,7 @@
     "invalidEmail": "El formato del correo no es válido",
     "invalidNumber": "Debe ser un número mayor a 0",
     "passwordLength": "Mínimo 8 caracteres",
-    "passwordComplexity": "Debe incluir mayúscula, minúscula, número y símbolo (@$!%*?&)",
+    "passwordComplexity": "La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial (_@$!%*?&-)",
     "passwordMatch": "Las contraseñas no coinciden",
     "maxTags": "No puedes agregar más de 6 etiquetas",
     "tooLong1000": "No puede exceder los 1000 caracteres",
@@ -110,14 +110,20 @@
     "createAccount": "Crear cuenta",
     "roleTypeNote": "No te preocupes: podrás crear un perfil del otro tipo más tarde con esta misma cuenta.",
     "accessDenied": "Acceso Denegado",
-    "errorInvalidCredentials": "Correo electrónico o contraseña inválidos",
+    "errorInvalidCredentials": "Email o contraseña incorrecta",
     "errorEmailInUse": "El email ya está en uso",
-    "errorConnection": "Error de conexión. Tal vez el email o la contraseña este mal, si no, intente mas tarde.",
+    "errorConnection": "Error de conexión con el servidor",
     "errorNoProfilesFound": "Error: No se encontraron perfiles asociados.",
     "errorNotAuthenticated": "Debe iniciar sesión para acceder a esta página.",
     "errorAuthenticated": "Ya has iniciado sesión.",
     "successRegistration": "¡Registro exitoso! Ahora puedes iniciar sesión.",
-    "successLogin": "¡Inicio de sesión exitoso!"
+    "successLogin": "¡Inicio de sesión exitoso!",
+    "passwordRequired": "La contraseña es obligatoria",
+    "emailRequired": "El email es obligatorio",
+    "errorUnexpected": "Ocurrió un error inesperado",
+    "errorServer": "Error de conexión",
+    "invalidEmail": "Introduce un formato de email válido",
+    "errorProfileNameInUse": "El nombre de perfil ya está en uso"
   },
   "account": {
     "name": "Nombre",
@@ -172,7 +178,10 @@
       "nameRequired": "El nombre del perfil es obligatorio. No puede estar vacio",
       "nameTooShort": "El nombre es demasiado corto. Debe ser superior a 3.",
       "image": "URL de la Imagen",
-      "bio": "Bibliografia"
+      "bio": "Bibliografia",
+      "description_TABLETOP": "Crea un perfil de mesa para participar en campañas de rol tradicional. Este perfil se asociará a los personajes que crees personajes y campañas de mesa.",
+      "description_WRITTEN": "Crea un perfil narrativo para participar en campañas de rol escritas. Este perfil se asociará a los personajes que crees personajes y campañas narrativas."
+    
     }
   },
   "campaign": {

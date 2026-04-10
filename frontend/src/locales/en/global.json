@@ -82,7 +82,7 @@
     "invalidEmail": "The email format is not valid",
     "invalidNumber": "Must be a number greater than 0",
     "passwordLength": "Minimum 8 characters",
-    "passwordComplexity": "Must include uppercase, lowercase, number, and symbol (_@$!%*?&-)",
+    "passwordComplexity": "The password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (_@$!%*?",
     "passwordMatch": "Passwords do not match",
     "maxTags": "You cannot add more than 6 tags",
     "tooLong1000": "Cannot exceed 1000 characters",
@@ -102,15 +102,21 @@
     "createAccount": "Create account",
     "roleTypeNote": "Don't worry: you'll be able to create the other type of profile later with this same account.",
     "accessDenied": "Access Denied",
-    "errorInvalidCredentials": "Invalid email or password",
+    "errorInvalidCredentials": "Incorrect email or password",
     "errorEmailInUse": "Email is already in use",
-    "errorConnection": "Connection error. \nMaybe the email or password is wrong, if not, try again later.",
+    "errorConnection": "Server connection error",
     "errorNoProfilesFound": "Error: No associated profiles were found.",
     "errorNotAuthenticated": "You must be logged in to access this page.",
     "errorAuthenticated": "You are already logged in.",
     "successRegistration": "Registration successful! You can now log in.",
     "successLogin": "Login successful!",
-    "whoAreYou": "What do you feel like doing today?"
+    "whoAreYou": "What do you feel like doing today?",
+    "passwordRequired": "Password is required",
+    "emailRequired": "Email is mandatory",
+    "errorUnexpected": "An unexpected error occurred",
+    "errorServer": "Connection error",
+    "invalidEmail": "Enter a valid email format",
+    "errorProfileNameInUse": "Profile name is already in use"
   },
   "account": {
     "name": "Name",
@@ -165,7 +171,9 @@
       "nameRequired": "The profile name is required. \nIt can't be empty",
       "nameTooShort": "The name is too short. \nIt must be greater than 3.",
       "image": "Image URL",
-      "bio": "Literature"
+      "bio": "Literature",
+      "description_TABLETOP": "Create a tabletop profile to participate in traditional role-playing campaigns. This profile will be associated with the characters you create and tabletop campaigns.",
+      "description_WRITTEN": "Create a narrative profile to participate in written role-playing campaigns. This profile will be associated with the characters you create and narrative campaigns."
     }
   },
   "campaign": {
