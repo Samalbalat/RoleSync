@@ -98,8 +98,8 @@ export function TableDrawer({ open, onClose, openDrawer }) {
 				{/* Contenido scrolleable */}
 				<div className='flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 space-y-8'>
 					{/* Imagen Principal */}
-					<div className='w-full h-56 rounded-2xl bg-gray-800 border border-white/10 overflow-hidden relative flex items-center justify-center shadow-lg'>
-						<span className='text-gray-500 italic text-lg'>Aquí irá la imagen de los dados/taberna</span>
+					<div className='w-full rounded-2xl bg-gray-800 border border-white/10 overflow-hidden relative shadow-lg'>
+						<img src={'DrawerTable.png'} alt='D20 sobre mapa de batalla' className='w-full h-auto block opacity-80' />
 						<div className='absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent'></div>
 					</div>
 

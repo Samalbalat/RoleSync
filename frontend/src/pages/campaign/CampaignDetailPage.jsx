@@ -30,6 +30,7 @@ import CampaignService from '../../services/CampaignService';
 import CharacterService from '../../services/CharacterService';
 import CampaignMembersManager from '../../components/campaign/detail/CampaignMembersManager';
 import CampaignTimeline from '../../components/forum/CampaignTimeline';
+import ProfileDetailModal from '../../components/profile/ProfileDetailModal';
 
 export default function CampaignDetailPage() {
 	const { t } = useTranslation('global');
@@ -43,6 +44,10 @@ export default function CampaignDetailPage() {
 	const [campaignTemplate, setCampaignTemplate] = useState(null);
 	const [characters, setCharacters] = useState([]);
 	const [loading, setLoading] = useState(true);
+	const [viewProfileModal, setViewProfileModal] = useState({
+		isOpen: false,
+		profileName: '',
+	});
 
 	const fetchCampaignAndTemplate = useCallback(
 		async (showLoading = true) => {
@@ -169,7 +174,12 @@ export default function CampaignDetailPage() {
 		<div className='space-y-6 mt-4'>
 			<CampaignInfoList campaign={campaign} isWritten={isWritten} t={t} />
 			{!isOwner && (
-				<Card className='shadow-sm border border-gray-200 bg-gray-50'>
+				<Card
+					className='shadow-sm border border-gray-200 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors'
+					onClick={() =>
+						campaign.owner?.profileName && setViewProfileModal({ isOpen: true, profileName: campaign.owner.profileName })
+					}
+				>
 					<CardBody className='flex items-center gap-4 p-4'>
 						<Avatar
 							src={campaign.owner?.profileImage || `https://ui-avatars.com/api/?name=DM`}
@@ -330,6 +340,7 @@ export default function CampaignDetailPage() {
 									themeColor={theme}
 									onMemberChange={() => fetchCampaignAndTemplate(false)}
 									maxPlayers={campaign.maxPlayers}
+									profileType={userProfile?.type}
 								/>
 							)}
 							<Card className='shadow-sm border border-gray-200'>
@@ -380,6 +391,12 @@ export default function CampaignDetailPage() {
 					</div>
 				</div>
 			</div>
+			<ProfileDetailModal
+				isOpen={viewProfileModal.isOpen}
+				onClose={() => setViewProfileModal({ isOpen: false, profileName: '' })}
+				profileName={viewProfileModal.profileName}
+				roleType={userProfile?.type}
+			/>
 		</div>
 	);
 }

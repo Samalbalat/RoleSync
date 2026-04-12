@@ -16,8 +16,9 @@ import {
 } from '@material-tailwind/react';
 import { CheckIcon, XMarkIcon, UserMinusIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import CampaignService from '../../../services/CampaignService';
+import ProfileDetailModal from '../../profile/ProfileDetailModal';
 
-export default function CampaignMembersManager({ campaignId, t, themeColor, onMemberChange, maxPlayers }) {
+export default function CampaignMembersManager({ campaignId, t, themeColor, onMemberChange, maxPlayers, profileType }) {
 	const [participants, setParticipants] = useState([]);
 	const [requests, setRequests] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -33,6 +34,11 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 		isOpen: false,
 		profileName: '',
 		message: '',
+	});
+
+	const [viewProfileModal, setViewProfileModal] = useState({
+		isOpen: false,
+		profileName: '',
 	});
 
 	const fetchMembersAndRequests = useCallback(async () => {
@@ -60,12 +66,11 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 	const handleRequestAction = async (profileName, status, message = '') => {
 		try {
 			setActionLoading(profileName);
-			// Pasamos el mensaje al servicio
 			await CampaignService.updateRequestStatus(campaignId, profileName, status, message);
-			await fetchMembersAndRequests(); // Recargamos las listas
+			await fetchMembersAndRequests();
 
 			if (onMemberChange && status === 'ACCEPT') {
-				onMemberChange(); // Avisa al padre
+				onMemberChange();
 			}
 		} catch (error) {
 			console.error(`Error al actualizar estado a ${status}:`, error);
@@ -147,7 +152,13 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 									key={req.profileId || req.id || `req-${index}`}
 									className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-3 rounded-lg shadow-sm border border-gray-100'
 								>
-									<div className='flex items-center gap-3 w-full sm:w-auto'>
+									<div
+										className='flex items-center gap-3 w-full sm:w-auto cursor-pointer hover:opacity-80 transition-opacity'
+										onClick={e => {
+											e.stopPropagation();
+											setViewProfileModal({ isOpen: true, profileName: req.profileName });
+										}}
+									>
 										<Avatar
 											src={req.profileImage || 'https://ui-avatars.com/api/?name=User'}
 											alt={req.profileName}
@@ -170,9 +181,12 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 												variant='text'
 												className='px-2'
 												disabled={actionLoading === req.profileName}
-												onClick={() => handleRequestAction(req.profileName, 'ACCEPT')}
+												onClick={e => {
+													e.stopPropagation();
+													handleRequestAction(req.profileName, 'ACCEPT');
+												}}
 											>
-												<CheckIcon className='h-5 w-5' />
+												<CheckIcon className='h-5 w-5 pointer-events-none' />
 											</Button>
 										</Tooltip>
 										<Tooltip content={t('common.reject')}>
@@ -182,9 +196,12 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 												variant='text'
 												className='px-2'
 												disabled={actionLoading === req.profileName}
-												onClick={() => handleOpenRejectModal(req.profileName)} // Abre el modal en lugar de rechazar directo
+												onClick={e => {
+													e.stopPropagation();
+													handleOpenRejectModal(req.profileName);
+												}}
 											>
-												<XMarkIcon className='h-5 w-5' />
+												<XMarkIcon className='h-5 w-5 pointer-events-none' />
 											</Button>
 										</Tooltip>
 									</div>
@@ -213,7 +230,13 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 									key={player.profileId || player.id || `player-${index}`}
 									className='flex items-center justify-between bg-gray-50 p-2 rounded-lg border border-gray-100'
 								>
-									<div className='flex items-center gap-3'>
+									<div
+										className='flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity'
+										onClick={e => {
+											e.stopPropagation();
+											setViewProfileModal({ isOpen: true, profileName: player.profileName });
+										}}
+									>
 										<Avatar
 											src={player.profileImage || `https://ui-avatars.com/api/?name=${player.profileName}`}
 											alt={player.profileName}
@@ -230,9 +253,12 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 											variant='text'
 											className='px-2'
 											disabled={actionLoading === player.profileName}
-											onClick={() => handleOpenKickModal(player.profileName)}
+											onClick={e => {
+												e.stopPropagation();
+												handleOpenKickModal(player.profileName);
+											}}
 										>
-											<UserMinusIcon className='h-4 w-4' />
+											<UserMinusIcon className='h-4 w-4 pointer-events-none' />
 										</Button>
 									</Tooltip>
 								</div>
@@ -246,7 +272,7 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 			<Dialog open={kickModal.isOpen} handler={handleCloseKickModal} size='xs'>
 				<DialogHeader className='flex flex-col items-center justify-center gap-2 pt-8 pb-2'>
 					<div className='p-3 bg-red-50 rounded-full text-red-500'>
-						<ExclamationTriangleIcon className='h-8 w-8' />
+						<ExclamationTriangleIcon className='h-8 w-8 pointer-events-none' />
 					</div>
 					<Typography variant='h5' color='blue-gray' className='text-center'>
 						{t('campaign.members.kickConfirmTitle')}
@@ -280,7 +306,7 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 			<Dialog open={rejectModal.isOpen} handler={handleCloseRejectModal} size='xs'>
 				<DialogHeader className='flex flex-col items-center justify-center gap-2 pt-8 pb-2'>
 					<div className='p-3 bg-orange-50 rounded-full text-orange-500'>
-						<UserMinusIcon className='h-8 w-8' />
+						<UserMinusIcon className='h-8 w-8 pointer-events-none' />
 					</div>
 					<Typography variant='h5' color='blue-gray' className='text-center'>
 						{t('campaign.members.rejectConfirmTitle')}
@@ -308,6 +334,13 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 					</Button>
 				</DialogFooter>
 			</Dialog>
+
+			<ProfileDetailModal
+				isOpen={viewProfileModal.isOpen}
+				onClose={() => setViewProfileModal({ isOpen: false, profileName: '' })}
+				profileName={viewProfileModal.profileName}
+				roleType={profileType}
+			/>
 		</div>
 	);
 }
@@ -318,4 +351,5 @@ CampaignMembersManager.propTypes = {
 	themeColor: PropTypes.object,
 	onMemberChange: PropTypes.func,
 	maxPlayers: PropTypes.number.isRequired,
+	profileType: PropTypes.string.isRequired,
 };
