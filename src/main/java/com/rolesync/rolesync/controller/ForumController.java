@@ -262,24 +262,18 @@ public class ForumController {
                 if("NONE".equals(relation) || "PENDING".equals(relation)) {
                     return ResponseEntity.status(403).build();
                 }
-
                 CharacterSheet character = null;
-                if(request.getIsOoc() == null || !request.getIsOoc()) { // if not explicitly OOC, treat as IC and require character info
-                    if(request.getAuthorCharacterId() == null) {
-                        return ResponseEntity.status(400).body("Character ID is required for IC posts");
-                    }else{
+                    if(request.getAuthorCharacterId() != null){
                         character = characterRepository.findById(request.getAuthorCharacterId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
                         // Ensure character belongs to profile
                         if (!character.getOwner().getId().equals(profile.getId())) {
                             return ResponseEntity.status(403).build();
-                            }
                         }
-                }
-                
+                    }
                 Post post = new Post();
                 CampaignPostDTO campaignPostDto = new CampaignPostDTO(createPostFromRequest(request, post, profile, character, campaign, relation));
                 return ResponseEntity.ok().body(campaignPostDto);
-    }
+            }
 
     @PostMapping("forums/posts")
     public ResponseEntity<?> postForumPost(
