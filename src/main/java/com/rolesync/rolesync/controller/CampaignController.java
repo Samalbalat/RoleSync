@@ -86,7 +86,9 @@ public class CampaignController {
             @RequestParam(required = false) String themes,
             @RequestParam(required = false) String duration) {
         BooleanExpression predicate = Q.campaignType.eq(type);
-
+        
+        predicate = predicate.and(Q.status.ne(CampaignStatus.DELETED));
+        
         if (system != null && !system.isBlank()) {
             predicate = predicate.and(Q.system.containsIgnoreCase(system));
         }
@@ -113,7 +115,6 @@ public class CampaignController {
 
         if (status != null && !status.isBlank()) {
             predicate = predicate.and(Q.status.eq(CampaignStatus.valueOf(status.toUpperCase())));
-            predicate = predicate.and(Q.status.ne(CampaignStatus.DELETED));
         }
         if (themes != null && !themes.isBlank()) {
             predicate = predicate.and(

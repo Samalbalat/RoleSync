@@ -21,6 +21,7 @@ public class CharacterSheetGetOutDTO {
     private String campaignName;
     private Long templateId;
     private List<CharacterSchemaField> schema;
+    private String characterImage;
 
     public CharacterSheetGetOutDTO(CharacterSheet sheet) {
         this.id = sheet.getId();
@@ -31,6 +32,7 @@ public class CharacterSheetGetOutDTO {
         this.campaignName = sheet.getCampaign()!=null ? sheet.getCampaign().getName() : null;
         this.templateId = sheet.getTemplate()!=null ? sheet.getTemplate().getId() : null;
         this.schema = sheet.getSchema();
+        this.characterImage = sheet.getImage();
     }
     
 }

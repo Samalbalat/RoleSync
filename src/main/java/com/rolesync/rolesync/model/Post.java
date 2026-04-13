@@ -47,7 +47,7 @@ public class Post {
     private String authorCharacterImage;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "campaign_id", nullable = false)
+    @JoinColumn(name = "campaign_id")
     private Campaign campaign;
 
     @ManyToOne(fetch = FetchType.LAZY)

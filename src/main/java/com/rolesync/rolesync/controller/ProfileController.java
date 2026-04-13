@@ -60,12 +60,13 @@ public class ProfileController {
         }
     }
 
-    @GetMapping("/{profileName}")
+    @GetMapping("/{profileToGet}")
     public ResponseEntity<?> getProfileByName(Authentication authentication,
         @PathVariable String roleType,
+        @PathVariable String profileToGet,
         @RequestHeader("X-Profile-Name") String profileName)
         {
-        Optional<Profile> profile = profileRepository.findByProfilename(profileName);
+        Optional<Profile> profile = profileRepository.findByProfilename(profileToGet);
         if (profile.isPresent()) {
             System.out.println("Profile found: " + profile.get());
             ProfileInDTO response = profile.map(p -> 
@@ -126,7 +127,7 @@ public class ProfileController {
         @RequestHeader("X-Profile-Name") String profileName)
         {
         if(!utilsCalls.checkAuthAndProfile(authentication, profileName)){
-            return ResponseEntity.status(403).body("Unauthorized to update this profile");
+            return ResponseEntity.status(403).body("Unauthorized to create a profile for the current user");
         }
         Optional<Profile> profile = profileRepository.findByProfilename(profileName);
         List<Profile> userProfiles = profileRepository.findAllByUsername(authentication.getName());
