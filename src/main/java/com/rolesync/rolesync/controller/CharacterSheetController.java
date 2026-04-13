@@ -267,10 +267,7 @@ public class CharacterSheetController {
             return ResponseEntity.status(403).body("User not authenticated or profile not found");
         }
         Campaign campaign = campaignOpt.get();
-        Profile activeProfile = profileRepository.findByProfilename(profileName)
-                .orElseThrow(() -> new IllegalStateException("Active profile not found"));
-        if (!campaign.getOwnerName().equals(activeProfile.getProfilename()) ||
-            (campaign.getMembers() == null && !campaign.getMembers().contains(activeProfile.getProfilename()))) {
+        if (!profileBelongsToCampaign(profileName, campaign)) {
             return ResponseEntity.status(403).body("User is not a member of the campaign");
         }
         
