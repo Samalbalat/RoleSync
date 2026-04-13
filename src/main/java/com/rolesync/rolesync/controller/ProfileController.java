@@ -2,6 +2,7 @@ package com.rolesync.rolesync.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import org.antlr.v4.runtime.misc.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,7 +130,11 @@ public class ProfileController {
         if(!utilsCalls.checkAuthAndProfile(authentication, profileName)){
             return ResponseEntity.status(403).body("Unauthorized to create a profile for the current user");
         }
+        //Active profile is the one making the request
         Optional<Profile> profile = profileRepository.findByProfilename(profileName);
+        if(!profile.isEmpty() && profile.get().getProfileType().toString().equalsIgnoreCase(roleType)){
+            return ResponseEntity.status(403).body("User already has a profile for this role type");
+        }
         List<Profile> userProfiles = profileRepository.findAllByUsername(authentication.getName());
         if (userProfiles.size()==2) {
             return ResponseEntity.status(403).body("User already has profiles for both role types");
@@ -137,7 +142,6 @@ public class ProfileController {
         if(userProfiles.stream().anyMatch(p -> p.getProfileType().toString().equalsIgnoreCase(roleType))){
             return ResponseEntity.status(403).body("User already has a profile for this role type");
         }
-        if (!profile.isPresent()) {
             String principal = authentication.getName();
             System.out.println("Profile creation available for user: " + principal + " and roleType: " + roleType);
             Profile newProfile = new Profile();
@@ -148,9 +152,5 @@ public class ProfileController {
             newProfile.setDescription(profilePostInDTO.getDescription());
             profileRepository.save(newProfile);
             return ResponseEntity.status(201).build();
-        }else{
-            return ResponseEntity.status(403).body("Profile already exists for this role type");
-        }  
     }
-    
 }
