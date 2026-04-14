@@ -25,34 +25,6 @@ public class GetForumPostsOutItemDTO {
     private boolean isLocked;
     private List<String> mediaUrls;
 
-    public GetForumPostsOutItemDTO(
-        Long id,
-        PostType type,
-        String title,
-        List<String> tags,
-        String content,
-        Instant createdAt,
-        Instant updatedAt,
-        Boolean isEdited,
-        Boolean isLocked,
-        String profilename,
-        String image,
-        List<String> mediaUrls) {
-
-    this.id = id;
-    this.type = type.toString();
-    this.title = title;
-    this.tags = tags;
-    this.content = content;
-    this.createdAt = createdAt;
-    this.updatedAt = updatedAt;
-    this.isEdited = isEdited;
-    this.isLocked = isLocked;
-    this.mediaUrls = mediaUrls;
-
-    this.author = new GetForumPostsOutItemAuthorDTO(profilename, image);
-}
-
     public GetForumPostsOutItemDTO(GetForumPostItemOutBasicData basicData, GetForumPostsOutItemAuthorDTO getForumPostsOutItemAuthorDTO, List<String> mediaUrls, List<String> tags) {
         this.id = basicData.getId();
         this.type = basicData.getType();
