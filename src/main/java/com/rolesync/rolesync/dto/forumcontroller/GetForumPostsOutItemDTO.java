@@ -67,7 +67,6 @@ public class GetForumPostsOutItemDTO {
                 this.isEdited = boolean1;
                 this.isLocked = b;
                 this.mediaUrls = list2;
-                
     }
     
 }
