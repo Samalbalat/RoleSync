@@ -86,20 +86,9 @@ public class UserController {
         Optional<User> user = utilsCalls.getUserFromUsername(authentication);
         if (user.isPresent()) {
             User updatedUser = user.get();
-            if(userRepository.findByEmail(userPutInDTO.getEmail()).isPresent() && !updatedUser.getEmail().equals(userPutInDTO.getEmail())){
-                return ResponseEntity.status(403).body("Email already exists and is not the current email");
-            }
-            if (userPutInDTO.getEmail().isBlank() || userPutInDTO.getPassword().isBlank() || userPutInDTO.getTimeZone().isBlank()) {
-                return ResponseEntity.status(400).body("Email, password and time zone cannot be blank");
-                
-            }
-            if(!updatedUser.getPassword().equals(userPutInDTO.getOldPassword())){
-                return ResponseEntity.status(403).body("Old password is incorrect");
-            }
-            if (!checkPassword(userPutInDTO.getPassword())) {
-                return ResponseEntity.status(400).body("Password must be 8-20 characters long, contain at least one digit,"+
-                "one lowercase letter, one uppercase letter, one special character (@#$%^&+=) and have no whitespace");
-                
+            ResponseEntity<?> checks = UserPutChecks(userPutInDTO, updatedUser);
+            if(checks != null){
+                return checks;
             }
             updatedUser.setEmail(userPutInDTO.getEmail());
             updatedUser.setTimeZone(userPutInDTO.getTimeZone());
@@ -117,5 +106,22 @@ public class UserController {
         Pattern pattern = Pattern.compile(regExpn, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(password);
         return matcher.matches();
+    }
+
+    private ResponseEntity<?> UserPutChecks(UserPutInDTO userPutInDTO, User updatedUser){
+        if(userRepository.findByEmail(userPutInDTO.getEmail()).isPresent() && !updatedUser.getEmail().equals(userPutInDTO.getEmail())){
+                return ResponseEntity.status(403).body("Email already exists and is not the current email");
+            }
+            if (userPutInDTO.getEmail().isBlank() || userPutInDTO.getPassword().isBlank() || userPutInDTO.getTimeZone().isBlank()) {
+                return ResponseEntity.status(400).body("Email, password and time zone cannot be blank");
+            }
+            if(!updatedUser.getPassword().equals(userPutInDTO.getOldPassword())){
+                return ResponseEntity.status(403).body("Old password is incorrect");
+            }
+            if (!checkPassword(userPutInDTO.getPassword())) {
+                return ResponseEntity.status(400).body("Password must be 8-20 characters long, contain at least one digit,"+
+                "one lowercase letter, one uppercase letter, one special character (@#$%^&+=) and have no whitespace");
+            }
+            return null;
     }
 }
