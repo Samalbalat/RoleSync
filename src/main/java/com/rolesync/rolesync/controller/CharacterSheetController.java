@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.core.Authentication;
 
+import com.rolesync.rolesync.dto.charactersheetcontroller.CharacterSheetGetOutDTO;
 import com.rolesync.rolesync.dto.charactersheetcontroller.CharacterSheetInPostDTO;
 import com.rolesync.rolesync.dto.charactersheetcontroller.CharacterTemplateOutPostDTO;
 import com.rolesync.rolesync.model.Campaign;
@@ -214,13 +215,20 @@ public class CharacterSheetController {
                 dto.setCampaign_id(null);
                 dto.setCampaign_name(null);
             }
+            if(template.getImage()!=null){
+                    dto.setImage(template.getImage());
+                }
             dto.setSchema_definition(template.getSchema());
             return dto;
         }).toList();
         return ResponseEntity.ok(response);
     }
 
-    private ResponseEntity<?> getMySheets(Authentication authentication, boolean isTemplate, @RequestHeader("X-Profile-Name") String profileName) {
+    private ResponseEntity<?> getMySheets
+            (Authentication authentication,
+            boolean isTemplate,
+            @RequestHeader("X-Profile-Name") String profileName)
+        {
         if(!utilsCalls.checkAuthAndProfile(authentication, profileName)){
             return ResponseEntity.status(403).body("User not authenticated or profile not found");
         }
@@ -240,6 +248,9 @@ public class CharacterSheetController {
                 dto.setCampaign_id(null);
                 dto.setCampaign_name(null);
             }
+            if(sheet.getImage()!=null){
+                    dto.setImage(sheet.getImage());
+                }
             dto.setSchema_definition(sheet.getSchema());
             dto.setName(sheet.getName());
             return dto;
@@ -252,11 +263,11 @@ public class CharacterSheetController {
         if (campaignOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+        if(!utilsCalls.checkAuthAndProfile(authentication, profileName)){
+            return ResponseEntity.status(403).body("User not authenticated or profile not found");
+        }
         Campaign campaign = campaignOpt.get();
-        Profile activeProfile = profileRepository.findByProfilename(profileName)
-                .orElseThrow(() -> new IllegalStateException("Active profile not found"));
-        if (!campaign.getOwnerName().equals(activeProfile.getProfilename()) &&
-            (campaign.getMembers() == null || !campaign.getMembers().contains(activeProfile.getProfilename()))) {
+        if (!profileBelongsToCampaign(profileName, campaign)) {
             return ResponseEntity.status(403).body("User is not a member of the campaign");
         }
         
@@ -265,6 +276,7 @@ public class CharacterSheetController {
             CharacterTemplateOutPostDTO dto = new CharacterTemplateOutPostDTO();
             dto.setId(sheet.getId());
             dto.setName(sheet.getName());
+            dto.setImage(sheet.getImage());
             dto.setCampaign_id(sheet.getCampaign().getId().toString());
             dto.setCampaign_name(sheet.getCampaign().getName());
             dto.setSchema_definition(sheet.getSchema());
@@ -282,14 +294,21 @@ public class CharacterSheetController {
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(403).body("User not found");
         }else{
-        
             if(character.isEmpty()){
                 return ResponseEntity.status(404).body("Character not found");
-            }else if(character.get().getIsPublic()==false && !character.get().getOwner().equals(userOpt.get())){
-                return ResponseEntity.status(403).body("User is not the owner of this character");
+            }else if(character.get().getIsPublic()){
+                return ResponseEntity.ok(new CharacterSheetGetOutDTO(character.get()));
+            }else if(character.get().getCampaign()!=null){
+                Campaign campaign = character.get().getCampaign();
+                if(!profileBelongsToCampaign(profileName, campaign)){
+                    return ResponseEntity.status(403).body("User is not a member of the campaign");
+                }
+            }else if(!character.get().getOwner().getProfilename().equals(profileName)){
+                String conditionalMessageIfIsTemplate = character.get().getIsTemplate() ? "template" : "character";
+                return ResponseEntity.status(403).body("User is not the owner of this " + conditionalMessageIfIsTemplate);
             }
+            return ResponseEntity.ok(new CharacterSheetGetOutDTO(character.get()));
         }
-        return ResponseEntity.ok(character.get());
     }
 
     private ResponseEntity<?> updateSheet(Authentication authentication, Long id, CharacterSheetInPostDTO dto, @RequestHeader ("X-Profile-Name") String profileName) {
@@ -315,6 +334,11 @@ public class CharacterSheetController {
         CharacterTemplateOutPostDTO response = new CharacterTemplateOutPostDTO();
         response.setId(characterSheet.getId());
         return ResponseEntity.ok(response);
+    }
+
+    private boolean profileBelongsToCampaign(String profilename, Campaign campaign){
+        return campaign.getOwnerName().equals(profilename) ||
+            (campaign.getMembers() != null && campaign.getMembers().contains(profilename));
     }
 }
 

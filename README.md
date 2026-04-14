@@ -33,18 +33,23 @@ RoleSync es un proyecto backend enfocado en:
 ## 🧱 Arquitectura del proyecto
 
 El proyecto sigue la arquitectura estándar de un backend en Spring Boot:
+
 - src/main/java/com/rolesync/rolseync
-  - config: Se encuentra el .java que gestiona la seguridad de la página
-  - controller: Controladores que manejan los endpoints
-  - dto: Distintos DTOs que utiliza cada controlador
-  - repository: Repositorios que manejan la conexión entre los controladores y la base de Datos de PostgreSQL
-  - security: Un conjunto de entidades dedicadas al manejo de JWT y la clase User que gestiona la seguridad de la página
-  - utils: Varias clases con funciones genéricas y desacopladas del resto de entidades
+- config: Se encuentra el .java que gestiona la seguridad de la página
+- controller: Controladores que manejan los endpoints
+- dto: Distintos DTOs que utiliza cada controlador
+- repository: Repositorios que manejan la conexión entre los controladores y la base de Datos de PostgreSQL
+- security: Un conjunto de entidades dedicadas al manejo de JWT y la clase User que gestiona la seguridad de la página
+- utils: Varias clases con funciones genéricas y desacopladas del resto de entidades
 
 ---
+
 ## 📂 Entidades principales
+
 ---
+
 ## 🔧 Requisitos y configuración
+
 Necesitaras tener PostgreSQL instalado, Java 21, Maven y adecuar el archivo application.properties a una base de datos limpia para que se puedan crear las tablas inciales de la aplicación
 ---
 ## 🧪 Cómo probar

@@ -8,8 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.core.Authentication;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.rolesync.rolesync.dto.campaigncontroller.CampaignFilter;
+import com.rolesync.rolesync.dto.campaigncontroller.CampaignGetByFilterDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignGetByIdOutDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignGetMeOutDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignGetMeOutItemDTO;
@@ -21,13 +22,14 @@ import com.rolesync.rolesync.dto.campaigncontroller.CampaignRequestInDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignRequestPutInDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignRequestsByIdOutDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.OwnerProfileDTO;
+import com.rolesync.rolesync.dto.campaigncontroller.mappers.CampaignMapper;
+import com.rolesync.rolesync.dto.campaigncontroller.predicates.CampaignPredicateBuilder;
 import com.rolesync.rolesync.model.Campaign;
 import com.rolesync.rolesync.model.CampaignRequest;
 import com.rolesync.rolesync.model.CampaignRequestStatus;
 import com.rolesync.rolesync.model.CampaignStatus;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.ProfileType;
-import com.rolesync.rolesync.model.QCampaign;
 import com.rolesync.rolesync.repository.CampaignRepository;
 import com.rolesync.rolesync.repository.CampaignRequestRepository;
 import com.rolesync.rolesync.repository.CharacterSheetRepository;
@@ -36,10 +38,10 @@ import com.rolesync.rolesync.utils.UtilsCalls;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -52,7 +54,6 @@ public class CampaignController {
     private final CampaignRequestRepository campaignRequestRepository;
     private final CharacterSheetRepository characterSheetRepository;
     private final UtilsCalls utilsCalls;
-    private static final QCampaign Q = QCampaign.campaign;
 
     public CampaignController(
             CampaignRepository campaignRepository,
@@ -70,106 +71,59 @@ public class CampaignController {
     // ---------- FILTERED GET ----------
 
     @GetMapping
-    public ResponseEntity<List<Campaign>> getCampaigns(
-            @RequestParam ProfileType type,
-            @RequestParam(required = false) String system,
-            @RequestParam(required = false) String location,
-            @RequestParam(required = false) String language,
-            @RequestParam(required = false) String timeZone,
-            @RequestParam(required = false) String dayWeek,
-            @RequestParam(required = false) String communication,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) String page,
-            @RequestParam(required = false) String themes,
-            @RequestParam(required = false) String duration) {
-        BooleanExpression predicate = Q.campaignType.eq(type);
+    public ResponseEntity<List<CampaignGetByFilterDTO>> getCampaigns(@ModelAttribute CampaignFilter filter) {
+        CampaignPredicateBuilder predicateBuilder = new CampaignPredicateBuilder();
+        
+        BooleanExpression predicate = predicateBuilder.build(filter);
 
-        if (system != null && !system.isBlank()) {
-            predicate = predicate.and(Q.system.containsIgnoreCase(system));
-        }
-
-        if (location != null && !location.isBlank()) {
-            predicate = predicate.and(Q.location.containsIgnoreCase(location));
-        }
-
-        if (language != null && !language.isBlank()) {
-            predicate = predicate.and(Q.language.containsIgnoreCase(language));
-        }
-
-        if (timeZone != null && !timeZone.isBlank()) {
-            predicate = predicate.and(Q.timeZone.containsIgnoreCase(timeZone));
-        }
-
-        if (dayWeek != null && !dayWeek.isBlank()) {
-            predicate = predicate.and(Q.dayWeek.containsIgnoreCase(dayWeek));
-        }
-
-        if (communication != null && !communication.isBlank()) {
-            predicate = predicate.and(Q.communication.containsIgnoreCase(communication));
-        }
-
-        if (status != null && !status.isBlank()) {
-            predicate = predicate.and(Q.status.eq(CampaignStatus.valueOf(status.toUpperCase())));
-            predicate = predicate.and(Q.status.ne(CampaignStatus.DELETED));
-        }
-        if (themes != null && !themes.isBlank()) {
-            predicate = predicate.and(
-                    Expressions.booleanTemplate("CAST({0} AS text) ilike {1}", Q.themes, "%" + themes + "%"));
-        }
-        if (duration != null && !duration.isBlank()) {
-            predicate = predicate.and(Q.duration.containsIgnoreCase(duration));
-        }
-
-        if (search != null && !search.isBlank()) {
-            search = search.trim();
-            String[] keywords = search.split(" ");
-            BooleanExpression searchPredicate = Q.name.containsIgnoreCase(keywords[0]);
-            for (int i = 1; i < keywords.length; i++) {
-                searchPredicate = searchPredicate.and(Q.name.containsIgnoreCase(keywords[i]));
-            }
-            predicate = predicate.and(searchPredicate);
-        }
-
-        return ResponseEntity.ok(
-                (List<Campaign>) campaignRepository.findAll(predicate));
+        List<Campaign> campaigns = (List<Campaign>) campaignRepository.findAll(predicate);
+        List<CampaignGetByFilterDTO> response = campaigns.stream().map(CampaignMapper::toGetByFilterDTO).toList();
+        return ResponseEntity.ok(response);
     }
 
     // ---------- MINE GET ----------
     @GetMapping("/me")
     public ResponseEntity<CampaignGetMeOutDTO> getMyCampaigns(
             @RequestHeader("X-Profile-Name") String profileName) {
+
         CampaignGetMeOutDTO response = new CampaignGetMeOutDTO();
-        List<CampaignGetMeOutItemDTO> asMaster = campaignRepository.findByOwnerName(profileName).stream().map(c -> {
-            CampaignGetMeOutItemDTO item = new CampaignGetMeOutItemDTO();
-            if (c.getStatus() != CampaignStatus.DELETED) {
-                item.setId(c.getId());
-                item.setName(c.getName());
-                item.setImage(c.getImage());
-                item.setSystem(c.getSystem());
-                item.setStatus(c.getStatus().name());
-                item.setPendingRequests(c.getRequests().size());
-            }
-            return item;
-        }).toList();
+
+        // AS MASTER
+        List<CampaignGetMeOutItemDTO> asMaster =
+                campaignRepository.findByOwnerName(profileName).stream()
+                        .filter(c -> c.getStatus() != CampaignStatus.DELETED)
+                        .map(c -> {
+                            CampaignGetMeOutItemDTO item = new CampaignGetMeOutItemDTO();
+                            item.setId(c.getId());
+                            item.setName(c.getName());
+                            item.setImage(c.getImage());
+                            item.setSystem(c.getSystem());
+                            item.setStatus(c.getStatus().name());
+                            Integer pendingRequests = Integer.valueOf(campaignRequestRepository.countPendingRequestsByCampaignId(c.getId()).toString());
+                            item.setPendingRequests(pendingRequests);
+
+                            return item;
+                        }).toList();
+
         response.setAsMaster(asMaster);
 
-        List<CampaignGetMeOutItemDTO> asPlayer = campaignRepository.findAll().stream()
-                .filter(c -> c.getMembers() != null && c.getMembers().contains(profileName))
-                .map(c -> {
-                    CampaignGetMeOutItemDTO item = new CampaignGetMeOutItemDTO();
-                    if (c.getStatus() != CampaignStatus.DELETED) {
-                        item.setId(c.getId());
-                        item.setName(c.getName());
-                        item.setImage(c.getImage());
-                        item.setSystem(c.getSystem());
-                        item.setStatus(c.getStatus().name());
-                        item.setOwnerName(c.getOwnerName());
-                    }
-                    return item;
-                }).toList();
+        // AS PLAYER
+        List<CampaignGetMeOutItemDTO> asPlayer =
+                campaignRepository.findByMember(profileName).stream()
+                        .filter(c -> c.getStatus() != CampaignStatus.DELETED)
+                        .map(c -> {
+                            CampaignGetMeOutItemDTO item = new CampaignGetMeOutItemDTO();
+                            item.setId(c.getId());
+                            item.setName(c.getName());
+                            item.setImage(c.getImage());
+                            item.setSystem(c.getSystem());
+                            item.setStatus(c.getStatus().name());
+                            item.setOwnerName(c.getOwnerName());
+                            return item;
+                        }).toList();
 
         response.setAsPlayer(asPlayer);
+
         return ResponseEntity.ok(response);
     }
 
@@ -345,7 +299,7 @@ public class CampaignController {
         Optional<Campaign> campaignOpt = campaignRepository.findById(campaignId);
         boolean isAuthorized = utilsCalls.checkAuthAndProfile(authentication, profileName);
         Profile profile = profileRepository.findByProfilename(dto.getProfileName()).orElse(null);
-        ResponseEntity<?> viabilityCheck = checkChangeRequestStatusViability(isAuthorized, campaignOpt, profile, dto.getProfileName());
+        ResponseEntity<?> viabilityCheck = checkChangeRequestStatusViability(isAuthorized, campaignOpt, profile, profileName);
         if (viabilityCheck != null) {
             return viabilityCheck;
         }
@@ -405,7 +359,51 @@ public class CampaignController {
             campaign.setMembers(members);
             campaignRepository.save(campaign);
         }
+        CampaignRequest request = campaignRequestRepository.findLastRequestByProfileAndCampaign(
+            profileRepository.findByProfilename(dto.getProfileName()).orElse(null).getId(),
+            campaign.getId()
+        ).orElse(null);
+        if(request != null) {
+            request.setStatus(CampaignRequestStatus.KICKED);
+            request.setMessage(request.getMessage() + " (Kicked from campaign)");
+            campaignRequestRepository.save(request);
+        }
         return ResponseEntity.ok("Member kicked");
+    }
+
+    @PutMapping("/{id}/block")
+    public ResponseEntity<?> blockMember(
+            Authentication authentication,
+            @PathVariable Long id,
+            @RequestBody CampaignRequestPutInDTO dto,
+            @RequestHeader("X-Profile-Name") String profileName) {
+        boolean isAuthorized = utilsCalls.checkAuthAndProfile(authentication, profileName);
+        if (!isAuthorized) {
+            return ResponseEntity.status(403).body("User is not authorized to update this request");
+        }
+        Optional<Campaign> campaignOpt = campaignRepository.findById(id);
+        if (campaignOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else if (!campaignOpt.get().getOwnerName().equals(profileName)) {
+            return ResponseEntity.status(403).body("User is not authorized to block members from this campaign");
+        }
+        Campaign campaign = campaignOpt.get();
+        List<String> members = campaign.getMembers();
+        if (members != null && members.contains(dto.getProfileName())) {
+            members.remove(dto.getProfileName());
+            campaign.setMembers(members);
+            campaignRepository.save(campaign);
+        }
+        CampaignRequest request = campaignRequestRepository.findLastRequestByProfileAndCampaign(
+            profileRepository.findByProfilename(dto.getProfileName()).orElse(null).getId(),
+            campaign.getId()
+        ).orElse(null);
+        if(request != null) {
+            request.setStatus(CampaignRequestStatus.BLOCKED);
+            request.setMessage(request.getMessage() + " (Blocked from campaign)");
+            campaignRequestRepository.save(request);
+        }
+        return ResponseEntity.ok("Member blocked");
     }
 
     // ---------- GREY OUT ----------
@@ -428,6 +426,8 @@ public class CampaignController {
         return ResponseEntity.ok("Campaign deleted");
     }
 
+
+    // ---------- APPLY TO CAMPAIGN ----------
     @PostMapping("/{id}/join")
     public ResponseEntity<String> applyToCampaign(
             Authentication authentication,
@@ -437,6 +437,13 @@ public class CampaignController {
         boolean isAuthorized = utilsCalls.checkAuthAndProfile(authentication, profileName);
         if (!isAuthorized) {
             return ResponseEntity.status(403).body("User is not properly authorized to join this campaign");
+        }
+        CampaignRequest lastRequest = campaignRequestRepository.findLastRequestByProfileAndCampaign(
+            profileRepository.findByProfilename(profileName).orElse(null).getId(),
+            id
+        ).orElse(null);
+        if(lastRequest != null && lastRequest.getStatus() == CampaignRequestStatus.BLOCKED) {
+            return ResponseEntity.status(403).body("User is blocked from joining this campaign");
         }
         Optional<Campaign> campaignOpt = campaignRepository.findById(id);
         if(campaignOpt.get().getMembers() != null && campaignOpt.get().getMembers().contains(profileName) || campaignOpt.get().getOwnerName().equals(profileName)) {

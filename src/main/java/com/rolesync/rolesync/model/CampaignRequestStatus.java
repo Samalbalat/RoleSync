@@ -5,5 +5,6 @@ public enum CampaignRequestStatus {
     PENDING,
     ACCEPT,
     REJECT,
-    KICKED
+    KICKED,
+    BLOCKED
 }

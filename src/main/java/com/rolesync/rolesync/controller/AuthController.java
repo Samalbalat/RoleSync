@@ -2,6 +2,7 @@ package com.rolesync.rolesync.controller;
 
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -50,8 +51,11 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
         System.out.println(loginRequest);
-        User user = userRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("Error: Usuario no encontrado."));
+        Optional<User> userOptional = userRepository.findByEmail(loginRequest.getEmail());
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.badRequest().body("Error: Usuario no encontrado.");
+        }
+        User user = userOptional.get();
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(user.getEmail(), loginRequest.getPassword()));
 

@@ -15,6 +15,7 @@ public class CharacterTemplateOutPostDTO {
     private String name;
     private String campaign_id;
     private String campaign_name;
+    private String image;
     private List<CharacterSchemaField> schema_definition;
     
 }
