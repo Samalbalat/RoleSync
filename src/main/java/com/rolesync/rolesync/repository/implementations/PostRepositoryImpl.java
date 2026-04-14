@@ -41,7 +41,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
             builder.and(isPublic);
         }
         
-
         return queryFactory
                 .selectFrom(post)
                 .where(builder)

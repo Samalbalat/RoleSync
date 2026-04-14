@@ -61,8 +61,8 @@ public class Post {
 
     private boolean isDm;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "media_urls", columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "media_urls", columnDefinition = "text[]")
     private List<String> mediaUrls;
 
     private boolean isEdited;

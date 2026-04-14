@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,7 +30,6 @@ import com.rolesync.rolesync.model.Post;
 import com.rolesync.rolesync.model.PostType;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.repository.CampaignRepository;
-import com.rolesync.rolesync.repository.CampaignRequestRepository;
 import com.rolesync.rolesync.repository.CharacterSheetRepository;
 import com.rolesync.rolesync.repository.PostRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
@@ -39,7 +41,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
 
 @RestController
 public class ForumController {
@@ -54,9 +55,8 @@ public class ForumController {
             CampaignRepository campaignRepository,
             UtilsCalls utilsCalls,
             ProfileRepository profileRepository,
-            CampaignRequestRepository campaignRequestRepository,
-            CharacterSheetRepository characterSheetRepository,
-            PostRepository postRepository,CharacterSheetRepository characterRepository) {
+            PostRepository postRepository,
+            CharacterSheetRepository characterRepository) {
         this.campaignRepository = campaignRepository;
         this.utilsCalls = utilsCalls;
         this.postRepository = postRepository;
@@ -72,39 +72,28 @@ public class ForumController {
             @RequestParam(required = false) Integer limit,
             @RequestParam(required = false) Instant cursor,
             @RequestParam(required = false) Long characterId) {
-                //Security checks
-                if(!utilsCalls.checkAuthAndProfile(authentication, profileName)) {
-                    return ResponseEntity.status(403).body("Unauthorized");
-                }
-                Campaign campaign = campaignRepository.findById(id).orElse(null);
-                String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
-                if("NONE".equals(relation) || "PENDING".equals(relation)) {
-                    return ResponseEntity.status(403).body("Access denied");
-                }
-                if (characterId!=null) {
-                    CharacterSheet accessingCharacter = characterRepository.findById(characterId).orElse(null);
-                    if(accessingCharacter == null) {
-                        return ResponseEntity.status(400).body("Invalid character ID"); // Invalid character ID
-                    }else if(!accessingCharacter.getOwner().getProfilename().equals(profileName)) {
-                        return ResponseEntity.status(403).body("Access denied"); // Character does not belong to profile
-                    }
-                }
-                // Fetch posts with pagination
-                int effectiveLimit = Math.min((limit != null && limit > 0) ? limit : 20, 100); // Default to 20 if not provided or invalid
-                List<Post> page = postRepository.findCampaignPosts(id, cursor, effectiveLimit, characterId);
+        // Security checks
+        ResponseEntity<?> accessCheck = (ResponseEntity<?>) getPostFromCampaignsSecurity(authentication, profileName,
+                id, characterId);
+        if (accessCheck != null) {
+            return accessCheck;
+        }
+        // Fetch posts with pagination
+        int effectiveLimit = Math.min((limit != null && limit > 0) ? limit : 20, 100); // Default to 20 if not provided
+                                                                                       // or invalid
+        List<Post> page = postRepository.findCampaignPosts(id, cursor, effectiveLimit, characterId);
+        // Prepare response additional info for pagination
+        Instant nextCursor = null;
+        Boolean hasMore = false;
+        if (page.size() > effectiveLimit) {
+            nextCursor = page.get(effectiveLimit).getCreatedAt();
+            hasMore = true;
+            page = page.subList(0, effectiveLimit);
+        }
 
-                // Prepare response additional info for pagination
-                Instant nextCursor = null;
-                Boolean hasMore = false;
-                if (page.size() > effectiveLimit) {
-                    nextCursor = page.get(effectiveLimit).getCreatedAt();
-                    hasMore = true;
-                    page = page.subList(0, effectiveLimit);
-                }
-
-                List<GetCampaignPostsOutItemDTO> dtoList = page.stream().map(GetCampaignPostsOutDTOMapper::toDTO).toList();
-                return ResponseEntity.ok().body(new GetCampaignPostsOutDTO(dtoList, nextCursor, hasMore));
-            }
+        List<GetCampaignPostsOutItemDTO> dtoList = page.stream().map(GetCampaignPostsOutDTOMapper::toDTO).toList();
+        return ResponseEntity.ok().body(new GetCampaignPostsOutDTO(dtoList, nextCursor, hasMore));
+    }
 
     @GetMapping("posts/{id}/replies")
     public ResponseEntity<GetCampaignPostsOutDTO> getPostReplies(
@@ -113,72 +102,91 @@ public class ForumController {
             @RequestHeader("X-Profile-Name") String profileName,
             @RequestParam(required = false) Integer limit,
             @RequestParam(required = false) Instant cursor) {
-                //Security checks
-                if(!utilsCalls.checkAuthAndProfile(authentication, profileName)) {
-                    return ResponseEntity.status(403).build();
-                }
-                Post parentPost = postRepository.findById(id).orElse(null);
-                Campaign campaign = campaignRepository.findById(parentPost.getCampaign().getId()).orElse(null);
-                String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
-                if("NONE".equals(relation) || "PENDING".equals(relation)) {
-                    return ResponseEntity.status(403).build();
-                }
+        // Security checks
+        if (!utilsCalls.checkAuthAndProfile(authentication, profileName)) {
+            return ResponseEntity.status(403).build();
+        }
+        Post parentPost = postRepository.findById(id).orElse(null);
+        Campaign campaign = campaignRepository.findById(parentPost.getCampaign().getId()).orElse(null);
+        String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
+        if ("NONE".equals(relation) || "PENDING".equals(relation)) {
+            return ResponseEntity.status(403).build();
+        }
 
-                // Fetch posts with pagination
-                int effectiveLimit = Math.min((limit != null && limit > 0) ? limit : 20, 100); // Default to 20 if not provided or invalid
-                List<Post> page = postRepository.findPostReplies(id, cursor, effectiveLimit);
+        // Fetch posts with pagination
+        int effectiveLimit = Math.min((limit != null && limit > 0) ? limit : 20, 100); // Default to 20 if not provided
+                                                                                       // or invalid
+        List<Post> page = postRepository.findPostReplies(id, cursor, effectiveLimit);
 
-                // Prepare response additional info for pagination
-                Instant nextCursor = null;
-                Boolean hasMore = false;
-                if (page.size() > effectiveLimit) {
-                    nextCursor = page.get(effectiveLimit).getCreatedAt();
-                    hasMore = true;
-                    page = page.subList(0, effectiveLimit);
-                }
+        // Prepare response additional info for pagination
+        Instant nextCursor = null;
+        Boolean hasMore = false;
+        if (page.size() > effectiveLimit) {
+            nextCursor = page.get(effectiveLimit).getCreatedAt();
+            hasMore = true;
+            page = page.subList(0, effectiveLimit);
+        }
 
-                List<GetCampaignPostsOutItemDTO> dtoList = page.stream().map(GetCampaignPostsOutDTOMapper::toDTO).toList();
-                return ResponseEntity.ok().body(new GetCampaignPostsOutDTO(dtoList, nextCursor, hasMore));
-            }
-    
+        List<GetCampaignPostsOutItemDTO> dtoList = page.stream().map(GetCampaignPostsOutDTOMapper::toDTO).toList();
+        return ResponseEntity.ok().body(new GetCampaignPostsOutDTO(dtoList, nextCursor, hasMore));
+    }
+
     @GetMapping("forums/posts")
-    public ResponseEntity<GetForumPostsOutDTO> getForumPosts(
+    public ResponseEntity<?> getForumPosts(
             Authentication authentication,
             @RequestHeader("X-Profile-Name") String profileName,
             @RequestParam(required = false) Integer limit,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) String tags,
             @RequestParam(required = false) String orderBy) {
-                //Security checks
-                if(!utilsCalls.checkAuthAndProfile(authentication, profileName)) {
-                    return ResponseEntity.status(403).build();
-                }
+        // Security checks
+        ResponseEntity<?> accessCheck = validateAccess(authentication, profileName);
+        if (accessCheck != null) {
+            return accessCheck;
+        }
 
-                int effectiveLimit = Math.min((limit != null && limit > 0) ? limit : 20, 100); // Default to 20 if not provided or invalid
-                int effectivePage = (page != null && page > 0) ? page : 1; // Default to 1 if not provided or invalid
-                Integer totalItems = postRepository.countForumPostsByTags(tags != null ? Arrays.asList(tags.split(",")) : List.of()).intValue();
-                Integer totalPages = (int) Math.ceil((double) totalItems / effectiveLimit);
+        int effectiveLimit = resolveLimit(limit);
+        int effectivePage = resolvePage(page);
+        String[] tagList = (tags == null || tags.isBlank())
+                ? null
+                : parseTags(tags);
+        long totalItems = postRepository.countForumPosts(tagList);
+        int totalPages = calculateTotalPages((int) totalItems, effectiveLimit);
 
-                if (effectivePage > totalPages) {
-                    return ResponseEntity.status(400).body(null); // Invalid page number
-                }
+        validatePage(effectivePage, totalPages);
 
-                // Fetch posts with pagination and optional filtering by tags 
-                List<Post> forumPosts = postRepository.findPostsByTags(tags != null ? Arrays.asList(tags.split(",")) : List.of(), effectiveLimit, (effectivePage - 1) * effectiveLimit);
+        Pageable pageable = PageRequest.of(effectivePage - 1, effectiveLimit);
 
-                //Response mapping
-                List<GetForumPostsOutItemDTO> dtoList = new ArrayList<>();
-                for (Post post : forumPosts) {
-                    GetForumPostsOutItemDTO dto = GetForumPostsOutDTOMapper.toDTO(post);
-                    Profile authorProfile = profileRepository.findById(post.getAuthorProfileId()).orElse(null);
-                    if (authorProfile != null) {
-                        dto.setAuthor(new GetForumPostsOutItemAuthorDTO(authorProfile.getProfilename(), authorProfile.getImage()));
-                    }
-                    dtoList.add(dto);
-                }
-                GetForumPostsOutMetaDTO meta = new GetForumPostsOutMetaDTO((long) effectivePage, (long) totalPages, (long) totalItems);
-                return ResponseEntity.ok().body(new GetForumPostsOutDTO(dtoList, meta));
-            }
+        List<GetForumPostsOutItemDTO> dtoList = postRepository
+                .findForumPosts(tagList, pageable.getPageSize(), pageable.getOffset())
+                .stream()
+                .map(record -> {
+                    String[] tagsArr = (String[]) record[3];
+                    String[] mediaArr = (String[]) record[11];
+                    GetForumPostsOutItemDTO dto = new GetForumPostsOutItemDTO(
+                            (Long) record[0],
+                            PostType.valueOf((String) record[1]),
+                            (String) record[2],
+                            tagsArr != null ? Arrays.asList(tagsArr) : List.of(),
+                            (String) record[4],
+                            new GetForumPostsOutItemAuthorDTO((String) record[9], (String) record[10]),
+                            (Instant) record[5],
+                            (Instant) record[6],
+                            (Boolean) record[7],
+                            (Boolean) record[8],
+                            mediaArr != null ? Arrays.asList(mediaArr) : List.of());
+
+                    return dto;
+                })
+                .toList();
+
+        GetForumPostsOutMetaDTO meta = new GetForumPostsOutMetaDTO(
+                (long) effectivePage,
+                (long) totalPages,
+                totalItems);
+
+        return ResponseEntity.ok(new GetForumPostsOutDTO(dtoList, meta));
+    }
 
     @GetMapping("forums/posts/{id}")
     public ResponseEntity<?> getForumPostDetail(
@@ -189,24 +197,24 @@ public class ForumController {
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) String tags,
             @RequestParam(required = false) String orderBy) {
-                //Security checks
-                if(!utilsCalls.checkAuthAndProfile(authentication, profileName)) {
-                    return ResponseEntity.status(403).build();
-                }
-
-                Post forumPost = postRepository.findById(id).orElse(null);
-                if(forumPost == null) {
-                    return ResponseEntity.status(404).body("Post not found");
-                }else if(forumPost.getCampaign() != null) {
-                    return ResponseEntity.status(400).body("Post is not a forum post");
-                }
-                GetForumPostsOutItemDTO dto = GetForumPostsOutDTOMapper.toDTO(forumPost);
-                Profile authorProfile = profileRepository.findById(forumPost.getAuthorProfileId()).orElse(null);
-                if (authorProfile != null) {
-                    dto.setAuthor(new GetForumPostsOutItemAuthorDTO(authorProfile.getProfilename(), authorProfile.getImage()));
-                }
-                return ResponseEntity.ok().body(dto);
-            }
+        // Security checks
+        ResponseEntity<?> accessCheck = validateAccess(authentication, profileName);
+        if (accessCheck != null) {
+            return accessCheck;
+        }
+        Post forumPost = postRepository.findById(id).orElse(null);
+        if (forumPost == null) {
+            return ResponseEntity.status(404).body("Post not found");
+        } else if (forumPost.getCampaign() != null) {
+            return ResponseEntity.status(400).body("Post is not a forum post");
+        }
+        GetForumPostsOutItemDTO dto = GetForumPostsOutDTOMapper.toDTO(forumPost);
+        Profile authorProfile = profileRepository.findById(forumPost.getAuthorProfileId()).orElse(null);
+        if (authorProfile != null) {
+            dto.setAuthor(new GetForumPostsOutItemAuthorDTO(authorProfile.getProfilename(), authorProfile.getImage()));
+        }
+        return ResponseEntity.ok().body(dto);
+    }
 
     @GetMapping("forums/myPosts")
     public ResponseEntity<?> getMyForumPosts(
@@ -214,83 +222,93 @@ public class ForumController {
             @RequestHeader("X-Profile-Name") String profileName,
             @RequestParam(required = false) Integer limit,
             @RequestParam(required = false) Integer page) {
-                //Security checks
-                if(!utilsCalls.checkAuthAndProfile(authentication, profileName)) {
-                    return ResponseEntity.status(403).body("Unauthorized");
-                }
-                Profile profile = profileRepository.findByProfilename(profileName).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        // Security checks
+        ResponseEntity<?> accessCheck = validateAccess(authentication, profileName);
+        if (accessCheck != null) {
+            return accessCheck;
+        }
+        Profile profile = profileRepository.findByProfilename(profileName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-                int effectiveLimit = Math.min((limit != null && limit > 0) ? limit : 20, 100); // Default to 20 if not provided or invalid
-                int effectivePage = (page != null && page > 0) ? page : 1; // Default to 1 if not provided or invalid
-                Integer totalItems = postRepository.countForumPostsByAuthorId(profile.getId()).intValue();
-                Integer totalPages = (int) Math.ceil((double) totalItems / effectiveLimit);
+        int effectiveLimit = Math.min((limit != null && limit > 0) ? limit : 20, 100); // Default to 20 if not provided
+                                                                                       // or invalid
+        int effectivePage = (page != null && page > 0) ? page : 1; // Default to 1 if not provided or invalid
+        Integer totalItems = postRepository.countForumPostsByAuthorId(profile.getId()).intValue();
+        Integer totalPages = (int) Math.ceil((double) totalItems / effectiveLimit);
 
-                if (effectivePage > totalPages) {
-                    return ResponseEntity.status(400).body("Invalid page number"); // Invalid page number
-                }
+        if (effectivePage > totalPages) {
+            return ResponseEntity.status(400).body("Invalid page number"); // Invalid page number
+        }
 
-                // Fetch posts with pagination and optional filtering by tags 
-                List<Post> forumPosts = postRepository.findPostsByAuthorId(profile.getId    (), effectiveLimit, (effectivePage - 1) * effectiveLimit);
+        // Fetch posts with pagination and optional filtering by tags
+        List<Post> forumPosts = postRepository.findPostsByAuthorId(profile.getId(), effectiveLimit,
+                (effectivePage - 1) * effectiveLimit);
 
-                //Response mapping
-                List<GetForumPostsOutItemDTO> dtoList = new ArrayList<>();
-                for (Post post : forumPosts) {
-                    GetForumPostsOutItemDTO dto = GetForumPostsOutDTOMapper.toDTO(post);
-                    Profile authorProfile = profileRepository.findById(post.getAuthorProfileId()).orElse(null);
-                    if (authorProfile != null) {
-                        dto.setAuthor(new GetForumPostsOutItemAuthorDTO(authorProfile.getProfilename(), authorProfile.getImage()));
-                    }
-                    dtoList.add(dto);
-                }
-                GetForumPostsOutMetaDTO meta = new GetForumPostsOutMetaDTO((long) effectivePage, (long) totalPages, (long) totalItems);
-                return ResponseEntity.ok().body(new GetForumPostsOutDTO(dtoList, meta));
-            }
-    
+        // Response mapping
+        List<GetForumPostsOutItemDTO> dtoList = new ArrayList<>();
+        for (Post post : forumPosts) {
+            GetForumPostsOutItemDTO dto = GetForumPostsOutDTOMapper.toDTO(post);
+            dto.setAuthor(new GetForumPostsOutItemAuthorDTO(profile.getProfilename(), profile.getImage()));
+            dtoList.add(dto);
+        }
+        GetForumPostsOutMetaDTO meta = new GetForumPostsOutMetaDTO((long) effectivePage, (long) totalPages,
+                (long) totalItems);
+        return ResponseEntity.ok().body(new GetForumPostsOutDTO(dtoList, meta));
+    }
+
     @PostMapping("campaigns/{id}/posts")
     public ResponseEntity<?> postCampaignPost(
             @PathVariable Long id,
             @RequestHeader("X-Profile-Name") String profileName,
             Authentication authentication,
             @RequestBody PostCampaignPostsInDTO request) {
-                //Security checks
-                Profile profile = profileRepository.findByProfilename(profileName).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-                if(!utilsCalls.checkAuthAndProfile(authentication, profileName)) {
-                    return ResponseEntity.status(403).build();
-                }
-                Campaign campaign = campaignRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-                String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
-                if("NONE".equals(relation) || "PENDING".equals(relation)) {
-                    return ResponseEntity.status(403).build();
-                }
-                CharacterSheet character = null;
-                    if(request.getAuthorCharacterId() != null){
-                        character = characterRepository.findById(request.getAuthorCharacterId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-                        // Ensure character belongs to profile
-                        if (!character.getOwner().getId().equals(profile.getId())) {
-                            return ResponseEntity.status(403).build();
-                        }
-                    }
-                Post post = new Post();
-                CampaignPostDTO campaignPostDto = new CampaignPostDTO(createPostFromRequest(request, post, profile, character, campaign, relation));
-                return ResponseEntity.ok().body(campaignPostDto);
+        // Security checks
+        ResponseEntity<?> accessCheck = validateAccess(authentication, profileName);
+        if (accessCheck != null) {
+            return accessCheck;
+        }
+        Profile profile = profileRepository.findByProfilename(profileName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Campaign campaign = campaignRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
+        if ("NONE".equals(relation) || "PENDING".equals(relation)) {
+            return ResponseEntity.status(403).build();
+        }
+        CharacterSheet character = null;
+        if (request.getAuthorCharacterId() != null) {
+            character = characterRepository.findById(request.getAuthorCharacterId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+            // Ensure character belongs to profile
+            if (!character.getOwner().getId().equals(profile.getId())) {
+                return ResponseEntity.status(403).build();
             }
+        }
+        Post post = new Post();
+        CampaignPostDTO campaignPostDto = new CampaignPostDTO(
+                createPostFromRequest(request, post, profile, character, campaign, relation));
+        return ResponseEntity.ok().body(campaignPostDto);
+    }
 
     @PostMapping("forums/posts")
     public ResponseEntity<?> postForumPost(
             @RequestHeader("X-Profile-Name") String profileName,
             Authentication authentication,
             @RequestBody PostForumPostsInDTO request) {
-                //Security checks
-                Profile profile = profileRepository.findByProfilename(profileName).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-                if(!utilsCalls.checkAuthAndProfile(authentication, profileName)) {
-                    return ResponseEntity.status(403).body("Unauthorized");
-                }
-                Post post = new Post();
-                Post responsePost = createPostFromRequest(request, post, profile);
-                return ResponseEntity.ok().body(responsePost.getId());
+        // Security checks
+        ResponseEntity<?> accessCheck = validateAccess(authentication, profileName);
+        if (accessCheck != null) {
+            return accessCheck;
+        }
+        Profile profile = profileRepository.findByProfilename(profileName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Post post = new Post();
+        Post responsePost = createPostFromRequest(request, post, profile);
+        return ResponseEntity.ok().body(responsePost.getId());
     }
 
-    private Post createPostFromRequest(PostCampaignPostsInDTO request, Post post, Profile profile, CharacterSheet character, Campaign campaign, String relation) {
+    private Post createPostFromRequest(PostCampaignPostsInDTO request, Post post, Profile profile,
+            CharacterSheet character, Campaign campaign, String relation) {
         post.setType(PostType.valueOf(request.getType()));
         post.setContent(request.getContent());
 
@@ -303,16 +321,16 @@ public class ForumController {
         }
         post.setCampaign(campaign);
 
-        if(request.getParentPostId() != null) { // parentPostId is optional, only for replies
+        if (request.getParentPostId() != null) { // parentPostId is optional, only for replies
             post.setParentPost(
-                postRepository.findById(request.getParentPostId()).orElse(null)
-            );
+                    postRepository.findById(request.getParentPostId()).orElse(null));
         }
 
         post.setCreatedAt(Instant.now());
 
         post.setOoc(request.getIsOoc());
-        if (request.getIsDm() != null && "OWNER".equals(relation)) { // Only allow setting DM flag if explicitly provided and user is OWNER
+        if (request.getIsDm() != null && "OWNER".equals(relation)) { // Only allow setting DM flag if explicitly
+                                                                     // provided and user is OWNER
             post.setDm(request.getIsDm());
         } else {
             post.setDm(false); // default to false for non-OWNERs or if not provided
@@ -328,12 +346,14 @@ public class ForumController {
 
         // Visibility (optional)
         if (request.getVisibleToCharacterIds() != null && !request.getVisibleToCharacterIds().isEmpty()) {
-            List<CharacterSheet> visibleCharacters = characterRepository.findAllById(request.getVisibleToCharacterIds());
+            List<CharacterSheet> visibleCharacters = characterRepository
+                    .findAllById(request.getVisibleToCharacterIds());
             if (visibleCharacters.size() != request.getVisibleToCharacterIds().size()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Some character IDs are invalid");
             }
-            post.setVisibleToCharacterIds((new HashSet<>(visibleCharacters.stream().map(CharacterSheet::getId).toList())));
-        }else{
+            post.setVisibleToCharacterIds(
+                    (new HashSet<>(visibleCharacters.stream().map(CharacterSheet::getId).toList())));
+        } else {
             post.setVisibleToCharacterIds(new HashSet<>()); // empty set means visible to all characters
         }
         postRepository.save(post);
@@ -346,13 +366,11 @@ public class ForumController {
 
         post.setAuthorProfileId(profile.getId());
 
-
         post.setParentPost(
-            request.getParentPostId() != null
-                ? postRepository.findById(request.getParentPostId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
-                : null
-        );
+                request.getParentPostId() != null
+                        ? postRepository.findById(request.getParentPostId())
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
+                        : null);
 
         post.setCreatedAt(Instant.now());
 
@@ -366,8 +384,63 @@ public class ForumController {
 
         post.setPinned(false);
         post.setLocked(false);
-        post.setTags(request.getTags()!= null ? request.getTags() : List.of());
+        post.setTags(request.getTags() != null ? request.getTags() : List.of());
         postRepository.save(post);
         return post;
+    }
+
+    private Object getPostFromCampaignsSecurity(Authentication authentication, String profileName, Long id,
+            Long characterId) {
+        // Security checks
+        ResponseEntity<?> accessCheck = validateAccess(authentication, profileName);
+        if (accessCheck != null) {
+            return accessCheck;
+        }
+        Campaign campaign = campaignRepository.findById(id).orElse(null);
+        String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
+        if ("NONE".equals(relation) || "PENDING".equals(relation)) {
+            return ResponseEntity.status(403).body("Access denied");
+        }
+        if (characterId != null) {
+            CharacterSheet accessingCharacter = characterRepository.findById(characterId).orElse(null);
+            if (accessingCharacter == null) {
+                return ResponseEntity.status(400).body("Invalid character ID"); // Invalid character ID
+            } else if (!accessingCharacter.getOwner().getProfilename().equals(profileName)) {
+                return ResponseEntity.status(403).body("Access denied"); // Character does not belong to profile
+            }
+        }
+        return null; // No issues, access granted
+    }
+
+    private ResponseEntity<?> validateAccess(Authentication auth, String profileName) {
+        if (!utilsCalls.checkAuthAndProfile(auth, profileName)) {
+            return ResponseEntity.status(403).body("Access denied");
+        }
+        return null;
+    }
+
+    private int resolveLimit(Integer limit) {
+        return Math.min((limit != null && limit > 0) ? limit : 20, 100);
+    }
+
+    private int resolvePage(Integer page) {
+        return (page != null && page > 0) ? page : 1;
+    }
+
+    private int calculateTotalPages(int totalItems, int limit) {
+        return (int) Math.ceil((double) totalItems / limit);
+    }
+
+    private void validatePage(int page, int totalPages) {
+        if (page > totalPages && totalPages != 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid page number");
+        }
+    }
+
+    private String[] parseTags(String tags) {
+        return Arrays.stream(tags.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toArray(String[]::new);
     }
 }

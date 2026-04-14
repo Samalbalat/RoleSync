@@ -340,9 +340,5 @@ public class CharacterSheetController {
         return campaign.getOwnerName().equals(profilename) ||
             (campaign.getMembers() != null && campaign.getMembers().contains(profilename));
     }
-
-    private boolean profileIsOwnerOfSheetOrIsPublic(String profilename, CharacterSheet sheet){
-        return sheet.getOwner().getProfilename().equals(profilename) || sheet.getIsPublic();
-    }
 }
 
