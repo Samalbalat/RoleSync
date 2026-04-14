@@ -86,7 +86,7 @@ public class UserController {
         Optional<User> user = utilsCalls.getUserFromUsername(authentication);
         if (user.isPresent()) {
             User updatedUser = user.get();
-            ResponseEntity<?> checks = UserPutChecks(userPutInDTO, updatedUser);
+            ResponseEntity<?> checks = userPutChecks(userPutInDTO, updatedUser);
             if(checks != null){
                 return checks;
             }
@@ -108,7 +108,7 @@ public class UserController {
         return matcher.matches();
     }
 
-    private ResponseEntity<?> UserPutChecks(UserPutInDTO userPutInDTO, User updatedUser){
+    private ResponseEntity<?> userPutChecks(UserPutInDTO userPutInDTO, User updatedUser){
         if(userRepository.findByEmail(userPutInDTO.getEmail()).isPresent() && !updatedUser.getEmail().equals(userPutInDTO.getEmail())){
                 return ResponseEntity.status(403).body("Email already exists and is not the current email");
             }

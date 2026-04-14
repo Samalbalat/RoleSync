@@ -53,20 +53,17 @@ public class GetForumPostsOutItemDTO {
     this.author = new GetForumPostsOutItemAuthorDTO(profilename, image);
 }
 
-    public GetForumPostsOutItemDTO(Long long1, PostType valueOf, String string, List<String> list, String string2,
-            GetForumPostsOutItemAuthorDTO getForumPostsOutItemAuthorDTO, Instant instant, Instant instant2,
-            Boolean boolean1, boolean b, List<String> list2) {
-                this.id = long1;
-                this.type = valueOf.toString();
-                this.title = string;
-                this.tags = list;
-                this.content = string2;
-                this.author = getForumPostsOutItemAuthorDTO;
-                this.createdAt = instant;
-                this.updatedAt = instant2;
-                this.isEdited = boolean1;
-                this.isLocked = b;
-                this.mediaUrls = list2;
+    public GetForumPostsOutItemDTO(GetForumPostItemOutBasicData basicData, GetForumPostsOutItemAuthorDTO getForumPostsOutItemAuthorDTO, List<String> mediaUrls, List<String> tags) {
+        this.id = basicData.getId();
+        this.type = basicData.getType();
+        this.title = basicData.getTitle();
+        this.content = basicData.getContent();
+        this.createdAt = basicData.getCreatedAt();
+        this.updatedAt = basicData.getUpdatedAt();
+        this.isEdited = basicData.isEdited();
+        this.isLocked = basicData.isLocked();
+        this.author = getForumPostsOutItemAuthorDTO;
+        this.mediaUrls = mediaUrls;
+        this.tags = tags;
     }
-    
 }

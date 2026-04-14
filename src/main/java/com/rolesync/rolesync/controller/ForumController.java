@@ -17,6 +17,7 @@ import com.rolesync.rolesync.dto.forumcontroller.GetCampaignPostsOutDTOMapper;
 import com.rolesync.rolesync.dto.forumcontroller.CampaignPostDTO;
 import com.rolesync.rolesync.dto.forumcontroller.GetCampaignPostsOutDTO;
 import com.rolesync.rolesync.dto.forumcontroller.GetCampaignPostsOutItemDTO;
+import com.rolesync.rolesync.dto.forumcontroller.GetForumPostItemOutBasicData;
 import com.rolesync.rolesync.dto.forumcontroller.GetForumPostsOutDTO;
 import com.rolesync.rolesync.dto.forumcontroller.GetForumPostsOutDTOMapper;
 import com.rolesync.rolesync.dto.forumcontroller.GetForumPostsOutItemAuthorDTO;
@@ -163,18 +164,20 @@ public class ForumController {
                 .map(record -> {
                     String[] tagsArr = (String[]) record[3];
                     String[] mediaArr = (String[]) record[11];
-                    GetForumPostsOutItemDTO dto = new GetForumPostsOutItemDTO(
+                    GetForumPostItemOutBasicData basicData = new GetForumPostItemOutBasicData(
                             (Long) record[0],
-                            PostType.valueOf((String) record[1]),
+                            (String) record[1],
                             (String) record[2],
-                            tagsArr != null ? Arrays.asList(tagsArr) : List.of(),
                             (String) record[4],
-                            new GetForumPostsOutItemAuthorDTO((String) record[9], (String) record[10]),
                             (Instant) record[5],
                             (Instant) record[6],
                             (Boolean) record[7],
-                            (Boolean) record[8],
-                            mediaArr != null ? Arrays.asList(mediaArr) : List.of());
+                            (Boolean) record[8]);
+                    GetForumPostsOutItemDTO dto = new GetForumPostsOutItemDTO(
+                            basicData,
+                            new GetForumPostsOutItemAuthorDTO((String) record[9], (String) record[10]),
+                            mediaArr != null ? Arrays.asList(mediaArr) : List.of(),
+                            tagsArr != null ? Arrays.asList(tagsArr) : List.of());
 
                     return dto;
                 })
