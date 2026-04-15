@@ -40,6 +40,12 @@ public class Profile {
     @OneToMany(mappedBy = "owner")
     private Set<CharacterSheet> sheets;
 
+    @OneToMany(mappedBy = "reviewer")
+    private Set<Review> reviews;
+
+    @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL)
+    private ProfileMetrics metrics;
+    
     public Profile(String username, String profilename, String profileType, String image) {
         this.username = username;
         this.profilename = profilename;
