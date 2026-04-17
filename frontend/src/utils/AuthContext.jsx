@@ -1,6 +1,6 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import AuthService from '../services/authService';
+import AuthService from '../services/AuthService';
 
 const AuthContext = createContext();
 
