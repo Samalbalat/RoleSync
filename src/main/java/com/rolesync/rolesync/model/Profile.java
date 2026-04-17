@@ -4,6 +4,7 @@ import java.util.Set;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,11 +22,13 @@ import lombok.ToString;
 @Getter
 @Setter
 @AllArgsConstructor
-@ToString(exclude = {"sheets","reviews", "metrics"})
+@ToString(exclude = {"sheets","reviews","metrics"})
 @NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     private String username;
