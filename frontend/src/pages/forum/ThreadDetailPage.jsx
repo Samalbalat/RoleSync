@@ -1,12 +1,30 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
-import { Typography, Avatar, Button, Chip } from '@material-tailwind/react';
+import { Typography, Avatar, Button, Chip, Spinner } from '@material-tailwind/react';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
-import { mockGeneralThreads, mockGeneralReplies } from '../../data/mockPosts';
 import PostEditor from '../../components/forum/PostEditor';
+import ForumService from '../../services/ForumService';
 import { useTranslation } from 'react-i18next';
+
+const getCurrentUser = () => {
+	try {
+		const storedProfile = localStorage.getItem('activeProfile');
+		if (storedProfile) {
+			const parsedProfile = JSON.parse(storedProfile);
+			return {
+				id: parsedProfile.name,
+				profileName: parsedProfile.name,
+				profileImage: null,
+			};
+		}
+	} catch (error) {
+		console.error('Error al parsear activeProfile del localStorage:', error);
+	}
+
+	return { id: 'unknown', profileName: 'Usuario', profileImage: null };
+};
 
 const renderMarkdown = content => {
 	const rawHtml = marked.parse(content || '');
@@ -19,18 +37,40 @@ const ThreadDetailPage = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
 
-	// Simulamos la llamada a la API: GET /forums/threads/{threadId}
-	const thread = mockGeneralThreads.find(t => t.id === id);
+	// 1. Añadimos estados para manejar los datos reales de la API
+	const [thread, setThread] = useState(null);
+	const [replies, setReplies] = useState([]);
+	const [loading, setLoading] = useState(true);
 
-	// Simulamos la llamada a la API: GET /posts/{threadId}/replies
-	const replies = mockGeneralReplies.filter(r => r.parentPostId === id);
+	const currentUser = getCurrentUser();
 
-	if (!thread) {
-		return <div className='p-8 text-center text-gray-500'>Hilo no encontrado.</div>;
-	}
+	// 2. Cargamos los datos al montar el componente
+	useEffect(() => {
+		const fetchThreadAndReplies = async () => {
+			setLoading(true);
+			try {
+				// Obtenemos el post padre
+				const threadData = await ForumService.getGeneralThreadDetail(id);
+				// Ajusta esto dependiendo de si tu Axios devuelve los datos directamente o anidados en .data
+				setThread(threadData.data || threadData);
 
-	// Función de ayuda para la fecha
+				// Obtenemos las respuestas (reutilizando el getReplies que ya tenías)
+				const repliesData = await ForumService.getReplies(id);
+				setReplies(Array.isArray(repliesData.data) ? repliesData.data : []);
+			} catch (error) {
+				console.error('Error fetching thread details:', error);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		if (id) {
+			fetchThreadAndReplies();
+		}
+	}, [id, t]);
+
 	const formatDate = isoString => {
+		if (!isoString) return '';
 		return new Date(isoString).toLocaleDateString('es-ES', {
 			day: 'numeric',
 			month: 'long',
@@ -40,6 +80,30 @@ const ThreadDetailPage = () => {
 		});
 	};
 
+	// 3. Manejamos el estado de carga visualmente
+	if (loading) {
+		return (
+			<div className='flex flex-col items-center justify-center py-20'>
+				<Spinner className='h-10 w-10 text-indigo-500' />
+				<Typography className='mt-4 text-gray-500'>Cargando hilo...</Typography>
+			</div>
+		);
+	}
+
+	if (!thread) {
+		return (
+			<div className='p-8 text-center flex flex-col items-center gap-4'>
+				<Typography variant='h5' color='blue-gray'>
+					Hilo no encontrado
+				</Typography>
+				<Button variant='text' onClick={() => navigate('/forum')} className='flex items-center gap-2'>
+					<ArrowLeftIcon className='w-4 h-4' /> Volver
+				</Button>
+			</div>
+		);
+	}
+
+	// 4. He añadido "?" (Optional chaining) en los author.profileName por si algún usuario viene sin perfil
 	return (
 		<div className='max-w-4xl mx-auto py-8 px-4 w-full flex flex-col gap-6'>
 			{/* BOTÓN VOLVER */}
@@ -57,7 +121,6 @@ const ThreadDetailPage = () => {
 
 			{/* HILO ORIGINAL (POST PADRE) */}
 			<div className='bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-indigo-100 relative overflow-hidden'>
-				{/* Decoración de fondo */}
 				<div className='absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-full -z-0 opacity-50'></div>
 
 				<div className='relative z-10'>
@@ -66,7 +129,7 @@ const ThreadDetailPage = () => {
 					</Typography>
 
 					{/* TAGS */}
-					{thread.tags && (
+					{thread.tags && thread.tags.length > 0 && (
 						<div className='flex gap-2 mb-6'>
 							{thread.tags.map(tag => (
 								<Chip
@@ -83,13 +146,13 @@ const ThreadDetailPage = () => {
 					{/* AUTOR DEL HILO */}
 					<div className='flex items-center gap-3 mb-6 pb-6 border-b border-gray-100'>
 						<Avatar
-							src={thread.author.profileImage || `https://ui-avatars.com/api/?name=${thread.author.profileName}`}
-							alt={thread.author.profileName}
+							src={thread.author?.profileImage || `https://ui-avatars.com/api/?name=${thread.author?.profileName || 'User'}`}
+							alt={thread.author?.profileName || 'Usuario'}
 							size='md'
 						/>
 						<div>
 							<Typography variant='h6' color='blue-gray' className='text-sm'>
-								{thread.author.profileName}
+								{thread.author?.profileName || 'Usuario Anónimo'}
 							</Typography>
 							<Typography variant='small' className='text-gray-500 text-xs'>
 								{t('forum.campaign.publishedOn')} {formatDate(thread.createdAt)}
@@ -115,23 +178,21 @@ const ThreadDetailPage = () => {
 				{replies.length > 0 ? (
 					replies.map(reply => (
 						<div key={reply.id} className='bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex gap-4'>
-							{/* Avatar lateral (estilo foro clásico) */}
 							<div className='flex flex-col items-center shrink-0 w-16'>
 								<Avatar
 									src={
-										reply.author.profileImage ||
-										`https://ui-avatars.com/api/?name=${reply.author.profileName}&background=f3f4f6`
+										reply.author?.profileImage ||
+										`https://ui-avatars.com/api/?name=${reply.author?.profileName || 'User'}&background=f3f4f6`
 									}
-									alt={reply.author.profileName}
+									alt={reply.author?.profileName || 'Usuario'}
 									size='sm'
 								/>
 							</div>
 
-							{/* Contenido de la respuesta */}
 							<div className='flex-1'>
 								<div className='flex justify-between items-start mb-2'>
 									<Typography variant='small' color='blue-gray' className='font-bold'>
-										{reply.author.profileName}
+										{reply.author?.profileName || 'Usuario Anónimo'}
 									</Typography>
 									<Typography variant='small' className='text-gray-400 text-[10px]'>
 										{formatDate(reply.createdAt)} {reply.isEdited && '(editado)'}
@@ -146,7 +207,9 @@ const ThreadDetailPage = () => {
 						</div>
 					))
 				) : (
-					<Typography className='text-gray-500 italic py-4 text-center'>{t('forum.campaign.noReplies')}</Typography>
+					<Typography className='text-gray-500 italic py-4 text-center'>
+						{t('forum.campaign.noReplies') || 'No hay respuestas todavía.'}
+					</Typography>
 				)}
 			</div>
 
@@ -162,9 +225,21 @@ const ThreadDetailPage = () => {
 						{t('forum.yourReply')}
 					</Typography>
 					<PostEditor
-						type='REPLY'
+						typePost='REPLY'
 						isGeneralForum={true}
-						currentUser={{ id: 'user-1', profileName: 'MiUsuario', profileImage: null }}
+						parentPostId={thread.id}
+						myCharacter={null}
+						currentUser={currentUser}
+						onPostCreated={newReply => {
+							const replyToRender = {
+								...newReply,
+								author: newReply.author || {
+									profileName: currentUser.profileName,
+									profileImage: currentUser.profileImage,
+								},
+							};
+							setReplies([...replies, replyToRender]);
+						}}
 					/>
 				</div>
 			)}

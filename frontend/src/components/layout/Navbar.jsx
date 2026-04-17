@@ -249,27 +249,7 @@ export default function Navbar() {
 							variant='text'
 							className='flex items-center justify-start gap-3 text-gray-800'
 							onClick={() => {
-								navigate('/campaigns');
-								setOpenNav(false);
-							}}
-						>
-							<MapIcon className='h-5 w-5' /> {t('menu.myCampaigns')}
-						</Button>
-						<Button
-							variant='text'
-							className='flex items-center justify-start gap-3 text-gray-800'
-							onClick={() => {
-								navigate('/characters');
-								setOpenNav(false);
-							}}
-						>
-							<UserGroupIcon className='h-5 w-5' /> {t('menu.myCharacters')}
-						</Button>
-						<Button
-							variant='text'
-							className='flex items-center justify-start gap-3 text-gray-800'
-							onClick={() => {
-								navigate('/posts');
+								navigate('/forum/my-posts');
 								setOpenNav(false);
 							}}
 						>

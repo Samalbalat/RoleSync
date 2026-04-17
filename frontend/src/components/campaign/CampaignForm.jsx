@@ -296,7 +296,6 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 							<Option value='CET'>CET (Europa Central)</Option>
 							<Option value='EST'>EST (EEUU Costa Este)</Option>
 							<Option value='PST'>PST (EEUU Costa Oeste)</Option>
-							<Option value='UTC-3'>UTC-3 (Argentina/Uruguay)</Option>
 						</Select>
 						{errors.timeZone && (
 							<Typography variant='small' color='red' className='mt-1'>

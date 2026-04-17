@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useId } from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import {
@@ -87,6 +87,8 @@ const PostEditor = ({
 	typePost,
 	parentPostId = null,
 }) => {
+	const editorId = useId();
+
 	const [content, setContent] = useState('');
 	const [isOoc, setIsOoc] = useState(false);
 	const [visibleToIds, setVisibleToIds] = useState([]);
@@ -143,30 +145,61 @@ const PostEditor = ({
 	const handleSubmit = async () => {
 		if (isSubmitDisabled) return;
 
-		let finalVisibleIds = null;
-		if (visibleToIds.length > 0) {
-			// Usamos Set para evitar duplicados por si acaso
-			const idsSet = new Set(visibleToIds);
-			if (authorId) idsSet.add(authorId);
-			finalVisibleIds = Array.from(idsSet);
-		}
-
-		const finalIsOoc = isOwner || isGeneralForum || isOoc;
-
-		const postData = {
-			type: typePost,
-			content: content,
-			authorCharacterId: authorId,
-			parentPostId: parentPostId,
-			isOoc: finalIsOoc,
-			isDm: isOwner,
-			mediaUrls: imageUrl ? [imageUrl] : [],
-			visibleToCharacterIds: finalVisibleIds,
-		};
 		try {
-			const newPost = await ForumService.createPost(campaignId, postData);
+			let newPost;
+
+			// ==========================================
+			// RUTA A: FORO GENERAL
+			// ==========================================
+			if (isGeneralForum) {
+				const generalPayload = {
+					type: typePost || 'REPLY',
+					title: '',
+					parentPostId: parentPostId || 0,
+					content: content,
+					mediaUrls: imageUrl ? [imageUrl] : [],
+					tags: [],
+				};
+
+				newPost = await ForumService.createGeneralReply(generalPayload);
+			}
+			// ==========================================
+			// RUTA B: CAMPAÑAS (Intacto, no se rompe nada)
+			// ==========================================
+			else {
+				let finalVisibleIds = null;
+				if (visibleToIds.length > 0) {
+					const idsSet = new Set(visibleToIds);
+					if (authorId) idsSet.add(authorId);
+					finalVisibleIds = Array.from(idsSet);
+				}
+
+				const finalIsOoc = isOwner || isGeneralForum || isOoc;
+
+				const postData = {
+					type: typePost || 'REPLY',
+					content: content,
+					authorCharacterId: authorId,
+					parentPostId: parentPostId,
+					isOoc: finalIsOoc,
+					isDm: isOwner,
+					mediaUrls: imageUrl ? [imageUrl] : [],
+					visibleToCharacterIds: finalVisibleIds,
+				};
+
+				newPost = await ForumService.createPost(campaignId, postData);
+			}
+
 			if (onPostCreated) {
-				onPostCreated(newPost);
+				const responseData = newPost?.data || newPost || {};
+
+				const enrichedPost = {
+					content: content,
+					createdAt: new Date().toISOString(),
+					...responseData,
+				};
+
+				onPostCreated(enrichedPost);
 			}
 
 			setContent('');
@@ -186,7 +219,9 @@ const PostEditor = ({
 			{/* CABECERA DEL EDITOR */}
 			<div className='flex justify-between items-center mb-3'>
 				<div className='flex items-center gap-3'>
-					<Avatar src={displayAvatar} alt='Avatar' size='sm' className='border border-gray-300 shadow-sm' />
+					{!isGeneralForum && (
+						<Avatar src={displayAvatar} alt='Avatar' size='sm' className='border border-gray-300 shadow-sm' />
+					)}
 					<div className='flex flex-col'>
 						<Typography variant='small' className='font-bold text-gray-800'>
 							{displayName}
@@ -209,7 +244,7 @@ const PostEditor = ({
 							{t('forum.occMode')}
 						</Typography>
 						<Switch
-							id='ooc-switch'
+							id={`ooc-switch-${editorId}`}
 							color='gray'
 							checked={isOoc}
 							onChange={e => setIsOoc(e.target.checked)}
@@ -352,15 +387,21 @@ const PostEditor = ({
 									<EyeSlashIcon className='h-5 w-5' />
 								</IconButton>
 							</MenuHandler>
-							<MenuList className='max-h-72'>
+							<MenuList className='max-h-72 z-[10000]'>
+								{' '}
+								{/* <-- z-index altísimo añadido */}
 								<Typography variant='small' color='blue-gray' className='mb-2 font-bold px-3'>
 									{t('forum.postEditor.whoCanSee')}
 								</Typography>
 								{hasOtherCharacters ? (
 									whisperCharacters.map(char => (
 										<MenuItem key={char.id} className='p-0'>
-											<label className='flex w-full cursor-pointer items-center px-3 py-2'>
+											<label
+												htmlFor={`whisper-${editorId}-${char.id}`}
+												className='flex w-full cursor-pointer items-center px-3 py-2'
+											>
 												<Checkbox
+													id={`whisper-${editorId}-${char.id}`}
 													ripple={false}
 													className='hover:before:opacity-0'
 													containerProps={{ className: 'p-0 mr-3' }}

@@ -455,7 +455,8 @@
     "yourReply": "Your answer",
     "errors": {
       "fetchReplies": "Error loading responses",
-      "fetchThreads": "Error loading posts"
+      "fetchThreads": "Error loading posts",
+      "fetchThread": "Error loading forum thread."
     }
   },
   "footer": {

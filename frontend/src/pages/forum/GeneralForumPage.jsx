@@ -6,7 +6,6 @@ import CreateGeneralPost from '../../components/forum/CreateGeneralPost';
 import ForumService from '../../services/ForumService';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import toast from 'react-hot-toast';
 
 const GeneralForumPage = () => {
 	const { t } = useTranslation('global');
@@ -34,7 +33,6 @@ const GeneralForumPage = () => {
 				setTotalPages(response.meta?.totalPages || 1);
 			} catch (error) {
 				console.error('Error fetching general threads:', error);
-				toast.error(t('forum.errors.fetchThreads'));
 			} finally {
 				setLoading(false);
 			}
