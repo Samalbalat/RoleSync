@@ -67,7 +67,6 @@ public class ProfileController {
         {
         Optional<Profile> profile = profileRepository.findByProfilename(profileToGet);
         if (profile.isPresent()) {
-            System.out.println("Profile found: " + profile.get());
             ProfileInDTO response = profile.map(p -> 
             new ProfileInDTO(p.getProfilename(), p.getImage(), p.getDescription())
         ).orElse(null);
