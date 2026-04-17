@@ -3,14 +3,6 @@ name: Build, Tag and Deploy
 permissions:
   contents: write
 
-env:
-    TWINE_USERNAME: __token__
-    TWINE_PASSWORD: ${{ secrets.PYPI_TEST_TOKEN }}
-    TWINE_REPOSITORY_URL: "https://test.pypi.org/legacy/"
-    DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-    DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-    DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}  
-
 on:
   push:
     branches:
@@ -26,40 +18,44 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Set version tag
+      # 2. Build JAR
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
+
+      # 3. Generate version
       - name: Generate version
         id: version
         run: echo "VERSION=v1.0.${{ github.run_number }}" >> $GITHUB_OUTPUT
-
-      # 3. Create Git tag
-      - name: Create Git tag
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git tag ${{ steps.version.outputs.VERSION }}
-          git push origin ${{ steps.version.outputs.VERSION }}
 
       # 4. Login to Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: "$DOCKER_USERNAME"
-          password: "$DOCKER_PASSWORD"
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       # 5. Build Docker image
       - name: Build Docker image
         run: |
-          docker build -t $DOCKER_USERNAME/rolesync:${{ steps.version.outputs.VERSION }} .
-          docker tag "$DOCKER_USERNAME"/rolesync:${{ steps.version.outputs.VERSION }} \
-                     "$DOCKER_USERNAME"/rolesync:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/rolesync:${{ steps.version.outputs.VERSION }} .
+          docker tag ${{ secrets.DOCKER_USERNAME }}/rolesync:${{ steps.version.outputs.VERSION }} \
+                     ${{ secrets.DOCKER_USERNAME }}/rolesync:latest
 
       # 6. Push Docker image
       - name: Push Docker image
         run: |
-          docker push "$DOCKER_USERNAME"/rolesync:${{ steps.version.outputs.VERSION }}
-          docker push "$DOCKER_USERNAME"/rolesync:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/rolesync:${{ steps.version.outputs.VERSION }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/rolesync:latest
 
-      # 7. Trigger Render deploy
-      - name: Deploy to Render
+      # 7. Create Git tag (AFTER success)
+      - name: Create Git tag
         run: |
-          curl -X POST "$DEPLOY_HOOK_URL"
+          VERSION=${{ steps.version.outputs.VERSION }}
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git tag -a $VERSION -m "Release $VERSION" || echo "Tag exists"
+          git push origin $VERSION || echo "Tag already pushed"
+
+      # 8. Trigger Render deploy
+      - name: Deploy to Render
+        run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
