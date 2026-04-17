@@ -67,4 +67,5 @@ jobs:
 
       # 10. Trigger Render deploy
       - name: Deploy to Render
+        sleep 10
         run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
