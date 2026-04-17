@@ -1,6 +1,7 @@
 package com.rolesync.rolesync.controller;
 
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,8 +20,11 @@ import com.rolesync.rolesync.dto.authcontroller.LoginRequest;
 import com.rolesync.rolesync.dto.authcontroller.ProfileMeResponse;
 import com.rolesync.rolesync.dto.authcontroller.SignupRequest;
 import com.rolesync.rolesync.model.Profile;
+import com.rolesync.rolesync.model.ProfileMetrics;
+import com.rolesync.rolesync.model.ProfileType;
 import com.rolesync.rolesync.model.User;
 import com.rolesync.rolesync.repository.UserRepository;
+import com.rolesync.rolesync.repository.ProfileMetricsRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
 import com.rolesync.rolesync.security.jwt.JwtUtils;
 import com.rolesync.rolesync.security.service.UserDetailsImpl;
@@ -40,6 +44,7 @@ public class AuthController {
     @Autowired UserRepository userRepository;
     @Autowired PasswordEncoder encoder;
     @Autowired JwtUtils jwtUtils;
+    @Autowired ProfileMetricsRepository profileMetricsRepository;
 
     /**
      * Authenticate the user with the provided email and password.
@@ -90,11 +95,24 @@ public class AuthController {
         }
         User user = new User(signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()), signUpRequest.getTimeZone());
-        Profile profile = new Profile(signUpRequest.getEmail(), signUpRequest.getProfilename()
-        ,signUpRequest.getRoleType(),null);
-
+        ProfileMetrics metrics = new ProfileMetrics();
+        
+        metrics.setPostsCount(0);
+        metrics.setRepliesCount(0);
+        metrics.setCampaignsCount(0);
+        metrics.setCredibilityScore(0f);
+        metrics.setLastUpdated(Instant.now());
+        Profile profile = new Profile(signUpRequest.getEmail(),
+                signUpRequest.getProfilename(),
+                ProfileType.valueOf(signUpRequest.getRoleType().toUpperCase()),
+                "",
+                null,
+                null,
+                metrics);
+        metrics.setProfile(profile);
         userRepository.save(user);
         profileRepository.save(profile);
+        profileMetricsRepository.save(metrics);
         return ResponseEntity.ok("Usuario registrado exitosamente!");
     }
 

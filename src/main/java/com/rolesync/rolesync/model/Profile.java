@@ -45,22 +45,45 @@ public class Profile {
 
     @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL)
     private ProfileMetrics metrics;
-    
-    public Profile(String username, String profilename, String profileType, String image) {
-        this.username = username;
-        this.profilename = profilename;
-        this.profileType = ProfileType.valueOf(profileType);
-        this.image = image;
-        this.description = "";
-    }
 
-    public Profile(String username, String profilename, String profileType, String description, String image, Set<CharacterSheet> sheets) {
+    public Profile(String username,
+                   String profilename,
+                   ProfileType profileType,
+                   String description,
+                   String image,
+                   Set<CharacterSheet> sheets,
+                   ProfileMetrics metrics) {
         this.username = username;
         this.profilename = profilename;
-        this.profileType = ProfileType.valueOf(profileType);
-        this.description = description;
+        this.profileType = profileType;
+        this.description = description != null ? description : "";
         this.image = image;
         this.sheets = sheets;
-        
+        this.metrics = metrics;
+    }
+
+    public Profile(String username,
+                   String profilename,
+                   ProfileType profileType,
+                   String image) {
+        this(username, profilename, profileType, "", image, null, null);
+    }
+
+    public static Profile of(String username,
+                             String profilename,
+                             String profileType,
+                             String description,
+                             String image,
+                             Set<CharacterSheet> sheets,
+                             ProfileMetrics metrics) {
+        return new Profile(
+            username,
+            profilename,
+            ProfileType.valueOf(profileType),
+            description,
+            image,
+            sheets,
+            metrics
+        );
     }
 }
