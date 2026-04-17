@@ -37,7 +37,8 @@ public interface PostRepository
                 JOIN profiles pr ON pr.id = p.author_profile_id
                 WHERE p.campaign_id IS NULL
                   AND (
-                        :tags IS NULL OR p.tags && CAST(:tags AS text[])
+                        CAST(:tags AS text[]) IS NULL
+                        OR p.tags && CAST(:tags AS text[])
                   )
                 ORDER BY p.created_at DESC
                 LIMIT :limit OFFSET :offset
@@ -48,13 +49,14 @@ public interface PostRepository
             @Param("offset") long offset);
 
     @Query(value = """
-                SELECT COUNT(*)
-                FROM posts p
-                WHERE p.campaign_id IS NULL
-                  AND (
-                        :tags IS NULL OR p.tags && CAST(:tags AS text[])
-                  )
-            """, nativeQuery = true)
+        SELECT COUNT(*)
+        FROM posts p
+        WHERE p.campaign_id IS NULL
+        AND (
+                CAST(:tags AS text[]) IS NULL
+                OR p.tags && CAST(:tags AS text[])
+        )
+    """, nativeQuery = true)
     long countForumPosts(@Param("tags") String[] tags);
 
 }

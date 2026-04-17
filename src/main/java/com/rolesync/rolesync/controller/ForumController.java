@@ -108,10 +108,12 @@ public class ForumController {
             return ResponseEntity.status(403).build();
         }
         Post parentPost = postRepository.findById(id).orElse(null);
-        Campaign campaign = campaignRepository.findById(parentPost.getCampaign().getId()).orElse(null);
-        String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
-        if ("NONE".equals(relation) || "PENDING".equals(relation)) {
-            return ResponseEntity.status(403).build();
+        if (parentPost.getCampaign() != null) {
+            Campaign campaign = campaignRepository.findById(parentPost.getCampaign().getId()).orElse(null);
+            String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
+            if ("NONE".equals(relation) || "PENDING".equals(relation)) {
+                return ResponseEntity.status(403).build();
+            }
         }
 
         // Fetch posts with pagination
@@ -154,7 +156,9 @@ public class ForumController {
         long totalItems = postRepository.countForumPosts(tagList);
         int totalPages = calculateTotalPages((int) totalItems, effectiveLimit);
 
-        validatePage(effectivePage, totalPages);
+        if(validatePage(effectivePage, totalPages)!=null){
+            return validatePage(effectivePage, totalPages);
+        }
 
         Pageable pageable = PageRequest.of(effectivePage - 1, effectiveLimit);
 
@@ -434,10 +438,11 @@ public class ForumController {
         return (int) Math.ceil((double) totalItems / limit);
     }
 
-    private void validatePage(int page, int totalPages) {
+    private ResponseEntity<?> validatePage(int page, int totalPages) {
         if (page > totalPages && totalPages != 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid page number");
+            return ResponseEntity.status(400).body("Invalid page number"); // Invalid page number
         }
+        return null;
     }
 
     private String[] parseTags(String tags) {
