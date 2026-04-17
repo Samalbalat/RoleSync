@@ -21,7 +21,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @AllArgsConstructor
-@ToString(exclude = {"sheets"})
+@ToString(exclude = {"sheets","reviews", "metrics"})
 @NoArgsConstructor
 public class Profile {
     @Id
