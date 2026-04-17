@@ -12,6 +12,7 @@ on:
 jobs:
   build-tag-deploy:
     runs-on: ubuntu-latest
+    environment: Backend
 
     steps:
       # 1. Checkout
