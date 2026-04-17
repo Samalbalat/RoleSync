@@ -1,5 +1,6 @@
 package com.rolesync.rolesync.controller;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rolesync.rolesync.dto.profilecontroller.ProfileInDTO;
 import com.rolesync.rolesync.model.Profile;
+import com.rolesync.rolesync.model.ProfileMetrics;
 import com.rolesync.rolesync.model.ProfileType;
 import com.rolesync.rolesync.repository.ProfileRepository;
 import com.rolesync.rolesync.security.jwt.JwtUtils;
@@ -141,12 +143,21 @@ public class ProfileController {
         }
             String principal = authentication.getName();
             System.out.println("Profile creation available for user: " + principal + " and roleType: " + roleType);
+            
             Profile newProfile = new Profile();
             newProfile.setUsername(principal);
             newProfile.setProfileType(ProfileType.valueOf(roleType.toUpperCase()));
             newProfile.setProfilename(profilePostInDTO.getProfileName());
             newProfile.setImage(profilePostInDTO.getImage());
             newProfile.setDescription(profilePostInDTO.getDescription());
+
+            ProfileMetrics metrics = new ProfileMetrics();
+            metrics.setProfile(newProfile);
+            metrics.setPostsCount(0);
+            metrics.setRepliesCount(0);
+            metrics.setCampaignsCount(0);
+            metrics.setCredibilityScore(0f);
+            metrics.setLastUpdated(Instant.now());
             profileRepository.save(newProfile);
             return ResponseEntity.status(201).build();
     }

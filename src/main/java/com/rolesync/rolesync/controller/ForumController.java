@@ -34,6 +34,7 @@ import com.rolesync.rolesync.repository.CampaignRepository;
 import com.rolesync.rolesync.repository.CharacterSheetRepository;
 import com.rolesync.rolesync.repository.PostRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
+import com.rolesync.rolesync.services.PostService;
 import com.rolesync.rolesync.utils.UtilsCalls;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,18 +52,21 @@ public class ForumController {
     private final PostRepository postRepository;
     private final CharacterSheetRepository characterRepository;
     private final ProfileRepository profileRepository;
+    private final PostService postService;
 
     public ForumController(
             CampaignRepository campaignRepository,
             UtilsCalls utilsCalls,
             ProfileRepository profileRepository,
             PostRepository postRepository,
-            CharacterSheetRepository characterRepository) {
+            CharacterSheetRepository characterRepository,
+            PostService postService) {
         this.campaignRepository = campaignRepository;
         this.utilsCalls = utilsCalls;
         this.postRepository = postRepository;
         this.profileRepository = profileRepository;
         this.characterRepository = characterRepository;
+        this.postService = postService;
     }
 
     @GetMapping("campaigns/{id}/posts")
@@ -292,8 +296,7 @@ public class ForumController {
             }
         }
         Post post = new Post();
-        CampaignPostDTO campaignPostDto = new CampaignPostDTO(
-                createPostFromRequest(request, post, profile, character, campaign, relation));
+        CampaignPostDTO campaignPostDto = postService.createCampaignPost(request, post, profile, character, campaign, relation);
         return ResponseEntity.ok().body(campaignPostDto);
     }
 
@@ -310,90 +313,8 @@ public class ForumController {
         Profile profile = profileRepository.findByProfilename(profileName)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Post post = new Post();
-        Post responsePost = createPostFromRequest(request, post, profile);
+        Post responsePost = postService.createForumPost(request, post, profile);
         return ResponseEntity.ok().body(responsePost.getId());
-    }
-
-    private Post createPostFromRequest(PostCampaignPostsInDTO request, Post post, Profile profile,
-            CharacterSheet character, Campaign campaign, String relation) {
-        post.setType(PostType.valueOf(request.getType()));
-        post.setContent(request.getContent());
-
-        post.setAuthorProfileId(profile.getId());
-
-        if (character != null) { // if not explicitly OOC, treat as IC and require character info
-            post.setAuthorCharacterId(character.getId());
-            post.setAuthorCharacterName(character.getName());
-            post.setAuthorCharacterImage(character.getImage());
-        }
-        post.setCampaign(campaign);
-
-        if (request.getParentPostId() != null) { // parentPostId is optional, only for replies
-            post.setParentPost(
-                    postRepository.findById(request.getParentPostId()).orElse(null));
-        }
-
-        post.setCreatedAt(Instant.now());
-
-        post.setOoc(request.getIsOoc());
-        if (request.getIsDm() != null && "OWNER".equals(relation)) { // Only allow setting DM flag if explicitly
-                                                                     // provided and user is OWNER
-            post.setDm(request.getIsDm());
-        } else {
-            post.setDm(false); // default to false for non-OWNERs or if not provided
-        }
-
-        post.setMediaUrls(request.getMediaUrls() != null ? request.getMediaUrls() : List.of());
-
-        post.setEdited(false);
-        post.setUpdatedAt(null);
-
-        post.setPinned(false);
-        post.setLocked(false);
-
-        // Visibility (optional)
-        if (request.getVisibleToCharacterIds() != null && !request.getVisibleToCharacterIds().isEmpty()) {
-            List<CharacterSheet> visibleCharacters = characterRepository
-                    .findAllById(request.getVisibleToCharacterIds());
-            if (visibleCharacters.size() != request.getVisibleToCharacterIds().size()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Some character IDs are invalid");
-            }
-            post.setVisibleToCharacterIds(
-                    (new HashSet<>(visibleCharacters.stream().map(CharacterSheet::getId).toList())));
-        } else {
-            post.setVisibleToCharacterIds(new HashSet<>()); // empty set means visible to all characters
-        }
-        postRepository.save(post);
-        return post;
-    }
-
-    private Post createPostFromRequest(PostForumPostsInDTO request, Post post, Profile profile) {
-        post.setType(PostType.valueOf(request.getType()));
-        post.setContent(request.getContent());
-
-        post.setAuthorProfileId(profile.getId());
-
-        post.setParentPost(
-                request.getParentPostId() != null
-                        ? postRepository.findById(request.getParentPostId())
-                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
-                        : null);
-
-        post.setCreatedAt(Instant.now());
-
-        post.setOoc(true);
-        post.setDm("THREAD_START".equals(request.getType())); // only thread starters are DMs, replies are always OOC
-
-        post.setMediaUrls(request.getMediaUrls() != null ? request.getMediaUrls() : List.of());
-
-        post.setEdited(false);
-        post.setUpdatedAt(null);
-
-        post.setPinned(false);
-        post.setLocked(false);
-        post.setTags(request.getTags() != null ? request.getTags() : List.of());
-        postRepository.save(post);
-        return post;
     }
 
     private Object getPostFromCampaignsSecurity(Authentication authentication, String profileName, Long id,
