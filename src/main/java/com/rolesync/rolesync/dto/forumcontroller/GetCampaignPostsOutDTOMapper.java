@@ -20,7 +20,7 @@ public class GetCampaignPostsOutDTOMapper {
         dto.setAuthorCharacterName(post.getAuthorCharacterName());
         dto.setAuthorCharacterImage(post.getAuthorCharacterImage());
 
-        dto.setCampaignId(post.getCampaign().getId() != null ? post.getCampaign().getId() : null);
+        dto.setCampaignId(post.getCampaign() != null ? post.getCampaign().getId() : null);
 
 
         dto.setParentPostId(
