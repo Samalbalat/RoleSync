@@ -34,7 +34,7 @@ jobs:
       # 4. Generate version
       - name: Generate version
         id: version
-        run: echo "VERSION=v1.0.${{ github.run_number }}" >> $GITHUB_OUTPUT
+        run: echo "VERSION=v1.0.${{ github.run_number }}-${{ github.sha }}" >> $GITHUB_OUTPUT
 
       # 5. Login to Docker Hub
       - name: Login to Docker Hub
