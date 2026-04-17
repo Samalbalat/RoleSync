@@ -6,7 +6,7 @@ import { useForm, Controller } from 'react-hook-form'; // Importamos hook-form y
 import AuthLayout from '../../components/auth/AuthLayout';
 import { TIMEZONES } from '../../data/timezones';
 import { useNavigate } from 'react-router-dom';
-import AuthService from '../../services/authService';
+import AuthService from '../../services/AuthService';
 
 export function RegisterPage() {
 	const { t } = useTranslation('global');
