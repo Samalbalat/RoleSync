@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://rolesync-y4wc.onrender.com/api/$1"
+      "destination": "https://rolesync-y4wc.onrender.com/$1"
     },
     {
       "source": "/(.*)",
