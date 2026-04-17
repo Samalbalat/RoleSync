@@ -3,26 +3,25 @@ import { Typography, Button, Spinner } from '@material-tailwind/react';
 import { ArrowLeftIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
 import GeneralListCard from '../../components/forum/GeneralListCard';
-import { mockGeneralThreads } from '../../data/mockPosts';
+import ForumService from '../../services/ForumService';
 import { useTranslation } from 'react-i18next';
 
 const MyPostsPage = () => {
 	const navigate = useNavigate();
 	const { t } = useTranslation('global');
+
 	const [myPosts, setMyPosts] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
+	const [page, setPage] = useState(1);
+	const [totalPages, setTotalPages] = useState(1);
 
-	// Simulamos la carga desde la API
 	useEffect(() => {
 		const fetchMyPosts = async () => {
 			setIsLoading(true);
 			try {
-				await new Promise(resolve => setTimeout(resolve, 800));
-				const filteredPosts = mockGeneralThreads.filter(
-					t => t.author.id === 'user-1' || t.author.profileName === 'MiUsuario',
-				);
-
-				setMyPosts(filteredPosts.length > 0 ? filteredPosts : [mockGeneralThreads[0]]);
+				const response = await ForumService.getMyThreads(page, 20);
+				setMyPosts(response.data || []);
+				setTotalPages(response.meta?.totalPages || 1);
 			} catch (error) {
 				console.error('Error cargando mis posts:', error);
 			} finally {
@@ -31,7 +30,10 @@ const MyPostsPage = () => {
 		};
 
 		fetchMyPosts();
-	}, []);
+	}, [page]);
+
+	const handleNextPage = () => setPage(prev => Math.min(prev + 1, totalPages));
+	const handlePrevPage = () => setPage(prev => Math.max(prev - 1, 1));
 
 	return (
 		<div className='max-w-4xl mx-auto py-8 px-4 w-full flex flex-col gap-6'>
@@ -61,7 +63,7 @@ const MyPostsPage = () => {
 			</div>
 
 			{/* LISTADO DE MIS HILOS */}
-			<div className='flex flex-col gap-3'>
+			<div className='flex flex-col gap-3 min-h-[300px]'>
 				{isLoading ? (
 					<div className='flex flex-col items-center justify-center py-12'>
 						<Spinner className='h-10 w-10 text-indigo-500' />
@@ -84,6 +86,22 @@ const MyPostsPage = () => {
 					</div>
 				)}
 			</div>
+
+			{/* PAGINACIÓN */}
+			{!isLoading && totalPages > 1 && (
+				<div className='flex justify-center items-center gap-4 mt-4'>
+					<Button variant='text' onClick={handlePrevPage} disabled={page === 1}>
+						{t('common.previous')}
+					</Button>
+					<Typography color='gray' className='font-normal'>
+						Página <strong className='text-blue-gray-900'>{page}</strong> de{' '}
+						<strong className='text-blue-gray-900'>{totalPages}</strong>
+					</Typography>
+					<Button variant='text' onClick={handleNextPage} disabled={page === totalPages}>
+						{t('common.next')}
+					</Button>
+				</div>
+			)}
 		</div>
 	);
 };

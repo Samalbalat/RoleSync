@@ -8,6 +8,29 @@ import { useTranslation } from 'react-i18next';
 export default function CampaignCard({ campana, theme }) {
 	const navigate = useNavigate();
 	const { t } = useTranslation('global');
+
+	const campaignStatus = () => {
+		if (campana.status === 'OPEN') {
+			return t('status.open');
+		} else if (campana.status === 'ACTIVE') {
+			return t('status.active');
+		} else if (campana.status === 'BREAK') {
+			return t('status.break');
+		} else if (campana.status === 'FINISHED') {
+			return t('status.finished');
+		}
+	};
+	const campaignStatusColor = () => {
+		if (campana.status === 'OPEN') {
+			return 'green';
+		} else if (campana.status === 'ACTIVE') {
+			return 'blue';
+		} else if (campana.status === 'BREAK') {
+			return 'yellow';
+		} else if (campana.status === 'FINISHED') {
+			return 'gray';
+		}
+	};
 	return (
 		<Card
 			className='w-full overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer group border border-gray-100'
@@ -28,8 +51,8 @@ export default function CampaignCard({ campana, theme }) {
 				<div className='absolute top-3 right-3'>
 					<Chip
 						size='sm'
-						value={campana.status === 'OPEN' ? t('status.open') : t('status.ongoing')}
-						color={campana.status === 'OPEN' ? 'green' : 'blue-gray'}
+						value={campaignStatus()}
+						color={campaignStatusColor()}
 						className='font-bold shadow-md border-white border'
 					/>
 				</div>

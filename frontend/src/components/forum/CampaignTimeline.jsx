@@ -9,7 +9,7 @@ import ThreadDialog from './ThreadDialog';
 import PostEditor from './PostEditor';
 import ForumService from '../../services/ForumService';
 
-const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, characters, ownerImage }) => {
+const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, characters, ownerImage, campaignStatus }) => {
 	const { t } = useTranslation('global');
 
 	const [posts, setPosts] = useState([]);
@@ -20,6 +20,9 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [selectedPost, setSelectedPost] = useState(null);
 	const [isPinnedOpen, setIsPinnedOpen] = useState(false);
+
+	const isPausedOrCompleted = campaignStatus === 'BREAK' || campaignStatus === 'FINISHED';
+	const canWrite = isOwner || (isTabletop ? true : !isPausedOrCompleted);
 
 	useEffect(() => {
 		const fetchInitialPosts = async () => {
@@ -127,25 +130,37 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 					</AccordionBody>
 				</Accordion>
 			)}
+
 			{/* POST EDITOR O AVISO DE SIN PERSONAJE */}
-			{myCharacter ? (
-				<PostEditor
-					campaignId={campaignId}
-					myCharacter={myCharacter}
-					otherCharacters={characters}
-					isOwner={isOwner}
-					isTabletop={isTabletop}
-					onPostCreated={handlePostCreated}
-					typePost='THREAD_START'
-					parentPostId={null}
-				/>
+			{canWrite ? (
+				myCharacter ? (
+					<PostEditor
+						campaignId={campaignId}
+						myCharacter={myCharacter}
+						otherCharacters={characters}
+						isOwner={isOwner}
+						isTabletop={isTabletop}
+						onPostCreated={handlePostCreated}
+						typePost='THREAD_START'
+						parentPostId={null}
+					/>
+				) : (
+					<div className='p-4 bg-grey-100 border border-orange-200 text-grey-800 rounded-xl shadow-sm flex flex-col items-center justify-center text-center gap-2'>
+						<Typography variant='h6' color='blue-gray' className='font-bold'>
+							{t('forum.campaign.needCharacter')}
+						</Typography>
+						<Typography variant='small' className='font-medium opacity-80 max-w-md'>
+							{isTabletop ? t('forum.campaign.needCharacterDescTable') : t('forum.campaign.needCharacterDescNarrative')}
+						</Typography>
+					</div>
+				)
 			) : (
-				<div className='p-4 bg-grey-100 border border-orange-200 text-grey-800 rounded-xl shadow-sm flex flex-col items-center justify-center text-center gap-2'>
+				<div className='p-4 bg-gray-50 border border-gray-200 text-gray-500 rounded-xl shadow-sm flex flex-col items-center justify-center text-center gap-2'>
 					<Typography variant='h6' color='blue-gray' className='font-bold'>
-						{t('forum.campaign.needCharacter')}
+						{t('forum.campaign.readOnly')}
 					</Typography>
 					<Typography variant='small' className='font-medium opacity-80 max-w-md'>
-						{isTabletop ? t('forum.campaign.needCharacterDescTable') : t('forum.campaign.needCharacterDescNarrative')}
+						{t('forum.campaign.pausedDesc')}
 					</Typography>
 				</div>
 			)}
@@ -190,6 +205,7 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 					myCharacter={myCharacter}
 					characters={characters}
 					ownerImage={ownerImage}
+					campaignStatus={campaignStatus}
 				/>
 			)}
 		</div>
@@ -203,6 +219,7 @@ CampaignTimeline.propTypes = {
 	myCharacter: PropTypes.object,
 	characters: PropTypes.arrayOf(PropTypes.object),
 	ownerImage: PropTypes.string,
+	campaignStatus: PropTypes.string,
 };
 
 export default CampaignTimeline;

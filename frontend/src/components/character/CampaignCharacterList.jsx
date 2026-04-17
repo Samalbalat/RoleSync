@@ -51,7 +51,7 @@ export default function CampaignCharacterList({ characters }) {
 									variant='circular'
 									alt={char.name}
 									src={
-										char.avatar_url ||
+										char.image ||
 										`https://ui-avatars.com/api/?name=${encodeURIComponent(char.name)}&background=random&color=fff`
 									}
 									onError={e => {

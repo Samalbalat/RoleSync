@@ -268,12 +268,11 @@ export default function TemplateBuilder() {
 									</Typography>
 									<Typography variant='small' color='gray' className='font-mono'>
 										{t('character.templateBuilder.type')}: {fieldTypes.find(t => t.value === field.type)?.label}
-										{field.type === 'number' &&
-											(field.min !== '' || field.max !== '')(
-												<>
-													{t('character.templateBuilder.range')}: {rangeMin(field)} - {rangeMax(field)}
-												</>,
-											)}
+										{field.type === 'number' && (field.min !== '' || field.max !== '') && (
+											<>
+												{t('character.templateBuilder.range')}: {rangeMin(field)} - {rangeMax(field)}
+											</>
+										)}
 									</Typography>
 								</div>
 								<div className='flex gap-2'>

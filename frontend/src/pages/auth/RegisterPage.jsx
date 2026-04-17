@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { Input, Button, Typography, Select, Option, Alert } from '@material-tailwind/react';
 import { EyeSlashIcon, EyeIcon, InformationCircleIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
+import { useForm, Controller } from 'react-hook-form'; // Importamos hook-form y Controller
 import AuthLayout from '../../components/auth/AuthLayout';
 import { TIMEZONES } from '../../data/timezones';
-import { validateEmail, validatePassword, validateRequired } from '../../utils/validators';
 import { useNavigate } from 'react-router-dom';
 import AuthService from '../../services/authService';
 
@@ -12,83 +12,85 @@ export function RegisterPage() {
 	const { t } = useTranslation('global');
 	const navigate = useNavigate();
 
-	const [formData, setFormData] = useState({
-		profileName: '',
-		roleType: '',
-		timeZone: '',
-		email: '',
-		password: '',
-		confirmPassword: '',
-	});
+	// Configuración de react-hook-form
+	const {
+		register,
+		handleSubmit,
+		control,
+		watch,
+		formState: { errors, isSubmitting },
+	} = useForm();
 
-	// Esto es para el ojito de la contraseña
+	// Estados solo para la UI (ojitos y errores de servidor)
 	const [passwordShown, setPasswordShown] = useState(false);
 	const [confirmShown, setConfirmShown] = useState(false);
-
-	const [loading, setLoading] = useState(false);
 	const [serverError, setServerError] = useState(null);
-	const [errors, setErrors] = useState({});
 
-	const handleChange = (key, value) => {
-		setFormData({ ...formData, [key]: value });
-		if (errors[key]) setErrors({ ...errors, [key]: null });
-		if (serverError) setServerError(null);
-	};
+	// Watcher para comprobar que las contraseñas coinciden
+	const password = watch('password');
 
-	const handleSubmit = async e => {
-		e.preventDefault();
+	const onSubmit = async data => {
 		setServerError(null);
 
-		//Validaciones frontend
-		const newErrors = {};
-		newErrors.profileName = validateRequired(formData.profileName);
-		newErrors.roleType = validateRequired(formData.roleType);
-		newErrors.timeZone = validateRequired(formData.timeZone);
-		newErrors.email = validateEmail(formData.email);
-		newErrors.password = validatePassword(formData.password);
+		try {
+			const signupRequest = {
+				profilename: data.profileName,
+				roleType: data.roleType.toUpperCase(),
+				timeZone: data.timeZone,
+				email: data.email,
+				password: data.password,
+			};
 
-		if (formData.confirmPassword !== formData.password) {
-			newErrors.confirmPassword = 'errors.passwordMatch';
-		}
+			await AuthService.register(signupRequest);
+			navigate('/login', { state: { message: t('auth.successRegistration') } });
+		} catch (error) {
+			console.error('Error en registro:', error);
+			const errorData = error.response?.data;
+			const errorString = typeof errorData === 'string' ? errorData : errorData?.message || '';
 
-		Object.keys(newErrors).forEach(key => {
-			if (newErrors[key] === null) delete newErrors[key];
-		});
-
-		setErrors(newErrors);
-
-		if (Object.keys(newErrors).length === 0) {
-			setLoading(true);
-			try {
-				const signupRequest = {
-					profilename: formData.profileName,
-					roleType: formData.roleType.toUpperCase(),
-					timeZone: formData.timeZone,
-					email: formData.email,
-					password: formData.password,
-				};
-
-				await AuthService.register(signupRequest);
-
-				navigate('/login', { state: { message: t('auth.successRegistration') } });
-			} catch (error) {
-				// Validaciones backend
-				console.error('Error en registro:', error);
-				if (error.response?.data == 'Error: Username ya está en uso') {
-					setServerError(t('auth.errorEmailInUse'));
-				} else {
-					setServerError(t('auth.errorConnection'));
-				}
-			} finally {
-				setLoading(false);
+			if (errorString.includes('Error: Correo  ya en uso')) {
+				setServerError(t('auth.errorEmailInUse'));
+			} else if (errorString.includes('Error: El nombre de perfil ya está en uso')) {
+				setServerError(t('auth.errorProfileNameInUse'));
+			} else {
+				setServerError(t('auth.errorConnection'));
 			}
 		}
 	};
 
+	// Desestructuramos las referencias de los Inputs normales
+	const { ref: profileRef, ...profileRest } = register('profileName', {
+		required: t('errors.required'),
+	});
+	const { ref: emailRef, ...emailRest } = register('email', {
+		required: t('errors.required'),
+		pattern: {
+			value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+			message: t('auth.invalidEmail'),
+		},
+	});
+
+	const complexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._-])[A-Za-z\d@$!%*?&._-]+$/;
+	const { ref: passwordRef, ...passwordRest } = register('password', {
+		required: t('errors.required'),
+		minLength: {
+			value: 8,
+			message: t('errors.passwordLength'),
+		},
+		pattern: {
+			value: complexityRegex,
+			message: t('errors.passwordComplexity', ''),
+		},
+	});
+	const { ref: confirmRef, ...confirmRest } = register('confirmPassword', {
+		required: t('errors.required', 'Debes confirmar tu contraseña'),
+		validate: value => value === password || t('errors.passwordMatch'),
+	});
+
 	return (
 		<AuthLayout>
 			<form
-				onSubmit={handleSubmit}
+				onSubmit={handleSubmit(onSubmit)}
 				noValidate
 				className='mx-auto max-w-[24rem] lg:max-w-4xl w-full text-left grid grid-cols-1 lg:grid-cols-2 gap-6 bg-white/95 backdrop-blur-sm p-8 rounded-xl shadow-2xl'
 			>
@@ -113,61 +115,75 @@ export function RegisterPage() {
 						label={t('profile.profileName')}
 						size='lg'
 						placeholder='MasterDungeon'
-						value={formData.profileName}
-						onChange={e => handleChange('profileName', e.target.value)}
 						className='bg-white'
+						autoComplete='off'
+						inputRef={profileRef}
+						{...profileRest}
 						error={!!errors.profileName}
 					/>
 					{errors.profileName && (
 						<Typography variant='small' color='red' className='mt-1 text-xs'>
-							{t(errors.profileName)}
+							{errors.profileName.message}
 						</Typography>
 					)}
 				</div>
 
-				{/* Tipo de Perfil Inicial */}
+				{/* Tipo de Perfil Inicial (Usando Controller de React-Hook-Form) */}
 				<div>
-					<Select
-						label={t('profile.roleType')}
-						size='lg'
-						value={formData.roleType}
-						onChange={val => handleChange('roleType', val)}
-						className='bg-white'
-						error={!!errors.roleType}
-					>
-						<Option value='WRITTEN'>{t('profile.narrative')}</Option>
-						<Option value='TABLETOP'>{t('profile.table')}</Option>
-					</Select>
+					<Controller
+						name='roleType'
+						control={control}
+						rules={{ required: t('errors.required', 'Selecciona un tipo de perfil') }}
+						render={({ field }) => (
+							<Select
+								label={t('profile.roleType')}
+								size='lg'
+								className='bg-white'
+								value={field.value}
+								onChange={val => field.onChange(val)}
+								error={!!errors.roleType}
+							>
+								<Option value='WRITTEN'>{t('profile.narrative')}</Option>
+								<Option value='TABLETOP'>{t('profile.table')}</Option>
+							</Select>
+						)}
+					/>
 					{errors.roleType && (
 						<Typography variant='small' color='red' className='mt-1 text-xs'>
-							{t(errors.roleType)}
+							{errors.roleType.message}
 						</Typography>
 					)}
-
 					<Typography variant='paragraph' className='mt-1 text-[12px] text-gray-500 italic'>
 						* {t('auth.roleTypeNote')}
 					</Typography>
 				</div>
 
-				{/* Zona Horaria */}
+				{/* Zona Horaria (Usando Controller) */}
 				<div>
-					<Select
-						label={t('account.timeZone')}
-						size='lg'
-						value={formData.timeZone}
-						onChange={val => handleChange('timeZone', val)}
-						className='bg-white'
-						error={!!errors.timeZone}
-					>
-						{TIMEZONES.map(({ value, label }) => (
-							<Option key={value} value={value}>
-								{label}
-							</Option>
-						))}
-					</Select>
+					<Controller
+						name='timeZone'
+						control={control}
+						rules={{ required: t('errors.required', 'Selecciona tu zona horaria') }}
+						render={({ field }) => (
+							<Select
+								label={t('account.timeZone')}
+								size='lg'
+								className='bg-white'
+								value={field.value}
+								onChange={val => field.onChange(val)}
+								error={!!errors.timeZone}
+							>
+								{TIMEZONES.map(({ value, label }) => (
+									<Option key={value} value={value}>
+										{label}
+									</Option>
+								))}
+							</Select>
+						)}
+					/>
 					{errors.timeZone && (
 						<Typography variant='small' color='red' className='mt-1 text-xs'>
-							{t(errors.timeZone)}
+							{errors.timeZone.message}
 						</Typography>
 					)}
 				</div>
@@ -179,15 +195,15 @@ export function RegisterPage() {
 						size='lg'
 						type='email'
 						placeholder='name@mail.com'
-						autoComplete='email'
-						value={formData.email}
-						onChange={e => handleChange('email', e.target.value)}
+						autoComplete='nope'
 						className='bg-white'
+						inputRef={emailRef}
+						{...emailRest}
 						error={!!errors.email}
 					/>
 					{errors.email && (
 						<Typography variant='small' color='red' className='mt-1 text-xs'>
-							{t(errors.email)}
+							{errors.email.message}
 						</Typography>
 					)}
 				</div>
@@ -200,10 +216,10 @@ export function RegisterPage() {
 						placeholder='********'
 						type={passwordShown ? 'text' : 'password'}
 						autoComplete='new-password'
-						value={formData.password}
-						onChange={e => handleChange('password', e.target.value)}
-						error={!!errors.password}
 						className='bg-white'
+						inputRef={passwordRef}
+						{...passwordRest}
+						error={!!errors.password}
 						icon={
 							<button type='button' onClick={() => setPasswordShown(!passwordShown)} className='focus:outline-none'>
 								{passwordShown ? <EyeIcon className='h-5 w-5' /> : <EyeSlashIcon className='h-5 w-5' />}
@@ -212,11 +228,12 @@ export function RegisterPage() {
 					/>
 					{errors.password && (
 						<Typography variant='small' color='red' className='mt-1 text-xs'>
-							{t(errors.password)}
+							{errors.password.message}
 						</Typography>
 					)}
 				</div>
 
+				{/* Confirm Password */}
 				<div>
 					<Input
 						label={t('account.confirmPassword')}
@@ -224,9 +241,9 @@ export function RegisterPage() {
 						placeholder='********'
 						type={confirmShown ? 'text' : 'password'}
 						autoComplete='new-password'
-						value={formData.confirmPassword}
-						onChange={e => handleChange('confirmPassword', e.target.value)}
 						className='bg-white'
+						inputRef={confirmRef}
+						{...confirmRest}
 						error={!!errors.confirmPassword}
 						icon={
 							<button type='button' onClick={() => setConfirmShown(!confirmShown)} className='focus:outline-none'>
@@ -236,19 +253,20 @@ export function RegisterPage() {
 					/>
 					{errors.confirmPassword && (
 						<Typography variant='small' color='red' className='mt-1 text-xs'>
-							{t(errors.confirmPassword)}
+							{errors.confirmPassword.message}
 						</Typography>
 					)}
 				</div>
+
 				<div className='lg:col-span-2 flex flex-col items-center mt-2'>
 					<Button
 						type='submit'
 						color='red'
 						size='lg'
 						className='mt-1 flex justify-center items-center gap-2'
-						disabled={loading}
+						disabled={isSubmitting}
 					>
-						{loading ? 'Creando cuenta...' : t('auth.signUp')}
+						{isSubmitting ? 'Creando cuenta...' : t('auth.signUp')}
 					</Button>
 
 					<Typography variant='small' color='gray' className='!mt-4 text-center font-normal'>

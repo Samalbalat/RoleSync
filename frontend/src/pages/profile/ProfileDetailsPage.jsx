@@ -33,6 +33,60 @@ import { ProfileCharacterList } from '../../components/profile/ProfileCharacterL
 import CharacterDetailDialog from '../../components/character/CharacterDetailDialog';
 import { CreateProfileModal } from '../../components/profile/CreateProfileModal';
 
+// --- UTILIDADES PARA AVATARES DINÁMICOS ---
+const getInitials = name => {
+	if (!name) return '?';
+	const parts = name.trim().split(' ');
+	if (parts.length >= 2) {
+		return (parts[0][0] + parts[1][0]).toUpperCase();
+	}
+	return name.substring(0, 2).toUpperCase();
+};
+
+const getAvatarColor = name => {
+	if (!name) return '#94a3b8'; // slate-400 fallback
+	const colors = [
+		'#ef4444',
+		'#f97316',
+		'#f59e0b',
+		'#84cc16',
+		'#10b981',
+		'#06b6d4',
+		'#3b82f6',
+		'#6366f1',
+		'#8b5cf6',
+		'#d946ef',
+		'#f43f5e',
+	];
+	let hash = 0;
+	for (let i = 0; i < name.length; i++) {
+		hash = name.charCodeAt(i) + ((hash << 5) - hash);
+	}
+	return colors[Math.abs(hash) % colors.length];
+};
+
+// --- COMPONENTE AVATAR DINÁMICO ---
+function DynamicAvatar({ src, name, className }) {
+	// Si hay una imagen válida (y no es el default antiguo), la mostramos
+	if (src && !src.includes('default-avatar')) {
+		return <Avatar src={src} alt={name} variant='circular' className={className} />;
+	}
+
+	// Si no hay imagen, mostramos las iniciales
+	const initials = getInitials(name);
+	const bgColor = getAvatarColor(name);
+
+	return (
+		<div
+			className={`flex items-center justify-center rounded-full text-white font-bold select-none ${className}`}
+			style={{ backgroundColor: bgColor }}
+		>
+			{initials}
+		</div>
+	);
+}
+// ------------------------------------------
+
 function LoadingScreen() {
 	const theme = getTheme();
 	return (
@@ -54,7 +108,6 @@ export function ProfileDetailsPage() {
 	const [openCreate, setOpenCreate] = useState(false);
 	const [selectedCharacterId, setSelectedCharacterId] = useState(null);
 	const [openCharacterDetail, setOpenCharacterDetail] = useState(false);
-	//const [openEditAccount, setOpenEditAccount] = useState(false);
 	const { t } = useTranslation('global');
 	const theme = getTheme();
 
@@ -87,10 +140,8 @@ export function ProfileDetailsPage() {
 		try {
 			await profileService.updateProfile(activeProfile.type, data);
 
-			// 1. Actualizamos la info visual de esta página
 			setProfileData(prev => ({ ...prev, ...data }));
 
-			// 2. Si el nombre o imagen cambiaron, actualizamos el "perfil activo" global
 			const updatedActive = {
 				...activeProfile,
 				name: data.profileName,
@@ -128,38 +179,50 @@ export function ProfileDetailsPage() {
 
 	const handleCreateProfile = async formData => {
 		try {
-			// formData trae: { profileName, image, description }
-			// missingType es: 'WRITTEN' o 'TABLETOP'
 			const newProfile = await profileService.createProfile(missingType, formData);
+
+			const completedNewProfile = {
+				...newProfile,
+				profileName: newProfile.profileName || formData.profileName,
+				roleType: newProfile.roleType || missingType,
+				image: newProfile.image || formData.image,
+			};
+
+			const updatedProfiles = [...userData.profiles, completedNewProfile];
 
 			setUserData(prev => ({
 				...prev,
-				profiles: [...prev.profiles, newProfile],
+				profiles: updatedProfiles,
 			}));
 
-			const currentAvailable = JSON.parse(localStorage.getItem('availableProfiles') || '[]');
-			localStorage.setItem('availableProfiles', JSON.stringify([...currentAvailable, newProfile]));
+			const newAvailableProfiles = updatedProfiles.map(p => {
+				let finalRoleType = p.roleType || p.type;
+				if (!finalRoleType && p.profileName === activeProfile.name) {
+					finalRoleType = activeProfile.type;
+				}
+
+				return {
+					email: userData?.email || '',
+					profileName: p.profileName,
+					roleType: finalRoleType,
+					image: p.image || null,
+				};
+			});
+
+			localStorage.setItem('availableProfiles', JSON.stringify(newAvailableProfiles));
 
 			setOpenCreate(false);
 			toast.success(t('profile.create.success'));
+
+			setTimeout(() => {
+				window.location.reload();
+			}, 1000);
 		} catch (error) {
 			console.error('Error al crear:', error);
 			toast.error(t('profile.create.error'));
 			throw error;
 		}
 	};
-
-	// const handleSaveAccount = async data => {
-	// 	try {
-	// 		await profileService.updateUserInfo(data);
-	// 		setUserData(prev => ({ ...prev, ...data }));
-	// 		setOpenEditAccount(false);
-	// 		toast.success(t('profile.account.saveSuccess'));
-	// 	} catch (error) {
-	// 		console.error('Error al guardar la cuenta', error);
-	// 		toast.error(t('profile.account.saveError'));
-	// 	}
-	// };
 
 	const handleSwitchProfile = targetProfile => {
 		const storedAvailable = JSON.parse(localStorage.getItem('availableProfiles') || '[]');
@@ -173,7 +236,6 @@ export function ProfileDetailsPage() {
 			};
 
 			localStorage.setItem('activeProfile', JSON.stringify(newProfile));
-
 			window.location.reload();
 		} else {
 			console.error('No se encontró la información completa del perfil seleccionado');
@@ -187,26 +249,29 @@ export function ProfileDetailsPage() {
 
 	if (loading) return <LoadingScreen />;
 
+	const currentName = profileData?.profileName || activeProfile.name;
+
 	return (
 		<div className='max-w-7xl mx-auto px-4 py-8'>
 			{/* Header del Perfil */}
 			<Card className='mb-8 overflow-hidden'>
 				<div className={`h-32 bg-gradient-to-r ${theme.banner}`} />
 				<CardBody className='relative flex flex-col md:flex-row items-center gap-6 -mt-16'>
-					<Avatar
-						src={profileData?.image || '/default-avatar.png'}
-						alt='avatar'
-						variant='circular'
+					{/* AVATAR PRINCIPAL MODIFICADO */}
+					<DynamicAvatar
+						src={profileData?.image}
+						name={currentName}
 						className={`
-        border-4 border-white shadow-xl bg-white
-        w-28 h-28        /* Tamaño en móvil (aprox 112px) */
-        md:w-40 md:h-40  /* Tamaño en tablet (aprox 160px) */
-        lg:w-48 lg:h-48  /* Tamaño en PC (aprox 192px) */
-    `}
+                            border-4 border-white shadow-xl bg-white
+                            w-28 h-28 text-4xl        /* Tamaño en móvil */
+                            md:w-40 md:h-40 md:text-6xl /* Tamaño en tablet */
+                            lg:w-48 lg:h-48 lg:text-7xl /* Tamaño en PC */
+                        `}
 					/>
+
 					<div className='flex-1 text-center md:text-left mt-4 md:mt-8'>
 						<Typography variant='h3' color='blue-gray'>
-							{profileData?.profileName || activeProfile.name}
+							{currentName}
 						</Typography>
 						<Typography variant='paragraph' className='font-normal text-blue-gray-500 max-w-2xl'>
 							{profileData?.description || t('profile.noDescription')}
@@ -220,15 +285,11 @@ export function ProfileDetailsPage() {
 			<div className='grid grid-cols-1 lg:grid-cols-4 gap-8'>
 				{/* COLUMNA IZQUIERDA: Información de Cuenta y Otros Perfiles */}
 				<div className='lg:col-span-1 space-y-6'>
-					{/* Card de Cuenta */}
 					<Card className='border border-blue-gray-50 shadow-sm'>
 						<CardBody className='p-4'>
 							<Typography variant='h6' color='blue-gray' className='mb-4 flex items-center gap-2'>
 								<IdentificationIcon className={`w-5 h-5 ${theme.textPrimary}`} /> {t('profile.accountInfo')}
 							</Typography>
-							{/* <Button variant='text' size='sm' className='p-2' onClick={() => setOpenEditAccount(true)}>
-								<GlobeAltIcon className='w-4 h-4 text-blue-gray-400' />
-							</Button> */}
 							<div className='space-y-3'>
 								<div>
 									<Typography variant='small' className='font-bold text-blue-gray-400 uppercase text-[10px]'>
@@ -248,7 +309,6 @@ export function ProfileDetailsPage() {
 						</CardBody>
 					</Card>
 
-					{/* Card de Otros Perfiles */}
 					<Card className='border border-blue-gray-50 shadow-sm'>
 						<CardBody className='p-4'>
 							<div className='flex justify-between items-center mb-4'>
@@ -277,7 +337,9 @@ export function ProfileDetailsPage() {
 													: 'hover:bg-gray-50 cursor-pointer'
 											}`}
 										>
-											<Avatar src={p.image || '/default-avatar.png'} size='sm' />
+											{/* AVATARES SECUNDARIOS MODIFICADOS */}
+											<DynamicAvatar src={p.image} name={p.profileName} className='w-9 h-9 text-sm shrink-0' />
+
 											<div className='flex-1 overflow-hidden'>
 												<div className='flex items-center justify-between'>
 													<Typography variant='small' className='font-bold text-blue-gray-800 truncate'>
@@ -301,7 +363,6 @@ export function ProfileDetailsPage() {
 									);
 								})}
 
-								{/* OPCIONAL: Espacio vacío visual si falta un perfil para animar a crearlo */}
 								{canCreateProfile && (
 									<button
 										onClick={() => setOpenCreate(true)}
@@ -320,7 +381,7 @@ export function ProfileDetailsPage() {
 					</Card>
 				</div>
 
-				{/* COLUMNA DERECHA: Pestañas de Juego (Campañas/Personajes) */}
+				{/* COLUMNA DERECHA: Pestañas de Juego */}
 				<div className='lg:col-span-3'>
 					<Tabs value='campaigns'>
 						<TabsHeader
@@ -374,18 +435,10 @@ export function ProfileDetailsPage() {
 			<CreateProfileModal
 				open={openCreate}
 				handler={() => setOpenCreate(!openCreate)}
-				type={missingType} // La lógica que calculamos antes
+				type={missingType}
 				onCreate={handleCreateProfile}
 				theme={theme}
 			/>
-
-			{/* <EditAccountModal
-				open={openEditAccount}
-				handler={() => setOpenEditAccount(!openEditAccount)}
-				userData={userData}
-				onSave={handleSaveAccount}
-				theme={theme}
-			/> */}
 		</div>
 	);
 }

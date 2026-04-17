@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
@@ -10,14 +10,20 @@ import {
 	DialogFooter,
 	Typography,
 	Input,
-	Textarea,
 	Button,
 	Chip,
 	IconButton,
 } from '@material-tailwind/react';
-import { PaperAirplaneIcon, XMarkIcon, ChatBubbleLeftEllipsisIcon, PhotoIcon, LinkIcon } from '@heroicons/react/24/outline';
+import {
+	PaperAirplaneIcon,
+	XMarkIcon,
+	ChatBubbleLeftEllipsisIcon,
+	PhotoIcon,
+	LinkIcon,
+	AdjustmentsHorizontalIcon,
+} from '@heroicons/react/24/outline';
 import { getTheme } from '../../utils/themeUtils';
-import ForumService from '../../services/ForumService'; // <-- Importamos el servicio
+import ForumService from '../../services/ForumService';
 
 const formatTags = tagsString => {
 	if (!tagsString) return [];
@@ -36,10 +42,12 @@ const getErrorMessage = error => {
 	);
 };
 
-// Añadimos la prop onSuccess para recargar la lista al terminar
 const CreateGeneralPost = ({ open, handleClose, onSuccess }) => {
 	const [tagsPreview, setTagsPreview] = useState([]);
 	const [showImageInput, setShowImageInput] = useState(false);
+	const [showFormatMenu, setShowFormatMenu] = useState(false);
+	const textareaRef = useRef(null);
+
 	const { t } = useTranslation('global');
 	const theme = getTheme();
 
@@ -49,6 +57,7 @@ const CreateGeneralPost = ({ open, handleClose, onSuccess }) => {
 		formState: { errors, isSubmitting },
 		watch,
 		setValue,
+		getValues,
 		reset,
 	} = useForm({
 		defaultValues: {
@@ -66,6 +75,26 @@ const CreateGeneralPost = ({ open, handleClose, onSuccess }) => {
 		setTagsPreview(formatTags(currentTagsInput));
 	}, [currentTagsInput]);
 
+	const insertFormatting = (prefix, suffix = '') => {
+		const textarea = textareaRef.current;
+		if (!textarea) return;
+
+		const start = textarea.selectionStart;
+		const end = textarea.selectionEnd;
+		const text = getValues('content') || '';
+		const selected = text.substring(start, end);
+		const insertedText = selected || 'texto';
+
+		const newText = text.substring(0, start) + prefix + insertedText + suffix + text.substring(end);
+
+		setValue('content', newText, { shouldValidate: true, shouldDirty: true });
+
+		setTimeout(() => {
+			textarea.focus();
+			textarea.setSelectionRange(start + prefix.length, start + prefix.length + insertedText.length);
+		}, 0);
+	};
+
 	const onSubmit = async data => {
 		try {
 			const payload = {
@@ -74,20 +103,17 @@ const CreateGeneralPost = ({ open, handleClose, onSuccess }) => {
 				content: data.content,
 				tags: formatTags(data.tagsInput),
 				mediaUrls: data.imageUrl ? [data.imageUrl] : [],
-				// parentPostId: Lo omitimos porque es un hilo principal, no una respuesta.
-				// Si el backend te obliga a pasarlo sí o sí, pon: parentPostId: null o 0
 			};
 
-			// Llamada real a la API
 			await ForumService.createGeneralThread(payload);
 
 			toast.success(t('forum.general.create.success') || 'Hilo creado con éxito');
 
 			reset();
 			setShowImageInput(false);
+			setShowFormatMenu(false);
 			handleClose();
 
-			// Si nos pasaron la función para refrescar la lista, la llamamos
 			if (onSuccess) {
 				onSuccess();
 			}
@@ -96,6 +122,11 @@ const CreateGeneralPost = ({ open, handleClose, onSuccess }) => {
 			toast.error(t('forum.general.create.error') || 'Error al crear el hilo');
 		}
 	};
+
+	const { ref: contentRef, ...contentRest } = register('content', {
+		required: t('forum.general.create.contentRequired'),
+		minLength: { value: 10, message: t('forum.general.create.contentMinLength') },
+	});
 
 	return (
 		<Dialog
@@ -171,35 +202,93 @@ const CreateGeneralPost = ({ open, handleClose, onSuccess }) => {
 						)}
 					</div>
 
-					{/* CONTENIDO (MARDKOWN) + BOTÓN IMAGEN */}
+					{/* CONTENIDO + BARRA DE HERRAMIENTAS */}
 					<div>
 						<div className='flex justify-between items-center mb-2'>
 							<Typography variant='small' color='blue-gray' className='font-medium'>
 								{t('forum.general.create.content')}
 							</Typography>
-							<Button
-								size='sm'
-								variant={showImageInput ? 'filled' : 'text'}
-								color={showImageInput ? 'indigo' : 'blue-gray'}
-								className='flex items-center gap-2 px-3 py-1.5 rounded-full lowercase'
-								onClick={() => setShowImageInput(!showImageInput)}
-							>
-								<PhotoIcon className='w-4 h-4' />
-								{showImageInput ? t('forum.general.create.hideImage') : t('forum.general.create.addImage')}
-							</Button>
+
+							<div className='flex gap-2'>
+								<Button
+									size='sm'
+									variant={showFormatMenu ? 'filled' : 'text'}
+									color={showFormatMenu ? 'indigo' : 'blue-gray'}
+									className='flex items-center gap-2 px-3 py-1.5 rounded-full lowercase'
+									onClick={() => setShowFormatMenu(!showFormatMenu)}
+								>
+									<AdjustmentsHorizontalIcon className='w-4 h-4' />
+									Formato
+								</Button>
+								<Button
+									size='sm'
+									variant={showImageInput ? 'filled' : 'text'}
+									color={showImageInput ? 'indigo' : 'blue-gray'}
+									className='flex items-center gap-2 px-3 py-1.5 rounded-full lowercase'
+									onClick={() => setShowImageInput(!showImageInput)}
+								>
+									<PhotoIcon className='w-4 h-4' />
+									{showImageInput ? t('forum.general.create.hideImage') : t('forum.general.create.addImage')}
+								</Button>
+							</div>
 						</div>
-						<Textarea
-							size='lg'
-							rows={6}
-							placeholder={t('forum.general.create.contentPlaceholder')}
-							error={!!errors.content}
-							color={theme.primary}
-							className='resize-y'
-							{...register('content', {
-								required: t('forum.general.create.contentRequired'),
-								minLength: { value: 10, message: t('forum.general.create.contentMinLength') },
-							})}
-						/>
+
+						{/* BARRA DE FORMATO MARKDOWN */}
+						{showFormatMenu && (
+							<div className='flex gap-2 mb-2 p-1 bg-gray-50 rounded-lg border border-gray-200 animate-fade-in'>
+								<Button
+									size='sm'
+									variant='text'
+									color='blue-gray'
+									className='px-3 py-1 font-bold'
+									onClick={() => insertFormatting('**', '**')}
+								>
+									B
+								</Button>
+								<Button
+									size='sm'
+									variant='text'
+									color='blue-gray'
+									className='px-3 py-1 italic font-serif'
+									onClick={() => insertFormatting('*', '*')}
+								>
+									I
+								</Button>
+								<Button
+									size='sm'
+									variant='text'
+									color='blue-gray'
+									className='px-3 py-1 line-through'
+									onClick={() => insertFormatting('~~', '~~')}
+								>
+									S
+								</Button>
+								<div className='w-px bg-gray-300 mx-1'></div>
+								<Button
+									size='sm'
+									variant='text'
+									color='blue-gray'
+									className='px-3 py-1 flex items-center gap-1'
+									onClick={() => insertFormatting('> ')}
+								>
+									{t('forum.quote') || 'Citar'}
+								</Button>
+							</div>
+						)}
+
+						{/* TEXTAREA NATIVO INTEGRADO CON REACT-HOOK-FORM */}
+						<div className='relative'>
+							<textarea
+								{...contentRest}
+								ref={e => {
+									contentRef(e); // Asigna la ref para react-hook-form
+									textareaRef.current = e; // Asigna nuestra ref local para manejar selecciones
+								}}
+								rows={6}
+								className={`w-full min-h-[120px] p-3 rounded-lg border ${errors.content ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all resize-y bg-gray-50 text-gray-900`}
+								placeholder={t('forum.general.create.contentPlaceholder')}
+							/>
+						</div>
 						{getErrorMessage(errors.content)}
 					</div>
 
@@ -265,7 +354,7 @@ const CreateGeneralPost = ({ open, handleClose, onSuccess }) => {
 CreateGeneralPost.propTypes = {
 	open: PropTypes.bool,
 	handleClose: PropTypes.func,
-	onSuccess: PropTypes.func, // Añadido a las propTypes
+	onSuccess: PropTypes.func,
 };
 
 export default CreateGeneralPost;

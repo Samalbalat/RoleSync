@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
-import { Typography, Input, Button } from '@material-tailwind/react';
+import { useEffect, useState } from 'react';
+import { Typography, Input, Button, Spinner } from '@material-tailwind/react';
 import { EyeSlashIcon, EyeIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
+import { useForm } from 'react-hook-form'; // Importamos hook-form
 import AuthLayout from '../../components/auth/AuthLayout';
 import { useAuth } from '../../utils/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -12,24 +13,28 @@ export function LoginPage() {
 	const { login, setActiveProfile } = useAuth();
 	const navigate = useNavigate();
 
-	const [email, setEmail] = useState('');
-	const passwordRef = useRef(null);
+	// Configuración de react-hook-form
+	const {
+		register,
+		handleSubmit,
+		formState: { errors, isSubmitting },
+	} = useForm();
+
 	const [passwordShown, setPasswordShown] = useState(false);
-	const [error, setError] = useState(null);
+	// Cambiamos el nombre de error a apiError para diferenciarlo de los errors del formulario
+	const [apiError, setApiError] = useState(null);
 
 	const togglePasswordVisiblity = () => setPasswordShown(cur => !cur);
 
 	const location = useLocation();
 	const successMessage = location.state?.message;
 	const errorMessage = location.state?.errorMessage;
+
 	useEffect(() => {
 		if (successMessage) {
 			toast.success(successMessage, {
 				id: 'registro-exito',
-				style: {
-					background: '#333',
-					color: '#fff',
-				},
+				style: { background: '#333', color: '#fff' },
 			});
 			window.history.replaceState({}, document.title);
 		} else if (errorMessage) {
@@ -41,13 +46,11 @@ export function LoginPage() {
 		}
 	}, [successMessage, errorMessage]);
 
-	const handleLogin = async e => {
-		e.preventDefault();
-		setError(null);
-		const passwordValue = passwordRef.current.value;
+	const onSubmit = async data => {
+		setApiError(null);
 
 		try {
-			const profiles = await login(email, passwordValue);
+			const profiles = await login(data.email, data.password);
 
 			if (Array.isArray(profiles) && profiles.length > 0) {
 				const userEmail = profiles[0].email;
@@ -65,32 +68,52 @@ export function LoginPage() {
 
 					navigate('/', { state: { message: t('auth.successLogin') } });
 				}
-
 				// CASO B: Tiene más de 1 perfil -> Selector de perfiles
 				else {
 					localStorage.setItem('availableProfiles', JSON.stringify(profiles));
 					navigate('/profile-selection');
 				}
 			} else {
-				setError(t('auth.errorNoProfilesFound'));
+				setApiError(t('auth.errorNoProfilesFound'));
 			}
 		} catch (error) {
 			console.error(error);
-			if (error.response?.status === 401) {
-				setError(t('auth.errorInvalidCredentials'));
+			const status = error.response?.status;
+
+			// Lógica de errores 403 y 500 solicitada
+			if (status === 403 || status === 401) {
+				// Añado el 401 por seguridad, pero el 403 es el que prioriza tu backend
+				setApiError(t('auth.errorInvalidCredentials'));
+			} else if (status === 500) {
+				setApiError(t('auth.errorServer'));
 			} else {
-				setError(t('auth.errorConnection'));
+				setApiError(t('auth.errorUnexpected'));
 			}
 		}
 	};
+
+	// Desestructuramos el ref de hook-form para pasarlo como inputRef a Material Tailwind
+	const { ref: emailRef, ...emailRest } = register('email', {
+		required: t('auth.emailRequired'),
+		pattern: {
+			value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+			message: t('auth.invalidEmail'),
+		},
+	});
+	const { ref: passwordRef, ...passwordRest } = register('password', {
+		required: t('auth.passwordRequired'),
+	});
+
 	return (
 		<AuthLayout>
-			<form onSubmit={handleLogin} className='mx-auto max-w-[32rem] text-left'>
+			{/* Cambiamos el onSubmit para usar handleSubmit de react-hook-form */}
+			<form onSubmit={handleSubmit(onSubmit)} className='mx-auto max-w-[32rem] text-left'>
 				<div className='lg:col-span-2 text-center mb-2'>
 					<Typography variant='h3' color='blue-gray'>
 						{t('auth.login')}
 					</Typography>
 				</div>
+
 				<div className='mb-6'>
 					<label htmlFor='email'>
 						<Typography variant='small' className='mb-2 block font-medium text-gray-900'>
@@ -100,15 +123,23 @@ export function LoginPage() {
 					<Input
 						id='email'
 						type='email'
-						name='email'
-						value={email}
-						onChange={e => setEmail(e.target.value)}
 						placeholder='name@mail.com'
 						color='gray'
 						size='lg'
+						autoComplete='new-password'
 						className='w-full placeholder:opacity-100 focus:border-t-primary border-t-blue-gray-200'
 						labelProps={{ className: 'hidden' }}
+						// Inyectamos las props de react-hook-form
+						inputRef={emailRef}
+						{...emailRest}
+						error={!!errors.email}
 					/>
+					{/* Mensaje de error de validación del formulario */}
+					{errors.email && (
+						<Typography variant='small' color='red' className='mt-1 text-sm font-normal'>
+							{errors.email.message}
+						</Typography>
+					)}
 				</div>
 
 				<div className='mb-6'>
@@ -119,12 +150,10 @@ export function LoginPage() {
 					</label>
 					<Input
 						id='password'
-						name='password'
-						inputRef={passwordRef}
 						type={passwordShown ? 'text' : 'password'}
 						size='lg'
 						placeholder='********'
-						autoComplete='off'
+						autoComplete='new-password'
 						labelProps={{ className: 'hidden' }}
 						className='w-full placeholder:opacity-100 focus:border-t-primary border-t-blue-gray-200'
 						icon={
@@ -132,18 +161,28 @@ export function LoginPage() {
 								{passwordShown ? <EyeIcon className='h-5 w-5' /> : <EyeSlashIcon className='h-5 w-5' />}
 							</i>
 						}
+						// Inyectamos las props de react-hook-form
+						inputRef={passwordRef}
+						{...passwordRest}
+						error={!!errors.password}
 					/>
+					{errors.password && (
+						<Typography variant='small' color='red' className='mt-1 text-sm font-normal'>
+							{errors.password.message}
+						</Typography>
+					)}
 				</div>
 
-				{error && (
-					<Typography color='red' className='mb-4 text-center'>
-						{error}
+				{apiError && (
+					<Typography color='red' className='mb-4 text-center font-medium'>
+						{apiError}
 					</Typography>
 				)}
 
 				<div className='flex justify-center mt-8'>
-					<Button type='submit' color='gray' size='lg'>
-						{t('auth.login')}
+					{/* Deshabilitamos el botón para evitar doble submit */}
+					<Button type='submit' color='gray' size='lg' disabled={isSubmitting}>
+						{isSubmitting ? <Spinner className='h-5 w-5 mx-auto' /> : t('auth.login')}
 					</Button>
 				</div>
 

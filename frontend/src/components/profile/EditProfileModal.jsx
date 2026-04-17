@@ -51,7 +51,10 @@ export function EditProfileModal({ open, handler, profileData, onSave, theme }) 
 			reset();
 			clearErrors();
 		} catch (e) {
-			if (e.response && e.response.status === 409) {
+			if (
+				e.response?.status === 403 &&
+				e.response?.data?.includes('Profile name already exists and is not the current profile')
+			) {
 				setError('profileName', {
 					type: 'manual',
 					message: t('profile.edit.errorAlreadyExists'),

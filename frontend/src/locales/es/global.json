@@ -1,6 +1,6 @@
 {
   "home": {
-    "yourCampaigns": "Tus campañas",
+    "yourCampaigns": "Tus campañas Activas",
     "campaignPhrase": "Los mundos que diriges y las aventuras que exploras.",
     "masterCampaigns": {
       "title": "🛡️ Partidas que Diriges",
@@ -57,7 +57,7 @@
     "sending": "Enviando",
     "search": "Buscar",
     "loading": "Cargando...",
-    "enter": "Entrar",
+    "enter": "Enter",
     "other": "Otro",
     "loadMore": "Cargar mas",
     "previous": "Anterior",
@@ -88,14 +88,16 @@
     "invalidEmail": "El formato del correo no es válido",
     "invalidNumber": "Debe ser un número mayor a 0",
     "passwordLength": "Mínimo 8 caracteres",
-    "passwordComplexity": "Debe incluir mayúscula, minúscula, número y símbolo (@$!%*?&)",
+    "passwordComplexity": "La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial (_@$!%*?&-)",
     "passwordMatch": "Las contraseñas no coinciden",
     "maxTags": "No puedes agregar más de 6 etiquetas",
     "tooLong1000": "No puede exceder los 1000 caracteres",
     "invalidMinMax": "Los valores mínimo y máximo deben ser números válidos",
     "minMaxOrder": "El valor mínimo no puede ser mayor que el máximo",
     "fetchCharacter": "No se ha encontrado el personaje.",
-    "fetchCharacters": "Error al cargar los personajes"
+    "fetchCharacters": "Error al cargar los personajes",
+    "maxLength50": "Máximo 50 caracteres",
+    "maxLength2000": "Máximo 2000 caracteres"
   },
   "auth": {
     "login": "Iniciar Sesión",
@@ -108,14 +110,20 @@
     "createAccount": "Crear cuenta",
     "roleTypeNote": "No te preocupes: podrás crear un perfil del otro tipo más tarde con esta misma cuenta.",
     "accessDenied": "Acceso Denegado",
-    "errorInvalidCredentials": "Correo electrónico o contraseña inválidos",
+    "errorInvalidCredentials": "Email o contraseña incorrecta",
     "errorEmailInUse": "El email ya está en uso",
-    "errorConnection": "Error de conexión. Tal vez el email o la contraseña este mal, si no, intente mas tarde.",
+    "errorConnection": "Error de conexión con el servidor",
     "errorNoProfilesFound": "Error: No se encontraron perfiles asociados.",
     "errorNotAuthenticated": "Debe iniciar sesión para acceder a esta página.",
     "errorAuthenticated": "Ya has iniciado sesión.",
     "successRegistration": "¡Registro exitoso! Ahora puedes iniciar sesión.",
-    "successLogin": "¡Inicio de sesión exitoso!"
+    "successLogin": "¡Inicio de sesión exitoso!",
+    "passwordRequired": "La contraseña es obligatoria",
+    "emailRequired": "El email es obligatorio",
+    "errorUnexpected": "Ocurrió un error inesperado",
+    "errorServer": "Error de conexión",
+    "invalidEmail": "Introduce un formato de email válido",
+    "errorProfileNameInUse": "El nombre de perfil ya está en uso"
   },
   "account": {
     "name": "Nombre",
@@ -170,7 +178,9 @@
       "nameRequired": "El nombre del perfil es obligatorio. No puede estar vacio",
       "nameTooShort": "El nombre es demasiado corto. Debe ser superior a 3.",
       "image": "URL de la Imagen",
-      "bio": "Bibliografia"
+      "bio": "Bibliografia",
+      "description_TABLETOP": "Crea un perfil de mesa para participar en campañas de rol tradicional. Este perfil se asociará a los personajes que crees personajes y campañas de mesa.",
+      "description_WRITTEN": "Crea un perfil narrativo para participar en campañas de rol escritas. Este perfil se asociará a los personajes que crees personajes y campañas narrativas."
     }
   },
   "campaign": {
@@ -217,7 +227,9 @@
       "currentMaxPlayers": "Jugadores actuales / Máximos",
       "successCreate": "¡Campaña creada con éxito!",
       "successUpdate": "¡Campaña actualizada con éxito!",
-      "errorCreate": "Hubo un error al crear la campaña. Por favor, inténtalo de nuevo más tarde."
+      "errorCreate": "Hubo un error al crear la campaña. Por favor, inténtalo de nuevo más tarde.",
+      "statusUpdated": "Estado actualizado correctamente",
+      "deleted": "No se puede acceder a esta campaña."
     },
     "detail": {
       "about": "Sobre la Campaña",
@@ -229,7 +241,8 @@
       "joinFull": "Lista de Espera",
       "contactGM": "Mensaje al Master",
       "infoTitle": "Detalles de la Partida",
-      "pending": "Solicitud Pendiente"
+      "pending": "Solicitud Pendiente",
+      "closed": "Cerrada"
     },
     "join": {
       "title": "Solicitar Unirse a la Campaña",
@@ -251,13 +264,19 @@
       "kick": "Eliminar Miembro",
       "kickConfirmTitle": "Confirmación de Eliminación",
       "kickConfirmDesc1": "Estás a punto de eliminar a ",
-      "kickConfirmDesc2": " de la campaña. Esta acción no se puede deshacer y el jugador tendrá que enviar una nueva solicitud si desea unirse nuevamente."
+      "kickConfirmDesc2": " de la campaña. Esta acción no se puede deshacer y el jugador tendrá que enviar una nueva solicitud si desea unirse nuevamente.",
+      "rejectReasonLabel": "Motivo del rechazo (opcional)",
+      "rejectConfirmTitle": "Rechazar solicitud",
+      "reasonLabel": "Motivo de expulsión (opcional)",
+      "rejectConfirmDesc1": "¿Estás seguro de querer rechazar a "
     },
     "errors": {
-      "fetchCharacters": "Error al cargar los personajes de la campaña"
+      "fetchCharacters": "Error al cargar los personajes de la campaña",
+      "updateStatus": "Error al actualizar el estado"
     },
     "roleplay": "Rol en vivo",
     "status": {
+      "status": "Estado de la Campaña",
       "open": "Abierto"
     }
   },
@@ -279,7 +298,7 @@
       "minValue": "Valor Mínimo (Opcional)",
       "maxValue": "Valor Máximo (Opcional)",
       "cancel": "Cancelar edición",
-      "addField": "Añadir Campo",
+      "addField": "Añadir Atributo Corto",
       "updateField": "Actualizar Campo",
       "saveTemplate": "Guardar Plantilla",
       "createTemplate": "Crear Plantilla",
@@ -303,7 +322,8 @@
       "errorSave": "Hubo un error al guardar la plantilla.",
       "errorNoName": "Debes darle un nombre a la plantilla.",
       "loadigData": "Cargando datos de la plantilla...",
-      "range": "| Rango: "
+      "range": "| Rango: ",
+      "addLongField": "Añadir Atributo Largo"
     },
     "form": {
       "title": "Crear Personaje",
@@ -340,7 +360,8 @@
     "ongoing": "En Curso",
     "active": "En curso",
     "break": "En descanso",
-    "finished": "Terminado"
+    "finished": "Terminado",
+    "deleted": "Eliminar"
   },
   "filter": {
     "filter": "Filtrar",
@@ -370,7 +391,9 @@
       "publishedOn": "Publicado el",
       "noReplies": "Aún no hay respuestas. ¡Sé el primero en aportar algo!",
       "lockedThread": "Este hilo ha sido bloqueado.",
-      "noNewReplies": "Ya no se admiten nuevas respuestas en este debate."
+      "noNewReplies": "Ya no se admiten nuevas respuestas en este debate.",
+      "readOnly": "Modo Lectura",
+      "pausedDesc": "La campaña está pausada o ha terminado. Solo el Master puede añadir nuevos mensajes."
     },
     "general": {
       "comunityForum": "Foro de la Comunidad",
@@ -449,7 +472,8 @@
     "yourReply": "Tu respuesta",
     "errors": {
       "fetchReplies": "Error al cargar las respuestas",
-      "fetchThreads": "Error cargando los posts"
+      "fetchThreads": "Error cargando los posts",
+      "fetchThread": "Error al cargar el hilo del foro."
     }
   },
   "footer": {

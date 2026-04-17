@@ -89,7 +89,7 @@ export default function HomePage() {
 							variant='text'
 							color={theme.secondary}
 							className='hidden sm:flex items-center gap-2'
-							onClick={() => navigate('/campaigns')}
+							onClick={() => navigate('/profile')}
 						>
 							{t('common.viewAll')} <ArrowRightIcon className='h-4 w-4' />
 						</Button>
@@ -108,7 +108,7 @@ export default function HomePage() {
 
 				{/* Botón móvil global de campañas */}
 				<div className='mb-12 sm:hidden flex justify-center px-2'>
-					<Button variant='outlined' color={theme.secondary} fullWidth onClick={() => navigate('/campaigns')}>
+					<Button variant='outlined' color={theme.secondary} fullWidth onClick={() => navigate('/profile')}>
 						{t('common.viewAll')} {t('home.yourCampaigns')}
 					</Button>
 				</div>

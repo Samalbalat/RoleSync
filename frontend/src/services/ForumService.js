@@ -71,6 +71,20 @@ const ForumService = {
         }
     },
 
+    /**
+     * Crear una respuesta a un hilo en el foro general
+     * @param {Object} replyData - { type, title, parentPostId, content, mediaUrls, tags }
+     */
+    createGeneralReply: async (replyData) => {
+        try {
+            const response = await api.post('/forums/posts', replyData);
+            return response.data;
+        } catch (error) {
+            console.error('Error creating general reply:', error);
+            throw error;
+        }
+    },
+
     // ==========================================
     // SECCIÓN B: CAMPAÑAS (Rol y Foro Interno)
     // ==========================================

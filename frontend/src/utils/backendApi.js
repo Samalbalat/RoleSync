@@ -20,4 +20,22 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+// Interceptor de respuestas para manejar el JWT expirado
+// api.interceptors.response.use(
+//     (response) => {
+//         return response;
+//     },
+//     (error) => {
+//         if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+//             console.error('El token ha caducado o es inválido. Cerrando sesión...');
+            
+//             localStorage.clear();
+            
+//             window.location.href = '/login'; 
+//         }
+        
+//         return Promise.reject(error);
+//     }
+// );
+
 export default api;

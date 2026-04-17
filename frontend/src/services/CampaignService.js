@@ -122,10 +122,10 @@ const CampaignService = {
         }
     },
 
-    updateRequestStatus: async (id, profileName, status) => {
+    updateRequestStatus: async (id, profileName, status, message) => {
         try {
             // status debe ser 'ACCEPTED' o 'REJECTED' según el backend
-            const response = await api.put(`/campaigns/${id}/requests`, { profileName, status });
+            const response = await api.put(`/campaigns/${id}/requests`, { profileName, status, message });
             return response.data;
         } catch (error) {
             console.error(`Error updating request status for profile ${profileName}:`, error);

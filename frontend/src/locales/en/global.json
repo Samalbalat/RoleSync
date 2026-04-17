@@ -1,6 +1,6 @@
 {
   "home": {
-    "yourCampaigns": "Your campaigns",
+    "yourCampaigns": "Your active campaigns",
     "campaignPhrase": "The worlds you lead and the adventures you explore.",
     "masterCampaigns": {
       "title": "🛡️ Campaigns You Lead",
@@ -82,14 +82,16 @@
     "invalidEmail": "The email format is not valid",
     "invalidNumber": "Must be a number greater than 0",
     "passwordLength": "Minimum 8 characters",
-    "passwordComplexity": "Must include uppercase, lowercase, number, and symbol (_@$!%*?&-)",
+    "passwordComplexity": "The password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (_@$!%*?",
     "passwordMatch": "Passwords do not match",
     "maxTags": "You cannot add more than 6 tags",
     "tooLong1000": "Cannot exceed 1000 characters",
     "invalidMinMax": "Minimum and maximum values must be valid numbers",
     "minMaxOrder": "Minimum value cannot be greater than maximum value",
     "fetchCharacter": "The character has not been found.",
-    "fetchCharacters": "Error loading characters"
+    "fetchCharacters": "Error loading characters",
+    "maxLength50": "Maximum 50 characters",
+    "maxLength2000": "Maximum 2000 characters"
   },
   "auth": {
     "login": "Login",
@@ -100,15 +102,21 @@
     "createAccount": "Create account",
     "roleTypeNote": "Don't worry: you'll be able to create the other type of profile later with this same account.",
     "accessDenied": "Access Denied",
-    "errorInvalidCredentials": "Invalid email or password",
+    "errorInvalidCredentials": "Incorrect email or password",
     "errorEmailInUse": "Email is already in use",
-    "errorConnection": "Connection error. \nMaybe the email or password is wrong, if not, try again later.",
+    "errorConnection": "Server connection error",
     "errorNoProfilesFound": "Error: No associated profiles were found.",
     "errorNotAuthenticated": "You must be logged in to access this page.",
     "errorAuthenticated": "You are already logged in.",
     "successRegistration": "Registration successful! You can now log in.",
     "successLogin": "Login successful!",
-    "whoAreYou": "What do you feel like doing today?"
+    "whoAreYou": "What do you feel like doing today?",
+    "passwordRequired": "Password is required",
+    "emailRequired": "Email is mandatory",
+    "errorUnexpected": "An unexpected error occurred",
+    "errorServer": "Connection error",
+    "invalidEmail": "Enter a valid email format",
+    "errorProfileNameInUse": "Profile name is already in use"
   },
   "account": {
     "name": "Name",
@@ -163,7 +171,9 @@
       "nameRequired": "The profile name is required. \nIt can't be empty",
       "nameTooShort": "The name is too short. \nIt must be greater than 3.",
       "image": "Image URL",
-      "bio": "Literature"
+      "bio": "Literature",
+      "description_TABLETOP": "Create a tabletop profile to participate in traditional role-playing campaigns. This profile will be associated with the characters you create and tabletop campaigns.",
+      "description_WRITTEN": "Create a narrative profile to participate in written role-playing campaigns. This profile will be associated with the characters you create and narrative campaigns."
     }
   },
   "campaign": {
@@ -208,7 +218,9 @@
       "needsCharacter": "You don't have a character associated with this campaign yet.",
       "currentMaxPlayers": "Current Players / Max",
       "successCreate": "Campaign created successfully!",
-      "errorCreate": "There was an error creating the campaign. \nPlease try again later."
+      "errorCreate": "There was an error creating the campaign. \nPlease try again later.",
+      "statusUpdated": "Status updated successfully",
+      "deleted": "This campaign cannot be accessed."
     },
     "detail": {
       "about": "About the Campaign",
@@ -220,7 +232,8 @@
       "joinFull": "Waiting List",
       "contactGM": "Message the GM",
       "infoTitle": "Game Details",
-      "pending": "Request Pending"
+      "pending": "Request Pending",
+      "closed": "Closed"
     },
     "join": {
       "title": "Request to Join Campaign",
@@ -241,10 +254,17 @@
       "kick": "Remove Member",
       "kickConfirmTitle": "Kick Confirmation",
       "kickConfirmDesc1": "You are about to remove ",
-      "kickConfirmDesc2": " from the campaign. This action cannot be undone and the player will have to send a new request if they want to join again."
+      "kickConfirmDesc2": " from the campaign. This action cannot be undone and the player will have to send a new request if they want to join again.",
+      "rejectReasonLabel": "Reason for rejection (optional)",
+      "rejectConfirmTitle": "Reject request",
+      "reasonLabel": "Reason for expulsion (optional)",
+      "rejectConfirmDesc1": "Are you sure you want to reject"
     },
     "roleplay": "live role",
-    "campaigns": "Campaigns"
+    "campaigns": "Campaigns",
+    "errors": {
+      "updateStatus": "Error updating status"
+    }
   },
   "character": {
     "characters": "Characters",
@@ -264,7 +284,7 @@
       "minValue": "Minimum Value (Optional)",
       "maxValue": "Maximum Value (Optional)",
       "cancel": "Cancel editing",
-      "addField": "Add Field",
+      "addField": "Add Short Attribute",
       "updateField": "Update Field",
       "saveTemplate": "Save Template",
       "createTemplate": "Create Template",
@@ -288,7 +308,8 @@
       "errorNoName": "You must give the template a name.",
       "errorLoadCharacter": "Error loading template data.",
       "loadigData": "Loading template data...",
-      "range": "| \nRange:"
+      "range": "| \nRange:",
+      "addLongField": "Add Long Attribute"
     },
     "form": {
       "title": "Create Character",
@@ -325,7 +346,8 @@
     "ongoing": "Ongoing",
     "active": "In progress",
     "break": "at rest",
-    "finished": "Finished"
+    "finished": "Finished",
+    "deleted": "Eliminate"
   },
   "filter": {
     "filter": "Filter",
@@ -351,7 +373,9 @@
       "publishedOn": "Published on",
       "noReplies": "There are no answers yet. \nBe the first to contribute something!",
       "lockedThread": "This thread has been blocked.",
-      "noNewReplies": "New responses are no longer allowed in this debate."
+      "noNewReplies": "New responses are no longer allowed in this debate.",
+      "readOnly": "Reading Mode",
+      "pausedDesc": "The campaign is paused or has ended. \nOnly the Master can add new messages."
     },
     "general": {
       "create": {
@@ -431,7 +455,8 @@
     "yourReply": "Your answer",
     "errors": {
       "fetchReplies": "Error loading responses",
-      "fetchThreads": "Error loading posts"
+      "fetchThreads": "Error loading posts",
+      "fetchThread": "Error loading forum thread."
     }
   },
   "footer": {

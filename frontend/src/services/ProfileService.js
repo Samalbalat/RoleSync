@@ -45,6 +45,17 @@ const profileService = {
         }
     },
 
+    // Obtener los datos de un perfil segun su profilename
+    getProfileByName: async (roleType, profileName) => {
+        try {
+            const response = await api.get(`/rolesync/profile/${roleType}/${profileName}`);
+            return response.data;
+        } catch (error) {
+            console.error("Error fetching profile by name:", error);
+            throw error;
+        }
+    },
+
     // Actualizar datos de la cuenta (email, timeZone, password)
     // updateUserInfo: async (userData) => {
     //     try {
