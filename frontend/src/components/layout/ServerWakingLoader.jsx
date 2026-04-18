@@ -1,25 +1,22 @@
 import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { Typography } from '@material-tailwind/react';
 
-const ServerWakingLoader = ({ isSubmitting }) => {
+const ServerWakingLoader = ({ isLoading }) => {
 	const [isWakingUp, setIsWakingUp] = useState(false);
 
 	useEffect(() => {
 		let timeoutId;
-
-		// Si la petición ha empezado, arrancamos el cronómetro de 7 segundos
-		if (isSubmitting) {
+		if (isLoading) {
 			timeoutId = setTimeout(() => {
 				setIsWakingUp(true);
 			}, 10000);
 		} else {
-			// Si la petición ha terminado (isSubmitting es false), limpiamos todo
 			setIsWakingUp(false);
 			clearTimeout(timeoutId);
 		}
-
 		return () => clearTimeout(timeoutId);
-	}, [isSubmitting]);
+	}, [isLoading]);
 
 	if (!isWakingUp) return null;
 
@@ -36,6 +33,10 @@ const ServerWakingLoader = ({ isSubmitting }) => {
 			<img src='/dice-loading.gif' alt='Dado girando' className='w-16 h-16 mx-auto object-contain' />
 		</div>
 	);
+};
+
+ServerWakingLoader.propTypes = {
+	isLoading: PropTypes.bool.isRequired,
 };
 
 export default ServerWakingLoader;

@@ -7,13 +7,13 @@ import AuthLayout from '../../components/auth/AuthLayout';
 import { useAuth } from '../../utils/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import ServerWakingLoader from '../../components/layout/ServerWakingLoader';
 
 export function LoginPage() {
 	const { t } = useTranslation('global');
 	const { login, setActiveProfile } = useAuth();
 	const navigate = useNavigate();
 
+	// Configuración de react-hook-form
 	const {
 		register,
 		handleSubmit,
@@ -21,7 +21,7 @@ export function LoginPage() {
 	} = useForm();
 
 	const [passwordShown, setPasswordShown] = useState(false);
-
+	// Cambiamos el nombre de error a apiError para diferenciarlo de los errors del formulario
 	const [apiError, setApiError] = useState(null);
 
 	const togglePasswordVisiblity = () => setPasswordShown(cur => !cur);
@@ -185,8 +185,6 @@ export function LoginPage() {
 						{isSubmitting ? <Spinner className='h-5 w-5 mx-auto' /> : t('auth.login')}
 					</Button>
 				</div>
-
-				<ServerWakingLoader isSubmitting={isSubmitting} />
 
 				<Typography variant='small' color='gray' className='!mt-4 text-center font-normal'>
 					{t('auth.notRegistered')}?{' '}
