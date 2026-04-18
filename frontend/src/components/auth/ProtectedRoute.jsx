@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../utils/AuthContext';
 import { Spinner } from '@material-tailwind/react';
+import ServerWakingLoader from '../layout/ServerWakingLoader';
 
 const ProtectedRoute = () => {
 	const { account, activeProfile, loading } = useAuth();
