@@ -300,6 +300,8 @@ public class CharacterSheetController {
                 Campaign campaign = character.get().getCampaign();
                 if(!profileBelongsToCampaign(profileName, campaign)){
                     return ResponseEntity.status(403).body("User is not a member of the campaign");
+                }else{
+                    return ResponseEntity.ok(new CharacterSheetGetOutDTO(character.get()));
                 }
             }else if(!character.get().getOwner().getProfilename().equals(profileName)){
                 String conditionalMessageIfIsTemplate = character.get().getIsTemplate() ? "template" : "character";
