@@ -189,7 +189,7 @@ public class CharacterSheetController {
         }else{
             characterSheet.setCampaign(null);
         }
-        characterSheet.setIsPublic(dto.getIsPublic() != null ? dto.getIsPublic() : false);
+        characterSheet.setIsPublic(dto.getIsPublic() != null ? dto.getIsPublic() : true);
         characterSheet.setName(dto.getName());
         characterSheet.setSchema(dto.getAttributes());
         characterSheet.setImage(dto.getAvatar_url());
