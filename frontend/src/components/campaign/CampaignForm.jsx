@@ -6,8 +6,8 @@ import { useTranslation } from 'react-i18next';
 
 const LIMITS = {
 	NAME: 100,
-	DESCRIPTION: 1000,
-	IMAGE: 1000,
+	DESCRIPTION: 255,
+	IMAGE: 255,
 	SHORT_TEXT: 50,
 	TAG: 30,
 };
@@ -112,7 +112,7 @@ function CampaignForm({ initialValues, onSubmit, loading, theme, campaignType })
 		if (!formData.description.trim()) {
 			errs.description = t('errors.required');
 		} else if (formData.description.length > LIMITS.DESCRIPTION) {
-			errs.description = t('errors.tooLong1000');
+			errs.description = t('errors.tooLong255');
 		}
 
 		return errs;

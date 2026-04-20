@@ -91,7 +91,8 @@
     "fetchCharacter": "The character has not been found.",
     "fetchCharacters": "Error loading characters",
     "maxLength50": "Maximum 50 characters",
-    "maxLength2000": "Maximum 2000 characters"
+    "maxLength2000": "Maximum 2000 characters",
+    "tooLong255": "Cannot exceed 255 characters"
   },
   "auth": {
     "login": "Login",

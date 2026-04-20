@@ -97,7 +97,8 @@
     "fetchCharacter": "No se ha encontrado el personaje.",
     "fetchCharacters": "Error al cargar los personajes",
     "maxLength50": "Máximo 50 caracteres",
-    "maxLength2000": "Máximo 2000 caracteres"
+    "maxLength2000": "Máximo 2000 caracteres",
+    "tooLong255": "No puede exceder los 255 caracteres"
   },
   "auth": {
     "login": "Iniciar Sesión",
