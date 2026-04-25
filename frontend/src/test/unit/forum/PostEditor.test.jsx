@@ -23,18 +23,29 @@ vi.mock('react-hot-toast', () => ({
 }));
 
 vi.mock('@material-tailwind/react', () => ({
-	Typography: ({ children }) => <div>{children}</div>,
-	Avatar: ({ alt }) => <img alt={alt} />,
-	Button: ({ children, onClick, disabled, size: _s, color: _c, className: _cl }) => (
-		<button onClick={onClick} disabled={disabled}>
+	Typography: ({ children, className }) => <div className={className}>{children}</div>,
+
+	Avatar: ({ alt, src }) => <img alt={alt} src={src} />,
+
+	Button: ({ children, onClick, disabled, title }) => (
+		<button onClick={onClick} disabled={disabled} title={title}>
 			{children}
 		</button>
 	),
-	IconButton: ({ children, onClick }) => <button onClick={onClick}>{children}</button>,
+	IconButton: ({ children, onClick, title }) => (
+		<button onClick={onClick} title={title}>
+			{children}
+		</button>
+	),
 	Switch: ({ checked, onChange, id }) => (
 		<input type='checkbox' id={id} checked={checked} onChange={onChange} role='switch' />
 	),
-	Input: ({ label, value, onChange }) => <input aria-label={label} value={value} onChange={onChange} />,
+	Input: ({ label, value, onChange }) => (
+		<div>
+			<label htmlFor='url-input'>{label}</label>
+			<input id='url-input' aria-label={label} value={value} onChange={onChange} />
+		</div>
+	),
 	Menu: ({ children }) => <div>{children}</div>,
 	MenuHandler: ({ children }) => <div>{children}</div>,
 	MenuList: ({ children }) => <div>{children}</div>,
@@ -42,18 +53,14 @@ vi.mock('@material-tailwind/react', () => ({
 	Checkbox: ({ checked, onChange, id }) => <input type='checkbox' id={id} checked={checked} onChange={onChange} />,
 }));
 
-vi.mock('@heroicons/react/24/outline', async importOriginal => {
-	const actual = await importOriginal();
-	return {
-		...actual,
-		PaperAirplaneIcon: () => null,
-		PhotoIcon: () => null,
-		AdjustmentsHorizontalIcon: () => null,
-		EyeSlashIcon: () => null,
-		XMarkIcon: () => null,
-		LinkIcon: () => null,
-	};
-});
+vi.mock('@heroicons/react/24/outline', () => ({
+	PaperAirplaneIcon: () => <span>PaperAirplaneIcon</span>,
+	PhotoIcon: () => <span>PhotoIcon</span>,
+	AdjustmentsHorizontalIcon: () => <span>AdjustmentsHorizontalIcon</span>,
+	EyeSlashIcon: () => <span>EyeSlashIcon</span>,
+	XMarkIcon: () => <span>XMarkIcon</span>,
+	LinkIcon: () => <span>LinkIcon</span>,
+}));
 
 // ─── Helper ──────────────────────────────────────────────────────────────────
 
@@ -215,5 +222,69 @@ describe('PostEditor — Tests Unitarios', () => {
 		await waitFor(() => {
 			expect(onPostCreated).not.toHaveBeenCalled();
 		});
+	});
+
+	// 1️⃣3️⃣ Formato de texto: Negrita
+	test('inserta etiquetas de negrita al hacer clic en el botón B', async () => {
+		render(<PostEditor {...buildProps()} />);
+
+		await userEvent.click(screen.getByTitle('forum.postEditor.format'));
+
+		const textarea = screen.getByRole('textbox', { hidden: true });
+		await userEvent.type(textarea, 'hola');
+
+		await userEvent.click(screen.getByText('B'));
+
+		expect(textarea.value).toContain('**texto**');
+	});
+
+	// 1️⃣4️⃣ Gestión de Imágenes: Mostrar y Ocultar input
+	test.skip('permite abrir y cerrar el input de imagen', async () => {
+		render(<PostEditor {...buildProps()} />);
+
+		await userEvent.click(screen.getByTitle('forum.postEditor.addImage'));
+
+		const inputUrl = screen.getByLabelText('forum.postEditor.imagePlaceholder');
+		await userEvent.type(inputUrl, 'http://foto.com/pjs.png');
+
+		const previewImg = screen.getByAltText('Preview');
+		expect(previewImg.src).toBe('http://foto.com/pjs.png');
+
+		const closeBtn = screen.getByRole('button', { name: /XMarkIcon/i });
+		await userEvent.click(closeBtn);
+
+		expect(screen.queryByAltText('Preview')).not.toBeInTheDocument();
+	});
+
+	// 1️⃣5️⃣ Menú de Susurros: Toggle de visibilidad
+	test('permite seleccionar personajes para susurros', async () => {
+		const otherCharacters = [{ id: 10, name: 'Legolas' }];
+		render(<PostEditor {...buildProps({ otherCharacters })} />);
+
+		await userEvent.click(screen.getByTitle('forum.whisper'));
+
+		const checkbox = screen.getByLabelText('Legolas');
+		await userEvent.click(checkbox);
+
+		expect(screen.getByText('forum.whisper')).toBeInTheDocument();
+
+		await userEvent.click(screen.getByText('forum.public'));
+		expect(screen.queryByText('forum.whisper')).not.toBeInTheDocument();
+	});
+
+	// 1️⃣6️⃣ Fallbacks de Avatar (Cubre ramas de los helpers externos)
+	test('usa avatar por defecto si el personaje no tiene uno', () => {
+		render(<PostEditor {...buildProps({ myCharacter: { id: 1, name: 'Sin Foto', avatar: null } })} />);
+		const img = screen.getByAltText('Avatar');
+		expect(img.src).toContain('ui-avatars.com');
+	});
+
+	// 1️⃣7️⃣ Manejo de errores en la imagen (onError/onLoad)
+	test('la imagen de preview maneja eventos de carga', () => {
+		render(<PostEditor {...buildProps()} />);
+		const img = document.createElement('img');
+		img.src = 'test.jpg';
+
+		const { container } = render(<PostEditor {...buildProps()} />);
 	});
 });

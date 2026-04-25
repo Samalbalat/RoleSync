@@ -15,6 +15,13 @@ export default defineConfig({
     globals: true,          
     environment: 'jsdom',   
     setupFiles: './src/test/setup.js',  
-    css: true,              
+    css: true,
+    coverage: {
+      exclude: [
+        'src/test/mocks/**', 
+        'node_modules/**',
+        'dist/**'
+      ]
+    },              
   },
 })

@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { vi } from 'vitest';
+import { vi, describe, test, expect, beforeEach, afterEach } from 'vitest';
 import { ProfileDetailsPage } from '../../../pages/profile/ProfileDetailsPage';
 import profileService from '../../../services/ProfileService';
 import campaignService from '../../../services/CampaignService';
@@ -59,7 +59,15 @@ vi.mock('../../../components/profile/EditProfileModal', () => ({
 	EditProfileModal: ({ open, onSave }) =>
 		open ? (
 			<div role='dialog' data-testid='edit-profile-modal'>
-				<button onClick={() => onSave({ profileName: 'AlexModificado', description: '', image: '' })}>common.save</button>
+				<button
+					onClick={async () => {
+						try {
+							await onSave({ profileName: 'AlexModificado', description: '', image: '' });
+						} catch (e) {}
+					}}
+				>
+					common.save
+				</button>
 			</div>
 		) : null,
 }));
@@ -68,7 +76,15 @@ vi.mock('../../../components/profile/CreateProfileModal', () => ({
 	CreateProfileModal: ({ open, onCreate }) =>
 		open ? (
 			<div role='dialog' data-testid='create-profile-modal'>
-				<button onClick={() => onCreate({ profileName: 'NuevoPerfil' })}>common.create</button>
+				<button
+					onClick={async () => {
+						try {
+							await onCreate({ profileName: 'NuevoPerfil' });
+						} catch (e) {}
+					}}
+				>
+					common.create
+				</button>
 			</div>
 		) : null,
 }));
@@ -84,18 +100,26 @@ vi.mock('../../../components/profile/ProfileCampaignList', () => ({
 }));
 
 vi.mock('../../../components/profile/ProfileCharacterList', () => ({
-	ProfileCharacterList: ({ characters }) => (
+	ProfileCharacterList: ({ characters, onCharacterClick }) => (
 		<div data-testid='character-list'>
 			{characters.map(c => (
-				<div key={c.id}>{c.name}</div>
+				<button key={c.id} onClick={() => onCharacterClick(c.id)}>
+					{c.name}
+				</button>
 			))}
 		</div>
 	),
 }));
 
 vi.mock('../../../components/character/CharacterDetailDialog', () => ({
-	default: () => null,
+	default: ({ open, characterId }) => (open ? <div data-testid='character-dialog'>Character {characterId}</div> : null),
 }));
+
+// Mockear window.location.reload para que no rompa el entorno de tests
+Object.defineProperty(window, 'location', {
+	configurable: true,
+	value: { reload: vi.fn() },
+});
 
 vi.mock('@material-tailwind/react', () => ({
 	Typography: ({ children }) => <div>{children}</div>,
@@ -305,5 +329,133 @@ describe('ProfileDetailsPage — Tests de Integración', () => {
 
 		await waitFor(() => screen.getAllByText('AlexTable'));
 		expect(screen.queryByText(/profile.createType/i)).not.toBeInTheDocument();
+	});
+
+	// 1️⃣1️⃣  Abrir detalle del personaje
+	test('abre el modal de detalle de personaje al hacer click en uno', async () => {
+		setupMocks();
+		renderPage();
+
+		await waitFor(() => screen.getByTestId('character-list'));
+
+		// Hacemos clic en el personaje
+		await userEvent.click(screen.getByText('Arador el Valiente'));
+
+		// Comprobamos que el diálogo se abre con el ID correcto (10)
+		expect(screen.getByTestId('character-dialog')).toBeInTheDocument();
+		expect(screen.getByText('Character 10')).toBeInTheDocument();
+	});
+
+	// 1️⃣2️⃣  Cambiar de perfil (Switch Profile)
+	test('cambia el perfil activo y recarga la página al hacer click en otro perfil', async () => {
+		setupMocks();
+		// Le damos dos perfiles, uno activo y otro inactivo
+		profileService.getUserInfo.mockResolvedValue({
+			...mockUserData,
+			profiles: [
+				{ id: 1, profileName: 'AlexTable', roleType: 'TABLETOP', image: null },
+				{ id: 2, profileName: 'AlexNarrative', roleType: 'WRITTEN', image: null },
+			],
+		});
+		// Preparamos el localStorage con los datos completos
+		localStorage.setItem(
+			'availableProfiles',
+			JSON.stringify([
+				{ email: 'alex@email.com', profileName: 'AlexTable', roleType: 'TABLETOP' },
+				{ email: 'alex@email.com', profileName: 'AlexNarrative', roleType: 'WRITTEN' },
+			]),
+		);
+
+		renderPage();
+
+		await waitFor(() => screen.getByText('AlexNarrative'));
+
+		// Hacemos clic en el perfil inactivo
+		await userEvent.click(screen.getByText('AlexNarrative'));
+
+		// Verificamos que se guardó en localStorage y se llamó a reload
+		const newActive = JSON.parse(localStorage.getItem('activeProfile'));
+		expect(newActive.name).toBe('AlexNarrative');
+		expect(window.location.reload).toHaveBeenCalled();
+	});
+
+	// 1️⃣3️⃣  Crear nuevo perfil
+	test('llama a createProfile y recarga al crear un nuevo perfil', async () => {
+		setupMocks();
+		profileService.createProfile.mockResolvedValue({ id: 3, profileName: 'NuevoPerfil', roleType: 'WRITTEN' });
+
+		renderPage();
+		await waitFor(() => {
+			expect(screen.getByText(/profile.createType/i)).toBeInTheDocument();
+		});
+		await userEvent.click(screen.getByText(/profile.createType/i));
+
+		expect(screen.getByTestId('create-profile-modal')).toBeInTheDocument();
+		await userEvent.click(screen.getByRole('button', { name: /common.create/i }));
+
+		await waitFor(() => {
+			expect(profileService.createProfile).toHaveBeenCalled();
+		});
+
+		await waitFor(
+			() => {
+				expect(window.location.reload).toHaveBeenCalled();
+			},
+			{ timeout: 3000 },
+		);
+	});
+
+	// 1️⃣4️⃣  Mensaje cuando no hay campañas
+	test('muestra mensaje de vacío cuando no hay campañas en ningún rol', async () => {
+		setupMocks();
+		// Simulamos que no tiene campañas
+		campaignService.getMyCampaigns.mockResolvedValue({ asMaster: [], asPlayer: [] });
+
+		renderPage();
+
+		await waitFor(() => {
+			expect(screen.getByText('profile.noCampaigns')).toBeInTheDocument();
+		});
+	});
+
+	// 1️⃣5️⃣  Manejo de Error al Guardar Perfil
+	test('muestra toast de error si falla la actualización del perfil', async () => {
+		setupMocks();
+
+		profileService.updateProfile.mockImplementation(() => Promise.reject(new Error('API Down')));
+
+		const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+		const toast = await import('react-hot-toast');
+
+		renderPage();
+
+		await waitFor(() => screen.getAllByText('AlexTable'));
+
+		await userEvent.click(screen.getByRole('button', { name: /profile.edit.button/i }));
+		await userEvent.click(screen.getByRole('button', { name: /common.save/i }));
+
+		await waitFor(() => {
+			expect(toast.default.error).toHaveBeenCalledWith('profile.edit.saveError');
+		});
+
+		consoleSpy.mockRestore();
+	});
+
+	// 1️⃣6️⃣  Manejo de Error al Cargar Datos Principales
+	test('maneja errores en el fetchAllData silenciosamente', async () => {
+		useAuth.mockReturnValue({ activeProfile, setActiveProfile: vi.fn() });
+		// Rompemos el fetch de la API intencionalmente
+		profileService.getProfile.mockRejectedValue(new Error('Fallo crítico'));
+
+		// Espiamos console.error para que no ensucie la terminal y comprobamos que se llama
+		const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+		renderPage();
+
+		await waitFor(() => {
+			expect(consoleSpy).toHaveBeenCalledWith('Error cargando datos del perfil', expect.any(Error));
+		});
+
+		consoleSpy.mockRestore();
 	});
 });
