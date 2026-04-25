@@ -10,7 +10,6 @@ vi.mock('../../../services/CharacterService', () => ({
 	default: { getCharacterById: vi.fn() },
 }));
 
-// 🔥 FIX: Creamos una referencia estable para 't' y evitamos el bucle infinito
 const mockT = key => key;
 vi.mock('react-i18next', () => ({
 	useTranslation: () => ({ t: mockT }),
