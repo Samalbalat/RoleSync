@@ -15,9 +15,16 @@ import { TrashIcon, PlusIcon, PencilIcon, CheckIcon, XMarkIcon } from '@heroicon
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { validateMinMax, validateRequired } from '../../utils/validators';
 import { getTheme } from '../../utils/themeUtils';
 import CharacterService from '../../services/CharacterService';
+import {
+	generateInternalKey,
+	validateField,
+	buildTemplatePayload,
+	mapBackendSchemaToFields,
+	rangeMin,
+	rangeMax,
+} from '../../utils/character/templateBuilderUtils';
 
 export default function TemplateBuilder() {
 	const { t } = useTranslation('global');
@@ -61,17 +68,10 @@ export default function TemplateBuilder() {
 					setTemplateName(data.name || '');
 
 					// Mapeamos los atributos del backend a nuestro formato del frontend
-					if (data.schema && data.schema.length > 0) {
-						const mappedFields = data.schema.map(attr => ({
-							key: attr.key,
-							label: attr.label,
-							type: attr.type,
-							// Si el backend te devuelve required, min y max, los usamos. Si no, valores por defecto.
-							required: attr.required || false,
-							min: attr.min ?? '',
-							max: attr.max ?? '',
-						}));
-						setFields(mappedFields);
+					if (Array.isArray(data?.schema)) {
+						setFields(mapBackendSchemaToFields(data.schema));
+					} else {
+						setFields([]);
 					}
 				} catch (error) {
 					console.error('Error al cargar la plantilla:', error);
@@ -85,18 +85,6 @@ export default function TemplateBuilder() {
 		}
 	}, [templateId, isEditMode, t]);
 
-	const generateInternalKey = label => {
-		const cleanLabel = label
-			.toLowerCase()
-			.normalize('NFD')
-			.replaceAll(/[\u0300-\u036f]/g, '')
-			.replaceAll(/\s+/g, '_')
-			.replaceAll(/[^a-z0-9_]/g, '');
-
-		const randomSuffix = Math.random().toString(36).substring(2, 6);
-		return `${cleanLabel}_${randomSuffix}`;
-	};
-
 	const handleChange = (name, value) => {
 		const allowedKeys = ['label', 'type', 'required', 'min', 'max'];
 		if (!allowedKeys.includes(name)) return;
@@ -109,16 +97,10 @@ export default function TemplateBuilder() {
 	};
 
 	const saveField = () => {
-		const labelError = validateRequired(currentField.label);
-		const minMaxError = validateMinMax(currentField.min, currentField.max);
+		const validationErrors = validateField(currentField);
 
-		if (labelError) {
-			setErrors({ label: labelError });
-			return;
-		}
-
-		if (minMaxError) {
-			setErrors({ minMax: minMaxError });
+		if (validationErrors) {
+			setErrors(validationErrors);
 			return;
 		}
 
@@ -178,22 +160,13 @@ export default function TemplateBuilder() {
 			return;
 		}
 
-		const mappedAttributes = fields.map(field => ({
-			key: field.key,
-			label: field.label,
-			type: field.type,
-			required: field.required,
-			min: field.min,
-			max: field.max,
-		}));
-
-		const payload = {
-			name: templateName,
-			avatar_url: '',
-			campaign_id: Number(campaignId),
-			template_id: isEditMode ? Number(templateId) : null,
-			attributes: mappedAttributes,
-		};
+		const payload = buildTemplatePayload({
+			fields,
+			templateName,
+			campaignId,
+			templateId,
+			isEditMode,
+		});
 
 		try {
 			// --- DECISIÓN: ¿CREAR O ACTUALIZAR? ---
@@ -224,8 +197,6 @@ export default function TemplateBuilder() {
 			</div>
 		);
 	}
-	const rangeMin = field => (field.min !== '' && field.min !== null ? field.min : '-');
-	const rangeMax = field => (field.max !== '' && field.max !== null ? field.max : '-');
 
 	return (
 		<div className='w-full max-w-4xl mx-auto p-4 space-y-6'>
@@ -241,10 +212,12 @@ export default function TemplateBuilder() {
 			<Card className='w-full shadow-sm border border-blue-gray-100'>
 				<CardBody>
 					<Input
+						id='templateName'
 						label={t('character.templateBuilder.templateName')}
 						value={templateName}
 						onChange={e => setTemplateName(e.target.value)}
 						required
+						aria-label={t('character.templateBuilder.templateName')}
 					/>
 				</CardBody>
 			</Card>
@@ -313,14 +286,21 @@ export default function TemplateBuilder() {
 					{/* INPUT DEL NOMBRE CON MANEJO DE ERRORES */}
 					<div className='grid grid-cols-1 md:grid-cols-2 gap-4 items-center'>
 						<Input
+							id='fieldName'
 							label={t('character.templateBuilder.nameField')}
 							value={currentField.label}
 							onChange={e => handleChange('label', e.target.value)}
 							error={!!errors.label}
+							aria-label={t('character.templateBuilder.nameField')}
 						/>
 						{errors.label && (
 							<Typography variant='small' color='red' className='mt-1 flex items-center gap-1 font-normal'>
 								<span className='font-medium'>{t(errors.label)}</span>
+							</Typography>
+						)}
+						{errors.minMax && (
+							<Typography variant='small' color='red' className='mt-1 flex items-center gap-1 font-normal'>
+								<span className='font-medium'>{t(errors.minMax)}</span>
 							</Typography>
 						)}
 						<div className='w-full'>

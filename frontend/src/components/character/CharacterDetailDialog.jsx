@@ -11,9 +11,10 @@ import {
 	Spinner,
 } from '@material-tailwind/react';
 import { useTranslation } from 'react-i18next';
+import toast from 'react-hot-toast';
 import { getTheme } from '../../utils/themeUtils';
 import CharacterService from '../../services/CharacterService';
-import toast from 'react-hot-toast';
+import { parseCharacterFields, getDisplayValue, buildAvatarFallback } from '../../utils/character/characterDetailUtils';
 
 // --- SUBCOMPONENTE DE CARGA ---
 const LoadingContent = ({ theme, t }) => (
@@ -27,13 +28,13 @@ const LoadingContent = ({ theme, t }) => (
 const CharacterHeader = ({ character, theme, t }) => (
 	<DialogHeader className={`flex items-center gap-4 border-b border-gray-200 ${theme.bgLight} p-4 rounded-t-lg`}>
 		<Avatar
-			src={character.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(character.name)}&background=random`}
+			src={character.image || buildAvatarFallback(character.name)}
 			alt={character.name}
 			size='xl'
 			className={`border-2 ${theme.textPrimary} shadow-sm`}
 			onError={e => {
 				e.target.onerror = null;
-				e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(character.name)}&background=random`;
+				e.target.src = buildAvatarFallback(character.name);
 			}}
 		/>
 		<div>
@@ -49,34 +50,7 @@ const CharacterHeader = ({ character, theme, t }) => (
 
 // --- SUBCOMPONENTE DEL BODY ---
 const CharacterBody = ({ character, theme, t }) => {
-	let history = null;
-	let description = null;
-	let standardAttributes = [];
-
-	// Ahora leemos el array 'schema' que nos devuelve el backend
-	const characterFields = character.schema || [];
-
-	characterFields.forEach(attr => {
-		const label = attr.label || attr.key;
-		const val = attr.value;
-		const labelLower = label.toLowerCase();
-
-		if (['historia', 'history'].includes(labelLower)) {
-			history = val;
-		} else if (['descripción', 'description', 'descripcion'].includes(labelLower)) {
-			description = val;
-		} else {
-			standardAttributes.push({ key: label, value: val });
-		}
-	});
-
-	const getDisplayValue = value => {
-		if (typeof value === 'boolean') {
-			return value ? t('common.yes') : t('common.no');
-		}
-		// Si el valor está vacío, mostramos un guion para que no quede el hueco en blanco
-		return value !== null && value !== undefined && value !== '' ? value : '-';
-	};
+	const { history, description, standardAttributes } = parseCharacterFields(character.schema);
 
 	return (
 		<DialogBody className='h-[25rem] overflow-y-auto'>
@@ -118,8 +92,13 @@ const CharacterBody = ({ character, theme, t }) => {
 								>
 									{attr.key}
 								</Typography>
-								<Typography variant='h5' color={theme.primary} className='truncate px-2' title={getDisplayValue(attr.value)}>
-									{getDisplayValue(attr.value)}
+								<Typography
+									variant='h5'
+									color={theme.primary}
+									className='truncate px-2'
+									title={getDisplayValue(attr.value, t)}
+								>
+									{getDisplayValue(attr.value, t)}
 								</Typography>
 							</div>
 						))}

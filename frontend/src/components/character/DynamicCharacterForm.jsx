@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Card, CardBody, Typography, Input, Textarea, Button, Checkbox } from '@material-tailwind/react';
+import { Card, CardBody, Typography, Input, Textarea, Button, Checkbox, Spinner } from '@material-tailwind/react';
 import { useTranslation } from 'react-i18next';
 import { getTheme } from '../../utils/themeUtils';
 import CharacterService from '../../services/CharacterService';
+import { buildCharacterPayload } from '../../utils/character/dynamicCharacterFormUtils';
 
 export default function DynamicCharacterForm({ templateData }) {
 	const { t } = useTranslation('global');
@@ -26,61 +27,23 @@ export default function DynamicCharacterForm({ templateData }) {
 		);
 	}
 
-	DynamicCharacterForm.propTypes = {
-		templateData: PropTypes.shape({
-			id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-			campaign_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-			schema_definition: PropTypes.arrayOf(
-				PropTypes.shape({
-					key: PropTypes.string.isRequired,
-					label: PropTypes.string.isRequired,
-					type: PropTypes.string.isRequired,
-					required: PropTypes.bool,
-					min: PropTypes.number,
-					max: PropTypes.number,
-				}),
-			),
-		}),
-	};
-
 	const { id: template_id, campaign_id, schema_definition } = templateData;
 
 	const onSubmit = async data => {
-		const userAttributes = data.attributes || {};
-
-		const formattedAttributes = schema_definition.map(field => {
-			let val = userAttributes[field.key];
-
-			if (field.type === 'number' && Number.isNaN(val)) {
-				val = null;
-			} else if (field.type === 'boolean' && val === undefined) {
-				val = false;
-			} else if (val === undefined) {
-				val = '';
-			}
-
-			return {
-				key: field.key,
-				label: field.label,
-				type: field.type,
-				required: !!field.required,
-				min: field.min || 0,
-				max: field.max || 0,
-				value: val,
-			};
+		const payload = buildCharacterPayload({
+			data,
+			templateData,
 		});
-
-		const payload = {
-			name: data.name,
-			avatar_url: data.avatar_url || '',
-			campaign_id: Number(campaign_id),
-			template_id: Number(template_id),
-			attributes: formattedAttributes,
-		};
 
 		try {
 			await CharacterService.createCharacter(payload);
-			toast.success(t('character.message.successCreating', { name: data.name }));
+
+			toast.success(
+				t('character.message.successCreating', {
+					name: data.name,
+				}),
+			);
+
 			setTimeout(() => navigate(`/campaign/${campaign_id}`), 1500);
 		} catch (error) {
 			console.error('Error al crear personaje:', error);
@@ -225,3 +188,20 @@ export default function DynamicCharacterForm({ templateData }) {
 		</div>
 	);
 }
+
+DynamicCharacterForm.propTypes = {
+	templateData: PropTypes.shape({
+		id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+		campaign_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+		schema_definition: PropTypes.arrayOf(
+			PropTypes.shape({
+				key: PropTypes.string.isRequired,
+				label: PropTypes.string.isRequired,
+				type: PropTypes.string.isRequired,
+				required: PropTypes.bool,
+				min: PropTypes.number,
+				max: PropTypes.number,
+			}),
+		),
+	}),
+};
