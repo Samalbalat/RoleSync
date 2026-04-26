@@ -1,7 +1,7 @@
 # RoleSync
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/bcbf6c4efeb34c26922f12e2b272f23f)](https://app.codacy.com/gh/Samalbalat/RoleSync/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
-Pretendemos crear una aplicación que facilite la coordinación para los juegos de rol de mesa y la comunicación para el rol realizado en escrito
+Pretendemos crear una aplicación que facilite la coordinación para los juegos de rol de mesa y la comunicación para el rol escrito
 
 ## Lenguaje
 Este es un projecto Java (JDK 21), podéis descargar la versión [aquí](https://www.oracle.com/java/technologies/downloads/#jdk21-windows), la usaremos principalmente al ser la versión LTS más reciente.
