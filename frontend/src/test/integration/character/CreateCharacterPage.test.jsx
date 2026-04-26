@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { vi } from 'vitest';
+import { vi, test, describe, expect, beforeEach } from 'vitest';
 import CreateCharacterPage from '../../../pages/character/CreateCharacterPage';
 import CharacterService from '../../../services/CharacterService';
 

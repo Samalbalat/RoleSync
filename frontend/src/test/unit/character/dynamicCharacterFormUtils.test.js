@@ -4,6 +4,7 @@ import {
 	formatDynamicAttributes,
 	buildCharacterPayload,
 } from '../../../utils/character/dynamicCharacterFormUtils';
+import { test, describe, expect } from 'vitest';
 
 describe('dynamicCharacterFormUtils', () => {
 	test('normalizeAttributeValue devuelve null para NaN numérico', () => {

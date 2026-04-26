@@ -1,6 +1,7 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { vi } from 'vitest';
+import { vi, test, describe, expect, beforeEach } from 'vitest';
+import { toast } from 'react-hot-toast';
 import CreateGeneralPost from '../../../components/forum/CreateGeneralPost';
 import ForumService from '../../../services/ForumService';
 
@@ -131,7 +132,6 @@ describe('CreateGeneralPost — Tests Unitarios', () => {
 
 		await userEvent.type(screen.getByRole('textbox', { name: /forum.general.create.title/i }), 'Mi primer hilo de rol');
 
-		// Usamos directamente getByPlaceholderText para evitar que getByRole rompa el test
 		await userEvent.type(
 			screen.getByPlaceholderText('forum.general.create.contentPlaceholder'),
 			'Este es el contenido del hilo con más de diez caracteres.',
@@ -151,5 +151,113 @@ describe('CreateGeneralPost — Tests Unitarios', () => {
 		renderModal();
 		await userEvent.click(screen.getByRole('button', { name: /common.cancel/i }));
 		expect(handleClose).toHaveBeenCalledOnce();
+	});
+
+	// 8️⃣ Mostrar/Ocultar menús de formato e imagen
+	test('despliega los menús de formato y de añadir imagen al hacer clic', async () => {
+		renderModal();
+
+		const formatBtn = screen.getByRole('button', { name: /Formato/i });
+		await userEvent.click(formatBtn);
+		expect(screen.getByRole('button', { name: 'B' })).toBeInTheDocument();
+
+		const imageBtn = screen.getByRole('button', { name: /forum.general.create.addImage/i });
+		await userEvent.click(imageBtn);
+		expect(screen.getByRole('textbox', { name: /forum.general.create.imageUrl/i })).toBeInTheDocument();
+	});
+
+	// 9️⃣ Insertar formato Markdown
+	test('inserta las etiquetas markdown correctas en el textarea', async () => {
+		renderModal();
+		await userEvent.click(screen.getByRole('button', { name: /Formato/i }));
+
+		const textarea = screen.getByPlaceholderText('forum.general.create.contentPlaceholder');
+
+		// Negrita
+		await userEvent.click(screen.getByRole('button', { name: 'B' }));
+		expect(textarea.value).toBe('**texto**');
+		await userEvent.clear(textarea);
+
+		// Cursiva
+		await userEvent.click(screen.getByRole('button', { name: 'I' }));
+		expect(textarea.value).toBe('*texto*');
+		await userEvent.clear(textarea);
+
+		// Tachado
+		await userEvent.click(screen.getByRole('button', { name: 'S' }));
+		expect(textarea.value).toBe('~~texto~~');
+		await userEvent.clear(textarea);
+
+		// Cita
+		await userEvent.click(screen.getByRole('button', { name: /forum.quote/i }));
+		expect(textarea.value).toBe('> texto');
+	});
+
+	// 🔟 Manejar imagen (Previsualización, onLoad, onError y Limpiar)
+	test('maneja el input de imagen, sus eventos de carga/error y permite borrarla', async () => {
+		renderModal();
+		await userEvent.click(screen.getByRole('button', { name: /forum.general.create.addImage/i }));
+
+		const inputImage = screen.getByRole('textbox', { name: /forum.general.create.imageUrl/i });
+		await userEvent.type(inputImage, 'http://ejemplo.com/foto.jpg');
+
+		const img = await screen.findByAltText('Preview');
+		expect(img).toBeInTheDocument();
+
+		fireEvent.load(img);
+		expect(img.style.display).toBe('block');
+
+		fireEvent.error(img);
+		expect(img.style.display).toBe('none');
+		expect(toast.error).toHaveBeenCalledWith('forum.general.create.invalidImageUrl');
+
+		const clearIcons = screen.getAllByTestId('x-icon');
+		const clearBtn = clearIcons[clearIcons.length - 1].closest('button');
+		await userEvent.click(clearBtn);
+
+		await waitFor(() => {
+			expect(screen.queryByAltText('Preview')).not.toBeInTheDocument();
+		});
+	});
+
+	// 1️⃣1️⃣ Error en el envío (Catch)
+	test('muestra toast de error si la creación del hilo falla en el servicio', async () => {
+		const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+		ForumService.createGeneralThread.mockRejectedValue(new Error('API Error'));
+
+		renderModal();
+
+		await userEvent.type(screen.getByRole('textbox', { name: /forum.general.create.title/i }), 'Mi primer hilo');
+		await userEvent.type(
+			screen.getByPlaceholderText('forum.general.create.contentPlaceholder'),
+			'Contenido lo suficientemente largo para validar',
+		);
+
+		await userEvent.click(screen.getByRole('button', { name: /forum.general.create.submit/i }));
+
+		await waitFor(() => {
+			expect(toast.error).toHaveBeenCalledWith('forum.general.create.error');
+		});
+
+		consoleSpy.mockRestore();
+	});
+
+	// 1️⃣2️⃣ Envío exitoso sin prop onSuccess definida
+	test('no rompe la aplicación si se envía el formulario y onSuccess no está definido', async () => {
+		ForumService.createGeneralThread.mockResolvedValue({ id: 100 });
+
+		render(<CreateGeneralPost open={true} handleClose={handleClose} />);
+
+		await userEvent.type(screen.getByRole('textbox', { name: /forum.general.create.title/i }), 'Mi primer hilo');
+		await userEvent.type(
+			screen.getByPlaceholderText('forum.general.create.contentPlaceholder'),
+			'Contenido de prueba muy interesante',
+		);
+
+		await userEvent.click(screen.getByRole('button', { name: /forum.general.create.submit/i }));
+
+		await waitFor(() => {
+			expect(handleClose).toHaveBeenCalledOnce();
+		});
 	});
 });

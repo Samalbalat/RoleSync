@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { vi } from 'vitest';
+import { vi, test, describe, expect, beforeEach, afterEach } from 'vitest';
 import ThreadDetailPage from '../../../pages/forum/ThreadDetailPage';
 import ForumService from '../../../services/ForumService';
 

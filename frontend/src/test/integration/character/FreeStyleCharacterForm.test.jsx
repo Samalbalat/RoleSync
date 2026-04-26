@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { vi } from 'vitest';
+import { vi, test, describe, expect, beforeEach } from 'vitest';
 import toast from 'react-hot-toast';
 import FreeStyleCharacterForm from '../../../components/character/FreeStyleCharacterForm';
 import CharacterService from '../../../services/CharacterService';

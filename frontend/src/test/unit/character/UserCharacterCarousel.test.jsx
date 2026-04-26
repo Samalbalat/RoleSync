@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { vi } from 'vitest';
+import { vi, test, describe, expect, beforeEach } from 'vitest';
 import UserCharacterCarousel from '../../../components/character/UserCharacterCarousel';
 import CharacterService from '../../../services/CharacterService';
 

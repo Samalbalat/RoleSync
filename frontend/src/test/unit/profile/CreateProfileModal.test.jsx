@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { vi } from 'vitest';
+import { vi, test, describe, expect, beforeEach } from 'vitest';
 import { CreateProfileModal } from '../../../components/profile/CreateProfileModal';
 
 // ─── Mocks ───────────────────────────────────────────────────────────────────

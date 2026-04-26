@@ -6,6 +6,7 @@ import {
 	rangeMax,
 	validateField,
 } from '../../../utils/character/templateBuilderUtils';
+import { vi, test, describe, expect, beforeAll } from 'vitest';
 
 describe('templateBuilderUtils', () => {
 	beforeAll(() => {

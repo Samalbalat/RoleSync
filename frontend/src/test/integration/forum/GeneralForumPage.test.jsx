@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { vi } from 'vitest';
+import { vi, test, describe, expect, beforeEach } from 'vitest';
 import GeneralForumPage from '../../../pages/forum/GeneralForumPage';
 import ForumService from '../../../services/ForumService';
 

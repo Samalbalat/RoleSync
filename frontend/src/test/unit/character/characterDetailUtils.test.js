@@ -3,6 +3,7 @@ import {
 	getDisplayValue,
 	buildAvatarFallback,
 } from '../../../utils/character/characterDetailUtils';
+import { test, describe, expect } from 'vitest';
 
 describe('characterDetailUtils', () => {
 

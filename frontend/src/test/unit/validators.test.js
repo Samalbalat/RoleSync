@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { validateEmail, validatePassword, validateRequired, validateMinMax } from '../../utils/validators'; // Ajusta la ruta si es necesario
+import { validateEmail, validatePassword, validateRequired, validateMinMax } from '../../utils/validators'; 
 
 describe('Validators Utilities', () => {
     

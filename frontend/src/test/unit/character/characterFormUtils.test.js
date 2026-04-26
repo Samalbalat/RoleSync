@@ -2,6 +2,7 @@ import {
 	buildSafeKey,
 	formatAttributes
 } from '../../../utils/character/characterFormUtils';
+import { test, describe, expect } from 'vitest';
 
 describe('characterFormUtils',()=>{
 
