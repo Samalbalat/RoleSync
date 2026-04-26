@@ -31,6 +31,8 @@ import CharacterService from '../../services/CharacterService';
 import CampaignMembersManager from '../../components/campaign/detail/CampaignMembersManager';
 import CampaignTimeline from '../../components/forum/CampaignTimeline';
 import ProfileDetailModal from '../../components/profile/ProfileDetailModal';
+import ReviewList from '../../components/reviews/ReviewList';
+import StarRatingBadge from '../../components/reviews/StarRatingBadge';
 
 export default function CampaignDetailPage() {
 	const { t } = useTranslation('global');
@@ -194,6 +196,13 @@ export default function CampaignDetailPage() {
 							<Typography variant='h6' color='blue-gray'>
 								{campaign.owner?.profileName}
 							</Typography>
+							<div className='mt-1'>
+								<StarRatingBadge
+									averageRating={4.9} // TODO: Datos reales
+									totalReviews={42} // TODO: Datos reales
+									size='sm'
+								/>
+							</div>
 						</div>
 					</CardBody>
 				</Card>
@@ -224,15 +233,26 @@ export default function CampaignDetailPage() {
 		className: theme?.textPrimary,
 	};
 
+	const reviewsTab = {
+		label: t('campaign.reviews', 'Reseñas'), // Añade la key a tu global.json cuando puedas
+		value: 'reviews',
+		content: (
+			<div className='pt-4'>
+				<ReviewList targetId={id} targetType='CAMPAIGN' />
+			</div>
+		),
+		className: theme?.textPrimary,
+	};
+
 	let tabsData = [];
 	let defaultTabValue = 'info';
 
 	if (hasForum) {
-		tabsData = [infoTab, roleplayTab];
+		tabsData = [infoTab, roleplayTab, reviewsTab];
 		defaultTabValue = 'roleplay';
 	} else {
 		// Si es un visitante o aún no tiene ficha, primero la Info
-		tabsData = [infoTab];
+		tabsData = [infoTab, reviewsTab];
 	}
 	const campaignStatus = () => {
 		if (campaign.status === 'OPEN') {
@@ -296,9 +316,22 @@ export default function CampaignDetailPage() {
 									variant='filled'
 								/>
 							</div>
-							<Typography variant='h2' color='white' className='font-bold text-3xl md:text-4xl'>
-								{campaign.name}
-							</Typography>
+							{/* Contenedor del título y las estrellas */}
+							<div className='flex flex-col md:flex-row md:items-end gap-3 md:gap-6'>
+								<Typography variant='h2' color='white' className='font-bold text-3xl md:text-4xl'>
+									{campaign.name}
+								</Typography>
+
+								{/* Aquí integramos las estrellas con un fondo difuminado para que resalten */}
+								<div className='bg-black/50 backdrop-blur-sm px-4 py-1.5 rounded-full mb-1 w-fit'>
+									<StarRatingBadge
+										averageRating={4.5} // TODO: Cambiar por datos reales del back
+										totalReviews={12} // TODO: Cambiar por datos reales del back
+										size='md'
+										textColor='text-white'
+									/>
+								</div>
+							</div>
 						</div>
 					</div>
 

@@ -175,7 +175,8 @@
       "bio": "Literature",
       "description_TABLETOP": "Create a tabletop profile to participate in traditional role-playing campaigns. This profile will be associated with the characters you create and tabletop campaigns.",
       "description_WRITTEN": "Create a narrative profile to participate in written role-playing campaigns. This profile will be associated with the characters you create and narrative campaigns."
-    }
+    },
+    "reviews": "Reviews"
   },
   "campaign": {
     "campaign": "Campaign",
@@ -265,7 +266,8 @@
     "campaigns": "Campaigns",
     "errors": {
       "updateStatus": "Error updating status"
-    }
+    },
+    "reviews": "Reviews"
   },
   "character": {
     "characters": "Characters",
