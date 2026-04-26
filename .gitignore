@@ -64,3 +64,6 @@ dist-ssr
 
 .env
 .env.*
+
+# Testing coverage
+coverage/
