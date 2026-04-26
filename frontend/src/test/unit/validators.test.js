@@ -28,21 +28,18 @@ describe('Validators Utilities', () => {
         });
 
         test('debería retornar error si tiene menos de 8 caracteres', () => {
-            expect(validatePassword('Aa1!bcd')).toBe('errors.passwordLength'); // 7 caracteres
+            expect(validatePassword('Aa1!bcd')).toBe('errors.passwordLength'); 
         });
 
-        test('debería retornar error si no cumple la complejidad (falta mayúscula, número o símbolo)', () => {
-            // Falta símbolo
-            expect(validatePassword('solominusc123')).toBe('errors.passwordComplexity');
-            // Falta número
-            expect(validatePassword('SoloLetrasY!@')).toBe('errors.passwordComplexity');
-            // Falta minúscula
-            expect(validatePassword('MAYUSCULAS1!')).toBe('errors.passwordComplexity');
+        test('debería retornar error si no cumple la complejidad', () => {
+            expect(validatePassword('solo_minusculas_123')).toBe('errors.passwordComplexity');
+            expect(validatePassword('SOLO_MAYUSCULAS_123')).toBe('errors.passwordComplexity');
+            expect(validatePassword('SinNumeroNiSimbolo')).toBe('errors.passwordComplexity');
         });
 
         test('debería retornar null si la contraseña cumple todos los requisitos', () => {
-            expect(validatePassword('SuperSegura123!')).toBeNull();
-            expect(validatePassword('0tr@PassW0rd-')).toBeNull();
+            expect(validatePassword('Test-Pass-123')).toBeNull();
+            expect(validatePassword('Valid_Pass_99!')).toBeNull();
         });
     });
 

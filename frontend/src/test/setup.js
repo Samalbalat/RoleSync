@@ -1,12 +1,8 @@
-// src/test/setup.js
-import '@testing-library/jest-dom'
-import { server } from './mocks/server'
+import '@testing-library/jest-dom';
+import { beforeAll, afterEach, afterAll } from 'vitest'; 
+import { server } from './mocks/server';
 
-// Arranca el servidor antes de todos los tests
-beforeAll(() => server.listen())
-
-// Resetea handlers modificados en cada test
-afterEach(() => server.resetHandlers())
-
-// Para el servidor al acabar
-afterAll(() => server.close())
+// Gestión del servidor para los tests
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());

@@ -15,10 +15,8 @@ export const generateInternalKey = label => {
 
 export const validateField = currentField => {
 	const labelError = validateRequired(currentField.label);
-	if (labelError) {
-		return { label: labelError };
-	}
-
+	if (labelError) return { label: labelError };
+	
 	const minMaxError = validateMinMax(
 		currentField.min,
 		currentField.max
