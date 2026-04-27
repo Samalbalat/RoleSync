@@ -65,7 +65,7 @@ public class UserController {
             response.setEmail(user.get().getEmail());
             response.setTimeZone(user.get().getTimeZone());
             List<SimpleProfileDTO> profileDTOs = profiles.stream().map(profile -> 
-                new SimpleProfileDTO(profile.getId(), profile.getProfilename(), profile.getImage())
+                new SimpleProfileDTO(profile.getId(), profile.getProfilename(), profile.getImage(), profile.getProfileType().name())
             ).toList();
             response.setProfiles(profileDTOs);
             return ResponseEntity.ok(response);

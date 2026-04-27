@@ -19,6 +19,7 @@ import com.rolesync.rolesync.dto.profilecontroller.ProfileInDTO;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.ProfileMetrics;
 import com.rolesync.rolesync.model.ProfileType;
+import com.rolesync.rolesync.repository.ProfileMetricsRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
 import com.rolesync.rolesync.security.jwt.JwtUtils;
 import com.rolesync.rolesync.utils.UtilsCalls;
@@ -35,6 +36,14 @@ public class ProfileController {
     @Autowired ProfileRepository profileRepository;
     @Autowired JwtUtils jwtUtils;
     @Autowired UtilsCalls utilsCalls;
+    @Autowired ProfileMetricsRepository metricsRepository;
+
+     /**
+     * Get the profile of the authenticated user with the given roleType. If the profile does not exist, return a 404 Not Found response.
+     * @param authentication The authentication object containing the user's details
+     * @param roleType The role type of the profile to be retrieved
+     * @return ResponseEntity containing the profile data if found, or a 404 Not Found response if the profile does not exist
+     */
 
     /**
      * Get the profile of the authenticated user with the given roleType. If the profile does not exist, return a 404 Not Found response.
@@ -49,7 +58,6 @@ public class ProfileController {
         {
         Optional<Profile> profile = profileRepository.findByProfilename(profileName);
         if (profile.isPresent()) {
-            System.out.println("Profile found: " + profile.get());
             ProfileInDTO response = profile.map(p -> 
             new ProfileInDTO(p.getProfilename(), p.getImage(), p.getDescription())
         ).orElse(null);
@@ -68,7 +76,6 @@ public class ProfileController {
         {
         Optional<Profile> profile = profileRepository.findByProfilename(profileToGet);
         if (profile.isPresent()) {
-            System.out.println("Profile found: " + profile.get());
             ProfileInDTO response = profile.map(p -> 
             new ProfileInDTO(p.getProfilename(), p.getImage(), p.getDescription())
         ).orElse(null);
@@ -158,7 +165,9 @@ public class ProfileController {
             metrics.setCampaignsCount(0);
             metrics.setCredibilityScore(0f);
             metrics.setLastUpdated(Instant.now());
+            
             profileRepository.save(newProfile);
+            metricsRepository.save(metrics);
             return ResponseEntity.status(201).build();
     }
 }

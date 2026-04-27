@@ -3,7 +3,6 @@ package com.rolesync.rolesync.controller;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
@@ -28,7 +27,6 @@ import com.rolesync.rolesync.dto.forumcontroller.PostForumPostsInDTO;
 import com.rolesync.rolesync.model.Campaign;
 import com.rolesync.rolesync.model.CharacterSheet;
 import com.rolesync.rolesync.model.Post;
-import com.rolesync.rolesync.model.PostType;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.repository.CampaignRepository;
 import com.rolesync.rolesync.repository.CharacterSheetRepository;
@@ -295,8 +293,7 @@ public class ForumController {
                 return ResponseEntity.status(403).build();
             }
         }
-        Post post = new Post();
-        CampaignPostDTO campaignPostDto = postService.createCampaignPost(request, post, profile, character, campaign, relation);
+        CampaignPostDTO campaignPostDto = postService.createCampaignPost(request, profile, character, campaign, relation);
         return ResponseEntity.ok().body(campaignPostDto);
     }
 
@@ -312,8 +309,7 @@ public class ForumController {
         }
         Profile profile = profileRepository.findByProfilename(profileName)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        Post post = new Post();
-        Post responsePost = postService.createForumPost(request, post, profile);
+        Post responsePost = postService.createForumPost(request, profile);
         return ResponseEntity.ok().body(responsePost.getId());
     }
 

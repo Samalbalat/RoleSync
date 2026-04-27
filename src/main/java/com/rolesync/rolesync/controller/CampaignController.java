@@ -236,8 +236,10 @@ public class CampaignController {
             @RequestBody CampaignPostInDTO dto,
             @RequestHeader("X-Profile-Name") String profileName) {
         Campaign campaign = new Campaign();
-        Profile activeProfile = profileRepository.findByProfilename(profileName)
-                .orElseThrow(() -> new IllegalStateException("Active profile not found"));
+        Profile activeProfile = profileRepository.findByProfilename(profileName).get();
+        if(activeProfile == null) {
+            return ResponseEntity.status(403).body("User is not authorized");
+        }
         campaign.setOwnerName(activeProfile.getProfilename());
         createCampaignFromPostInDto(dto, campaign);
         campaignRepository.save(campaign);

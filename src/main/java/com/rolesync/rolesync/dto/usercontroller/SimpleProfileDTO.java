@@ -12,5 +12,6 @@ public class SimpleProfileDTO {
     private Long id;
     private String profileName;
     private String image;
+    private String roleType;
     
 }

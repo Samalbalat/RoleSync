@@ -53,8 +53,8 @@ public interface PostRepository
         SELECT COUNT(*)
         FROM posts p
         WHERE p.campaign_id IS NULL
-        AND p.type = 'THREAD_START'
-        AND (
+          AND p.type = 'THREAD_START'
+          AND (
                 CAST(:tags AS text[]) IS NULL
                 OR p.tags && CAST(:tags AS text[])
         )

@@ -34,12 +34,14 @@ public class PostService {
     private final ApplicationEventPublisher eventPublisher;
     
     @Transactional
-    public CampaignPostDTO createCampaignPost(PostCampaignPostsInDTO request, Post post, Profile profile,
+    public CampaignPostDTO createCampaignPost(PostCampaignPostsInDTO request, Profile profile,
             CharacterSheet character, Campaign campaign, String relation) {
+        Post post = new Post();
         return new CampaignPostDTO(createPostFromRequest(request, post, profile, character, campaign, relation));
     }
     @Transactional
-    public Post createForumPost(PostForumPostsInDTO request, Post post, Profile profile) {
+    public Post createForumPost(PostForumPostsInDTO request,Profile profile) {
+        Post post = new Post();
         return createPostFromRequest(request, post, profile);
     }
 
@@ -81,9 +83,18 @@ public class PostService {
         post.setLocked(false);
 
         // Visibility (optional)
-        visibilityPostAsigner(post, request);
-        
-        postRepository.save(post);
+        if (request.getVisibleToCharacterIds() != null && !request.getVisibleToCharacterIds().isEmpty()) {
+            List<CharacterSheet> visibleCharacters = characterRepository
+                    .findAllById(request.getVisibleToCharacterIds());
+            if (visibleCharacters.size() != request.getVisibleToCharacterIds().size()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Some character IDs are invalid");
+            }
+            post.setVisibleToCharacterIds(
+                    (new HashSet<>(visibleCharacters.stream().map(CharacterSheet::getId).toList())));
+        } else {
+            post.setVisibleToCharacterIds(new HashSet<>()); // empty set means visible to all characters
+        }
+        postRepository.saveAndFlush(post);
         eventPublisher.publishEvent(new PostCreatedEvent(profile));
         return post;
     }
@@ -114,7 +125,7 @@ public class PostService {
         post.setPinned(false);
         post.setLocked(false);
         post.setTags(request.getTags() != null ? request.getTags() : List.of());
-        postRepository.save(post);
+        postRepository.saveAndFlush(post);
         eventPublisher.publishEvent(new PostCreatedEvent(profile));
         return post;
     }

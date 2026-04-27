@@ -179,8 +179,6 @@ public class CharacterSheetController {
                     (campaign.getMembers() == null || !campaign.getMembers().contains(activeProfile.getProfilename()))) {
                     return ResponseEntity.status(403).body("User is not a member of the campaign");
                 }
-
-                characterSheet.setIsPublic(false);
                 characterSheet.setCampaign(campaign);
                 response.setCampaign_name(campaign.getName());
                 response.setCampaign_id(dto.getCampaign_id().toString());
@@ -191,7 +189,7 @@ public class CharacterSheetController {
         }else{
             characterSheet.setCampaign(null);
         }
-
+        characterSheet.setIsPublic(dto.getIsPublic() != null ? dto.getIsPublic() : true);
         characterSheet.setName(dto.getName());
         characterSheet.setSchema(dto.getAttributes());
         characterSheet.setImage(dto.getAvatar_url());
@@ -302,6 +300,8 @@ public class CharacterSheetController {
                 Campaign campaign = character.get().getCampaign();
                 if(!profileBelongsToCampaign(profileName, campaign)){
                     return ResponseEntity.status(403).body("User is not a member of the campaign");
+                }else{
+                    return ResponseEntity.ok(new CharacterSheetGetOutDTO(character.get()));
                 }
             }else if(!character.get().getOwner().getProfilename().equals(profileName)){
                 String conditionalMessageIfIsTemplate = character.get().getIsTemplate() ? "template" : "character";
