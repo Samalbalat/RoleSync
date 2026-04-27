@@ -130,4 +130,17 @@ public class PostService {
         return post;
     }
     
+    private void visibilityPostAsigner(Post post, PostCampaignPostsInDTO request) {
+        if (request.getVisibleToCharacterIds() != null && !request.getVisibleToCharacterIds().isEmpty()) {
+            List<CharacterSheet> visibleCharacters = characterRepository
+                    .findAllById(request.getVisibleToCharacterIds());
+            if (visibleCharacters.size() != request.getVisibleToCharacterIds().size()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Some character IDs are invalid");
+            }
+            post.setVisibleToCharacterIds(
+                    (new HashSet<>(visibleCharacters.stream().map(CharacterSheet::getId).toList())));
+        } else {
+            post.setVisibleToCharacterIds(new HashSet<>()); // empty set means visible to all characters
+        }
+    }
 }
