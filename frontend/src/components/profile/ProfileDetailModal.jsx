@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { Dialog, DialogHeader, DialogBody, Typography, Avatar, Spinner, Button } from '@material-tailwind/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import profileService from '../../services/ProfileService';
+import StarRatingBadge from '../reviews/StarRatingBadge';
+import ReviewList from '../reviews/ReviewList';
 
 export default function ProfileDetailModal({ isOpen, onClose, profileName, roleType }) {
 	const [profileData, setProfileData] = useState(null);
@@ -31,8 +33,69 @@ export default function ProfileDetailModal({ isOpen, onClose, profileName, roleT
 	console.log('Perfil que pido:', profileName); // Debugging log
 	console.log('Perfil que obtengo', profileData); // Debugging log
 
+	const averageRating = Number(profileData?.rating ?? 0);
+	const totalReviews = Number(profileData?.totalReviews ?? 0);
+
+	let dialogContent;
+
+	if (loading) {
+		dialogContent = (
+			<div className='flex justify-center py-8'>
+				<Spinner color='blue' />
+			</div>
+		);
+	} else if (profileData?.error) {
+		dialogContent = (
+			<div className='text-center py-8'>
+				<Typography color='red' className='font-medium'>
+					{profileData.error}
+				</Typography>
+			</div>
+		);
+	} else if (profileData) {
+		dialogContent = (
+			<div className='flex flex-col items-center space-y-6 py-4'>
+				{/* Avatar destacado */}
+				<Avatar
+					src={profileData.image || profileData.profileImage || `https://ui-avatars.com/api/?name=${profileName}&size=256`}
+					alt={profileData.profileName || profileName}
+					size='xxl'
+					className='h-32 w-32 shadow-md border-2 border-white shrink-0'
+				/>
+
+				{/* Información del Perfil */}
+				<div className='text-center space-y-4 w-full px-4'>
+					<div className='flex flex-col items-center gap-1.5'>
+						<Typography variant='h4' color='blue-gray' className='font-bold'>
+							{profileData.profileName || profileName}
+						</Typography>
+
+						<StarRatingBadge averageRating={averageRating} totalReviews={totalReviews} size='md' />
+					</div>
+
+					{/* Caja de descripción */}
+					{profileData.description ? (
+						<div className='bg-gray-50 p-4 rounded-xl border border-gray-100 shadow-sm max-w-2xl mx-auto w-full'>
+							<Typography className='text-gray-700 font-medium italic leading-relaxed text-sm'>
+								"{profileData.description}"
+							</Typography>
+						</div>
+					) : (
+						<Typography className='text-gray-400 italic text-sm'>Este usuario aún no ha escrito una descripción.</Typography>
+					)}
+				</div>
+
+				<div className='w-full mt-8 pt-8 border-t border-gray-100 text-left'>
+					<ReviewList targetId={profileName} targetType='PROFILE' />
+				</div>
+			</div>
+		);
+	} else {
+		dialogContent = <Typography className='text-center text-gray-500 py-8'>No hay datos disponibles.</Typography>;
+	}
+
 	return (
-		<Dialog open={isOpen} handler={onClose} size='sm'>
+		<Dialog open={isOpen} handler={onClose} size='lg'>
 			<DialogHeader className='justify-between border-b border-gray-100'>
 				<Typography variant='h5' color='blue-gray'>
 					Perfil de Jugador
@@ -42,53 +105,7 @@ export default function ProfileDetailModal({ isOpen, onClose, profileName, roleT
 				</Button>
 			</DialogHeader>
 
-			<DialogBody className='overflow-y-auto max-h-[60vh]'>
-				{loading ? (
-					<div className='flex justify-center py-8'>
-						<Spinner color='blue' />
-					</div>
-				) : profileData?.error ? (
-					<div className='text-center py-8'>
-						<Typography color='red' className='font-medium'>
-							{profileData.error}
-						</Typography>
-					</div>
-				) : profileData ? (
-					<div className='flex flex-col items-center space-y-6 py-4'>
-						{/* Avatar destacado */}
-						<Avatar
-							src={
-								profileData.image || profileData.profileImage || `https://ui-avatars.com/api/?name=${profileName}&size=256`
-							}
-							alt={profileData.profileName || profileName}
-							size='xxl'
-							className='h-32 w-32 shadow-md border-2 border-white'
-						/>
-
-						{/* Información del Perfil */}
-						<div className='text-center space-y-4 w-full px-4'>
-							<Typography variant='h4' color='blue-gray' className='font-bold'>
-								{profileData.profileName || profileName}
-							</Typography>
-
-							{/* Caja de descripción */}
-							{profileData.description ? (
-								<div className='bg-gray-50 p-4 rounded-xl border border-gray-100 shadow-sm'>
-									<Typography className='text-gray-700 font-medium italic leading-relaxed text-sm'>
-										"{profileData.description}"
-									</Typography>
-								</div>
-							) : (
-								<Typography className='text-gray-400 italic text-sm'>
-									Este usuario aún no ha escrito una descripción.
-								</Typography>
-							)}
-						</div>
-					</div>
-				) : (
-					<Typography className='text-center text-gray-500 py-8'>No hay datos disponibles.</Typography>
-				)}
-			</DialogBody>
+			<DialogBody className='overflow-y-auto max-h-[75vh]'>{dialogContent}</DialogBody>
 		</Dialog>
 	);
 }

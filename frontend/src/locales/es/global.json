@@ -182,7 +182,8 @@
       "bio": "Bibliografia",
       "description_TABLETOP": "Crea un perfil de mesa para participar en campañas de rol tradicional. Este perfil se asociará a los personajes que crees personajes y campañas de mesa.",
       "description_WRITTEN": "Crea un perfil narrativo para participar en campañas de rol escritas. Este perfil se asociará a los personajes que crees personajes y campañas narrativas."
-    }
+    },
+    "reviews": "Reseñas"
   },
   "campaign": {
     "campaign": "Campaña",
@@ -279,7 +280,8 @@
     "status": {
       "status": "Estado de la Campaña",
       "open": "Abierto"
-    }
+    },
+    "reviews": "Reseñas"
   },
   "character": {
     "characters": "Personajes",

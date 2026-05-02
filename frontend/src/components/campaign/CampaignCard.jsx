@@ -4,6 +4,7 @@ import { UserGroupIcon, CalendarIcon, ChatBubbleLeftRightIcon } from '@heroicons
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
+import StarRatingBadge from '../reviews/StarRatingBadge';
 
 export default function CampaignCard({ campana, theme }) {
 	const navigate = useNavigate();
@@ -85,6 +86,13 @@ export default function CampaignCard({ campana, theme }) {
 					) : (
 						<span className='text-xs text-gray-500 font-medium bg-gray-100 px-2 py-0.5 rounded'>{campana.theme}</span>
 					)}
+				</div>
+				<div className='mb-3'>
+					<StarRatingBadge
+						averageRating={4.8} // TODO: Datos reales (ej: campana.rating)
+						totalReviews={15} // TODO: Datos reales
+						size='sm'
+					/>
 				</div>
 				{/* ----------------------------------------------- */}
 
