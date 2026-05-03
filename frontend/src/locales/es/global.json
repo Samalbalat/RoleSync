@@ -288,7 +288,8 @@
       "status": "Estado de la Campaña",
       "open": "Abierto"
     },
-    "reviews": "Reseñas"
+    "reviews": "Reseñas",
+    "title": "Campaña"
   },
   "character": {
     "characters": "Personajes",
@@ -333,7 +334,19 @@
       "errorNoName": "Debes darle un nombre a la plantilla.",
       "loadigData": "Cargando datos de la plantilla...",
       "range": "| Rango: ",
-      "addLongField": "Añadir Atributo Largo"
+      "addLongField": "Añadir Atributo Largo",
+      "chooseStartingPoint": "Elige un punto de partida",
+      "fromScratch": "Desde Cero",
+      "fromScratchDesc": "Crea una plantilla con tus propios campos desde cero",
+      "copyMine": "Copiar mis plantillas",
+      "copyMineDesc": "Usa una plantilla de otra de tus campañas.",
+      "presetDnD": "Plantilla D&D 5e",
+      "presetDnDDesc": "Estructura base para Dungeons&Dragons.",
+      "errorLoadTemplates": "Error al cargar tus plantillas",
+      "selectTemplate": "Selecciona una plantilla",
+      "noTemplates": "No tienes plantillas creadas todavía.",
+      "presetCthulhu": "Plantilla Cthulhu 7ª Ed.",
+      "presetCthulhuDesc": "Estructura base para La Llamada de Cthulhu."
     },
     "form": {
       "title": "Crear Personaje",

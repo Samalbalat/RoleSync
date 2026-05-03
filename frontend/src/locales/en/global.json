@@ -274,7 +274,8 @@
     "errors": {
       "updateStatus": "Error updating status"
     },
-    "reviews": "Reviews"
+    "reviews": "Reviews",
+    "title": "Bell"
   },
   "character": {
     "characters": "Characters",
@@ -319,7 +320,19 @@
       "errorLoadCharacter": "Error loading template data.",
       "loadigData": "Loading template data...",
       "range": "| \nRange:",
-      "addLongField": "Add Long Attribute"
+      "addLongField": "Add Long Attribute",
+      "chooseStartingPoint": "Choose a starting point",
+      "fromScratch": "From Scratch",
+      "fromScratchDesc": "Create a template with your own fields from scratch",
+      "copyMine": "Copy my templates",
+      "copyMineDesc": "Use a template from another of your campaigns.",
+      "presetDnD": "Template D",
+      "presetDnDDesc": "Base structure for Dungeons",
+      "errorLoadTemplates": "Error loading your templates",
+      "selectTemplate": "Select a template",
+      "noTemplates": "You don't have templates created yet.",
+      "presetCthulhu": "Cthulhu Template 7th Ed.",
+      "presetCthulhuDesc": "Base structure for Call of Cthulhu."
     },
     "form": {
       "title": "Create Character",

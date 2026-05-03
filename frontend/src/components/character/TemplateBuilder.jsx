@@ -25,6 +25,7 @@ import {
 	rangeMin,
 	rangeMax,
 } from '../../utils/character/templateBuilderUtils';
+import { TEMPLATE_PRESETS } from '../../utils/character/templatePresets';
 
 export default function TemplateBuilder() {
 	const { t } = useTranslation('global');
@@ -35,6 +36,8 @@ export default function TemplateBuilder() {
 	// --- PARÁMETROS DE LA URL ---
 	const [searchParams] = useSearchParams();
 	const templateId = searchParams.get('templateId');
+	const cloneId = searchParams.get('cloneId');
+	const presetId = searchParams.get('preset');
 	const isEditMode = !!templateId;
 
 	const [campaignId, setCampaignId] = useState(searchParams.get('campaignId'));
@@ -66,7 +69,6 @@ export default function TemplateBuilder() {
 			const fetchTemplateData = async () => {
 				try {
 					const data = await CharacterService.getTemplateById(templateId);
-					console.log('Datos de la plantilla obtenidos del backend:', data);
 					setTemplateName(data.name || '');
 
 					if (!searchParams.get('campaignId')) {
@@ -90,6 +92,42 @@ export default function TemplateBuilder() {
 			fetchTemplateData();
 		}
 	}, [templateId, isEditMode, t, searchParams]);
+
+	useEffect(() => {
+		if (cloneId && !isEditMode) {
+			const fetchCloneData = async () => {
+				setIsLoading(true);
+				try {
+					const data = await CharacterService.getTemplateById(cloneId);
+
+					// Podemos pre-rellenar el nombre con un "Copia de..." para que quede claro
+					setTemplateName(data.name ? `${data.name} (Copia)` : 'Plantilla Copiada');
+
+					if (Array.isArray(data?.schema)) {
+						setFields(mapBackendSchemaToFields(data.schema));
+					}
+				} catch (error) {
+					console.error('Error al cargar la plantilla a clonar:', error);
+					toast.error(t('character.templateBuilder.errorLoadCharacter'));
+				} finally {
+					setIsLoading(false);
+				}
+			};
+
+			fetchCloneData();
+		}
+	}, [cloneId, isEditMode, t]);
+
+	useEffect(() => {
+		if (presetId && TEMPLATE_PRESETS[presetId] && !isEditMode) {
+			const presetData = TEMPLATE_PRESETS[presetId];
+			setTemplateName(presetData.name);
+
+			if (Array.isArray(presetData.schema)) {
+				setFields(mapBackendSchemaToFields(presetData.schema));
+			}
+		}
+	}, [presetId, isEditMode]);
 
 	const handleChange = (name, value) => {
 		const allowedKeys = ['label', 'type', 'required', 'min', 'max'];

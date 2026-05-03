@@ -9,6 +9,7 @@ import {
 	UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import JoinCampaignModal from './JoinCampaignModal';
+import CreateTemplateModal from './CreateTemplateModal';
 import { useLocation } from 'react-router-dom';
 
 export default function CampaignActionCard({
@@ -24,6 +25,7 @@ export default function CampaignActionCard({
 }) {
 	const relation = campaign.userRelation;
 	const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+	const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
 	const location = useLocation();
 	const canRequestJoin = () => {
 		if (isFull) return false;
@@ -92,7 +94,7 @@ export default function CampaignActionCard({
 								color='green'
 								variant='gradient'
 								className='flex items-center justify-center gap-2'
-								onClick={() => navigate(`/character/templateBuilder?campaignId=${campaign.id}`)}
+								onClick={() => setIsTemplateModalOpen(true)}
 							>
 								<DocumentPlusIcon className='h-5 w-5' />
 								{t('character.templateBuilder.createTemplate')}
@@ -215,6 +217,15 @@ export default function CampaignActionCard({
 				campaignId={campaign.id}
 				onSuccess={onRefreshData}
 				t={t}
+			/>
+
+			<CreateTemplateModal
+				isOpen={isTemplateModalOpen}
+				onClose={() => setIsTemplateModalOpen(false)}
+				campaignId={campaign.id}
+				navigate={navigate}
+				t={t}
+				location={location}
 			/>
 		</>
 	);
