@@ -77,7 +77,9 @@ export default function CampaignActionCard({
 								variant='gradient'
 								className='flex items-center justify-center gap-2'
 								onClick={() =>
-									navigate(`/character/templateBuilder?campaignId=${campaign.id}&templateId=${campaignTemplate.id}`)
+									navigate(`/character/templateBuilder?&templateId=${campaignTemplate.id}`, {
+										state: { from: location.pathname },
+									})
 								}
 							>
 								<DocumentCheckIcon className='h-5 w-5' />

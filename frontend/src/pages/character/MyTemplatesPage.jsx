@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Typography, Spinner, Card, CardBody, Avatar, IconButton, Tooltip } from '@material-tailwind/react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { getTheme } from '../../utils/themeUtils';
 import { useAuth } from '../../utils/AuthContext';
 import characterService from '../../services/CharacterService';
@@ -21,6 +21,7 @@ export default function MyTemplatesPage() {
 	const { t } = useTranslation('global');
 	const theme = getTheme();
 	const navigate = useNavigate();
+	const location = useLocation();
 
 	const [templates, setTemplates] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -43,8 +44,8 @@ export default function MyTemplatesPage() {
 		}
 	}, [activeProfile]);
 
-	const handleEditTemplate = (templateId, campaignId) => {
-		navigate(`/character/templateBuilder?campaignId=${campaignId}&templateId=${templateId}`);
+	const handleEditTemplate = templateId => {
+		navigate(`/character/templateBuilder?templateId=${templateId}`, { state: { from: location.pathname } });
 	};
 
 	const formatFieldType = type => {
@@ -95,7 +96,7 @@ export default function MyTemplatesPage() {
 												variant='text'
 												color='blue-gray'
 												className='rounded-full bg-white/80 backdrop-blur-sm hover:bg-gray-100'
-												onClick={() => handleEditTemplate(template.id, template.campaign_id)}
+												onClick={() => handleEditTemplate(template.id)}
 											>
 												<PencilIcon className='h-5 w-5' />
 											</IconButton>

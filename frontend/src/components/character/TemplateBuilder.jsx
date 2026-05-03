@@ -13,7 +13,7 @@ import {
 } from '@material-tailwind/react';
 import { TrashIcon, PlusIcon, PencilIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getTheme } from '../../utils/themeUtils';
 import CharacterService from '../../services/CharacterService';
@@ -29,14 +29,15 @@ import {
 export default function TemplateBuilder() {
 	const { t } = useTranslation('global');
 	const navigate = useNavigate();
+	const location = useLocation();
+	const theme = getTheme();
 
 	// --- PARÁMETROS DE LA URL ---
 	const [searchParams] = useSearchParams();
-	const campaignId = searchParams.get('campaignId');
 	const templateId = searchParams.get('templateId');
 	const isEditMode = !!templateId;
 
-	const theme = getTheme();
+	const [campaignId, setCampaignId] = useState(searchParams.get('campaignId'));
 
 	// --- ESTADOS GENERALES ---
 	const [isLoading, setIsLoading] = useState(isEditMode);
@@ -65,7 +66,12 @@ export default function TemplateBuilder() {
 			const fetchTemplateData = async () => {
 				try {
 					const data = await CharacterService.getTemplateById(templateId);
+					console.log('Datos de la plantilla obtenidos del backend:', data);
 					setTemplateName(data.name || '');
+
+					if (!searchParams.get('campaignId')) {
+						setCampaignId(data.campaignId);
+					}
 
 					// Mapeamos los atributos del backend a nuestro formato del frontend
 					if (Array.isArray(data?.schema)) {
@@ -83,7 +89,7 @@ export default function TemplateBuilder() {
 
 			fetchTemplateData();
 		}
-	}, [templateId, isEditMode, t]);
+	}, [templateId, isEditMode, t, searchParams]);
 
 	const handleChange = (name, value) => {
 		const allowedKeys = ['label', 'type', 'required', 'min', 'max'];
@@ -178,8 +184,10 @@ export default function TemplateBuilder() {
 				toast.success(t('character.templateBuilder.successSave'));
 			}
 
+			const returnUrl = location.state?.from || `/myTemplates`;
+
 			setTimeout(() => {
-				navigate(`/campaign/${campaignId}`);
+				navigate(returnUrl);
 			}, 1000);
 		} catch (error) {
 			console.error('Error al guardar la plantilla:', error);
