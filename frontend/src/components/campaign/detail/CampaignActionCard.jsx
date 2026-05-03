@@ -9,6 +9,7 @@ import {
 	UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import JoinCampaignModal from './JoinCampaignModal';
+import { useLocation } from 'react-router-dom';
 
 export default function CampaignActionCard({
 	campaign,
@@ -23,7 +24,7 @@ export default function CampaignActionCard({
 }) {
 	const relation = campaign.userRelation;
 	const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
-
+	const location = useLocation();
 	const canRequestJoin = () => {
 		if (isFull) return false;
 
@@ -128,7 +129,7 @@ export default function CampaignActionCard({
 								color='blue'
 								variant='outlined'
 								className='flex items-center justify-center gap-2 mt-2 bg-white'
-								onClick={() => navigate(`/character/edit/${campaign.characterId}`)}
+								onClick={() => navigate(`/character/edit/${campaign.characterId}`, { state: { from: location.pathname } })}
 							>
 								<PencilSquareIcon className='h-4 w-4' />
 								{t('character.editCharacter')}

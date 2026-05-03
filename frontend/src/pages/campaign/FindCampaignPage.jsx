@@ -60,7 +60,6 @@ export default function FindCampaignPage() {
 				const cleanParams = Object.fromEntries(Object.entries(backendParams).filter(([, v]) => v != null && v !== ''));
 
 				const results = await CampaignService.getCampaigns(cleanParams);
-				console.log('Campañas encontradas:', results);
 				setCampaigns(results);
 			} catch (error) {
 				console.error('Error fetching campaigns:', error);

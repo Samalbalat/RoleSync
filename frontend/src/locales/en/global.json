@@ -19,7 +19,12 @@
       "subtitle": "The heroes you've forged in your adventures.",
       "emptyMessage": "You haven't created any characters yet.",
       "createButton": "Create Your First Character",
-      "noCampaign": "No campaign"
+      "noCampaign": "No campaign",
+      "description": "Review and manage all your created characters."
+    },
+    "myTemplates": {
+      "title": "My Templates",
+      "description": "Here you can manage your base templates to create characters for your campaigns."
     }
   },
   "menu": {
@@ -55,7 +60,8 @@
     "other": "Other",
     "loadMore": "Load more",
     "previous": "Former",
-    "next": "Following"
+    "next": "Following",
+    "errorLoadingData": "Error loading campaigns"
   },
   "dayWeek": {
     "monday": "Monday",
@@ -176,7 +182,8 @@
       "description_TABLETOP": "Create a tabletop profile to participate in traditional role-playing campaigns. This profile will be associated with the characters you create and tabletop campaigns.",
       "description_WRITTEN": "Create a narrative profile to participate in written role-playing campaigns. This profile will be associated with the characters you create and narrative campaigns."
     },
-    "reviews": "Reviews"
+    "reviews": "Reviews",
+    "noTemplates": "You don't have templates created yet."
   },
   "campaign": {
     "campaign": "Campaign",
@@ -240,7 +247,7 @@
     "join": {
       "title": "Request to Join Campaign",
       "description": "Send a message to the GM to express your interest in joining this campaign. This will help them understand your motivations and decide if you're a good fit for the adventure.",
-      "messageLabel": "Message to the GM (optional)",
+      "messageLabel": "Message to the GM",
       "submit": "Send Request",
       "error": "There was an error sending your request. Please try again later."
     },
@@ -327,14 +334,19 @@
       "personalAttributes": "Personal Attributes",
       "atributesDescription": "Add stats, background, inventory... (e.g. \"Strength\", \"History\").",
       "value": "Value (e.g. 18, 'Dark Elf...')",
-      "submit": "Forge Character"
+      "submit": "Forge Character",
+      "submitEdit": "Save Changes",
+      "editDescription": "Modify your character's attributes and save the changes.",
+      "editTitle": "Edit Character"
     },
     "message": {
       "loadingCharacter": "Loading character profile...",
       "complete": "Complete the character sheet according to the rules of this campaign.",
       "errorLoading": "Error loading campaign template. Try again later.",
       "errorCreating": "Error creating character",
-      "successCreating": "Character {{name}} successfully created!"
+      "successCreating": "Character {{name}} successfully created!",
+      "errorUpdating": "Error updating character",
+      "successUpdating": "Successfully updated character"
     },
     "list": {
       "withoutCharacters": "There are no adventurers forged in this campaign yet."
@@ -465,5 +477,19 @@
   "footer": {
     "copyright": "My Application. \nAll rights reserved",
     "madeWithLove": "Made with ❤️ by Samu A.O. \nand Alex S.H."
+  },
+  "templates": {
+    "global": "Global Template",
+    "fieldsCount": "total fields",
+    "noFields": "No fields",
+    "fieldType": {
+      "shortText": "Short Text",
+      "longText": "Long Text",
+      "number": "Number",
+      "boolean": "checkbox"
+    }
+  },
+  "myCampaigns": {
+    "description": "Manage the campaigns you direct and participate in."
   }
 }

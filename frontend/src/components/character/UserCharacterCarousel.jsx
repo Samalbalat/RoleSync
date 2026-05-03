@@ -84,7 +84,7 @@ export default function UserCharacterCarousel() {
 					variant='text'
 					color={theme.secondary}
 					className='hidden sm:flex items-center gap-2'
-					onClick={() => navigate('/profile')}
+					onClick={() => navigate('/myCharacters')}
 				>
 					{t('common.viewAll')} <ArrowRightIcon className='h-4 w-4' />
 				</Button>
@@ -133,7 +133,7 @@ export default function UserCharacterCarousel() {
 				{/* Tarjeta Extra: "Ver todos" al final del carrusel */}
 				<Card
 					className={`min-w-[200px] sm:min-w-[240px] snap-start cursor-pointer hover:${theme.hoverBorder} hover:bg-blue-50 transition-colors border-2 border-dashed border-gray-300 bg-gray-50 flex-shrink-0 flex items-center justify-center shadow-none`}
-					onClick={() => navigate('/profile')}
+					onClick={() => navigate('/myCharacters')}
 				>
 					<CardBody className='flex flex-col items-center justify-center text-center p-6 h-full'>
 						<div
@@ -149,7 +149,7 @@ export default function UserCharacterCarousel() {
 			</div>
 
 			<div className='mt-4 sm:hidden flex justify-center'>
-				<Button variant='outlined' color={theme.secondary} fullWidth onClick={() => navigate('/characters')}>
+				<Button variant='outlined' color={theme.secondary} fullWidth onClick={() => navigate('/myCharacters')}>
 					{t('common.viewAll')}
 				</Button>
 			</div>

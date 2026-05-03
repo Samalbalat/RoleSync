@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import StarRatingBadge from '../reviews/StarRatingBadge';
 
-export default function CampaignCard({ campana, theme }) {
+export default function CampaignCard({ campana, theme, pageType = 'general', isMaster = false }) {
 	const navigate = useNavigate();
 	const { t } = useTranslation('global');
 
@@ -49,6 +49,19 @@ export default function CampaignCard({ campana, theme }) {
 				/>
 				<div className='absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60' />
 
+				{isMaster && campana.pendingRequests > 0 && pageType === 'me' && (
+					<div className='absolute top-3 left-3 z-10'>
+						<Badge
+							content={campana.pendingRequests}
+							className='min-w-[18px] min-h-[18px] bg-red-500 text-white border-2 border-white'
+						>
+							<div className='bg-white/90 p-1.5 rounded-full backdrop-blur-sm shadow-lg'>
+								<BellAlertIcon className={`h-5 w-5 text-${theme.primary}-500 group-hover:animate-pulse`} />
+							</div>
+						</Badge>
+					</div>
+				)}
+
 				<div className='absolute top-3 right-3'>
 					<Chip
 						size='sm'
@@ -58,14 +71,16 @@ export default function CampaignCard({ campana, theme }) {
 					/>
 				</div>
 
-				<div className='absolute bottom-3 left-3'>
-					<Chip
-						size='sm'
-						variant='ghost'
-						value={campana.system || ''}
-						className='bg-white/90 text-gray-900 font-bold backdrop-blur-sm'
-					/>
-				</div>
+				{campana.system && (
+					<div className='absolute bottom-3 left-3'>
+						<Chip
+							size='sm'
+							variant='ghost'
+							value={campana.system}
+							className='bg-white/90 text-gray-900 font-bold backdrop-blur-sm'
+						/>
+					</div>
+				)}
 			</div>
 
 			<CardBody className='p-5'>
@@ -73,20 +88,22 @@ export default function CampaignCard({ campana, theme }) {
 					{campana.name}
 				</Typography>
 
-				<div className='flex flex-wrap gap-1 mb-3'>
-					{Array.isArray(campana.themes) ? (
-						campana.themes.slice(0, 3).map((tag, index) => (
-							<span
-								key={index}
-								className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${theme.bgLight} text-${theme.primary}-700 border ${theme.lightborder}`}
-							>
-								{tag}
-							</span>
-						))
-					) : (
-						<span className='text-xs text-gray-500 font-medium bg-gray-100 px-2 py-0.5 rounded'>{campana.theme}</span>
-					)}
-				</div>
+				{(campana.themes || campana.theme) && (
+					<div className='flex flex-wrap gap-1 mb-3'>
+						{Array.isArray(campana.themes) ? (
+							campana.themes.slice(0, 3).map((tag, index) => (
+								<span
+									key={index}
+									className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${theme.bgLight} text-${theme.primary}-700 border ${theme.lightborder}`}
+								>
+									{tag}
+								</span>
+							))
+						) : (
+							<span className='text-xs text-gray-500 font-medium bg-gray-100 px-2 py-0.5 rounded'>{campana.theme}</span>
+						)}
+					</div>
+				)}
 				<div className='mb-3'>
 					<StarRatingBadge
 						averageRating={4.8} // TODO: Datos reales (ej: campana.rating)
@@ -94,28 +111,29 @@ export default function CampaignCard({ campana, theme }) {
 						size='sm'
 					/>
 				</div>
-				{/* ----------------------------------------------- */}
 
-				<div className='flex items-center justify-between pt-2 border-t border-gray-100'>
-					<Tooltip content={t('campaign.message.currentMaxPlayers')}>
-						<div className='flex items-center gap-1.5 text-gray-600 font-medium text-xs'>
-							<UserGroupIcon className={`h-4 w-4 text-${theme.primary}-500`} />
-							{campana.currentPlayers}/{campana.maxPlayers}
-						</div>
-					</Tooltip>
+				{pageType !== 'me' && campana.maxPlayers && (
+					<div className='flex items-center justify-between pt-2 border-t border-gray-100'>
+						<Tooltip content={t('campaign.message.currentMaxPlayers')}>
+							<div className='flex items-center gap-1.5 text-gray-600 font-medium text-xs'>
+								<UserGroupIcon className={`h-4 w-4 text-${theme.primary}-500`} />
+								{campana.currentPlayers || 0}/{campana.maxPlayers}
+							</div>
+						</Tooltip>
 
-					{campana.type === 'TABLETOP' ? (
-						<div className='flex items-center gap-1.5 text-gray-600 font-medium text-xs'>
-							<CalendarIcon className={`h-4 w-4 text-${theme.primary}-500`} />
-							{campana.schedule}
-						</div>
-					) : (
-						<div className='flex items-center gap-1.5 text-gray-600 font-medium text-xs'>
-							<ChatBubbleLeftRightIcon className={`h-4 w-4 text-${theme.primary}-500`} />
-							{campana.communication}
-						</div>
-					)}
-				</div>
+						{campana.type === 'TABLETOP' && campana.schedule ? (
+							<div className='flex items-center gap-1.5 text-gray-600 font-medium text-xs'>
+								<CalendarIcon className={`h-4 w-4 text-${theme.primary}-500`} />
+								{campana.schedule}
+							</div>
+						) : campana.communication ? (
+							<div className='flex items-center gap-1.5 text-gray-600 font-medium text-xs'>
+								<ChatBubbleLeftRightIcon className={`h-4 w-4 text-${theme.primary}-500`} />
+								{campana.communication}
+							</div>
+						) : null}
+					</div>
+				)}
 			</CardBody>
 		</Card>
 	);
