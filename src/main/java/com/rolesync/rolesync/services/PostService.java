@@ -102,6 +102,7 @@ public class PostService {
     
     private Post createPostFromRequest(PostForumPostsInDTO request, Post post, Profile profile) {
         post.setType(PostType.valueOf(request.getType()));
+        post.setTitle(request.getTitle());
         post.setContent(request.getContent());
 
         post.setAuthorProfileId(profile.getId());
