@@ -167,26 +167,22 @@ public class ForumController {
         List<GetForumPostsOutItemDTO> dtoList = postRepository
                 .findForumPosts(tagList, pageable.getPageSize(), pageable.getOffset())
                 .stream()
-                .map(record -> {
-                    String[] tagsArr = (String[]) record[3];
-                    String[] mediaArr = (String[]) record[11];
-                    GetForumPostItemOutBasicData basicData = new GetForumPostItemOutBasicData(
-                            (Long) record[0],
-                            (String) record[1],
-                            (String) record[2],
-                            (String) record[4],
-                            (Instant) record[5],
-                            (Instant) record[6],
-                            (Boolean) record[7],
-                            (Boolean) record[8]);
-                    GetForumPostsOutItemDTO dto = new GetForumPostsOutItemDTO(
-                            basicData,
-                            new GetForumPostsOutItemAuthorDTO((String) record[9], (String) record[10]),
-                            mediaArr != null ? Arrays.asList(mediaArr) : List.of(),
-                            tagsArr != null ? Arrays.asList(tagsArr) : List.of());
-
-                    return dto;
-                })
+                .map(forumPostView -> new GetForumPostsOutItemDTO(
+                        new GetForumPostItemOutBasicData(
+                                forumPostView.getId(),
+                                forumPostView.getType(),
+                                forumPostView.getTitle(),
+                                forumPostView.getContent(),
+                                forumPostView.getCreatedAt(),
+                                forumPostView.getUpdatedAt(),
+                                forumPostView.getIsEdited(),
+                                forumPostView.getIsLocked()
+                        ),
+                        new GetForumPostsOutItemAuthorDTO(forumPostView.getProfilename(), forumPostView.getImage()),
+                        Arrays.asList(forumPostView.getMediaUrls()),
+                        Arrays.asList(forumPostView.getTags()),
+                        forumPostView.getReplyCount()
+                ))
                 .toList();
 
         GetForumPostsOutMetaDTO meta = new GetForumPostsOutMetaDTO(

@@ -24,8 +24,9 @@ public class GetForumPostsOutItemDTO {
     private boolean isEdited;
     private boolean isLocked;
     private List<String> mediaUrls;
+    private Long replyCount;
 
-    public GetForumPostsOutItemDTO(GetForumPostItemOutBasicData basicData, GetForumPostsOutItemAuthorDTO getForumPostsOutItemAuthorDTO, List<String> mediaUrls, List<String> tags) {
+    public GetForumPostsOutItemDTO(GetForumPostItemOutBasicData basicData, GetForumPostsOutItemAuthorDTO getForumPostsOutItemAuthorDTO, List<String> mediaUrls, List<String> tags, Long replyCount) {
         this.id = basicData.getId();
         this.type = basicData.getType();
         this.title = basicData.getTitle();
@@ -37,5 +38,6 @@ public class GetForumPostsOutItemDTO {
         this.author = getForumPostsOutItemAuthorDTO;
         this.mediaUrls = mediaUrls;
         this.tags = tags;
+        this.replyCount = replyCount;
     }
 }
