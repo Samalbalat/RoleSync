@@ -136,17 +136,12 @@ public class ProfileController {
         if(!utilsCalls.checkAuthAndProfile(authentication, profileName)){
             return ResponseEntity.status(403).body("Unauthorized to create a profile for the current user");
         }
-        //Active profile is the one making the request
-        Optional<Profile> profile = profileRepository.findByProfilename(profileName);
-        if(!profile.isEmpty() && profile.get().getProfileType().toString().equalsIgnoreCase(roleType)){
-            return ResponseEntity.status(403).body("User already has a profile for this role type");
-        }
+
         List<Profile> userProfiles = profileRepository.findAllByUsername(authentication.getName());
         if (userProfiles.size()==2) {
             return ResponseEntity.status(403).body("User already has profiles for both role types");
-        }
-        if(userProfiles.stream().anyMatch(p -> p.getProfileType().toString().equalsIgnoreCase(roleType))){
-            return ResponseEntity.status(403).body("User already has a profile for this role type");
+        }else if(userProfiles.stream().anyMatch(p -> p.getProfileType().toString().equalsIgnoreCase(roleType) || p.getProfilename().equals(profilePostInDTO.getProfileName()))){
+            return ResponseEntity.status(403).body("User already has a profile for this role type or profile name is already taken");
         }
             String principal = authentication.getName();
             System.out.println("Profile creation available for user: " + principal + " and roleType: " + roleType);
@@ -171,3 +166,4 @@ public class ProfileController {
             return ResponseEntity.status(201).build();
     }
 }
+
