@@ -211,4 +211,35 @@ describe('CampaignFilterBar — Tests Unitarios', () => {
 
 		expect(screen.queryByText('filter.cleanFilters')).not.toBeInTheDocument();
 	});
+
+	// 1️⃣7️⃣ Actualizar selects restantes (comunicación y zona horaria) llama a setFilters
+	test('actualiza el estado al cambiar los selects de comunicación y zona horaria', async () => {
+		const props = buildProps();
+		render(<CampaignFilterBar {...props} />);
+		await userEvent.click(screen.getByRole('button', { name: /filter.filter/i }));
+
+		const communicationSelect = screen.getByRole('combobox', { name: /campaign.communication/i });
+		await userEvent.selectOptions(communicationSelect, 'Discord');
+
+		const timeZoneSelect = screen.getByRole('combobox', { name: /campaign.timeZone/i });
+		await userEvent.selectOptions(timeZoneSelect, 'CET');
+
+		expect(props.setFilters).toHaveBeenCalled();
+	});
+
+	// 1️⃣8️⃣ Actualizar los campos exclusivos de TABLETOP llama a setFilters
+	test('actualiza el estado al interactuar con los campos exclusivos de TABLETOP', async () => {
+		const props = buildProps(tabletopTheme); // Aseguramos que es modo Tabletop
+		render(<CampaignFilterBar {...props} />);
+		await userEvent.click(screen.getByRole('button', { name: /filter.filter/i }));
+
+		await userEvent.type(screen.getByRole('textbox', { name: /campaign.system/i }), 'D&D 5e');
+		await userEvent.type(screen.getByRole('textbox', { name: /campaign.location/i }), 'Madrid');
+		await userEvent.type(screen.getByRole('textbox', { name: /campaign.duration/i }), '3 horas');
+
+		const dayWeekSelect = screen.getByRole('combobox', { name: /campaign.dayWeek/i });
+		await userEvent.selectOptions(dayWeekSelect, 'saturday');
+
+		expect(props.setFilters).toHaveBeenCalled();
+	});
 });

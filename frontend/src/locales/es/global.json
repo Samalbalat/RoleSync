@@ -379,7 +379,8 @@
       "withoutCharacters": "Aún no hay jugadores en esta campaña."
     },
     "editCharacter": "Editar Personaje",
-    "noAttributes": "Este personaje aún no tiene detalles."
+    "noAttributes": "Este personaje aún no tiene detalles.",
+    "accessDeniedMessage": "No tienes permiso para editar este personaje."
   },
   "status": {
     "open": "Abierta",
@@ -521,5 +522,8 @@
   },
   "myCampaigns": {
     "description": "Gestiona las campañas que diriges y en las que participas."
+  },
+  "template": {
+    "accessDeniedMessage": "'No tienes permiso para editar esta plantilla.'"
   }
 }

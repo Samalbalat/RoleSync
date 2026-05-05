@@ -32,7 +32,7 @@ const LoadingContent = ({ theme, t }) => (
 const CharacterHeader = ({ character, theme, t, navigate, location, handleClose }) => (
 	<DialogHeader className={`flex items-center gap-4 border-b border-gray-200 ${theme.bgLight} p-4 rounded-t-lg`}>
 		<Avatar
-			src={character.image || buildAvatarFallback(character.name)}
+			src={character.characterImage || buildAvatarFallback(character.name)}
 			alt={character.name}
 			size='xl'
 			className={`border-2 ${theme.textPrimary} shadow-sm`}
@@ -46,7 +46,7 @@ const CharacterHeader = ({ character, theme, t, navigate, location, handleClose 
 				{character.name}
 			</Typography>
 			<Typography variant='small' color='blue-gray' className='font-normal'>
-				{t('campaign.campaign')}: {character.campaign?.name || t('home.playerCharacters.noCampaign')}
+				{t('campaign.campaign')}: {character.campaignName || t('home.playerCharacters.noCampaign')}
 			</Typography>
 		</div>
 		<div className='absolute top-2 right-2 z-10'>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardBody, Typography, Input, Button, IconButton, Textarea } from '@material-tailwind/react';
 import { PlusIcon, TrashIcon, CheckIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
@@ -13,6 +13,13 @@ export default function FreeStyleCharacterForm() {
 	const navigate = useNavigate();
 	const theme = getTheme();
 	const { t } = useTranslation('global');
+	const timerRef = useRef(null);
+
+	useEffect(() => {
+		return () => {
+			if (timerRef.current) clearTimeout(timerRef.current);
+		};
+	}, []);
 
 	const {
 		register,
@@ -59,7 +66,7 @@ export default function FreeStyleCharacterForm() {
 
 			toast.success(t('character.message.successCreating', { name: payload.name }));
 
-			setTimeout(() => navigate('/characters'), 1500);
+			timerRef.current = setTimeout(() => navigate('/characters'), 1500);
 		} catch (error) {
 			console.error('Error al guardar el personaje:', error);
 

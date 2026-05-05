@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { getTheme } from '../../utils/themeUtils';
 import CharacterService from '../../services/CharacterService';
 import EditCharacterForm from '../../components/character/EditCharacterForm';
+import AccessDeniedView from '../../components/layout/AccesDeniedView';
 
 export default function EditCharacterPage() {
 	const { id: characterId } = useParams();
@@ -13,7 +14,9 @@ export default function EditCharacterPage() {
 	const navigate = useNavigate();
 
 	const [characterData, setCharacterData] = useState(null);
+	const [accessDenied, setAccessDenied] = useState(false);
 	const [loading, setLoading] = useState(true);
+	const storedProfile = JSON.parse(localStorage.getItem('activeProfile'));
 
 	useEffect(() => {
 		const fetchCharacter = async () => {
@@ -21,10 +24,20 @@ export default function EditCharacterPage() {
 				setLoading(true);
 
 				const data = await CharacterService.getCharacterById(characterId);
+
+				const profileName = storedProfile?.name?.trim().toLowerCase();
+				const username = data?.username?.trim().toLowerCase();
+				if (profileName && username && profileName !== username) {
+					setAccessDenied(true);
+				}
 				setCharacterData(data);
 			} catch (error) {
-				console.error('Error al cargar el personaje para editar:', error);
-				navigate(-1);
+				if (error.response?.status === 404) {
+					setAccessDenied(true);
+				} else {
+					console.error('Error al cargar el personaje para editar:', error);
+					navigate(-1);
+				}
 			} finally {
 				setLoading(false);
 			}
@@ -33,9 +46,9 @@ export default function EditCharacterPage() {
 		if (characterId) {
 			fetchCharacter();
 		}
-	}, [characterId, navigate]);
+	}, [characterId, navigate, storedProfile]);
 
-	if (loading || !characterData) {
+	if (loading) {
 		return (
 			<div className={`min-h-screen bg-gray-50 flex flex-col items-center justify-center`}>
 				<Spinner className={`h-12 w-12 text-${theme.primary}-500`} />
@@ -44,6 +57,10 @@ export default function EditCharacterPage() {
 				</Typography>
 			</div>
 		);
+	}
+
+	if (accessDenied) {
+		return <AccessDeniedView t={t} type={'character'} />;
 	}
 
 	return (

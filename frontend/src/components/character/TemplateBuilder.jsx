@@ -26,12 +26,14 @@ import {
 	rangeMax,
 } from '../../utils/character/templateBuilderUtils';
 import { TEMPLATE_PRESETS } from '../../utils/character/templatePresets';
+import AccessDeniedView from '../layout/AccesDeniedView';
 
 export default function TemplateBuilder() {
 	const { t } = useTranslation('global');
 	const navigate = useNavigate();
 	const location = useLocation();
 	const theme = getTheme();
+	const storedProfile = JSON.parse(localStorage.getItem('activeProfile'));
 
 	// --- PARÁMETROS DE LA URL ---
 	const [searchParams] = useSearchParams();
@@ -48,6 +50,7 @@ export default function TemplateBuilder() {
 	const [fields, setFields] = useState([]);
 	const [editingIndex, setEditingIndex] = useState(null);
 	const [errors, setErrors] = useState({});
+	const [accessDenied, setAccessDenied] = useState(false);
 
 	const [currentField, setCurrentField] = useState({
 		label: '',
@@ -69,6 +72,12 @@ export default function TemplateBuilder() {
 			const fetchTemplateData = async () => {
 				try {
 					const data = await CharacterService.getTemplateById(templateId);
+
+					const profileName = storedProfile?.name?.trim().toLowerCase();
+					const username = data?.username?.trim().toLowerCase();
+					if (profileName && username && profileName !== username) {
+						setAccessDenied(true);
+					}
 					setTemplateName(data.name || '');
 
 					if (!searchParams.get('campaignId')) {
@@ -82,8 +91,12 @@ export default function TemplateBuilder() {
 						setFields([]);
 					}
 				} catch (error) {
-					console.error('Error al cargar la plantilla:', error);
-					toast.error(t('character.templateBuilder.errorLoadCharacter'));
+					if (error.response?.status === 404) {
+						setAccessDenied(true);
+					} else {
+						console.error('Error al cargar la plantilla:', error);
+						toast.error(t('character.templateBuilder.errorLoadCharacter'));
+					}
 				} finally {
 					setIsLoading(false);
 				}
@@ -91,7 +104,7 @@ export default function TemplateBuilder() {
 
 			fetchTemplateData();
 		}
-	}, [templateId, isEditMode, t, searchParams]);
+	}, [templateId, isEditMode, t, searchParams, storedProfile]);
 
 	useEffect(() => {
 		if (cloneId && !isEditMode) {
@@ -233,6 +246,10 @@ export default function TemplateBuilder() {
 		}
 	};
 
+	if (accessDenied) {
+		return <AccessDeniedView t={t} type={'character'} />;
+	}
+
 	if (isLoading) {
 		return (
 			<div className='flex flex-col items-center justify-center h-[60vh] gap-4'>
@@ -296,6 +313,7 @@ export default function TemplateBuilder() {
 								</div>
 								<div className='flex gap-2'>
 									<IconButton
+										aria-label='edit-field'
 										color='blue'
 										variant='text'
 										onClick={() => startEditing(index)}
@@ -303,7 +321,7 @@ export default function TemplateBuilder() {
 									>
 										<PencilIcon className='h-5 w-5' />
 									</IconButton>
-									<IconButton color='red' variant='text' onClick={() => removeField(index)}>
+									<IconButton aria-label='delete-field' color='red' variant='text' onClick={() => removeField(index)}>
 										<TrashIcon className='h-5 w-5' />
 									</IconButton>
 								</div>

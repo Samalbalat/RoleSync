@@ -135,6 +135,6 @@ describe('UserCharacterCarousel — Tests Unitarios', () => {
 		const headerButton = screen.getAllByRole('button', { name: /common.viewAll/i })[0];
 		await userEvent.click(headerButton);
 
-		expect(mockNavigate).toHaveBeenCalledWith('/profile');
+		expect(mockNavigate).toHaveBeenCalledWith('/myCharacters');
 	});
 });

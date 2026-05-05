@@ -76,8 +76,8 @@ describe('dynamicCharacterFormUtils', () => {
 				label:'Hero',
 				type:'boolean',
 				required:false,
-				min:0,
-				max:0,
+				min:null,
+				max:null,
 				value:false
 			}
 		]);
@@ -116,8 +116,8 @@ describe('dynamicCharacterFormUtils', () => {
 					label:'Fuerza',
 					type:'number',
 					required:false,
-					min:0,
-					max:0,
+					min:null,
+					max:null,
 					value:18
 				}
 			]

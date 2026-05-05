@@ -365,7 +365,8 @@
       "withoutCharacters": "There are no adventurers forged in this campaign yet."
     },
     "editCharacter": "Edit Character",
-    "noAttributes": "This character still has no details."
+    "noAttributes": "This character still has no details.",
+    "accessDeniedMessage": "You do not have permission to edit this character."
   },
   "status": {
     "open": "Open",
@@ -504,5 +505,8 @@
   },
   "myCampaigns": {
     "description": "Manage the campaigns you direct and participate in."
+  },
+  "template": {
+    "accessDeniedMessage": "'You do not have permission to edit this template.'"
   }
 }

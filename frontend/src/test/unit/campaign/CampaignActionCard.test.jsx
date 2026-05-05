@@ -3,12 +3,28 @@ import { vi, test, describe, expect, beforeEach } from 'vitest';
 import CampaignActionCard from '../../../components/campaign/detail/CampaignActionCard';
 
 // ─── Mocks ───────────────────────────────────────────────────────────────────
+vi.mock('react-router-dom', () => ({
+	useLocation: () => ({ pathname: '/' }),
+}));
+
+vi.mock('../../../components/campaign/detail/CreateTemplateModal', () => ({
+	default: ({ isOpen }) => (isOpen ? <div data-testid='create-template-modal'>Modal</div> : null),
+}));
 
 vi.mock('@material-tailwind/react', () => ({
+	Dialog: ({ children, open }) => (open ? <div data-testid='dialog'>{children}</div> : null),
+	DialogHeader: ({ children }) => <header>{children}</header>,
+	DialogBody: ({ children }) => <main>{children}</main>,
+	DialogFooter: ({ children }) => <footer>{children}</footer>,
 	Card: ({ children }) => <div>{children}</div>,
 	CardBody: ({ children }) => <div>{children}</div>,
 	Typography: ({ children }) => <div>{children}</div>,
 	Button: ({ children, onClick, disabled }) => (
+		<button onClick={onClick} disabled={disabled}>
+			{children}
+		</button>
+	),
+	IconButton: ({ children, onClick, disabled }) => (
 		<button onClick={onClick} disabled={disabled}>
 			{children}
 		</button>
@@ -27,9 +43,13 @@ vi.mock('@material-tailwind/react', () => ({
 vi.mock('@heroicons/react/24/outline', () => ({
 	PencilSquareIcon: () => null,
 	DocumentCheckIcon: () => null,
+	DocumentDuplicateIcon: () => null,
 	DocumentPlusIcon: () => null,
 	ClockIcon: () => null,
 	UserCircleIcon: () => null,
+	XMarkIcon: () => null,
+	BookOpenIcon: () => null,
+	EyeIcon: () => null,
 }));
 
 // JoinCampaignModal
@@ -114,10 +134,10 @@ describe('CampaignActionCard — Tests Unitarios', () => {
 		expect(navigate).toHaveBeenCalledWith('/campaigns/edit/1');
 	});
 
-	test('OWNER: navega a crear plantilla al hacer clic', () => {
+	test('OWNER: abre el modal de crear plantilla al hacer clic', () => {
 		render(<CampaignActionCard {...buildProps({ campaign: { userRelation: 'OWNER', id: 1 } })} />);
 		fireEvent.click(screen.getByRole('button', { name: /character.templateBuilder.createTemplate/i }));
-		expect(navigate).toHaveBeenCalledWith('/character/templateBuilder?campaignId=1');
+		expect(screen.getByTestId('create-template-modal')).toBeInTheDocument();
 	});
 
 	test('OWNER: navega a editar plantilla al hacer clic', () => {
@@ -125,7 +145,9 @@ describe('CampaignActionCard — Tests Unitarios', () => {
 			<CampaignActionCard {...buildProps({ campaign: { userRelation: 'OWNER', id: 1 } })} campaignTemplate={{ id: 99 }} />,
 		);
 		fireEvent.click(screen.getByRole('button', { name: /character.templateBuilder.editTemplate/i }));
-		expect(navigate).toHaveBeenCalledWith('/character/templateBuilder?campaignId=1&templateId=99');
+		expect(navigate).toHaveBeenCalledWith('/character/templateBuilder?&templateId=99', {
+			state: { from: '/' },
+		});
 	});
 
 	// ── Vista MEMBER ──────────────────────────────────────────────────────────
@@ -161,7 +183,9 @@ describe('CampaignActionCard — Tests Unitarios', () => {
 	test('MEMBER: navega a editar personaje al hacer clic', () => {
 		render(<CampaignActionCard {...buildProps({ campaign: { userRelation: 'MEMBER', characterId: 42 } })} />);
 		fireEvent.click(screen.getByRole('button', { name: /character.editCharacter/i }));
-		expect(navigate).toHaveBeenCalledWith('/character/edit/42');
+		expect(navigate).toHaveBeenCalledWith('/character/edit/42', {
+			state: { from: '/' },
+		});
 	});
 
 	// ── Vista VISITANTE ───────────────────────────────────────────────────────

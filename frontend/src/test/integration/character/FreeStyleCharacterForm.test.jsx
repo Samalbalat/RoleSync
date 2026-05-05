@@ -101,7 +101,7 @@ const getMTInput = labelText => screen.getByLabelText(labelText);
 
 describe('FreeStyleCharacterForm', () => {
 	beforeEach(() => {
-		vi.clearAllMocks();
+		vi.resetAllMocks();
 	});
 
 	test('renderiza correctamente el formulario inicial', () => {

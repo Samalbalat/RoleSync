@@ -31,7 +31,6 @@ export default function MyTemplatesPage() {
 			try {
 				setLoading(true);
 				const templateData = await characterService.getMyTemplates();
-				console.log('Plantillas obtenidas del backend:', templateData);
 				setTemplates(Array.isArray(templateData) ? templateData : []);
 			} catch (error) {
 				console.error('Error cargando plantillas:', error);
