@@ -512,7 +512,8 @@ public class CampaignController {
         dto.setImage(campaign.getImage());
         dto.setStatus(campaign.getStatus().name());
         dto.setType(campaign.getCampaignType().name());
-        dto.setCurrentPlayers(campaign.getMembers() != null ? Arrays.asList(campaign.getMembers()).size() : 0);
+        dto.setCurrentPlayers(campaign.getMembers() != null ? campaign.getMembers().size() : 0);
+        
         dto.setMaxPlayers(campaign.getMaxPlayers());
 
         OwnerProfileDTO owner = new OwnerProfileDTO();
