@@ -94,7 +94,7 @@ public class CharacterSheetController {
             @RequestHeader("X-Profile-Name") String profileName
     ) 
     {   
-        return getSheetById(authentication, id, profileName);
+        return getSheetById(authentication, id, false, profileName);
     }
 
     @GetMapping("/templates/{id}")
@@ -104,7 +104,7 @@ public class CharacterSheetController {
             @RequestHeader("X-Profile-Name") String profileName
     ) 
     {   
-        return getSheetById(authentication, id, profileName);
+        return getSheetById(authentication, id, true, profileName);
     }
 
     // ---------- PUT CHARACTER BY ID ----------
@@ -285,11 +285,11 @@ public class CharacterSheetController {
         return ResponseEntity.ok(response);
     }
 
-    private ResponseEntity<?> getSheetById(Authentication authentication, Long id, @RequestHeader ("X-Profile-Name") String profileName) {
+    private ResponseEntity<?> getSheetById(Authentication authentication, Long id, boolean isTemplate, @RequestHeader ("X-Profile-Name") String profileName) {
         if(!utilsCalls.checkAuthAndProfile(authentication, profileName)){
             return ResponseEntity.status(403).body("User not authenticated or profile not found");
         }
-        Optional<CharacterSheet> character = characterSheetRepository.findById(id);
+        Optional<CharacterSheet> character = characterSheetRepository.findByIdAndIsTemplate(id, isTemplate);
         Optional<Profile> userOpt = profileRepository.findByProfilename(profileName);
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(403).body("User not found");
