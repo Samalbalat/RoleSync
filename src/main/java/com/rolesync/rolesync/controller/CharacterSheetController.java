@@ -197,6 +197,8 @@ public class CharacterSheetController {
         characterSheetRepository.save(characterSheet);
         
         response.setId(characterSheet.getId());
+        response.setImage(dto.getAvatar_url());
+        response.setName(dto.getName());
         response.setSchema_definition(dto.getAttributes());
         return ResponseEntity.ok(response);
     }
