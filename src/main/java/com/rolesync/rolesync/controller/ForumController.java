@@ -24,6 +24,7 @@ import com.rolesync.rolesync.dto.forumcontroller.GetForumPostsOutItemDTO;
 import com.rolesync.rolesync.dto.forumcontroller.GetForumPostsOutMetaDTO;
 import com.rolesync.rolesync.dto.forumcontroller.PostCampaignPostsInDTO;
 import com.rolesync.rolesync.dto.forumcontroller.PostForumPostsInDTO;
+import com.rolesync.rolesync.dto.forumcontroller.PutPostModerateInDTO;
 import com.rolesync.rolesync.model.Campaign;
 import com.rolesync.rolesync.model.CharacterSheet;
 import com.rolesync.rolesync.model.Post;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
@@ -291,6 +293,73 @@ public class ForumController {
         }
         CampaignPostDTO campaignPostDto = postService.createCampaignPost(request, profile, character, campaign, relation);
         return ResponseEntity.ok().body(campaignPostDto);
+    }
+
+    @PutMapping("post/{id}/lock")
+    public ResponseEntity<?> putPostLock(
+            @PathVariable Long id,
+            @RequestHeader("X-Profile-Name") String profileName,
+            Authentication authentication,
+            @RequestBody PutPostModerateInDTO request) {
+
+        // Security checks
+        ResponseEntity<?> accessCheck = validateAccess(authentication, profileName);
+        if (accessCheck != null) return accessCheck;
+        Profile profile = profileRepository.findByProfilename(profileName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        boolean canModify = false;
+        if (post.getCampaign() == null) {
+            // Forum post → only author
+            canModify = post.getAuthorProfileId().equals(profile.getId());
+        } else {
+            Campaign campaign = campaignRepository.findById(post.getCampaign().getId())
+                    .orElse(null);
+            String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
+            // Campaign post → owner OR author
+            canModify = "OWNER".equals(relation) ||
+                        post.getAuthorProfileId().equals(profile.getId());
+        }
+        if (!canModify) {
+            return ResponseEntity.status(403).body("Access denied");
+        }
+        post.setLocked(request.getIsLocked());
+        postRepository.save(post);
+        return ResponseEntity.ok()
+                .body("Post " + (request.getIsLocked() ? "locked" : "unlocked"));
+    }
+
+    @PutMapping("post/{id}/pin")
+    public ResponseEntity<?> putPostModerate(
+            @PathVariable Long id,
+            @RequestHeader("X-Profile-Name") String profileName,
+            Authentication authentication,
+            @RequestBody PutPostModerateInDTO request) {
+        // Security checks
+        ResponseEntity<?> accessCheck = validateAccess(authentication, profileName);
+        if (accessCheck != null) return accessCheck;
+        Profile profile = profileRepository.findByProfilename(profileName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if(post.getCampaign() != null){
+        Campaign campaign = campaignRepository.findById(post.getCampaign().getId())
+                .orElse(null);
+        String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
+        // Campaign post → owner OR author
+        boolean canModify = "OWNER".equals(relation) ||
+                    post.getAuthorProfileId().equals(profile.getId());
+            if (!canModify) {
+                return ResponseEntity.status(403).body("Access denied");
+            }
+        }else{
+            return ResponseEntity.status(400).body("Post is not a campaign post, therefore cannot be pinned");
+        }
+        post.setLocked(request.getIsLocked());
+        postRepository.save(post);
+        return ResponseEntity.ok()
+                .body("Post " + (request.getIsLocked() ? "locked" : "unlocked"));
     }
 
     @PostMapping("forums/posts")
