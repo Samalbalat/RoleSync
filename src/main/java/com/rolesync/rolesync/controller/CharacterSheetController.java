@@ -297,26 +297,8 @@ public class CharacterSheetController {
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(403).body("User not found");
         }else{
-            if (character.isEmpty()) {
-            return ResponseEntity.status(404).body("Character not found");
-            }
-            CharacterSheet sheet = character.get();
-            if (Boolean.TRUE.equals(sheet.getIsPublic())) {
-                return ResponseEntity.ok(new CharacterSheetGetOutDTO(sheet));
-            }
-            if (sheet.getCampaign() != null) {
-                if (!profileBelongsToCampaign(profileName, sheet.getCampaign())) {
-                    return ResponseEntity.status(403).body("User is not a member of the campaign");
-                }
-                return ResponseEntity.ok(new CharacterSheetGetOutDTO(sheet));
-            }
-            if (!sheet.getOwner().getProfilename().equals(profileName)) {
-                String type = Boolean.TRUE.equals(sheet.getIsTemplate()) ? "template" : "character";
-                return ResponseEntity.status(403)
-                        .body("User is not the owner of this " + type);
-            }
-            return ResponseEntity.ok(new CharacterSheetGetOutDTO(sheet));
-            }
+            return getSheetByIdChecking(character, profileName);
+        }
     }
 
     private ResponseEntity<?> updateSheet(Authentication authentication, Long id, CharacterSheetInPostDTO dto, @RequestHeader ("X-Profile-Name") String profileName) {
@@ -348,5 +330,27 @@ public class CharacterSheetController {
         return campaign.getOwnerName().equals(profilename) ||
             (campaign.getMembers() != null && campaign.getMembers().contains(profilename));
     }
+
+    private ResponseEntity<?> getSheetByIdChecking(Optional<CharacterSheet> character, String profileName) {
+        if (character.isEmpty()) {
+            return ResponseEntity.status(404).body("Character not found");
+            }
+            CharacterSheet sheet = character.get();
+            if (Boolean.TRUE.equals(sheet.getIsPublic())) {
+                return ResponseEntity.ok(new CharacterSheetGetOutDTO(sheet));
+            }
+            if (sheet.getCampaign() != null) {
+                if (!profileBelongsToCampaign(profileName, sheet.getCampaign())) {
+                    return ResponseEntity.status(403).body("User is not a member of the campaign");
+                }
+                return ResponseEntity.ok(new CharacterSheetGetOutDTO(sheet));
+            }
+            if (!sheet.getOwner().getProfilename().equals(profileName)) {
+                String type = Boolean.TRUE.equals(sheet.getIsTemplate()) ? "template" : "character";
+                return ResponseEntity.status(403)
+                        .body("User is not the owner of this " + type);
+            }
+            return ResponseEntity.ok(new CharacterSheetGetOutDTO(sheet));
+        }
 }
 
