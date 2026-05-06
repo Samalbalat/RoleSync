@@ -168,7 +168,7 @@ public class CharacterSheetController {
         characterSheet.setOwner(profileOpt.get());
 
         if(dto.getCampaign_id()!=null){
-            assignCampingToPost(characterSheet, response, dto, isTemplate, profileName);
+            assignCampingToPost(characterSheet, response, dto, profileName);
         }else{
             characterSheet.setCampaign(null);
         }
@@ -186,7 +186,7 @@ public class CharacterSheetController {
         return ResponseEntity.ok(response);
     }
 
-    private ResponseEntity<?> assignCampingToPost(CharacterSheet characterSheet, CharacterTemplateOutPostDTO response, CharacterSheetInPostDTO dto, boolean isTemplate, String profileName){
+    private ResponseEntity<?> assignCampingToPost(CharacterSheet characterSheet, CharacterTemplateOutPostDTO response, CharacterSheetInPostDTO dto, String profileName){
             Optional<Campaign> campaignOpt = campaignRepository.findById(dto.getCampaign_id());
             if (!campaignOpt.isEmpty()) {
                 Campaign campaign = campaignOpt.get();
