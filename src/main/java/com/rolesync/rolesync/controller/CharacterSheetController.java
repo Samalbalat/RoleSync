@@ -168,24 +168,7 @@ public class CharacterSheetController {
         characterSheet.setOwner(profileOpt.get());
 
         if(dto.getCampaign_id()!=null){
-            Optional<Campaign> campaignOpt = campaignRepository.findById(dto.getCampaign_id());
-
-            if (!campaignOpt.isEmpty()) {
-                Campaign campaign = campaignOpt.get();
-                Profile activeProfile = profileRepository.findByProfilename(profileName)
-                    .orElseThrow(() -> new IllegalStateException("Active profile not found"));
-
-                if (!campaign.getOwnerName().equals(activeProfile.getProfilename()) &&
-                    (campaign.getMembers() == null || !campaign.getMembers().contains(activeProfile.getProfilename()))) {
-                    return ResponseEntity.status(403).body("User is not a member of the campaign");
-                }
-                characterSheet.setCampaign(campaign);
-                response.setCampaign_name(campaign.getName());
-                response.setCampaign_id(dto.getCampaign_id().toString());
-
-            }else{
-                return ResponseEntity.status(404).body("Campaign not found");
-            }
+            assignCampingToPost(characterSheet, response, dto, isTemplate, profileName);
         }else{
             characterSheet.setCampaign(null);
         }
@@ -201,6 +184,26 @@ public class CharacterSheetController {
         response.setName(dto.getName());
         response.setSchema_definition(dto.getAttributes());
         return ResponseEntity.ok(response);
+    }
+
+    private ResponseEntity<?> assignCampingToPost(CharacterSheet characterSheet, CharacterTemplateOutPostDTO response, CharacterSheetInPostDTO dto, boolean isTemplate, String profileName){
+            Optional<Campaign> campaignOpt = campaignRepository.findById(dto.getCampaign_id());
+            if (!campaignOpt.isEmpty()) {
+                Campaign campaign = campaignOpt.get();
+                Profile activeProfile = profileRepository.findByProfilename(profileName)
+                    .orElseThrow(() -> new IllegalStateException("Active profile not found"));
+
+                if (!campaign.getOwnerName().equals(activeProfile.getProfilename()) &&
+                    (campaign.getMembers() == null || !campaign.getMembers().contains(activeProfile.getProfilename()))) {
+                    return ResponseEntity.status(403).body("User is not a member of the campaign");
+                }
+                characterSheet.setCampaign(campaign);
+                response.setCampaign_name(campaign.getName());
+                response.setCampaign_id(dto.getCampaign_id().toString());
+                return ResponseEntity.ok(response);
+            }else{
+                return ResponseEntity.status(404).body("Campaign not found");
+            }
     }
 
     private ResponseEntity<?> getSheets(boolean isTemplate) {
@@ -294,23 +297,26 @@ public class CharacterSheetController {
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(403).body("User not found");
         }else{
-            if(character.isEmpty()){
-                return ResponseEntity.status(404).body("Character not found");
-            }else if(character.get().getIsPublic()){
-                return ResponseEntity.ok(new CharacterSheetGetOutDTO(character.get()));
-            }else if(character.get().getCampaign()!=null){
-                Campaign campaign = character.get().getCampaign();
-                if(!profileBelongsToCampaign(profileName, campaign)){
-                    return ResponseEntity.status(403).body("User is not a member of the campaign");
-                }else{
-                    return ResponseEntity.ok(new CharacterSheetGetOutDTO(character.get()));
-                }
-            }else if(!character.get().getOwner().getProfilename().equals(profileName)){
-                String conditionalMessageIfIsTemplate = character.get().getIsTemplate() ? "template" : "character";
-                return ResponseEntity.status(403).body("User is not the owner of this " + conditionalMessageIfIsTemplate);
+            if (character.isEmpty()) {
+            return ResponseEntity.status(404).body("Character not found");
             }
-            return ResponseEntity.ok(new CharacterSheetGetOutDTO(character.get()));
-        }
+            CharacterSheet sheet = character.get();
+            if (Boolean.TRUE.equals(sheet.getIsPublic())) {
+                return ResponseEntity.ok(new CharacterSheetGetOutDTO(sheet));
+            }
+            if (sheet.getCampaign() != null) {
+                if (!profileBelongsToCampaign(profileName, sheet.getCampaign())) {
+                    return ResponseEntity.status(403).body("User is not a member of the campaign");
+                }
+                return ResponseEntity.ok(new CharacterSheetGetOutDTO(sheet));
+            }
+            if (!sheet.getOwner().getProfilename().equals(profileName)) {
+                String type = Boolean.TRUE.equals(sheet.getIsTemplate()) ? "template" : "character";
+                return ResponseEntity.status(403)
+                        .body("User is not the owner of this " + type);
+            }
+            return ResponseEntity.ok(new CharacterSheetGetOutDTO(sheet));
+            }
     }
 
     private ResponseEntity<?> updateSheet(Authentication authentication, Long id, CharacterSheetInPostDTO dto, @RequestHeader ("X-Profile-Name") String profileName) {

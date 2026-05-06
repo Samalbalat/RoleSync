@@ -83,6 +83,15 @@ public class PostService {
         post.setLocked(false);
 
         // Visibility (optional)
+        visibilityAssigner(post, request);
+        
+        postRepository.saveAndFlush(post);
+        eventPublisher.publishEvent(new PostCreatedEvent(profile));
+        return post;
+    }
+    
+    private void visibilityAssigner(Post post, PostCampaignPostsInDTO request) {
+        // Visibility (optional)
         if (request.getVisibleToCharacterIds() != null && !request.getVisibleToCharacterIds().isEmpty()) {
             List<CharacterSheet> visibleCharacters = characterRepository
                     .findAllById(request.getVisibleToCharacterIds());
@@ -94,11 +103,7 @@ public class PostService {
         } else {
             post.setVisibleToCharacterIds(new HashSet<>()); // empty set means visible to all characters
         }
-        postRepository.saveAndFlush(post);
-        eventPublisher.publishEvent(new PostCreatedEvent(profile));
-        return post;
     }
-
     
     private Post createPostFromRequest(PostForumPostsInDTO request, Post post, Profile profile) {
         post.setType(PostType.valueOf(request.getType()));
@@ -129,19 +134,5 @@ public class PostService {
         postRepository.saveAndFlush(post);
         eventPublisher.publishEvent(new PostCreatedEvent(profile));
         return post;
-    }
-    
-    private void visibilityPostAsigner(Post post, PostCampaignPostsInDTO request) {
-        if (request.getVisibleToCharacterIds() != null && !request.getVisibleToCharacterIds().isEmpty()) {
-            List<CharacterSheet> visibleCharacters = characterRepository
-                    .findAllById(request.getVisibleToCharacterIds());
-            if (visibleCharacters.size() != request.getVisibleToCharacterIds().size()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Some character IDs are invalid");
-            }
-            post.setVisibleToCharacterIds(
-                    (new HashSet<>(visibleCharacters.stream().map(CharacterSheet::getId).toList())));
-        } else {
-            post.setVisibleToCharacterIds(new HashSet<>()); // empty set means visible to all characters
-        }
     }
 }
