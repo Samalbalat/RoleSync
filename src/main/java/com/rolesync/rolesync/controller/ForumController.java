@@ -324,10 +324,13 @@ public class ForumController {
         if (!canModify) {
             return ResponseEntity.status(403).body("Access denied");
         }
-        post.setLocked(request.getIsLocked());
+        if(request.getIsLocked() != null){
+        post.setLocked(Boolean.parseBoolean(request.getIsLocked()));
         postRepository.save(post);
         return ResponseEntity.ok()
-                .body("Post " + (request.getIsLocked() ? "locked" : "unlocked"));
+                .body("Post " + (Boolean.parseBoolean(request.getIsLocked()) ? "locked" : "unlocked"));
+        }
+        return ResponseEntity.badRequest().body("Invalid request: isLocked value is required");
     }
 
     @PutMapping("post/{id}/pin")
@@ -356,10 +359,13 @@ public class ForumController {
         }else{
             return ResponseEntity.status(400).body("Post is not a campaign post, therefore cannot be pinned");
         }
-        post.setLocked(request.getIsLocked());
-        postRepository.save(post);
-        return ResponseEntity.ok()
-                .body("Post " + (request.getIsLocked() ? "locked" : "unlocked"));
+        if(request.getIsPinned() != null){
+            post.setPinned(Boolean.parseBoolean(request.getIsPinned()));
+                    postRepository.save(post);
+            return ResponseEntity.ok()
+                .body("Post " + (Boolean.parseBoolean(request.getIsPinned()) ? "pinned" : "unpinned"));
+        }
+        return ResponseEntity.badRequest().body("Invalid request: isPinned value is required");
     }
 
     @PostMapping("forums/posts")

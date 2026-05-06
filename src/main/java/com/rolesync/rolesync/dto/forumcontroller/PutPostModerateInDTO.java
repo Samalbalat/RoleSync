@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class PutPostModerateInDTO {
-    private Boolean isLocked;
-    private Boolean isPinned;
+    private String isLocked;
+    private String isPinned;
 }
