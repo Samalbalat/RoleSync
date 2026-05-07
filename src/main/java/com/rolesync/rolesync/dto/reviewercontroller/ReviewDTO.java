@@ -1,4 +1,4 @@
-package com.rolesync.rolesync.dto.reviwercontroller;
+package com.rolesync.rolesync.dto.reviewercontroller;
 
 import java.time.Instant;
 

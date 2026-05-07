@@ -1,6 +1,6 @@
 package com.rolesync.rolesync.controller;
 
-import com.rolesync.rolesync.dto.reviwercontroller.CreateReviewDTO;
+import com.rolesync.rolesync.dto.reviewercontroller.CreateReviewDTO;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.ReviewTargetType;
 import com.rolesync.rolesync.repository.ProfileRepository;

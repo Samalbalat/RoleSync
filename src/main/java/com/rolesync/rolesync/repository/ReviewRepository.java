@@ -1,6 +1,6 @@
 package com.rolesync.rolesync.repository;
 
-import com.rolesync.rolesync.dto.reviwercontroller.ReviewSummaryDTO;
+import com.rolesync.rolesync.dto.reviewercontroller.ReviewSummaryDTO;
 import com.rolesync.rolesync.model.Review;
 import com.rolesync.rolesync.model.ReviewTargetType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,7 +31,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     );
 
     @Query("""
-        SELECT new com.rolesync.rolesync.dto.reviwercontroller.ReviewSummaryDTO(
+        SELECT new com.rolesync.rolesync.dto.reviewercontroller.ReviewSummaryDTO(
                 COALESCE(AVG(r.rating), 0),
                 COUNT(r)
         )

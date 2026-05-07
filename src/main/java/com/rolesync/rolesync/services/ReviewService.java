@@ -1,8 +1,8 @@
 package com.rolesync.rolesync.services;
 
-import com.rolesync.rolesync.dto.reviwercontroller.CreateReviewDTO;
-import com.rolesync.rolesync.dto.reviwercontroller.ReviewDTO;
-import com.rolesync.rolesync.dto.reviwercontroller.ReviewSummaryDTO;
+import com.rolesync.rolesync.dto.reviewercontroller.CreateReviewDTO;
+import com.rolesync.rolesync.dto.reviewercontroller.ReviewDTO;
+import com.rolesync.rolesync.dto.reviewercontroller.ReviewSummaryDTO;
 import com.rolesync.rolesync.model.*;
 import com.rolesync.rolesync.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
