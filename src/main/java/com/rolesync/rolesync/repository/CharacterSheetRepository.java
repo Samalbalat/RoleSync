@@ -1,6 +1,7 @@
 package com.rolesync.rolesync.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -17,6 +18,8 @@ public interface CharacterSheetRepository
     List<CharacterSheet> findByCampaignAndIsTemplate(Campaign campaign, Boolean isTemplate);
 
     List<CharacterSheet> findByIsTemplateAndIsPublic(Boolean isTemplate, Boolean isPublic);
+
+    Optional<CharacterSheet> findByIdAndIsTemplate(Long id, Boolean isTemplate);
 
     List<CharacterSheet> findByOwnerAndIsTemplate(Profile owner, Boolean isTemplate);
 

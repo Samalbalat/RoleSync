@@ -51,10 +51,9 @@ El proyecto sigue la arquitectura estándar de un backend en Spring Boot:
 ## 🔧 Requisitos y configuración
 
 Necesitaras tener PostgreSQL instalado, Java 21, Maven y adecuar el archivo application.properties a una base de datos limpia para que se puedan crear las tablas inciales de la aplicación
+
 ---
+
 ## 🧪 Cómo probar
+
 Se puede testear mediante el uso de Bruno, Insomnia o Postman con llamadas a la dirección de localhost
-
-
-
-

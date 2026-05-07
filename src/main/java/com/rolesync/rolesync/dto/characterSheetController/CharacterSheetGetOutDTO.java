@@ -15,8 +15,8 @@ public class CharacterSheetGetOutDTO {
 
     private Long id;
     private Long userId;
+    private String username;
     private String name;
-    private String avatarUrl;
     private Long campaignId;
     private String campaignName;
     private Long templateId;
@@ -26,8 +26,8 @@ public class CharacterSheetGetOutDTO {
     public CharacterSheetGetOutDTO(CharacterSheet sheet) {
         this.id = sheet.getId();
         this.userId = sheet.getOwner().getId();
+        this.username = sheet.getOwner().getProfilename();
         this.name = sheet.getName();
-        this.avatarUrl = sheet.getImage();
         this.campaignId = sheet.getCampaign()!=null ? sheet.getCampaign().getId() : null;
         this.campaignName = sheet.getCampaign()!=null ? sheet.getCampaign().getName() : null;
         this.templateId = sheet.getTemplate()!=null ? sheet.getTemplate().getId() : null;

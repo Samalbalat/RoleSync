@@ -24,6 +24,7 @@ import com.rolesync.rolesync.dto.forumcontroller.GetForumPostsOutItemDTO;
 import com.rolesync.rolesync.dto.forumcontroller.GetForumPostsOutMetaDTO;
 import com.rolesync.rolesync.dto.forumcontroller.PostCampaignPostsInDTO;
 import com.rolesync.rolesync.dto.forumcontroller.PostForumPostsInDTO;
+import com.rolesync.rolesync.dto.forumcontroller.PutPostModerateInDTO;
 import com.rolesync.rolesync.model.Campaign;
 import com.rolesync.rolesync.model.CharacterSheet;
 import com.rolesync.rolesync.model.Post;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
@@ -167,26 +169,22 @@ public class ForumController {
         List<GetForumPostsOutItemDTO> dtoList = postRepository
                 .findForumPosts(tagList, pageable.getPageSize(), pageable.getOffset())
                 .stream()
-                .map(record -> {
-                    String[] tagsArr = (String[]) record[3];
-                    String[] mediaArr = (String[]) record[11];
-                    GetForumPostItemOutBasicData basicData = new GetForumPostItemOutBasicData(
-                            (Long) record[0],
-                            (String) record[1],
-                            (String) record[2],
-                            (String) record[4],
-                            (Instant) record[5],
-                            (Instant) record[6],
-                            (Boolean) record[7],
-                            (Boolean) record[8]);
-                    GetForumPostsOutItemDTO dto = new GetForumPostsOutItemDTO(
-                            basicData,
-                            new GetForumPostsOutItemAuthorDTO((String) record[9], (String) record[10]),
-                            mediaArr != null ? Arrays.asList(mediaArr) : List.of(),
-                            tagsArr != null ? Arrays.asList(tagsArr) : List.of());
-
-                    return dto;
-                })
+                .map(forumPostView -> new GetForumPostsOutItemDTO(
+                        new GetForumPostItemOutBasicData(
+                                forumPostView.getId(),
+                                forumPostView.getType(),
+                                forumPostView.getTitle(),
+                                forumPostView.getContent(),
+                                forumPostView.getCreatedAt(),
+                                forumPostView.getUpdatedAt(),
+                                forumPostView.getIsEdited(),
+                                forumPostView.getIsLocked()
+                        ),
+                        new GetForumPostsOutItemAuthorDTO(forumPostView.getProfilename(), forumPostView.getImage()),
+                        Arrays.asList(forumPostView.getMediaUrls()),
+                        Arrays.asList(forumPostView.getTags()),
+                        forumPostView.getReplyCount()
+                ))
                 .toList();
 
         GetForumPostsOutMetaDTO meta = new GetForumPostsOutMetaDTO(
@@ -295,6 +293,79 @@ public class ForumController {
         }
         CampaignPostDTO campaignPostDto = postService.createCampaignPost(request, profile, character, campaign, relation);
         return ResponseEntity.ok().body(campaignPostDto);
+    }
+
+    @PutMapping("post/{id}/lock")
+    public ResponseEntity<?> putPostLock(
+            @PathVariable Long id,
+            @RequestHeader("X-Profile-Name") String profileName,
+            Authentication authentication,
+            @RequestBody PutPostModerateInDTO request) {
+
+        // Security checks
+        ResponseEntity<?> accessCheck = validateAccess(authentication, profileName);
+        if (accessCheck != null) return accessCheck;
+        Profile profile = profileRepository.findByProfilename(profileName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        boolean canModify = false;
+        if (post.getCampaign() == null) {
+            // Forum post → only author
+            canModify = post.getAuthorProfileId().equals(profile.getId());
+        } else {
+            Campaign campaign = campaignRepository.findById(post.getCampaign().getId())
+                    .orElse(null);
+            String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
+            // Campaign post → owner OR author
+            canModify = "OWNER".equals(relation) ||
+                        post.getAuthorProfileId().equals(profile.getId());
+        }
+        if (!canModify) {
+            return ResponseEntity.status(403).body("Access denied");
+        }
+        if(request.getIsLocked() != null){
+        post.setLocked(Boolean.parseBoolean(request.getIsLocked()));
+        postRepository.save(post);
+        return ResponseEntity.ok()
+                .body("Post " + (Boolean.parseBoolean(request.getIsLocked()) ? "locked" : "unlocked"));
+        }
+        return ResponseEntity.badRequest().body("Invalid request: isLocked value is required");
+    }
+
+    @PutMapping("post/{id}/pin")
+    public ResponseEntity<?> putPostModerate(
+            @PathVariable Long id,
+            @RequestHeader("X-Profile-Name") String profileName,
+            Authentication authentication,
+            @RequestBody PutPostModerateInDTO request) {
+        // Security checks
+        ResponseEntity<?> accessCheck = validateAccess(authentication, profileName);
+        if (accessCheck != null) return accessCheck;
+        Profile profile = profileRepository.findByProfilename(profileName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if(post.getCampaign() != null){
+        Campaign campaign = campaignRepository.findById(post.getCampaign().getId())
+                .orElse(null);
+        String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
+        // Campaign post → owner OR author
+        boolean canModify = "OWNER".equals(relation) ||
+                    post.getAuthorProfileId().equals(profile.getId());
+            if (!canModify) {
+                return ResponseEntity.status(403).body("Access denied");
+            }
+        }else{
+            return ResponseEntity.status(400).body("Post is not a campaign post, therefore cannot be pinned");
+        }
+        if(request.getIsPinned() != null){
+            post.setPinned(Boolean.parseBoolean(request.getIsPinned()));
+                    postRepository.save(post);
+            return ResponseEntity.ok()
+                .body("Post " + (Boolean.parseBoolean(request.getIsPinned()) ? "pinned" : "unpinned"));
+        }
+        return ResponseEntity.badRequest().body("Invalid request: isPinned value is required");
     }
 
     @PostMapping("forums/posts")
