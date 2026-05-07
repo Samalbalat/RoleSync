@@ -1,46 +1,54 @@
 package com.rolesync.rolesync.model;
 
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.Instant;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import lombok.Data;
+import org.hibernate.annotations.Check;
 
 @Entity
-@Data
-@Table(name = "reviews", uniqueConstraints = {
-    @UniqueConstraint(columnNames={"reviewer_id", "target_id", "target_type"}) // Ensure one review per reviewer per target
-})
-
+@Table(name = "reviews",
+       uniqueConstraints = {
+           @UniqueConstraint(name = "uk_author_target",
+               columnNames = {"reviewer_id", "targetType", "targetId"})
+       }
+)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "reviewer_id")
+    // Quién escribe la reseña
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reviewer_id", nullable = false)
     private Profile reviewer;
 
-    private Long targetId;
-    private String targetType;
+    // A qué se aplica la reseña
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReviewTargetType targetType;
 
-    private int rawScore;
-    private float normalizedScore;
+    @Column(nullable = false)
+    private Long targetId;
+
+    // Datos de la reseña
+    @Column(nullable = false)
+    @Check(constraints = "rating >= 1 AND rating <= 5")
+    private Integer rating; // 1–5
 
     @Column(columnDefinition = "TEXT")
     private String comment;
 
-    private Float credibilityScore;
-    private Float qualityScore;
-    private Float finalScore;
-
+    @Column(nullable = false)
     private Instant createdAt;
+
+    @Column(nullable = false)
+    private Instant updatedAt;
 }
