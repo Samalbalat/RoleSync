@@ -45,20 +45,30 @@ public class ReviewController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ReviewDTO>> getReviews(
+    public ResponseEntity<?> getReviews(
             @RequestParam ReviewTargetType type,
-            @RequestParam Long targetId
+            @RequestParam Long targetId,
+            @RequestHeader("X-Profile-Name") String profileName,
+            Authentication authentication
     ) {
+        if (!utilsCalls.checkAuthAndProfile(authentication, profileName)) {
+            return ResponseEntity.status(403).body("No esás correctamente autenticado o el perfil no existe");
+        }
         return ResponseEntity.ok(
                 reviewService.getReviews(type, targetId)
         );
     }
 
     @GetMapping("/summary")
-    public ResponseEntity<ReviewSummaryDTO> getSummary(
+    public ResponseEntity<?> getSummary(
             @RequestParam ReviewTargetType type,
-            @RequestParam Long targetId
+            @RequestParam Long targetId,
+            @RequestHeader("X-Profile-Name") String profileName,
+            Authentication authentication
     ) {
+        if (!utilsCalls.checkAuthAndProfile(authentication, profileName)) {
+            return ResponseEntity.status(403).body("No esás correctamente autenticado o el perfil no existe");
+        }
         return ResponseEntity.ok(
                 reviewService.getSummary(type, targetId)
         );
