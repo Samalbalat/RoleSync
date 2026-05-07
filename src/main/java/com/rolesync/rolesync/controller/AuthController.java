@@ -58,7 +58,7 @@ public class AuthController {
         System.out.println(loginRequest);
         Optional<User> userOptional = userRepository.findByEmail(loginRequest.getEmail());
         if (userOptional.isEmpty()) {
-            return ResponseEntity.badRequest().body("Error: Usuario no encontrado.");
+            return ResponseEntity.badRequest().body("Error: User not found.");
         }
         User user = userOptional.get();
         Authentication authentication = authenticationManager.authenticate(
@@ -89,9 +89,9 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity.badRequest().body("Error: Correo  ya en uso");
+            return ResponseEntity.badRequest().body("Error: Email already in use");
         }else if(profileRepository.existsByProfilename(signUpRequest.getProfilename())){
-            return ResponseEntity.badRequest().body("Error: El nombre de perfil ya está en uso");
+            return ResponseEntity.badRequest().body("Error: Profile name already in use");
         }
         User user = new User(signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()), signUpRequest.getTimeZone());

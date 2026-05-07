@@ -51,9 +51,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequestMapping("/campaigns")
 public class CampaignController {
 
-    private static final String ERR_UNAUTHORIZED = "User is not authorized";
-    private static final String ERR_UNAUTHORIZED_UPDATE_REQUEST = "User is not authorized to update this request";
-    private static final String ERR_NOT_FOUND = "Resource not found";
+    private static final String ERR_UNAUTHORIZED = "Usuario no está autorizado para realizar esta acción";
+    private static final String ERR_UNAUTHORIZED_UPDATE_REQUEST = "Usuario no está autorizado para actualizar esta solicitud";
 
     private final CampaignRepository campaignRepository;
     private final ProfileRepository profileRepository;
