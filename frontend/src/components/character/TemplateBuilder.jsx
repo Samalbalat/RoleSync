@@ -132,13 +132,18 @@ export default function TemplateBuilder() {
 	}, [cloneId, isEditMode, t]);
 
 	useEffect(() => {
-		if (presetId && Object.hasOwn(TEMPLATE_PRESETS, presetId) && !isEditMode) {
-			const presetData = TEMPLATE_PRESETS[presetId];
-			setTemplateName(presetData.name);
+		if (!presetId || isEditMode) return;
 
-			if (Array.isArray(presetData.schema)) {
-				setFields(mapBackendSchemaToFields(presetData.schema));
-			}
+		const presetEntry = Object.entries(TEMPLATE_PRESETS).find(([key]) => key === presetId);
+
+		if (!presetEntry) return;
+
+		const [, presetData] = presetEntry;
+
+		setTemplateName(presetData.name);
+
+		if (Array.isArray(presetData.schema)) {
+			setFields(mapBackendSchemaToFields(presetData.schema));
 		}
 	}, [presetId, isEditMode]);
 
