@@ -63,6 +63,19 @@ const CharacterService = {
         }
     },
 
+    /**
+     * Obtener mis plantillas(los de mi usuario/perfil activo)
+     */
+    getMyTemplates: async () => {
+        try {
+            const response = await api.get('/rolesync/templates/me');
+            return response.data;
+        } catch (error) {
+            console.error("Error fetching my templates:", error);
+            throw error;
+        }
+    },
+
     
     // ==========================================
     // SECCIÓN: PERSONAJES (Characters)

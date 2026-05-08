@@ -30,9 +30,6 @@ export default function ProfileDetailModal({ isOpen, onClose, profileName, roleT
 		}
 	}, [isOpen, profileName, roleType]);
 
-	console.log('Perfil que pido:', profileName); // Debugging log
-	console.log('Perfil que obtengo', profileData); // Debugging log
-
 	const averageRating = Number(profileData?.rating ?? 0);
 	const totalReviews = Number(profileData?.totalReviews ?? 0);
 

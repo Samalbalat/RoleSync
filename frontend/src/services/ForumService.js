@@ -123,6 +123,36 @@ const ForumService = {
         }
     },
 
+    /**
+     * Pinnear un post en la campaña
+     * @param {number|string} postId 
+     * @param {boolean} isPinned
+     */
+    pinPost: async (postId, isPinned) => {
+        try {
+            const response = await api.put(`/post/${postId}/pin`, { isPinned });
+            return response.data;
+        } catch (error) {
+            console.error(`Error pinning post ${postId}:`, error);
+            throw error;
+        }
+    },
+
+    /**
+     * Bloquear un post en la campaña
+     * @param {number|string} postId 
+     * @param {boolean} isLocked
+     */
+    lockPost: async (postId, isLocked) => {
+        try {
+            const response = await api.put(`/post/${postId}/lock`, { isLocked });
+            return response.data;
+        } catch (error) {
+            console.error(`Error locking post ${postId}:`, error);
+            throw error;
+        }
+    },
+
     // ==========================================
     // SECCIÓN C: ENDPOINTS COMPARTIDOS (Interacciones con Posts)
     // ==========================================

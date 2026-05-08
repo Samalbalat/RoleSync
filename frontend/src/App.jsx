@@ -21,6 +21,9 @@ import CreateGeneralPost from './components/forum/CreateGeneralPost';
 import MyPostsPage from './pages/forum/MyPostsPage';
 import { ProfileDetailsPage } from './pages/profile/ProfileDetailsPage';
 import EditCharacterPage from './pages/character/EditCharacterPage';
+import MyCampaignsPage from './pages/campaign/MyCampaignsPage';
+import MyCharactersPage from './pages/character/MyCharactersPage';
+import MyTemplatesPage from './pages/character/MyTemplatesPage';
 
 function App() {
 	return (
@@ -60,6 +63,7 @@ function App() {
 							<Route path='campaign/:id' element={<CampaignDetailPage />} />
 							<Route path='campaigns/create' element={<CreateCampaignPage />} />
 							<Route path='campaigns/edit/:id' element={<EditCampaignPage />} />
+							<Route path='myCampaigns' element={<MyCampaignsPage />} />
 
 							{/* Rutas de Personajes */}
 							<Route
@@ -73,7 +77,9 @@ function App() {
 							{/* onClick={() => navigate(`/character/templateBuilder?campaignId=${campaign.id}`)} /> */}
 							<Route path='createCharacter' element={<CreateCharacterPage />} />
 							{/* onClick={() => navigate(`/createCharacter?campaignId=${campaign.id}`)} */}
-							<Route path='/character/edit/:id' element={<EditCharacterPage />} />
+							<Route path='character/edit/:id' element={<EditCharacterPage />} />
+							<Route path='myCharacters' element={<MyCharactersPage />} />
+							<Route path='myTemplates' element={<MyTemplatesPage />} />
 
 							{/* Rutas de Foros generales */}
 							<Route path='forum' element={<GeneralForumPage />} />

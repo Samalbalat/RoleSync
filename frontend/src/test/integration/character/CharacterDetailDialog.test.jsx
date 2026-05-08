@@ -15,6 +15,12 @@ vi.mock('react-i18next', () => ({
 	useTranslation: () => ({ t: mockT }),
 }));
 
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', () => ({
+	useNavigate: () => mockNavigate,
+	useLocation: () => ({ pathname: '/mock-path' }),
+}));
+
 vi.mock('react-hot-toast', () => ({
 	default: { error: vi.fn() },
 }));
@@ -32,6 +38,9 @@ vi.mock('@material-tailwind/react', () => ({
 	Typography: ({ children }) => <span>{children}</span>,
 	Avatar: ({ alt }) => <img alt={alt} data-testid='avatar' />,
 	Spinner: () => <span data-testid='spinner'>Cargando...</span>,
+	// Añadimos los que faltaban:
+	Tooltip: ({ children }) => <div data-testid='tooltip'>{children}</div>,
+	IconButton: ({ children, onClick }) => <button onClick={onClick}>{children}</button>,
 }));
 
 // ─── Datos de prueba ─────────────────────────────────────────────────────────
@@ -62,6 +71,7 @@ describe('CharacterDetailDialog — Tests Unitarios', () => {
 
 	beforeEach(() => {
 		vi.clearAllMocks();
+		mockNavigate.mockClear();
 	});
 
 	test('no llama al servicio si el modal está cerrado', () => {

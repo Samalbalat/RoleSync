@@ -13,7 +13,7 @@ import {
 } from '@material-tailwind/react';
 import { TrashIcon, PlusIcon, PencilIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getTheme } from '../../utils/themeUtils';
 import CharacterService from '../../services/CharacterService';
@@ -25,18 +25,24 @@ import {
 	rangeMin,
 	rangeMax,
 } from '../../utils/character/templateBuilderUtils';
+import { TEMPLATE_PRESETS } from '../../utils/character/templatePresets';
+import AccessDeniedView from '../layout/AccesDeniedView';
 
 export default function TemplateBuilder() {
 	const { t } = useTranslation('global');
 	const navigate = useNavigate();
+	const location = useLocation();
+	const theme = getTheme();
+	const storedProfile = JSON.parse(localStorage.getItem('activeProfile'));
 
 	// --- PARÁMETROS DE LA URL ---
 	const [searchParams] = useSearchParams();
-	const campaignId = searchParams.get('campaignId');
 	const templateId = searchParams.get('templateId');
+	const cloneId = searchParams.get('cloneId');
+	const presetId = searchParams.get('preset');
 	const isEditMode = !!templateId;
 
-	const theme = getTheme();
+	const [campaignId, setCampaignId] = useState(searchParams.get('campaignId'));
 
 	// --- ESTADOS GENERALES ---
 	const [isLoading, setIsLoading] = useState(isEditMode);
@@ -44,6 +50,7 @@ export default function TemplateBuilder() {
 	const [fields, setFields] = useState([]);
 	const [editingIndex, setEditingIndex] = useState(null);
 	const [errors, setErrors] = useState({});
+	const [accessDenied, setAccessDenied] = useState(false);
 
 	const [currentField, setCurrentField] = useState({
 		label: '',
@@ -65,7 +72,17 @@ export default function TemplateBuilder() {
 			const fetchTemplateData = async () => {
 				try {
 					const data = await CharacterService.getTemplateById(templateId);
+
+					const profileName = storedProfile?.name?.trim().toLowerCase();
+					const username = data?.username?.trim().toLowerCase();
+					if (profileName && username && profileName !== username) {
+						setAccessDenied(true);
+					}
 					setTemplateName(data.name || '');
+
+					if (!searchParams.get('campaignId')) {
+						setCampaignId(data.campaignId);
+					}
 
 					// Mapeamos los atributos del backend a nuestro formato del frontend
 					if (Array.isArray(data?.schema)) {
@@ -74,8 +91,12 @@ export default function TemplateBuilder() {
 						setFields([]);
 					}
 				} catch (error) {
-					console.error('Error al cargar la plantilla:', error);
-					toast.error(t('character.templateBuilder.errorLoadCharacter'));
+					if (error.response?.status === 404) {
+						setAccessDenied(true);
+					} else {
+						console.error('Error al cargar la plantilla:', error);
+						toast.error(t('character.templateBuilder.errorLoadCharacter'));
+					}
 				} finally {
 					setIsLoading(false);
 				}
@@ -83,7 +104,48 @@ export default function TemplateBuilder() {
 
 			fetchTemplateData();
 		}
-	}, [templateId, isEditMode, t]);
+	}, [templateId, isEditMode, t, searchParams]);
+
+	useEffect(() => {
+		if (cloneId && !isEditMode) {
+			const fetchCloneData = async () => {
+				setIsLoading(true);
+				try {
+					const data = await CharacterService.getTemplateById(cloneId);
+
+					// Podemos pre-rellenar el nombre con un "Copia de..." para que quede claro
+					setTemplateName(data.name ? `${data.name} (Copia)` : 'Plantilla Copiada');
+
+					if (Array.isArray(data?.schema)) {
+						setFields(mapBackendSchemaToFields(data.schema));
+					}
+				} catch (error) {
+					console.error('Error al cargar la plantilla a clonar:', error);
+					toast.error(t('character.templateBuilder.errorLoadCharacter'));
+				} finally {
+					setIsLoading(false);
+				}
+			};
+
+			fetchCloneData();
+		}
+	}, [cloneId, isEditMode, t]);
+
+	useEffect(() => {
+		if (!presetId || isEditMode) return;
+
+		const presetEntry = Object.entries(TEMPLATE_PRESETS).find(([key]) => key === presetId);
+
+		if (!presetEntry) return;
+
+		const [, presetData] = presetEntry;
+
+		setTemplateName(presetData.name);
+
+		if (Array.isArray(presetData.schema)) {
+			setFields(mapBackendSchemaToFields(presetData.schema));
+		}
+	}, [presetId, isEditMode]);
 
 	const handleChange = (name, value) => {
 		const allowedKeys = ['label', 'type', 'required', 'min', 'max'];
@@ -178,14 +240,20 @@ export default function TemplateBuilder() {
 				toast.success(t('character.templateBuilder.successSave'));
 			}
 
+			const returnUrl = location.state?.from || `/myTemplates`;
+
 			setTimeout(() => {
-				navigate(`/campaign/${campaignId}`);
+				navigate(returnUrl);
 			}, 1000);
 		} catch (error) {
 			console.error('Error al guardar la plantilla:', error);
 			toast.error(t('character.templateBuilder.errorSave'));
 		}
 	};
+
+	if (accessDenied) {
+		return <AccessDeniedView t={t} type={'character'} />;
+	}
 
 	if (isLoading) {
 		return (
@@ -250,6 +318,7 @@ export default function TemplateBuilder() {
 								</div>
 								<div className='flex gap-2'>
 									<IconButton
+										aria-label='edit-field'
 										color='blue'
 										variant='text'
 										onClick={() => startEditing(index)}
@@ -257,7 +326,7 @@ export default function TemplateBuilder() {
 									>
 										<PencilIcon className='h-5 w-5' />
 									</IconButton>
-									<IconButton color='red' variant='text' onClick={() => removeField(index)}>
+									<IconButton aria-label='delete-field' color='red' variant='text' onClick={() => removeField(index)}>
 										<TrashIcon className='h-5 w-5' />
 									</IconButton>
 								</div>

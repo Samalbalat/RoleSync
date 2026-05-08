@@ -57,7 +57,6 @@ export default function CampaignDetailPage() {
 				if (showLoading) setLoading(true);
 				const campaignData = await CampaignService.getCampaignById(id);
 				setCampaign(campaignData);
-
 				if (campaignData?.userRelation === 'OWNER') {
 					const templates = await CharacterService.getCampaignTemplates(id);
 					if (templates?.[0]) setCampaignTemplate(templates[0]);
@@ -374,6 +373,7 @@ export default function CampaignDetailPage() {
 									onMemberChange={() => fetchCampaignAndTemplate(false)}
 									maxPlayers={campaign.maxPlayers}
 									profileType={userProfile?.type}
+									isFull={isFull}
 								/>
 							)}
 							<Card className='shadow-sm border border-gray-200'>

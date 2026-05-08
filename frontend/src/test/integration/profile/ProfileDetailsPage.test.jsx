@@ -31,6 +31,14 @@ vi.mock('../../../utils/AuthContext', () => ({
 	useAuth: vi.fn(),
 }));
 
+vi.mock('../../../components/reviews/ReviewList', () => ({
+	default: () => <div data-testid='mock-review-list' />,
+}));
+
+vi.mock('../../../components/reviews/StarRatingBadge', () => ({
+	default: () => <div data-testid='mock-star-rating-badge' />,
+}));
+
 vi.mock('react-i18next', () => {
 	const t = key => key;
 	return {

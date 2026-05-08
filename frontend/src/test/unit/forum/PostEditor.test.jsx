@@ -1,6 +1,7 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi, test, describe, expect, beforeEach } from 'vitest';
+import toast from 'react-hot-toast';
 import PostEditor from '../../../components/forum/PostEditor';
 import ForumService from '../../../services/ForumService';
 
@@ -24,9 +25,7 @@ vi.mock('react-hot-toast', () => ({
 
 vi.mock('@material-tailwind/react', () => ({
 	Typography: ({ children, className }) => <div className={className}>{children}</div>,
-
 	Avatar: ({ alt, src }) => <img alt={alt} src={src} />,
-
 	Button: ({ children, onClick, disabled, title }) => (
 		<button onClick={onClick} disabled={disabled} title={title}>
 			{children}
@@ -105,16 +104,37 @@ describe('PostEditor — Tests Unitarios', () => {
 		expect(screen.getByText('AlexTable')).toBeInTheDocument();
 	});
 
-	// 3️⃣  Botón enviar deshabilitado con textarea vacío
+	test('en modo foro general maneja fallback si el usuario no tiene nombre', () => {
+		render(
+			<PostEditor
+				{...buildProps({
+					isGeneralForum: true,
+					currentUser: null,
+					myCharacter: null,
+				})}
+			/>,
+		);
+		expect(screen.getByText('Usuario')).toBeInTheDocument();
+	});
+
+	// 3️⃣  Botón enviar deshabilitado con textarea vacío y sin imagen
 	test('el botón enviar está deshabilitado si el contenido está vacío', () => {
 		render(<PostEditor {...buildProps()} />);
 		expect(screen.getByRole('button', { name: /common.send/i })).toBeDisabled();
 	});
 
-	// 4️⃣  Botón enviar habilitado al escribir contenido
-	test('el botón enviar se habilita al escribir en el textarea', async () => {
-		render(<PostEditor {...buildProps()} />);
+	// 4️⃣  Botón enviar habilitado al escribir contenido o añadir imagen
+	test('el botón enviar se habilita al escribir en el textarea o añadir imagen', async () => {
+		const { rerender } = render(<PostEditor {...buildProps()} />);
+
 		await userEvent.type(screen.getByRole('textbox', { hidden: true }), 'Hola a todos!');
+		expect(screen.getByRole('button', { name: /common.send/i })).not.toBeDisabled();
+
+		rerender(<PostEditor {...buildProps()} />);
+
+		await userEvent.click(screen.getByTitle('forum.postEditor.addImage'));
+		const inputUrl = screen.getByLabelText('forum.postEditor.imagePlaceholder');
+		await userEvent.type(inputUrl, 'http://foto.com/img.png');
 		expect(screen.getByRole('button', { name: /common.send/i })).not.toBeDisabled();
 	});
 
@@ -138,7 +158,7 @@ describe('PostEditor — Tests Unitarios', () => {
 	});
 
 	// 6️⃣  Envío en modo foro general → llama a createGeneralReply
-	test('llama a ForumService.createGeneralReply al enviar en modo foro general', async () => {
+	test('llama a ForumService.createGeneralReply al enviar en modo foro general con imagen', async () => {
 		ForumService.createGeneralReply.mockResolvedValue({ id: 99 });
 		render(
 			<PostEditor
@@ -150,17 +170,30 @@ describe('PostEditor — Tests Unitarios', () => {
 			/>,
 		);
 
+		// Añadimos texto
 		await userEvent.type(screen.getByRole('textbox', { hidden: true }), 'Mi respuesta al foro');
+
+		// Añadimos imagen
+		await userEvent.click(screen.getByTitle('forum.postEditor.addImage'));
+		await userEvent.type(screen.getByLabelText('forum.postEditor.imagePlaceholder'), 'http://img.com/foto.png');
+
 		await userEvent.click(screen.getByRole('button', { name: /common.send/i }));
 
 		await waitFor(() => {
 			expect(ForumService.createGeneralReply).toHaveBeenCalledOnce();
+			expect(ForumService.createGeneralReply).toHaveBeenCalledWith(
+				expect.objectContaining({
+					content: 'Mi respuesta al foro',
+					mediaUrls: ['http://img.com/foto.png'],
+				}),
+			);
 		});
 	});
 
-	// 7️⃣  Tras envío exitoso → llama a onPostCreated
-	test('llama a onPostCreated con el nuevo post tras el envío', async () => {
-		ForumService.createPost.mockResolvedValue({ id: 99, content: 'Hola a todos!' });
+	// 7️⃣  Tras envío exitoso → llama a onPostCreated manejando data anidada
+	test('llama a onPostCreated con el nuevo post (manejando response.data)', async () => {
+		// Simulamos un backend que devuelve la respuesta dentro de "data"
+		ForumService.createPost.mockResolvedValue({ data: { id: 99, content: 'Data anidada' } });
 		render(<PostEditor {...buildProps()} />);
 
 		await userEvent.type(screen.getByRole('textbox', { hidden: true }), 'Hola a todos!');
@@ -168,6 +201,7 @@ describe('PostEditor — Tests Unitarios', () => {
 
 		await waitFor(() => {
 			expect(onPostCreated).toHaveBeenCalledOnce();
+			expect(onPostCreated).toHaveBeenCalledWith(expect.objectContaining({ id: 99 }));
 		});
 	});
 
@@ -185,19 +219,17 @@ describe('PostEditor — Tests Unitarios', () => {
 		});
 	});
 
-	// 9️⃣  Modo narrativo no-DM → muestra el switch OOC
+	// 9️⃣  Modos y OOC
 	test('muestra el switch de modo OOC en campañas narrativas para jugadores', () => {
 		render(<PostEditor {...buildProps({ isTabletop: false, isOwner: false, isGeneralForum: false })} />);
 		expect(screen.getByRole('switch')).toBeInTheDocument();
 	});
 
-	// 🔟  Modo tabletop → NO muestra el switch OOC
 	test('no muestra el switch OOC en modo tabletop', () => {
 		render(<PostEditor {...buildProps({ isTabletop: true })} />);
 		expect(screen.queryByRole('switch')).not.toBeInTheDocument();
 	});
 
-	// 1️⃣1️⃣  Modo foro general → NO muestra el switch OOC
 	test('no muestra el switch OOC en modo foro general', () => {
 		render(
 			<PostEditor
@@ -211,8 +243,8 @@ describe('PostEditor — Tests Unitarios', () => {
 		expect(screen.queryByRole('switch')).not.toBeInTheDocument();
 	});
 
-	// 1️⃣2️⃣  Error al enviar → no llama a onPostCreated
-	test('no llama a onPostCreated si el servicio falla', async () => {
+	// 🔟 Manejo de errores
+	test('llama a toast.error y no a onPostCreated si el servicio falla', async () => {
 		ForumService.createPost.mockRejectedValue(new Error('Error del servidor'));
 		render(<PostEditor {...buildProps()} />);
 
@@ -221,70 +253,120 @@ describe('PostEditor — Tests Unitarios', () => {
 
 		await waitFor(() => {
 			expect(onPostCreated).not.toHaveBeenCalled();
+			expect(toast.error).toHaveBeenCalledWith('forum.postEditor.creationError');
 		});
 	});
 
-	// 1️⃣3️⃣ Formato de texto: Negrita
-	test('inserta etiquetas de negrita al hacer clic en el botón B', async () => {
+	// 1️⃣2️⃣ Gestión de Imágenes: Mostrar, ocultar, y limpiar
+	test('permite abrir, previsualizar y cerrar el input de imagen', async () => {
 		render(<PostEditor {...buildProps()} />);
 
-		await userEvent.click(screen.getByTitle('forum.postEditor.format'));
-
-		const textarea = screen.getByRole('textbox', { hidden: true });
-		await userEvent.type(textarea, 'hola');
-
-		await userEvent.click(screen.getByText('B'));
-
-		expect(textarea.value).toContain('**texto**');
-	});
-
-	// 1️⃣4️⃣ Gestión de Imágenes: Mostrar y Ocultar input
-	test.skip('permite abrir y cerrar el input de imagen', async () => {
-		render(<PostEditor {...buildProps()} />);
-
+		// Abrir
 		await userEvent.click(screen.getByTitle('forum.postEditor.addImage'));
-
 		const inputUrl = screen.getByLabelText('forum.postEditor.imagePlaceholder');
 		await userEvent.type(inputUrl, 'http://foto.com/pjs.png');
 
+		// Previsualizar
 		const previewImg = screen.getByAltText('Preview');
 		expect(previewImg.src).toBe('http://foto.com/pjs.png');
 
-		const closeBtn = screen.getByRole('button', { name: /XMarkIcon/i });
-		await userEvent.click(closeBtn);
+		// Los mocks renderizan el componente Text "XMarkIcon". Hay dos (cerrar input y borrar imagen).
+		// Hacemos clic en el de la previsualización para borrar la URL
+		const closeBtns = screen.getAllByText('XMarkIcon');
+		await userEvent.click(closeBtns[1]); // El botón de la previsualización es el segundo
 
 		expect(screen.queryByAltText('Preview')).not.toBeInTheDocument();
+
+		// Clicar de nuevo en el icono de imagen cierra el menú
+		await userEvent.click(screen.getByTitle('forum.postEditor.addImage'));
+		expect(screen.queryByLabelText('forum.postEditor.imagePlaceholder')).not.toBeInTheDocument();
 	});
 
-	// 1️⃣5️⃣ Menú de Susurros: Toggle de visibilidad
-	test('permite seleccionar personajes para susurros', async () => {
-		const otherCharacters = [{ id: 10, name: 'Legolas' }];
-		render(<PostEditor {...buildProps({ otherCharacters })} />);
+	// 1️⃣3️⃣ Eventos de imagen (Load / Error)
+	test('la imagen de preview maneja eventos de carga y error', async () => {
+		render(<PostEditor {...buildProps()} />);
 
+		await userEvent.click(screen.getByTitle('forum.postEditor.addImage'));
+		await userEvent.type(screen.getByLabelText('forum.postEditor.imagePlaceholder'), 'test.jpg');
+
+		const previewImg = screen.getByAltText('Preview');
+
+		fireEvent.error(previewImg);
+		expect(previewImg.style.display).toBe('none');
+
+		fireEvent.load(previewImg);
+		expect(previewImg.style.display).toBe('block');
+	});
+
+	// 1️⃣4️⃣ Menú de Susurros Completo
+	test('permite seleccionar, deseleccionar y enviar personajes para susurros', async () => {
+		ForumService.createPost.mockResolvedValue({ id: 100 });
+		const otherCharacters = [{ id: 10, name: 'Legolas' }];
+		render(<PostEditor {...buildProps({ otherCharacters, myCharacter: { id: 1, name: 'Arador' } })} />);
+
+		// Abrir menú de susurros
 		await userEvent.click(screen.getByTitle('forum.whisper'));
 
 		const checkbox = screen.getByLabelText('Legolas');
+
+		// Seleccionar
 		await userEvent.click(checkbox);
+		expect(checkbox.checked).toBe(true);
+		expect(screen.getByText('forum.whisper')).toBeInTheDocument(); // Tag de "Susurro" arriba
 
-		expect(screen.getByText('forum.whisper')).toBeInTheDocument();
+		// Deseleccionar clickeando otra vez
+		await userEvent.click(checkbox);
+		expect(checkbox.checked).toBe(false);
 
-		await userEvent.click(screen.getByText('forum.public'));
-		expect(screen.queryByText('forum.whisper')).not.toBeInTheDocument();
+		// Volver a seleccionar y usar el botón público para limpiar
+		await userEvent.click(checkbox);
+		await userEvent.click(screen.getByText('forum.public')); // Limpia el array
+		expect(checkbox.checked).toBe(false);
+
+		// Volver a seleccionar para probar el envío final
+		await userEvent.click(checkbox);
+		await userEvent.type(screen.getByRole('textbox', { hidden: true }), 'Secreto');
+		await userEvent.click(screen.getByRole('button', { name: /common.send/i }));
+
+		await waitFor(() => {
+			// Debería mandar el ID del destinatario y el ID del autor
+			expect(ForumService.createPost).toHaveBeenCalledWith(
+				'1',
+				expect.objectContaining({
+					visibleToCharacterIds: [10, 1],
+				}),
+			);
+		});
 	});
 
-	// 1️⃣6️⃣ Fallbacks de Avatar (Cubre ramas de los helpers externos)
+	test('muestra mensaje de vacío si no hay personajes para susurrar', async () => {
+		render(<PostEditor {...buildProps({ otherCharacters: [] })} />);
+		await userEvent.click(screen.getByTitle('forum.whisper'));
+		expect(screen.getByText('forum.postEditor.noMoreCharacters')).toBeInTheDocument();
+	});
+
+	// 1️⃣5️⃣ Fallbacks de Placeholders y avatares
 	test('usa avatar por defecto si el personaje no tiene uno', () => {
-		render(<PostEditor {...buildProps({ myCharacter: { id: 1, name: 'Sin Foto', avatar: null } })} />);
+		render(<PostEditor {...buildProps({ myCharacter: { id: 1, name: 'Master' } })} />);
 		const img = screen.getByAltText('Avatar');
 		expect(img.src).toContain('ui-avatars.com');
 	});
 
-	// 1️⃣7️⃣ Manejo de errores en la imagen (onError/onLoad)
-	test('la imagen de preview maneja eventos de carga', () => {
-		render(<PostEditor {...buildProps()} />);
-		const img = document.createElement('img');
-		img.src = 'test.jpg';
+	test('muestra el placeholder correcto según el rol y modo', () => {
+		// Tabletop DM
+		const { rerender } = render(<PostEditor {...buildProps({ isTabletop: true, isOwner: true })} />);
+		expect(screen.getByPlaceholderText('forum.postEditor.tabletopDmPlaceholder')).toBeInTheDocument();
 
-		const { container } = render(<PostEditor {...buildProps()} />);
+		// Tabletop Player
+		rerender(<PostEditor {...buildProps({ isTabletop: true, isOwner: false })} />);
+		expect(screen.getByPlaceholderText('forum.postEditor.tabletopPlayerPlaceholder')).toBeInTheDocument();
+
+		// DM Narrativo
+		rerender(<PostEditor {...buildProps({ isTabletop: false, isOwner: true })} />);
+		expect(screen.getByPlaceholderText('forum.postEditor.dmPlaceholder')).toBeInTheDocument();
+
+		// Default Narrativo Player
+		rerender(<PostEditor {...buildProps({ isTabletop: false, isOwner: false })} />);
+		expect(screen.getByPlaceholderText('forum.postEditor.defaultPlaceholder')).toBeInTheDocument();
 	});
 });

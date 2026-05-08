@@ -13,13 +13,8 @@ export default function ReviewModal({
 	const handleOpen = () => setOpen(!open);
 
 	const handleSubmit = async formData => {
-		console.log(`Simulando guardado para ${targetType} con ID ${targetId}...`, formData);
-
 		// Simulamos el delay del servidor
 		await new Promise(resolve => setTimeout(resolve, 1000));
-
-		// Aquí en el futuro llamaremos a ReviewService.create() o .update()
-		console.log('¡Reseña guardada mock!');
 
 		handleOpen();
 	};

@@ -61,8 +61,8 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 		setPosts(prevPosts => [newPost, ...prevPosts]);
 	};
 
-	const pinnedPosts = posts.filter(post => post.isPinned);
-	const regularPosts = posts.filter(post => !post.isPinned);
+	const pinnedPosts = posts.filter(post => post.isPinned || post.pinned);
+	const regularPosts = posts.filter(post => !(post.isPinned || post.pinned));
 
 	const handleOpenThread = post => {
 		if (isTabletop) return; //Si es tipo Mesa, no habrá hilos
@@ -76,14 +76,46 @@ const CampaignTimeline = ({ campaignId, isOwner, isTabletop, myCharacter, charac
 	};
 
 	// FUNCIONES DE CONTROL DEL DM (aqui meteremos la llamada a la API para cambiar los estados)
-	const handleTogglePin = (e, postId) => {
+	const handleTogglePin = async (e, postId) => {
 		e.stopPropagation();
-		setPosts(currentPosts => currentPosts.map(p => (p.id === postId ? { ...p, isPinned: !p.isPinned } : p)));
+
+		const post = posts.find(p => p.id === postId);
+		if (!post) return;
+
+		const newValue = !(post.isPinned || post.pinned);
+
+		setPosts(currentPosts => currentPosts.map(p => (p.id === postId ? { ...p, isPinned: newValue, pinned: newValue } : p)));
+
+		try {
+			await ForumService.pinPost(postId, newValue);
+		} catch (error) {
+			console.error('Error al pinear:', error);
+
+			setPosts(currentPosts =>
+				currentPosts.map(p => (p.id === postId ? { ...p, isPinned: !newValue, pinned: !newValue } : p)),
+			);
+		}
 	};
 
-	const handleToggleLock = (e, postId) => {
+	const handleToggleLock = async (e, postId) => {
 		e.stopPropagation();
-		setPosts(currentPosts => currentPosts.map(p => (p.id === postId ? { ...p, isLocked: !p.isLocked } : p)));
+
+		const post = posts.find(p => p.id === postId);
+		if (!post) return;
+
+		const newValue = !(post.isLocked || post.locked);
+
+		setPosts(currentPosts => currentPosts.map(p => (p.id === postId ? { ...p, isLocked: newValue, locked: newValue } : p)));
+
+		try {
+			await ForumService.lockPost(postId, newValue);
+		} catch (error) {
+			console.error('Error al bloquear:', error);
+
+			setPosts(currentPosts =>
+				currentPosts.map(p => (p.id === postId ? { ...p, isLocked: !newValue, locked: !newValue } : p)),
+			);
+		}
 	};
 
 	return (

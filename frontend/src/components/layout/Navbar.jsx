@@ -16,10 +16,11 @@ import {
 	ArrowRightStartOnRectangleIcon,
 	ChevronDownIcon,
 	UserIcon,
-	MapIcon,
 	ChatBubbleLeftRightIcon,
-	UserGroupIcon,
 	Bars3Icon,
+	MapIcon,
+	UserGroupIcon,
+	DocumentDuplicateIcon,
 } from '@heroicons/react/24/solid';
 import { FaDiceD20 } from 'react-icons/fa';
 import { LuBookOpenText } from 'react-icons/lu';
@@ -55,7 +56,7 @@ export default function Navbar() {
 		if (nextProfile) {
 			const newActive = { name: nextProfile.profileName, type: nextProfile.roleType };
 			localStorage.setItem('activeProfile', JSON.stringify(newActive));
-			window.location.href = '/';
+			globalThis.location.reload();
 		}
 	};
 
@@ -173,18 +174,24 @@ export default function Navbar() {
 									{t('menu.profile')}
 								</Typography>
 							</MenuItem>
-							{/* <MenuItem onClick={() => navigate('/campaigns')} className='flex items-center gap-2'>
+							<MenuItem onClick={() => navigate('/myCampaigns')} className='flex items-center gap-2'>
 								<MapIcon className='h-4 w-4 text-blue-gray-500' />
 								<Typography variant='small' className='font-medium'>
 									{t('menu.myCampaigns')}
 								</Typography>
 							</MenuItem>
-							<MenuItem onClick={() => navigate('/characters')} className='flex items-center gap-2'>
+							<MenuItem onClick={() => navigate('/myCharacters')} className='flex items-center gap-2'>
 								<UserGroupIcon className='h-4 w-4 text-blue-gray-500' />
 								<Typography variant='small' className='font-medium'>
 									{t('menu.myCharacters')}
 								</Typography>
-							</MenuItem> */}
+							</MenuItem>
+							<MenuItem onClick={() => navigate('/myTemplates')} className='flex items-center gap-2'>
+								<DocumentDuplicateIcon className='h-4 w-4 text-blue-gray-500' />
+								<Typography variant='small' className='font-medium'>
+									{t('home.myTemplates.title', 'Mis Plantillas')}
+								</Typography>
+							</MenuItem>
 							<MenuItem onClick={() => navigate('/forum/my-posts')} className='flex items-center gap-2'>
 								<ChatBubbleLeftRightIcon className='h-4 w-4 text-blue-gray-500' />
 								<Typography variant='small' className='font-medium'>
@@ -254,6 +261,36 @@ export default function Navbar() {
 							}}
 						>
 							<ChatBubbleLeftRightIcon className='h-5 w-5' /> {t('menu.myPosts')}
+						</Button>
+						<Button
+							variant='text'
+							className='flex items-center justify-start gap-3 text-gray-800'
+							onClick={() => {
+								navigate('/myCampaigns');
+								setOpenNav(false);
+							}}
+						>
+							<MapIcon className='h-5 w-5' /> {t('menu.myCampaigns')}
+						</Button>
+						<Button
+							variant='text'
+							className='flex items-center justify-start gap-3 text-gray-800'
+							onClick={() => {
+								navigate('/myCharacters');
+								setOpenNav(false);
+							}}
+						>
+							<UserGroupIcon className='h-5 w-5' /> {t('menu.myCharacters')}
+						</Button>
+						<Button
+							variant='text'
+							className='flex items-center justify-start gap-3 text-gray-800'
+							onClick={() => {
+								navigate('/myTemplates');
+								setOpenNav(false);
+							}}
+						>
+							<DocumentDuplicateIcon className='h-5 w-5' /> {t('home.myTemplates.title', 'Mis Plantillas')}
 						</Button>
 
 						<Button

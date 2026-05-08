@@ -10,6 +10,14 @@ vi.mock('../../../services/ProfileService', () => ({
 	default: { getProfileByName: vi.fn() },
 }));
 
+vi.mock('../../../components/reviews/ReviewList', () => ({
+	default: () => <div data-testid='mock-review-list' />,
+}));
+
+vi.mock('../../../components/reviews/StarRatingBadge', () => ({
+	default: () => <div data-testid='mock-star-rating-badge' />,
+}));
+
 vi.mock('@material-tailwind/react', () => ({
 	Dialog: ({ open, children }) => (open ? <div role='dialog'>{children}</div> : null),
 	DialogHeader: ({ children }) => <div>{children}</div>,

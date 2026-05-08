@@ -56,7 +56,7 @@ ReviewItem.propTypes = {
 		author: PropTypes.shape({
 			avatarUrl: PropTypes.string,
 			profileName: PropTypes.string.isRequired,
-			roleType: PropTypes.oneOf(['TABLETOP', 'NARRATIVE']).isRequired,
+			roleType: PropTypes.oneOf(['TABLETOP', 'WRITTEN']).isRequired,
 		}).isRequired,
 	}).isRequired,
 };

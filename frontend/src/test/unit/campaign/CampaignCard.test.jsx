@@ -16,6 +16,14 @@ vi.mock('react-i18next', () => ({
 	useTranslation: () => ({ t: key => key }),
 }));
 
+vi.mock('../../../components/reviews/ReviewList', () => ({
+	default: () => <div data-testid='mock-review-list' />,
+}));
+
+vi.mock('../../../components/reviews/StarRatingBadge', () => ({
+	default: () => <div data-testid='mock-star-rating-badge' />,
+}));
+
 vi.mock('@material-tailwind/react', () => ({
 	Card: ({ children, onClick, className }) => (
 		<div onClick={onClick} className={className}>

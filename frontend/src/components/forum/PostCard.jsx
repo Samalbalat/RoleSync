@@ -142,16 +142,18 @@ const PostCard = ({
 							</button>
 
 							{!isTabletop && (
-								<button
-									onClick={e => {
-										e.stopPropagation();
-										onToggleLock?.(e, post.id);
-									}}
-									className={`flex items-center justify-center p-1.5 rounded-full transition-colors ${isPostLocked ? 'text-red-500 hover:bg-red-50' : 'text-gray-500 hover:text-red-500 hover:bg-gray-100'}`}
-									title={isPostLocked ? t('forum.unlockResponses') : t('forum.lockResponses')}
-								>
-									{isPostLocked ? <LockClosedIcon className='w-5 h-5' /> : <LockOpenIcon className='w-5 h-5' />}
-								</button>
+								<>
+									<button
+										onClick={e => {
+											e.stopPropagation();
+											onToggleLock?.(e, post.id);
+										}}
+										className={`flex items-center justify-center p-1.5 rounded-full transition-colors ${isPostLocked ? 'text-red-500 hover:bg-red-50' : 'text-gray-500 hover:text-red-500 hover:bg-gray-100'}`}
+										title={isPostLocked ? t('forum.unlockResponses') : t('forum.lockResponses')}
+									>
+										{isPostLocked ? <LockClosedIcon className='w-5 h-5' /> : <LockOpenIcon className='w-5 h-5' />}
+									</button>
+								</>
 							)}
 						</>
 					) : (

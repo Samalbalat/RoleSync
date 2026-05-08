@@ -218,6 +218,11 @@ export const handlers = [
 		HttpResponse.json(mockTemplate)
 	),
 
+	// GET /rolesync/templates/me
+    http.get(`${BASE}/rolesync/templates/me`, () => {
+        return HttpResponse.json([mockTemplate]);
+    }),
+
 	// POST /rolesync/templates
 	http.post(`${BASE}/rolesync/templates`, () =>
 		HttpResponse.json({ id: 1, ...mockTemplate }, { status: 201 })
