@@ -29,6 +29,7 @@ export default function EditCharacterPage() {
 				const username = data?.username?.trim().toLowerCase();
 				if (profileName && username && profileName !== username) {
 					setAccessDenied(true);
+					return;
 				}
 				setCharacterData(data);
 			} catch (error) {
@@ -46,7 +47,7 @@ export default function EditCharacterPage() {
 		if (characterId) {
 			fetchCharacter();
 		}
-	}, [characterId, navigate, storedProfile]);
+	}, [characterId, navigate]);
 
 	if (loading) {
 		return (

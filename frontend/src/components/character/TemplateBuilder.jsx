@@ -104,7 +104,7 @@ export default function TemplateBuilder() {
 
 			fetchTemplateData();
 		}
-	}, [templateId, isEditMode, t, searchParams, storedProfile]);
+	}, [templateId, isEditMode, t, searchParams]);
 
 	useEffect(() => {
 		if (cloneId && !isEditMode) {

@@ -130,29 +130,29 @@ const PostCard = ({
 
 					{isCurrentUserDM ? (
 						<>
-							{/* <button
+							<button
 								onClick={e => {
 									e.stopPropagation();
 									onTogglePin?.(e, post.id);
 								}}
 								className={`flex items-center justify-center p-1.5 rounded-full transition-colors ${isPostPinned ? 'text-orange-500 hover:bg-orange-50' : 'text-gray-500 hover:text-orange-500 hover:bg-gray-100'}`}
 								title={isPostPinned ? t('forum.unpinMessage') : t('forum.pinMessage')}
-							> */}
-							{isPostPinned ? <TbPinnedFilled className='w-5 h-5' /> : <TbPinned className='w-5 h-5' />}
-							{/* </button> */}
+							>
+								{isPostPinned ? <TbPinnedFilled className='w-5 h-5' /> : <TbPinned className='w-5 h-5' />}
+							</button>
 
 							{!isTabletop && (
 								<>
-									{/* <button
+									<button
 										onClick={e => {
 											e.stopPropagation();
 											onToggleLock?.(e, post.id);
 										}}
 										className={`flex items-center justify-center p-1.5 rounded-full transition-colors ${isPostLocked ? 'text-red-500 hover:bg-red-50' : 'text-gray-500 hover:text-red-500 hover:bg-gray-100'}`}
 										title={isPostLocked ? t('forum.unlockResponses') : t('forum.lockResponses')}
-									>*/}
-									{isPostLocked ? <LockClosedIcon className='w-5 h-5' /> : <LockOpenIcon className='w-5 h-5' />}
-									{/* </button>*/}
+									>
+										{isPostLocked ? <LockClosedIcon className='w-5 h-5' /> : <LockOpenIcon className='w-5 h-5' />}
+									</button>
 								</>
 							)}
 						</>
