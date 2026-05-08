@@ -132,7 +132,7 @@ export default function TemplateBuilder() {
 	}, [cloneId, isEditMode, t]);
 
 	useEffect(() => {
-		if (presetId && TEMPLATE_PRESETS[presetId] && !isEditMode) {
+		if (presetId && Object.hasOwn(TEMPLATE_PRESETS, presetId) && !isEditMode) {
 			const presetData = TEMPLATE_PRESETS[presetId];
 			setTemplateName(presetData.name);
 

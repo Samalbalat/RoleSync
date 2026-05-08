@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, CardBody, Typography, Chip, Tooltip } from '@material-tailwind/react';
-import { UserGroupIcon, CalendarIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid';
+import { Card, CardBody, Typography, Chip, Tooltip, Badge } from '@material-tailwind/react';
+import { UserGroupIcon, CalendarIcon, ChatBubbleLeftRightIcon, BellAlertIcon } from '@heroicons/react/24/solid';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
