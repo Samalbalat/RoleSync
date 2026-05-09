@@ -7,14 +7,17 @@ import com.rolesync.rolesync.dto.campaigncontroller.CampaignFilter;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignPostInDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignPutInDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.predicates.CampaignPredicateBuilder;
+import com.rolesync.rolesync.dto.reviewercontroller.ReviewSummaryDTO;
 import com.rolesync.rolesync.model.Campaign;
 import com.rolesync.rolesync.model.CampaignStatus;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.ProfileType;
+import com.rolesync.rolesync.model.Review;
 import com.rolesync.rolesync.repository.CampaignRepository;
 import com.rolesync.rolesync.repository.CampaignRequestRepository;
 import com.rolesync.rolesync.repository.CharacterSheetRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
+import com.rolesync.rolesync.services.ReviewService;
 import com.rolesync.rolesync.utils.UtilsCalls;
 
 import org.junit.jupiter.api.DisplayName;
@@ -56,6 +59,9 @@ class CampaignControllerUnitTest {
 
         @MockitoBean
         private CampaignRequestRepository campaignRequestRepository;
+
+        @MockitoBean
+        private ReviewService reviewService;
 
         @MockitoBean
         private CharacterSheetRepository characterSheetRepository;
@@ -107,6 +113,8 @@ class CampaignControllerUnitTest {
                 // Mock repository directamente con ANY predicate
                 when(campaignRepository.findAll(predicate))
                                 .thenReturn(campaigns);
+                when(reviewService.getSummary(any(), anyLong()))
+                                .thenReturn(new ReviewSummaryDTO(0.0, 0L));
 
                 mockMvc.perform(get("/campaigns?=type=TABLETOP&system=DND")
                                 .with(user("test@test.com")))
@@ -133,6 +141,9 @@ class CampaignControllerUnitTest {
 
                 when(campaignRepository.findByMember("testProfile"))
                                 .thenReturn(List.of(campaign));
+
+                when(reviewService.getSummary(any(), anyLong()))
+                                .thenReturn(new ReviewSummaryDTO(0.0, 0L));
 
                 when(campaignRequestRepository.countPendingRequestsByCampaignId(anyLong()))
                                 .thenReturn(0L);
@@ -242,6 +253,9 @@ class CampaignControllerUnitTest {
 
                 when(utilsCalls.checkAuthAndProfile(any(), eq("testProfile")))
                                 .thenReturn(true);
+                                
+                when(reviewService.getSummary(any(), anyLong()))
+                                .thenReturn(new ReviewSummaryDTO(0.0, 0L));
 
                 when(utilsCalls.getProfileRelationToCampaign(anyString(), any()))
                                 .thenReturn("MEMBER");

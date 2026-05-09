@@ -157,6 +157,7 @@ public class CampaignController {
                     item.setSystem(c.getSystem());
                     item.setStatus(c.getStatus().name());
                     item.setOwnerName(c.getOwnerName());
+                    item.setReviewSummary(reviewService.getSummary(ReviewTargetType.CAMPAIGN, Long.valueOf(c.getId())));
                     return item;
                 }).toList();
 

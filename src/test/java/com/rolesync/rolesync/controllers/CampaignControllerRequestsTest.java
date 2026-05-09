@@ -8,15 +8,17 @@ import com.rolesync.rolesync.model.Campaign;
 import com.rolesync.rolesync.model.CampaignRequest;
 import com.rolesync.rolesync.model.CampaignRequestStatus;
 import com.rolesync.rolesync.model.Profile;
+import com.rolesync.rolesync.model.Review;
 import com.rolesync.rolesync.repository.CampaignRepository;
 import com.rolesync.rolesync.repository.CampaignRequestRepository;
 import com.rolesync.rolesync.repository.CharacterSheetRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
+import com.rolesync.rolesync.services.ReviewService;
 import com.rolesync.rolesync.utils.UtilsCalls;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -58,6 +60,9 @@ class CampaignControllerRequestsTest {
 
         @MockitoBean
         private CharacterSheetRepository characterSheetRepository;
+
+        @MockitoBean
+        private ReviewService reviewService;
 
         @MockitoBean
         private UtilsCalls utilsCalls;
