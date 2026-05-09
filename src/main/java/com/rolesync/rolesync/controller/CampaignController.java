@@ -1,5 +1,6 @@
 package com.rolesync.rolesync.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -32,10 +33,12 @@ import com.rolesync.rolesync.model.CampaignRequestStatus;
 import com.rolesync.rolesync.model.CampaignStatus;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.ProfileType;
+import com.rolesync.rolesync.model.ReviewTargetType;
 import com.rolesync.rolesync.repository.CampaignRepository;
 import com.rolesync.rolesync.repository.CampaignRequestRepository;
 import com.rolesync.rolesync.repository.CharacterSheetRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
+import com.rolesync.rolesync.services.ReviewService;
 import com.rolesync.rolesync.utils.UtilsCalls;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -59,18 +62,21 @@ public class CampaignController {
     private final CampaignRequestRepository campaignRequestRepository;
     private final CharacterSheetRepository characterSheetRepository;
     private final UtilsCalls utilsCalls;
+    private final ReviewService reviewService;
 
     public CampaignController(
             CampaignRepository campaignRepository,
             UtilsCalls utilsCalls,
             ProfileRepository profileRepository,
             CampaignRequestRepository campaignRequestRepository,
-            CharacterSheetRepository characterSheetRepository) {
+            CharacterSheetRepository characterSheetRepository,
+            ReviewService reviewService) {
         this.campaignRepository = campaignRepository;
         this.utilsCalls = utilsCalls;
         this.profileRepository = profileRepository;
         this.campaignRequestRepository = campaignRequestRepository;
         this.characterSheetRepository = characterSheetRepository;
+        this.reviewService = reviewService;
     }
 
     // ---------- FILTERED GET ----------
@@ -82,7 +88,34 @@ public class CampaignController {
         BooleanExpression predicate = predicateBuilder.build(filter);
 
         List<Campaign> campaigns = (List<Campaign>) campaignRepository.findAll(predicate);
-        List<CampaignGetByFilterDTO> response = campaigns.stream().map(CampaignMapper::toGetByFilterDTO).toList();
+        List<CampaignGetByFilterDTO> response = new ArrayList<>();
+        for (Campaign campaign : campaigns) {
+            if (campaign == null) {
+                return null;
+            }
+
+            CampaignGetByFilterDTO dto = new CampaignGetByFilterDTO();
+
+            dto.setId(campaign.getId() != null ? String.valueOf(campaign.getId()) : null);
+            dto.setName(campaign.getName());
+            dto.setCommunication(campaign.getCommunication());
+            dto.setThemes(campaign.getThemes());
+            dto.setImage(campaign.getImage());
+            dto.setSystem(campaign.getSystem());
+
+            // Enum → String (safe)
+            dto.setStatus(
+                    campaign.getStatus() != null ? campaign.getStatus().name() : null);
+
+            // Safe player count (no lazy loading involved)
+            dto.setCurrentPlayers(
+                    campaign.getMembers() != null ? campaign.getMembers().size() : 0);
+
+            dto.setMaxPlayers(
+                    campaign.getMaxPlayers() != null ? campaign.getMaxPlayers() : 0);
+            dto.setReviewSummary(reviewService.getSummary(ReviewTargetType.CAMPAIGN, Long.valueOf(campaign.getId())));
+            response.add(dto);
+        }
         return ResponseEntity.ok(response);
     }
 
@@ -103,6 +136,7 @@ public class CampaignController {
                     item.setImage(c.getImage());
                     item.setSystem(c.getSystem());
                     item.setStatus(c.getStatus().name());
+                    item.setReviewSummary(reviewService.getSummary(ReviewTargetType.CAMPAIGN, Long.valueOf(c.getId())));
                     Integer pendingRequests = Integer
                             .valueOf(campaignRequestRepository.countPendingRequestsByCampaignId(c.getId()).toString());
                     item.setPendingRequests(pendingRequests);
@@ -470,6 +504,7 @@ public class CampaignController {
         dto.setCurrentPlayers(campaign.getMembers() != null ? campaign.getMembers().size() : 0);
 
         dto.setMaxPlayers(campaign.getMaxPlayers());
+        dto.setReviewSummary(reviewService.getSummary(ReviewTargetType.CAMPAIGN, Long.valueOf(campaign.getId())));
 
         OwnerProfileDTO owner = new OwnerProfileDTO();
         profileRepository.findByProfilename(campaign.getOwnerName()).ifPresent(p -> {

@@ -2,6 +2,8 @@ package com.rolesync.rolesync.dto.campaigncontroller;
 
 import java.util.List;
 
+import com.rolesync.rolesync.dto.reviewercontroller.ReviewSummaryDTO;
+
 import lombok.Data;
 
 @Data
@@ -16,4 +18,5 @@ public class CampaignGetByFilterDTO {
     private int currentPlayers;
     private int maxPlayers;
     private String system;
+    private ReviewSummaryDTO reviewSummary;
 }
