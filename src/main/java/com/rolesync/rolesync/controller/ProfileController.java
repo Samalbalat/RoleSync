@@ -63,7 +63,7 @@ public class ProfileController {
         Optional<Profile> profile = profileRepository.findByProfilename(profileName);
         if (profile.isPresent()) {
             ProfileOutDTO response = profile.map(p -> 
-            new ProfileOutDTO(p.getProfilename(), p.getImage(), p.getDescription(), reviewService.getSummary(ReviewTargetType.PROFILE, p.getId()))
+            new ProfileOutDTO(p.getId(), p.getProfilename(), p.getImage(), p.getDescription(), reviewService.getSummary(ReviewTargetType.PROFILE, p.getId()))
         ).orElse(null);
         return ResponseEntity.ok()
                 .body(response);
@@ -81,7 +81,7 @@ public class ProfileController {
         Optional<Profile> profile = profileRepository.findByProfilename(profileToGet);
         if (profile.isPresent()) {
             ProfileOutDTO response = profile.map(p -> 
-            new ProfileOutDTO(p.getProfilename(), p.getImage(), p.getDescription(), reviewService.getSummary(ReviewTargetType.PROFILE, p.getId()))
+            new ProfileOutDTO(p.getId(), p.getProfilename(), p.getImage(), p.getDescription(), reviewService.getSummary(ReviewTargetType.PROFILE, p.getId()))
         ).orElse(null);
         return ResponseEntity.ok()
                 .body(response);

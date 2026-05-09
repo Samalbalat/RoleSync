@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class ProfileOutDTO {
-
+    Long id;
     String profileName;
     String image;
     String description;

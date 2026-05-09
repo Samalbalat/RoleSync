@@ -67,6 +67,7 @@ public class ReviewService {
         return new ReviewDTO(
                 r.getId(),
                 r.getReviewer().getId(),
+                r.getReviewer().getImage(),
                 r.getReviewer().getProfilename(),
                 r.getRating(),
                 r.getComment(),
