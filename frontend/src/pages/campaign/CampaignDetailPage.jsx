@@ -170,7 +170,6 @@ export default function CampaignDetailPage() {
 	};
 
 	const handleOpenAccordion = value => setOpenAccordion(openAccordion === value ? 0 : value);
-
 	const renderInfoBlock = () => (
 		<div className='space-y-6 mt-4'>
 			<CampaignInfoList campaign={campaign} isWritten={isWritten} t={t} />
@@ -195,13 +194,6 @@ export default function CampaignDetailPage() {
 							<Typography variant='h6' color='blue-gray'>
 								{campaign.owner?.profileName}
 							</Typography>
-							<div className='mt-1'>
-								<StarRatingBadge
-									averageRating={4.9} // TODO: Datos reales
-									totalReviews={42} // TODO: Datos reales
-									size='sm'
-								/>
-							</div>
 						</div>
 					</CardBody>
 				</Card>
@@ -237,7 +229,13 @@ export default function CampaignDetailPage() {
 		value: 'reviews',
 		content: (
 			<div className='pt-4'>
-				<ReviewList targetId={id} targetType='CAMPAIGN' />
+				<ReviewList
+					targetId={id}
+					targetType='CAMPAIGN'
+					canWrite={isParticipant}
+					averageRating={campaign.reviewSummary.average}
+					totalReviews={campaign.reviewSummary.count}
+				/>
 			</div>
 		),
 		className: theme?.textPrimary,
@@ -324,8 +322,8 @@ export default function CampaignDetailPage() {
 								{/* Aquí integramos las estrellas con un fondo difuminado para que resalten */}
 								<div className='bg-black/50 backdrop-blur-sm px-4 py-1.5 rounded-full mb-1 w-fit'>
 									<StarRatingBadge
-										averageRating={4.5} // TODO: Cambiar por datos reales del back
-										totalReviews={12} // TODO: Cambiar por datos reales del back
+										averageRating={campaign.reviewSummary.average}
+										totalReviews={campaign.reviewSummary.count}
 										size='md'
 										textColor='text-white'
 									/>

@@ -124,7 +124,6 @@ export function ProfileDetailsPage() {
 					characterService.getMyCharacters(),
 					profileService.getUserInfo(),
 				]);
-
 				setProfileData(pData);
 				setUserData(uData);
 				setCampaigns(cData || { asMaster: [], asPlayer: [] });
@@ -279,8 +278,8 @@ export function ProfileDetailsPage() {
 							</Typography>
 
 							<StarRatingBadge
-								averageRating={4.8} // TODO: Conectar con datos del backend (ej: profileData?.rating)
-								totalReviews={36} // TODO: Conectar con datos del backend
+								averageRating={profileData.reviewSummary.average}
+								totalReviews={profileData.reviewSummary.count}
 								size='md'
 							/>
 						</div>
@@ -430,7 +429,13 @@ export function ProfileDetailsPage() {
 							</TabPanel>
 							<TabPanel value='reviews'>
 								<div className='pt-4'>
-									<ReviewList targetId={currentName} targetType='PROFILE' />
+									<ReviewList
+										targetId={profileData.id}
+										targetType='PROFILE'
+										canWrite={false} // En este caso, no permitimos escribir reseñas en el propio perfil
+										averageRating={profileData.reviewSummary.average}
+										totalReviews={profileData.reviewSummary.count}
+									/>
 								</div>
 							</TabPanel>
 						</TabsBody>

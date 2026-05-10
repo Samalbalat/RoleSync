@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import { Rating, Typography } from '@material-tailwind/react';
 
 export default function StarRatingBadge({
@@ -7,14 +8,15 @@ export default function StarRatingBadge({
 	totalReviews = 0,
 	showCount = true,
 	size = 'sm',
-	textColor = 'text-blue-gray-900', // Prop nueva para controlar el color del texto
+	textColor = 'text-blue-gray-900',
 }) {
+	const { t } = useTranslation('global');
 	const roundedRating = Math.round(averageRating);
 
 	if (totalReviews === 0) {
 		return (
 			<Typography variant='small' className={`text-xs italic ${textColor}`}>
-				Sin reseñas
+				{t('reviews.noReviews')}
 			</Typography>
 		);
 	}

@@ -508,5 +508,8 @@
   },
   "template": {
     "accessDeniedMessage": "'You do not have permission to edit this template.'"
+  },
+  "reviews": {
+    "noReviews": "No reviews"
   }
 }

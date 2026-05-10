@@ -525,5 +525,8 @@
   },
   "template": {
     "accessDeniedMessage": "'No tienes permiso para editar esta plantilla.'"
+  },
+  "reviews": {
+    "noReviews": "Sin reseñas"
   }
 }
