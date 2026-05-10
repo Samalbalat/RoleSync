@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Card, CardBody, Typography, Avatar, Rating } from '@material-tailwind/react';
 
 export default function ReviewItem({ review }) {
-	const { rating, content, createdAt, author } = review;
+	const { authorImage, authorName, rating, comment, createdAt } = review;
 
 	// Formateamos la fecha para que quede bonita (ej: "26 abr 2026")
 	const formattedDate = new Date(createdAt).toLocaleDateString('es-ES', {
@@ -19,15 +19,15 @@ export default function ReviewItem({ review }) {
 				<div className='flex items-center justify-between mb-3'>
 					<div className='flex items-center gap-3'>
 						<Avatar
-							src={author.avatarUrl || 'https://docs.material-tailwind.com/img/face-2.jpg'}
-							alt={author.profileName}
+							src={authorImage || `https://ui-avatars.com/api/?name=${authorName}&size=256`}
+							alt={authorName}
 							size='sm'
 							variant='circular'
 						/>
 						<div>
 							<div className='flex items-center gap-2'>
 								<Typography variant='h6' color='blue-gray' className='text-sm'>
-									{author.profileName}
+									{authorName}
 								</Typography>
 							</div>
 							<Typography variant='small' color='gray' className='text-xs font-normal'>
@@ -41,7 +41,7 @@ export default function ReviewItem({ review }) {
 
 				{/* Contenido del comentario */}
 				<Typography color='blue-gray' className='font-normal text-sm'>
-					{content}
+					{comment}
 				</Typography>
 			</CardBody>
 		</Card>
@@ -51,12 +51,10 @@ export default function ReviewItem({ review }) {
 ReviewItem.propTypes = {
 	review: PropTypes.shape({
 		rating: PropTypes.number.isRequired,
-		content: PropTypes.string.isRequired,
+		comment: PropTypes.string.isRequired,
 		createdAt: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]).isRequired,
-		author: PropTypes.shape({
-			avatarUrl: PropTypes.string,
-			profileName: PropTypes.string.isRequired,
-			roleType: PropTypes.oneOf(['TABLETOP', 'WRITTEN']).isRequired,
-		}).isRequired,
+		authorImage: PropTypes.string,
+		authorName: PropTypes.string.isRequired,
+		authorId: PropTypes.string.isRequired,
 	}).isRequired,
 };

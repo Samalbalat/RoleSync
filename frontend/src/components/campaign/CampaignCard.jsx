@@ -106,8 +106,8 @@ export default function CampaignCard({ campana, theme, pageType = 'general', isM
 				)}
 				<div className='mb-3'>
 					<StarRatingBadge
-						averageRating={4.8} // TODO: Datos reales (ej: campana.rating)
-						totalReviews={15} // TODO: Datos reales
+						averageRating={campana.reviewSummary.average}
+						totalReviews={campana.reviewSummary.count}
 						size='sm'
 					/>
 				</div>

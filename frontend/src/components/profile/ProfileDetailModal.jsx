@@ -29,9 +29,8 @@ export default function ProfileDetailModal({ isOpen, onClose, profileName, roleT
 			setProfileData(null);
 		}
 	}, [isOpen, profileName, roleType]);
-
-	const averageRating = Number(profileData?.rating ?? 0);
-	const totalReviews = Number(profileData?.totalReviews ?? 0);
+	const averageRating = Number(profileData?.reviewSummary?.average);
+	const totalReviews = Number(profileData?.reviewSummary?.count);
 
 	let dialogContent;
 
@@ -83,7 +82,13 @@ export default function ProfileDetailModal({ isOpen, onClose, profileName, roleT
 				</div>
 
 				<div className='w-full mt-8 pt-8 border-t border-gray-100 text-left'>
-					<ReviewList targetId={profileName} targetType='PROFILE' />
+					<ReviewList
+						targetId={profileData.id}
+						targetType='PROFILE'
+						canWrite={true}
+						averageRating={profileData.reviewSummary.average}
+						totalReviews={profileData.reviewSummary.count}
+					/>
 				</div>
 			</div>
 		);

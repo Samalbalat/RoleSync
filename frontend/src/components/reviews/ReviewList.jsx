@@ -1,45 +1,54 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { Typography } from '@material-tailwind/react';
+import { Typography, Spinner } from '@material-tailwind/react';
 import ReviewItem from './ReviewItem';
 import ReviewModal from './ReviewModal';
+import ReviewService from '../../services/ReviewService';
+import { useAuth } from '../../utils/AuthContext';
+import { toast } from 'react-hot-toast';
 
-// --- DATOS MOCK ---
-const MOCK_REVIEWS = [
-	{
-		id: 1,
-		rating: 5,
-		content:
-			'¡Una campaña increíble! El DM prepara unos mapas brutales en Foundry y la trama engancha desde el minuto uno. Mi bárbaro casi muere en la última sesión, ¡10/10!',
-		createdAt: '2026-04-20T10:30:00Z',
-		author: {
-			profileId: 'p-101',
-			profileName: 'Grog El Destructor',
-			roleType: 'TABLETOP',
-			avatarUrl: 'https://docs.material-tailwind.com/img/face-3.jpg',
-		},
-	},
-	{
-		id: 2,
-		rating: 4,
-		content:
-			'Muy buena experiencia narrativa. Los tiempos de respuesta en los hilos son rápidos y el lore del mundo es súper profundo. Le quito una estrella porque a veces el sistema de magia es confuso.',
-		createdAt: '2026-04-24T16:15:00Z',
-		author: {
-			profileId: 'p-102',
-			profileName: 'Elara Moonwhisper',
-			roleType: 'WRITTEN',
-			avatarUrl: 'https://docs.material-tailwind.com/img/face-4.jpg',
-		},
-	},
-];
+export default function ReviewList({ targetId, targetType, canWrite, averageRating, totalReviews }) {
+	const { activeProfile } = useAuth();
+	const [reviews, setReviews] = useState([]);
+	const [loading, setLoading] = useState(true);
 
-export default function ReviewList({ targetId, targetType }) {
-	// En un futuro, aquí harías un useEffect para cargar las reviews reales
-	const reviews = MOCK_REVIEWS;
+	const fetchReviewData = useCallback(async () => {
+		if (!targetId) return;
 
-	// Calculamos la nota media para darle un poco de salsa a la UI
-	const averageRating = reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviews.length;
+		try {
+			setLoading(true);
+			const numericId = Number(targetId);
+
+			const listData = await ReviewService.getReviews(targetType, numericId);
+
+			setReviews(listData || []);
+		} catch (error) {
+			console.error('Error loading reviews:', error);
+			toast.error('No se pudieron cargar las reseñas');
+		} finally {
+			setLoading(false);
+		}
+	}, [targetId, targetType]);
+
+	useEffect(() => {
+		fetchReviewData();
+	}, [fetchReviewData]);
+
+	const userHasReviewed = useMemo(() => {
+		if (!activeProfile || !reviews.length) return false;
+
+		return reviews.some(review => review.authorName === activeProfile.name);
+	}, [reviews, activeProfile]);
+
+	const showWriteButton = canWrite && !userHasReviewed;
+
+	if (loading) {
+		return (
+			<div className='flex justify-center items-center py-10'>
+				<Spinner className='h-8 w-8 text-blue-500' />
+			</div>
+		);
+	}
 
 	return (
 		<div className='flex flex-col gap-6 w-full'>
@@ -54,13 +63,21 @@ export default function ReviewList({ targetId, targetType }) {
 							{averageRating.toFixed(1)}
 						</Typography>
 						<Typography variant='small' color='gray'>
-							de 5 ({reviews.length} valoraciones)
+							de 5 ({totalReviews} valoraciones)
 						</Typography>
 					</div>
 				</div>
 
-				{/* Aquí reciclamos el modal que hicimos antes */}
-				<ReviewModal targetId={targetId} targetType={targetType} />
+				{showWriteButton ? (
+					<ReviewModal targetId={targetId} targetType={targetType} onSuccess={fetchReviewData} />
+				) : (
+					activeProfile &&
+					userHasReviewed && (
+						<Typography variant='small' className='bg-blue-gray-50 px-3 py-1 rounded-lg text-blue-gray-600 italic'>
+							Ya has valorado esta {targetType === 'CAMPAIGN' ? 'campaña' : 'experiencia'}
+						</Typography>
+					)
+				)}
 			</div>
 
 			{/* Renderizado de los comentarios */}
@@ -80,4 +97,7 @@ export default function ReviewList({ targetId, targetType }) {
 ReviewList.propTypes = {
 	targetId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 	targetType: PropTypes.string.isRequired,
+	canWrite: PropTypes.bool.isRequired,
+	averageRating: PropTypes.number,
+	totalReviews: PropTypes.number,
 };
