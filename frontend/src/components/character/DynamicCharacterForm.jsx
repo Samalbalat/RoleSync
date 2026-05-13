@@ -27,7 +27,7 @@ export default function DynamicCharacterForm({ templateData }) {
 		);
 	}
 
-	const { id: template_id, campaign_id, schema_definition } = templateData;
+	const { campaign_id, schema_definition } = templateData;
 
 	const onSubmit = async data => {
 		const payload = buildCharacterPayload({

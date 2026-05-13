@@ -45,11 +45,16 @@ export default function FreeStyleCharacterForm() {
 		setAttributes(attributes.filter((_, index) => index !== indexToRemove));
 	};
 
+	const ALLOWED_ATTRIBUTE_FIELDS = new Set(['key', 'value']);
+
 	// Actualizar el nombre (key) o el valor (value) de un atributo
 	const handleAttributeChange = (index, field, newValue) => {
-		const updatedAttributes = [...attributes];
-		updatedAttributes[index][field] = newValue;
-		setAttributes(updatedAttributes);
+		if (!ALLOWED_ATTRIBUTE_FIELDS.has(field)) {
+			console.warn(`Campo de atributo no permitido: ${field}`);
+			return;
+		}
+
+		setAttributes(prev => prev.map((attr, i) => (i === index ? { ...attr, [field]: newValue } : attr)));
 	};
 
 	const onSubmit = async data => {

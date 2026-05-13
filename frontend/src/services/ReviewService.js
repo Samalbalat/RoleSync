@@ -8,14 +8,9 @@ const ReviewService = {
      * @param {number} targetId - ID numérico del objetivo
      */
     getReviews: async (type, targetId) => {
-        try {
-            const params = { type, targetId };
-            const response = await api.get('/rolesync/reviews', { params });
-            return response.data;
-        } catch (error) {
-            console.error(`Error fetching reviews for ${type} ${targetId}:`, error);
-            throw error;
-        }
+        const params = { type, targetId };
+        const response = await api.get('/rolesync/reviews', { params });
+        return response.data;
     },
 
     /**
@@ -23,13 +18,8 @@ const ReviewService = {
      * @param {Object} reviewData - { targetType, targetId, rating, comment }
      */
     createReview: async (reviewData) => {
-        try {
-            const response = await api.post('/rolesync/reviews', reviewData);
-            return response.data;
-        } catch (error) {
-            console.error('Error creating review:', error);
-            throw error;
-        }
+        const response = await api.post('/rolesync/reviews', reviewData);
+        return response.data;
     },
 
     /**
@@ -38,14 +28,10 @@ const ReviewService = {
      * @param {number} targetId - ID numérico del objetivo
      */
     getReviewSummary: async (type, targetId) => {
-        try {
-            const params = { type, targetId };
-            const response = await api.get('/rolesync/reviews/summary', { params });
-            return response.data; // Devuelve { averageRating, totalReviews }
-        } catch (error) {
-            console.error(`Error fetching summary for ${type} ${targetId}:`, error);
-            throw error;
-        }
+        const params = { type, targetId };
+        const response = await api.get('/rolesync/reviews/summary', { params });
+        return response.data; // Devuelve { averageRating, totalReviews }
+        
     }
 };
 

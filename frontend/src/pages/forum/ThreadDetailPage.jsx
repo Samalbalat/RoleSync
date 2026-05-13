@@ -27,8 +27,10 @@ const getCurrentUser = () => {
 };
 
 const renderMarkdown = content => {
-	const rawHtml = marked.parse(content || '');
+	const input = content ? String(content) : '';
+	const rawHtml = marked.parse(input);
 	const cleanHtml = DOMPurify.sanitize(rawHtml);
+
 	return { __html: cleanHtml };
 };
 
