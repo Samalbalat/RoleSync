@@ -58,7 +58,7 @@ const mockTemplate = {
 	schema: [
 		{ key: 'str', label: 'Strength', type: 'number', required: true, min: 1, max: 20 },
 	],
-};
+}
 
 
 
@@ -219,9 +219,9 @@ export const handlers = [
 	),
 
 	// GET /rolesync/templates/me
-    http.get(`${BASE}/rolesync/templates/me`, () => {
-        return HttpResponse.json([mockTemplate]);
-    }),
+    http.get(`${BASE}/rolesync/templates/me`, () => 
+        HttpResponse.json([mockTemplate])
+    ),
 
 	// POST /rolesync/templates
 	http.post(`${BASE}/rolesync/templates`, () =>

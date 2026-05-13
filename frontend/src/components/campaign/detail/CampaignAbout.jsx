@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card, CardBody, Typography, Chip } from '@material-tailwind/react';
+import { Card, CardBody, Typography } from '@material-tailwind/react';
 import { BookOpenIcon } from '@heroicons/react/24/outline';
 
 export default function CampaignAbout({ campaign, t }) {

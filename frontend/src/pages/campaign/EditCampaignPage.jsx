@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Typography, Spinner, Button } from '@material-tailwind/react'; // ¡Añadido Button!
-import { ShieldExclamationIcon } from '@heroicons/react/24/outline'; // ¡Añadido el icono!
+import { Typography, Spinner } from '@material-tailwind/react';
 import { getTheme } from '../../utils/themeUtils';
 import { useTranslation } from 'react-i18next';
 import CampaignForm from '../../components/campaign/CampaignForm';
