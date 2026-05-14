@@ -157,6 +157,7 @@ class ReviewControllerUnitTest {
                         .principal(authentication()))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Review already exists"));
+                verify(reviewService, times(1)).createReview(any(), any());
     }
 
     @Test
