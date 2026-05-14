@@ -16,12 +16,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rolesync.rolesync.dto.profilecontroller.ProfileInDTO;
+import com.rolesync.rolesync.dto.profilecontroller.ProfileOutDTO;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.ProfileMetrics;
 import com.rolesync.rolesync.model.ProfileType;
+import com.rolesync.rolesync.model.ReviewTargetType;
 import com.rolesync.rolesync.repository.ProfileMetricsRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
 import com.rolesync.rolesync.security.jwt.JwtUtils;
+import com.rolesync.rolesync.services.ReviewService;
 import com.rolesync.rolesync.utils.UtilsCalls;
 
 /**
@@ -37,6 +40,7 @@ public class ProfileController {
     @Autowired JwtUtils jwtUtils;
     @Autowired UtilsCalls utilsCalls;
     @Autowired ProfileMetricsRepository metricsRepository;
+    @Autowired ReviewService reviewService;
 
      /**
      * Get the profile of the authenticated user with the given roleType. If the profile does not exist, return a 404 Not Found response.
@@ -58,8 +62,8 @@ public class ProfileController {
         {
         Optional<Profile> profile = profileRepository.findByProfilename(profileName);
         if (profile.isPresent()) {
-            ProfileInDTO response = profile.map(p -> 
-            new ProfileInDTO(p.getProfilename(), p.getImage(), p.getDescription())
+            ProfileOutDTO response = profile.map(p -> 
+            new ProfileOutDTO(p.getId(), p.getProfilename(), p.getImage(), p.getDescription(), reviewService.getSummary(ReviewTargetType.PROFILE, p.getId()))
         ).orElse(null);
         return ResponseEntity.ok()
                 .body(response);
@@ -76,8 +80,8 @@ public class ProfileController {
         {
         Optional<Profile> profile = profileRepository.findByProfilename(profileToGet);
         if (profile.isPresent()) {
-            ProfileInDTO response = profile.map(p -> 
-            new ProfileInDTO(p.getProfilename(), p.getImage(), p.getDescription())
+            ProfileOutDTO response = profile.map(p -> 
+            new ProfileOutDTO(p.getId(), p.getProfilename(), p.getImage(), p.getDescription(), reviewService.getSummary(ReviewTargetType.PROFILE, p.getId()))
         ).orElse(null);
         return ResponseEntity.ok()
                 .body(response);

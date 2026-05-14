@@ -1,5 +1,6 @@
 package com.rolesync.rolesync.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -32,10 +33,12 @@ import com.rolesync.rolesync.model.CampaignRequestStatus;
 import com.rolesync.rolesync.model.CampaignStatus;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.ProfileType;
+import com.rolesync.rolesync.model.ReviewTargetType;
 import com.rolesync.rolesync.repository.CampaignRepository;
 import com.rolesync.rolesync.repository.CampaignRequestRepository;
 import com.rolesync.rolesync.repository.CharacterSheetRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
+import com.rolesync.rolesync.services.ReviewService;
 import com.rolesync.rolesync.utils.UtilsCalls;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,27 +54,29 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequestMapping("/campaigns")
 public class CampaignController {
 
-    private static final String ERR_UNAUTHORIZED = "User is not authorized";
-    private static final String ERR_UNAUTHORIZED_UPDATE_REQUEST = "User is not authorized to update this request";
-    private static final String ERR_NOT_FOUND = "Resource not found";
+    private static final String ERR_UNAUTHORIZED = "Usuario no está autorizado para realizar esta acción";
+    private static final String ERR_UNAUTHORIZED_UPDATE_REQUEST = "Usuario no está autorizado para actualizar esta solicitud";
 
     private final CampaignRepository campaignRepository;
     private final ProfileRepository profileRepository;
     private final CampaignRequestRepository campaignRequestRepository;
     private final CharacterSheetRepository characterSheetRepository;
     private final UtilsCalls utilsCalls;
+    private final ReviewService reviewService;
 
     public CampaignController(
             CampaignRepository campaignRepository,
             UtilsCalls utilsCalls,
             ProfileRepository profileRepository,
             CampaignRequestRepository campaignRequestRepository,
-            CharacterSheetRepository characterSheetRepository) {
+            CharacterSheetRepository characterSheetRepository,
+            ReviewService reviewService) {
         this.campaignRepository = campaignRepository;
         this.utilsCalls = utilsCalls;
         this.profileRepository = profileRepository;
         this.campaignRequestRepository = campaignRequestRepository;
         this.characterSheetRepository = characterSheetRepository;
+        this.reviewService = reviewService;
     }
 
     // ---------- FILTERED GET ----------
@@ -79,11 +84,38 @@ public class CampaignController {
     @GetMapping
     public ResponseEntity<List<CampaignGetByFilterDTO>> getCampaigns(@ModelAttribute CampaignFilter filter) {
         CampaignPredicateBuilder predicateBuilder = new CampaignPredicateBuilder();
-        
+
         BooleanExpression predicate = predicateBuilder.build(filter);
 
         List<Campaign> campaigns = (List<Campaign>) campaignRepository.findAll(predicate);
-        List<CampaignGetByFilterDTO> response = campaigns.stream().map(CampaignMapper::toGetByFilterDTO).toList();
+        List<CampaignGetByFilterDTO> response = new ArrayList<>();
+        for (Campaign campaign : campaigns) {
+            if (campaign == null) {
+                return null;
+            }
+
+            CampaignGetByFilterDTO dto = new CampaignGetByFilterDTO();
+
+            dto.setId(campaign.getId() != null ? String.valueOf(campaign.getId()) : null);
+            dto.setName(campaign.getName());
+            dto.setCommunication(campaign.getCommunication());
+            dto.setThemes(campaign.getThemes());
+            dto.setImage(campaign.getImage());
+            dto.setSystem(campaign.getSystem());
+
+            // Enum → String (safe)
+            dto.setStatus(
+                    campaign.getStatus() != null ? campaign.getStatus().name() : null);
+
+            // Safe player count (no lazy loading involved)
+            dto.setCurrentPlayers(
+                    campaign.getMembers() != null ? campaign.getMembers().size() : 0);
+
+            dto.setMaxPlayers(
+                    campaign.getMaxPlayers() != null ? campaign.getMaxPlayers() : 0);
+            dto.setReviewSummary(reviewService.getSummary(ReviewTargetType.CAMPAIGN, Long.valueOf(campaign.getId())));
+            response.add(dto);
+        }
         return ResponseEntity.ok(response);
     }
 
@@ -95,38 +127,39 @@ public class CampaignController {
         CampaignGetMeOutDTO response = new CampaignGetMeOutDTO();
 
         // AS MASTER
-        List<CampaignGetMeOutItemDTO> asMaster =
-                campaignRepository.findByOwnerName(profileName).stream()
-                        .filter(c -> c.getStatus() != CampaignStatus.DELETED)
-                        .map(c -> {
-                            CampaignGetMeOutItemDTO item = new CampaignGetMeOutItemDTO();
-                            item.setId(c.getId());
-                            item.setName(c.getName());
-                            item.setImage(c.getImage());
-                            item.setSystem(c.getSystem());
-                            item.setStatus(c.getStatus().name());
-                            Integer pendingRequests = Integer.valueOf(campaignRequestRepository.countPendingRequestsByCampaignId(c.getId()).toString());
-                            item.setPendingRequests(pendingRequests);
+        List<CampaignGetMeOutItemDTO> asMaster = campaignRepository.findByOwnerName(profileName).stream()
+                .filter(c -> c.getStatus() != CampaignStatus.DELETED)
+                .map(c -> {
+                    CampaignGetMeOutItemDTO item = new CampaignGetMeOutItemDTO();
+                    item.setId(c.getId());
+                    item.setName(c.getName());
+                    item.setImage(c.getImage());
+                    item.setSystem(c.getSystem());
+                    item.setStatus(c.getStatus().name());
+                    item.setReviewSummary(reviewService.getSummary(ReviewTargetType.CAMPAIGN, Long.valueOf(c.getId())));
+                    Integer pendingRequests = Integer
+                            .valueOf(campaignRequestRepository.countPendingRequestsByCampaignId(c.getId()).toString());
+                    item.setPendingRequests(pendingRequests);
 
-                            return item;
-                        }).toList();
+                    return item;
+                }).toList();
 
         response.setAsMaster(asMaster);
 
         // AS PLAYER
-        List<CampaignGetMeOutItemDTO> asPlayer =
-                campaignRepository.findByMember(profileName).stream()
-                        .filter(c -> c.getStatus() != CampaignStatus.DELETED)
-                        .map(c -> {
-                            CampaignGetMeOutItemDTO item = new CampaignGetMeOutItemDTO();
-                            item.setId(c.getId());
-                            item.setName(c.getName());
-                            item.setImage(c.getImage());
-                            item.setSystem(c.getSystem());
-                            item.setStatus(c.getStatus().name());
-                            item.setOwnerName(c.getOwnerName());
-                            return item;
-                        }).toList();
+        List<CampaignGetMeOutItemDTO> asPlayer = campaignRepository.findByMember(profileName).stream()
+                .filter(c -> c.getStatus() != CampaignStatus.DELETED)
+                .map(c -> {
+                    CampaignGetMeOutItemDTO item = new CampaignGetMeOutItemDTO();
+                    item.setId(c.getId());
+                    item.setName(c.getName());
+                    item.setImage(c.getImage());
+                    item.setSystem(c.getSystem());
+                    item.setStatus(c.getStatus().name());
+                    item.setOwnerName(c.getOwnerName());
+                    item.setReviewSummary(reviewService.getSummary(ReviewTargetType.CAMPAIGN, Long.valueOf(c.getId())));
+                    return item;
+                }).toList();
 
         response.setAsPlayer(asPlayer);
 
@@ -227,7 +260,7 @@ public class CampaignController {
             @RequestHeader("X-Profile-Name") String profileName) {
         Campaign campaign = new Campaign();
         Optional<Profile> activeProfileOpt = profileRepository.findByProfilename(profileName);
-        if(activeProfileOpt.isEmpty()) {
+        if (activeProfileOpt.isEmpty()) {
             return ResponseEntity.status(403).body(ERR_UNAUTHORIZED);
         }
         campaign.setOwnerName(activeProfileOpt.get().getProfilename());
@@ -279,7 +312,8 @@ public class CampaignController {
             return viabilityCheck;
         }
         List<CampaignRequest> requestOpt = campaignRequestRepository.findAllByCampaignAndProfile(campaign, profile);
-        CampaignRequest pendingRequest = requestOpt.stream().filter(r -> r.getStatus() == CampaignRequestStatus.PENDING).findFirst().orElse(null);
+        CampaignRequest pendingRequest = requestOpt.stream().filter(r -> r.getStatus() == CampaignRequestStatus.PENDING)
+                .findFirst().orElse(null);
         if (requestOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else if (dto.getStatus().equalsIgnoreCase("ACCEPT") && pendingRequest != null) {
@@ -301,7 +335,8 @@ public class CampaignController {
             Profile profile, String profileName) {
         if (!campaignOpt.getOwnerName().equals(profileName)) {
             return ResponseEntity.status(403).body(ERR_UNAUTHORIZED_UPDATE_REQUEST);
-        }        if (profile == null) {
+        }
+        if (profile == null) {
             return ResponseEntity.badRequest().body("Profile not found");
         }
         return null;
@@ -324,14 +359,13 @@ public class CampaignController {
             campaignRepository.save(campaign);
         }
         Profile profileToKick = profileRepository.findByProfilename(dto.getProfileName()).orElse(null);
-        if(profileToKick == null) {
+        if (profileToKick == null) {
             return ResponseEntity.badRequest().body("Profile not found");
         }
         CampaignRequest request = campaignRequestRepository.findLastRequestByProfileAndCampaign(
-            profileToKick.getId(),
-            campaign.getId()
-        ).orElse(null);
-        if(request != null) {
+                profileToKick.getId(),
+                campaign.getId()).orElse(null);
+        if (request != null) {
             request.setStatus(CampaignRequestStatus.KICKED);
             request.setMessage(request.getMessage() + " (Kicked from campaign)");
             campaignRequestRepository.save(request);
@@ -356,10 +390,9 @@ public class CampaignController {
             campaignRepository.save(campaign);
         }
         CampaignRequest request = campaignRequestRepository.findLastRequestByProfileAndCampaign(
-            profileRepository.findByProfilename(dto.getProfileName()).orElse(null).getId(),
-            campaign.getId()
-        ).orElse(null);
-        if(request != null) {
+                profileRepository.findByProfilename(dto.getProfileName()).orElse(null).getId(),
+                campaign.getId()).orElse(null);
+        if (request != null) {
             request.setStatus(CampaignRequestStatus.BLOCKED);
             request.setMessage(request.getMessage() + " (Blocked from campaign)");
             campaignRequestRepository.save(request);
@@ -382,7 +415,6 @@ public class CampaignController {
         return ResponseEntity.ok("Campaign deleted");
     }
 
-
     // ---------- APPLY TO CAMPAIGN ----------
     @PostMapping("/{id}/join")
     public ResponseEntity<String> applyToCampaign(
@@ -395,14 +427,14 @@ public class CampaignController {
             return ResponseEntity.status(403).body("User is not properly authorized to join this campaign");
         }
         CampaignRequest lastRequest = campaignRequestRepository.findLastRequestByProfileAndCampaign(
-            profileRepository.findByProfilename(profileName).orElse(null).getId(),
-            id
-        ).orElse(null);
-        if(lastRequest != null && lastRequest.getStatus() == CampaignRequestStatus.BLOCKED) {
+                profileRepository.findByProfilename(profileName).orElse(null).getId(),
+                id).orElse(null);
+        if (lastRequest != null && lastRequest.getStatus() == CampaignRequestStatus.BLOCKED) {
             return ResponseEntity.status(403).body("User is blocked from joining this campaign");
         }
         Optional<Campaign> campaignOpt = campaignRepository.findById(id);
-        if(campaignOpt.get().getMembers() != null && campaignOpt.get().getMembers().contains(profileName) || campaignOpt.get().getOwnerName().equals(profileName)) {
+        if (campaignOpt.get().getMembers() != null && campaignOpt.get().getMembers().contains(profileName)
+                || campaignOpt.get().getOwnerName().equals(profileName)) {
             return ResponseEntity.badRequest().body("User is already a member/owner of this campaign");
         }
         ResponseEntity<String> viabilityCheck = checkApplyViability(campaignOpt, profileName);
@@ -426,9 +458,13 @@ public class CampaignController {
         if (campaignOpt.isEmpty() || campaignOpt.get().getStatus() == CampaignStatus.DELETED) {
             return ResponseEntity.notFound().build();
         }
-        Optional<CampaignRequest> existingRequest = campaignRequestRepository.findAll().stream().filter(r -> r.getCampaign().getId().equals(campaignOpt.get().getId()) && r.getProfile().getProfilename().equals(profileName)).findFirst();
-        if(existingRequest.isPresent() && existingRequest.get().getStatus() == CampaignRequestStatus.PENDING) {
-                return ResponseEntity.badRequest().body("There is already a pending request for this user in this campaign");
+        Optional<CampaignRequest> existingRequest = campaignRequestRepository.findAll().stream()
+                .filter(r -> r.getCampaign().getId().equals(campaignOpt.get().getId())
+                        && r.getProfile().getProfilename().equals(profileName))
+                .findFirst();
+        if (existingRequest.isPresent() && existingRequest.get().getStatus() == CampaignRequestStatus.PENDING) {
+            return ResponseEntity.badRequest()
+                    .body("There is already a pending request for this user in this campaign");
         }
         return null;
     }
@@ -467,8 +503,9 @@ public class CampaignController {
         dto.setStatus(campaign.getStatus().name());
         dto.setType(campaign.getCampaignType().name());
         dto.setCurrentPlayers(campaign.getMembers() != null ? campaign.getMembers().size() : 0);
-        
+
         dto.setMaxPlayers(campaign.getMaxPlayers());
+        dto.setReviewSummary(reviewService.getSummary(ReviewTargetType.CAMPAIGN, Long.valueOf(campaign.getId())));
 
         OwnerProfileDTO owner = new OwnerProfileDTO();
         profileRepository.findByProfilename(campaign.getOwnerName()).ifPresent(p -> {
@@ -499,11 +536,11 @@ public class CampaignController {
     }
 
     private Campaign getAuthorizedCampaignOrThrow(Long id, Authentication auth, String profileName) {
-    if (!utilsCalls.checkAuthAndProfile(auth, profileName)) {
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not authorized");
-    }
+        if (!utilsCalls.checkAuthAndProfile(auth, profileName)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not authorized");
+        }
 
-    return campaignRepository.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return campaignRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 }
