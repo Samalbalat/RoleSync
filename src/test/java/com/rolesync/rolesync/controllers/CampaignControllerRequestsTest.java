@@ -7,14 +7,18 @@ import com.rolesync.rolesync.dto.campaigncontroller.predicates.CampaignPredicate
 import com.rolesync.rolesync.model.Campaign;
 import com.rolesync.rolesync.model.CampaignRequest;
 import com.rolesync.rolesync.model.CampaignRequestStatus;
+import com.rolesync.rolesync.model.LoginSession;
 import com.rolesync.rolesync.model.Profile;
 
 import com.rolesync.rolesync.repository.CampaignRepository;
 import com.rolesync.rolesync.repository.CampaignRequestRepository;
 import com.rolesync.rolesync.repository.CharacterSheetRepository;
+import com.rolesync.rolesync.repository.LoginSessionRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
 import com.rolesync.rolesync.services.ReviewService;
 import com.rolesync.rolesync.utils.UtilsCalls;
+
+import ch.qos.logback.core.net.LoginAuthenticator;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +28,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignRequestPutInDTO;
@@ -40,6 +45,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@ActiveProfiles("test")
 @WebMvcTest(CampaignController.class)
 class CampaignControllerRequestsTest {
 
