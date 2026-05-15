@@ -1,6 +1,5 @@
 package com.rolesync.rolesync.controller;
 
-
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -19,39 +18,63 @@ import org.springframework.web.bind.annotation.*;
 import com.rolesync.rolesync.dto.authcontroller.LoginRequest;
 import com.rolesync.rolesync.dto.authcontroller.ProfileMeResponse;
 import com.rolesync.rolesync.dto.authcontroller.SignupRequest;
+import com.rolesync.rolesync.model.LoginSession;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.ProfileMetrics;
 import com.rolesync.rolesync.model.ProfileType;
 import com.rolesync.rolesync.model.User;
 import com.rolesync.rolesync.repository.UserRepository;
+import com.rolesync.rolesync.repository.LoginSessionRepository;
 import com.rolesync.rolesync.repository.ProfileMetricsRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
 import com.rolesync.rolesync.security.jwt.JwtUtils;
 import com.rolesync.rolesync.security.service.UserDetailsImpl;
 
 /**
- * This controller handles all the endpoints related to user authentication and registration. It allows users to log in, register, and log out of the application.
- * The controller uses JWT authentication to secure the endpoints and ensure that only authenticated users can access certain resources. 
- * The login endpoint generates a JWT cookie upon successful authentication, while the logout endpoint clears the JWT cookie to log the user out. 
- * The registration endpoint allows new users to create an account by providing their email, password, time zone, profile name, and role type.
- * The controller also includes error handling to return appropriate responses when authentication fails or when a user tries to register with an email that is already in use.
+ * This controller handles all the endpoints related to user authentication and
+ * registration. It allows users to log in, register, and log out of the
+ * application.
+ * The controller uses JWT authentication to secure the endpoints and ensure
+ * that only authenticated users can access certain resources.
+ * The login endpoint generates a JWT cookie upon successful authentication,
+ * while the logout endpoint clears the JWT cookie to log the user out.
+ * The registration endpoint allows new users to create an account by providing
+ * their email, password, time zone, profile name, and role type.
+ * The controller also includes error handling to return appropriate responses
+ * when authentication fails or when a user tries to register with an email that
+ * is already in use.
  */
 @RestController
 @RequestMapping("/rolesync/auth")
 public class AuthController {
-    @Autowired AuthenticationManager authenticationManager;
-    @Autowired ProfileRepository profileRepository;
-    @Autowired UserRepository userRepository;
-    @Autowired PasswordEncoder encoder;
-    @Autowired JwtUtils jwtUtils;
-    @Autowired ProfileMetricsRepository profileMetricsRepository;
+    @Autowired
+    AuthenticationManager authenticationManager;
+    @Autowired
+    ProfileRepository profileRepository;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    PasswordEncoder encoder;
+    @Autowired
+    JwtUtils jwtUtils;
+    @Autowired
+    ProfileMetricsRepository profileMetricsRepository;
+    @Autowired
+    LoginSessionRepository loginSessionRepository;
 
     /**
      * Authenticate the user with the provided email and password.
-     * If the authentication is successful, a JWT cookie is generated and returned in the response header, along with a list of the user's profiles in the response body.
+     * If the authentication is successful, a JWT cookie is generated and returned
+     * in the response header, along with a list of the user's profiles in the
+     * response body.
      * If the authentication fails, an error message is returned.
-     * @param loginRequest The LoginRequest object containing the user's email and password
-     * @return A ResponseEntity containing a JWT cookie in the response header and a list of the user's profiles in the response body if the authentication is successful, or an error message if the authentication fails
+     * 
+     * @param loginRequest The LoginRequest object containing the user's email and
+     *                     password
+     * @return A ResponseEntity containing a JWT cookie in the response header and a
+     *         list of the user's profiles in the response body if the
+     *         authentication is successful, or an error message if the
+     *         authentication fails
      */
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
@@ -76,27 +99,35 @@ public class AuthController {
             response.setEmail(userDetails.getUsername());
             return response;
         }).toList();
+        LoginSession session = new LoginSession(user.getEmail());
+        loginSessionRepository.save(session);
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .body(profileResponses);
     }
 
     /**
-     * Register a new user with the provided information, including email, password, time zone, profile name, and role type.
+     * Register a new user with the provided information, including email, password,
+     * time zone, profile name, and role type.
      * If the email is already in use, an error message is returned.
-     * @param signUpRequest The SignupRequest object containing the new user's information, including email, password, time zone, profile name, and role type
-     * @return A ResponseEntity containing a success message if the user is registered successfully, or an error message if the email is already in use
+     * 
+     * @param signUpRequest The SignupRequest object containing the new user's
+     *                      information, including email, password, time zone,
+     *                      profile name, and role type
+     * @return A ResponseEntity containing a success message if the user is
+     *         registered successfully, or an error message if the email is already
+     *         in use
      */
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity.badRequest().body("Error: Email already in use");
-        }else if(profileRepository.existsByProfilename(signUpRequest.getProfilename())){
+        } else if (profileRepository.existsByProfilename(signUpRequest.getProfilename())) {
             return ResponseEntity.badRequest().body("Error: Profile name already in use");
         }
         User user = new User(signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()), signUpRequest.getTimeZone());
         ProfileMetrics metrics = new ProfileMetrics();
-        
+
         metrics.setPostsCount(0);
         metrics.setRepliesCount(0);
         metrics.setCampaignsCount(0);
@@ -117,13 +148,32 @@ public class AuthController {
     }
 
     /**
-     * Log out the authenticated user by clearing the JWT cookie. A success message is returned in the response body.
-     * @return A ResponseEntity containing a success message in the response body and a cleared JWT cookie in the response header
+     * Log out the authenticated user by clearing the JWT cookie. A success message
+     * is returned in the response body.
+     * 
+     * @return A ResponseEntity containing a success message in the response body
+     *         and a cleared JWT cookie in the response header
      */
     @PostMapping("/logout")
-    public ResponseEntity<?> logoutUser() {
+    public ResponseEntity<?> logoutUser(Authentication authentication) {
+        if (authentication != null) {
+
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+            String email = userDetails.getUsername();
+
+            loginSessionRepository
+                    .findFirstByEmailAndActiveTrue(email)
+                    .ifPresent(session -> {
+                        session.closeSession();
+                        loginSessionRepository.save(session);
+                    });
+        }
+
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body("Sesión cerrada.");
     }
 }
