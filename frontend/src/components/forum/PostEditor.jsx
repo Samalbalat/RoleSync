@@ -142,72 +142,59 @@ const PostEditor = ({
 		}, 0);
 	};
 
+	const resetForm = () => {
+		setContent('');
+		setImageUrl('');
+		setShowImageInput(false);
+		setShowFormatMenu(false);
+		setIsOoc(false);
+		setVisibleToIds([]);
+	};
+
+	const executePostCreation = async () => {
+		if (isGeneralForum) {
+			return await ForumService.createGeneralReply({
+				type: typePost || 'REPLY',
+				title: '',
+				parentPostId: parentPostId || 0,
+				content: content,
+				mediaUrls: imageUrl ? [imageUrl] : [],
+				tags: [],
+			});
+		}
+
+		const finalVisibleIds =
+			visibleToIds.length > 0 ? Array.from(new Set(authorId ? [authorId, ...visibleToIds] : visibleToIds)) : null;
+
+		return await ForumService.createPost(campaignId, {
+			type: typePost || 'REPLY',
+			content: content,
+			authorCharacterId: authorId,
+			parentPostId: parentPostId,
+			isOoc: isOwner || isGeneralForum || isOoc,
+			isDm: isOwner,
+			mediaUrls: imageUrl ? [imageUrl] : [],
+			visibleToCharacterIds: finalVisibleIds,
+		});
+	};
+
+	// MANEJADOR PRINCIPAL REFACTORIZADO (< 20 líneas)
 	const handleSubmit = async () => {
 		if (isSubmitDisabled) return;
 
 		try {
-			let newPost;
-
-			// ==========================================
-			// RUTA A: FORO GENERAL
-			// ==========================================
-			if (isGeneralForum) {
-				const generalPayload = {
-					type: typePost || 'REPLY',
-					title: '',
-					parentPostId: parentPostId || 0,
-					content: content,
-					mediaUrls: imageUrl ? [imageUrl] : [],
-					tags: [],
-				};
-
-				newPost = await ForumService.createGeneralReply(generalPayload);
-			}
-			// ==========================================
-			// RUTA B: CAMPAÑAS (Intacto, no se rompe nada)
-			// ==========================================
-			else {
-				let finalVisibleIds = null;
-				if (visibleToIds.length > 0) {
-					const idsSet = new Set(visibleToIds);
-					if (authorId) idsSet.add(authorId);
-					finalVisibleIds = Array.from(idsSet);
-				}
-
-				const finalIsOoc = isOwner || isGeneralForum || isOoc;
-
-				const postData = {
-					type: typePost || 'REPLY',
-					content: content,
-					authorCharacterId: authorId,
-					parentPostId: parentPostId,
-					isOoc: finalIsOoc,
-					isDm: isOwner,
-					mediaUrls: imageUrl ? [imageUrl] : [],
-					visibleToCharacterIds: finalVisibleIds,
-				};
-
-				newPost = await ForumService.createPost(campaignId, postData);
-			}
+			const newPost = await executePostCreation();
 
 			if (onPostCreated) {
 				const responseData = newPost?.data || newPost || {};
-
-				const enrichedPost = {
+				onPostCreated({
 					content: content,
 					createdAt: new Date().toISOString(),
 					...responseData,
-				};
-
-				onPostCreated(enrichedPost);
+				});
 			}
 
-			setContent('');
-			setImageUrl('');
-			setShowImageInput(false);
-			setShowFormatMenu(false);
-			setIsOoc(false);
-			setVisibleToIds([]);
+			resetForm();
 		} catch (error) {
 			console.error('Error al crear el post:', error);
 			toast.error(t('forum.postEditor.creationError'));

@@ -28,6 +28,23 @@ import {
 import { TEMPLATE_PRESETS } from '../../utils/character/templatePresets';
 import AccessDeniedView from '../layout/AccesDeniedView';
 
+// --- FUNCIONES AUXILIARES DE SOPORTE (Sacan la complejidad del componente) ---
+
+const isAccessDenied = (storedProfile, templateUsername) => {
+	const profileName = storedProfile?.name?.trim().toLowerCase();
+	const username = templateUsername?.trim().toLowerCase();
+	return !!(profileName && username && profileName !== username);
+};
+
+const handleTemplateError = (error, setAccessDenied, t) => {
+	if (error.response?.status === 404) {
+		setAccessDenied(true);
+	} else {
+		console.error('Error al cargar la plantilla:', error);
+		toast.error(t('character.templateBuilder.errorLoadCharacter'));
+	}
+};
+
 export default function TemplateBuilder() {
 	const { t } = useTranslation('global');
 	const navigate = useNavigate();
@@ -67,43 +84,33 @@ export default function TemplateBuilder() {
 		{ value: 'boolean', label: t('character.templateBuilder.checkboxDes') },
 	];
 
+	// --- EFFECT REFACTORIZADO (Complejidad reducida drásticamente) ---
 	useEffect(() => {
-		if (isEditMode) {
-			const fetchTemplateData = async () => {
-				try {
-					const data = await CharacterService.getTemplateById(templateId);
+		if (!isEditMode) return;
 
-					const profileName = storedProfile?.name?.trim().toLowerCase();
-					const username = data?.username?.trim().toLowerCase();
-					if (profileName && username && profileName !== username) {
-						setAccessDenied(true);
-					}
-					setTemplateName(data.name || '');
+		const fetchTemplateData = async () => {
+			try {
+				const data = await CharacterService.getTemplateById(templateId);
 
-					if (!searchParams.get('campaignId')) {
-						setCampaignId(data.campaignId);
-					}
-
-					// Mapeamos los atributos del backend a nuestro formato del frontend
-					if (Array.isArray(data?.schema)) {
-						setFields(mapBackendSchemaToFields(data.schema));
-					} else {
-						setFields([]);
-					}
-				} catch (error) {
-					if (error.response?.status === 404) {
-						setAccessDenied(true);
-					} else {
-						console.error('Error al cargar la plantilla:', error);
-						toast.error(t('character.templateBuilder.errorLoadCharacter'));
-					}
-				} finally {
-					setIsLoading(false);
+				if (isAccessDenied(storedProfile, data?.username)) {
+					setAccessDenied(true);
 				}
-			};
 
-			fetchTemplateData();
-		}
+				setTemplateName(data.name || '');
+
+				if (!searchParams.get('campaignId')) {
+					setCampaignId(data.campaignId);
+				}
+
+				setFields(Array.isArray(data?.schema) ? mapBackendSchemaToFields(data.schema) : []);
+			} catch (error) {
+				handleTemplateError(error, setAccessDenied, t);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		fetchTemplateData();
 	}, [templateId, isEditMode, t, searchParams]);
 
 	useEffect(() => {
@@ -112,8 +119,6 @@ export default function TemplateBuilder() {
 				setIsLoading(true);
 				try {
 					const data = await CharacterService.getTemplateById(cloneId);
-
-					// Podemos pre-rellenar el nombre con un "Copia de..." para que quede claro
 					setTemplateName(data.name ? `${data.name} (Copia)` : 'Plantilla Copiada');
 
 					if (Array.isArray(data?.schema)) {
@@ -135,11 +140,9 @@ export default function TemplateBuilder() {
 		if (!presetId || isEditMode) return;
 
 		const presetEntry = Object.entries(TEMPLATE_PRESETS).find(([key]) => key === presetId);
-
 		if (!presetEntry) return;
 
 		const [, presetData] = presetEntry;
-
 		setTemplateName(presetData.name);
 
 		if (Array.isArray(presetData.schema)) {
@@ -160,7 +163,6 @@ export default function TemplateBuilder() {
 
 	const saveField = () => {
 		const validationErrors = validateField(currentField);
-
 		if (validationErrors) {
 			setErrors(validationErrors);
 			return;
@@ -187,7 +189,6 @@ export default function TemplateBuilder() {
 
 	const startEditing = index => {
 		const fieldToEdit = fields.find((_, idx) => idx === index);
-
 		if (fieldToEdit) {
 			setCurrentField(fieldToEdit);
 			setEditingIndex(index);
@@ -203,7 +204,6 @@ export default function TemplateBuilder() {
 	};
 	const isEditing = typeof editingIndex === 'number';
 
-	// --- MANEJADOR DE ENVÍO CONECTADO AL BACKEND ---
 	const handleSubmitTemplate = async e => {
 		e.preventDefault();
 
@@ -231,7 +231,6 @@ export default function TemplateBuilder() {
 		});
 
 		try {
-			// --- DECISIÓN: ¿CREAR O ACTUALIZAR? ---
 			if (isEditMode) {
 				await CharacterService.updateTemplate(templateId, payload);
 				toast.success(t('character.templateBuilder.successUpdate'));
@@ -241,7 +240,6 @@ export default function TemplateBuilder() {
 			}
 
 			const returnUrl = location.state?.from || `/myTemplates`;
-
 			setTimeout(() => {
 				navigate(returnUrl);
 			}, 1000);
@@ -336,7 +334,6 @@ export default function TemplateBuilder() {
 				</Card>
 			)}
 
-			{/* FORMULARIO PARA AÑADIR/EDITAR CAMPO */}
 			<Card className={`w-full shadow-md border-t-4 ${isEditing ? theme.border : 'border-t-transparent'}`}>
 				<CardBody className='flex flex-col gap-4'>
 					<div className='flex justify-between items-center'>
@@ -352,7 +349,6 @@ export default function TemplateBuilder() {
 						)}
 					</div>
 
-					{/* INPUT DEL NOMBRE CON MANEJO DE ERRORES */}
 					<div className='grid grid-cols-1 md:grid-cols-2 gap-4 items-center'>
 						<Input
 							id='fieldName'
