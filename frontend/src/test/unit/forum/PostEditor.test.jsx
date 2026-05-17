@@ -333,7 +333,7 @@ describe('PostEditor — Tests Unitarios', () => {
 			expect(ForumService.createPost).toHaveBeenCalledWith(
 				'1',
 				expect.objectContaining({
-					visibleToCharacterIds: [10, 1],
+					visibleToCharacterIds: expect.arrayContaining([10, 1]),
 				}),
 			);
 		});

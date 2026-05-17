@@ -57,6 +57,7 @@ const campanaTabletop = {
 	currentPlayers: 2,
 	maxPlayers: 5,
 	schedule: 'Viernes 20:00',
+	reviewSummary: { averageRating: 4.5, totalReviews: 10 },
 };
 
 const campanaWritten = {
@@ -64,6 +65,7 @@ const campanaWritten = {
 	id: 2,
 	type: 'WRITTEN',
 	communication: 'Discord',
+	reviewSummary: { averageRating: 4.5, totalReviews: 10 },
 };
 
 // ─── Tests ───────────────────────────────────────────────────────────────────

@@ -48,7 +48,7 @@ vi.mock('@material-tailwind/react', () => ({
 const mockCharacterComplete = {
 	id: 1,
 	name: 'Gimli',
-	campaign: { name: 'El Señor de los Anillos' },
+	campaignName: 'El Señor de los Anillos',
 	schema: [
 		{ label: 'Fuerza', value: 18 },
 		{ label: 'Destreza', value: 12 },
@@ -60,7 +60,7 @@ const mockCharacterComplete = {
 const mockCharacterEmpty = {
 	id: 2,
 	name: 'Aldeano',
-	campaign: null,
+	campaignName: null,
 	schema: [],
 };
 

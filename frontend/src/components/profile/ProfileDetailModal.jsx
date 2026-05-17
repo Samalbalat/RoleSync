@@ -43,8 +43,8 @@ const ProfileContent = ({ profileData, profileName }) => {
 					targetId={profileData.id}
 					targetType='PROFILE'
 					canWrite={true}
-					averageRating={profileData.reviewSummary.average}
-					totalReviews={profileData.reviewSummary.count}
+					averageRating={profileData.reviewSummary?.average}
+					totalReviews={profileData.reviewSummary?.count}
 				/>
 			</div>
 		</div>

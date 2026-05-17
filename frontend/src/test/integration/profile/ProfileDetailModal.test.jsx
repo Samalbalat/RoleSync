@@ -36,9 +36,14 @@ vi.mock('@heroicons/react/24/outline', async importOriginal => {
 // ─── Datos de prueba ─────────────────────────────────────────────────────────
 
 const mockProfile = {
+	id: 1,
 	profileName: 'AlexTable',
 	description: 'Un amante del rol desde hace 10 años.',
 	image: null,
+	reviewSummary: {
+		average: 4.5,
+		count: 12,
+	},
 };
 
 const onClose = vi.fn();
