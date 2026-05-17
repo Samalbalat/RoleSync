@@ -55,6 +55,6 @@ ReviewItem.propTypes = {
 		createdAt: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]).isRequired,
 		authorImage: PropTypes.string,
 		authorName: PropTypes.string.isRequired,
-		authorId: PropTypes.string.isRequired,
+		authorId: PropTypes.number.isRequired,
 	}).isRequired,
 };

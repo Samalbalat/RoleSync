@@ -165,9 +165,14 @@ vi.mock('@heroicons/react/24/outline', async importOriginal => {
 const activeProfile = { name: 'AlexTable', type: 'TABLETOP' };
 
 const mockProfileData = {
+	id: 1,
 	profileName: 'AlexTable',
 	description: 'Amante del rol.',
 	image: null,
+	reviewSummary: {
+		average: 4.5,
+		count: 12,
+	},
 };
 
 const mockUserData = {

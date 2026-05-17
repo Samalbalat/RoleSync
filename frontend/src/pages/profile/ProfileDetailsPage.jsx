@@ -278,8 +278,8 @@ export function ProfileDetailsPage() {
 							</Typography>
 
 							<StarRatingBadge
-								averageRating={profileData.reviewSummary.average}
-								totalReviews={profileData.reviewSummary.count}
+								averageRating={profileData?.reviewSummary?.average || 0}
+								totalReviews={profileData?.reviewSummary?.count || 0}
 								size='md'
 							/>
 						</div>
@@ -430,11 +430,11 @@ export function ProfileDetailsPage() {
 							<TabPanel value='reviews'>
 								<div className='pt-4'>
 									<ReviewList
-										targetId={profileData.id}
+										targetId={profileData?.id || 0}
 										targetType='PROFILE'
 										canWrite={false} // En este caso, no permitimos escribir reseñas en el propio perfil
-										averageRating={profileData.reviewSummary.average}
-										totalReviews={profileData.reviewSummary.count}
+										averageRating={profileData?.reviewSummary?.average || 0}
+										totalReviews={profileData?.reviewSummary?.count || 0}
 									/>
 								</div>
 							</TabPanel>
