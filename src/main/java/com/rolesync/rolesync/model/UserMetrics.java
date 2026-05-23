@@ -1,6 +1,7 @@
 package com.rolesync.rolesync.model;
 
 import java.time.Instant;
+import java.util.Date;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,11 +15,11 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Entity
-@Table(name = "profile_metrics")
+@Table(name = "user_metrics")
 @Data
-@ToString(exclude = "profile")
+@ToString(exclude = "user")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class ProfileMetrics {
+public class UserMetrics {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,14 +27,17 @@ public class ProfileMetrics {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "profile_id")
-    private Profile profile;
+    @JoinColumn(name = "user_id")
+    private User user;
 
+    private Date registrationDate;
     private int postsCount;
-    private int campaignsCount;
-    private int repliesCount;
+    private long sessionsCount;
+    private float avgSessionTimeSeconds;
+    private Date lastSessionTime;
 
-    private float credibilityScore;
+
+    private double credibilityScore;
 
     private Instant lastUpdated;
 }

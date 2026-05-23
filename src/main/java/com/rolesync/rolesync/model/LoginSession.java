@@ -16,8 +16,6 @@ public class LoginSession {
 
     private String email;
 
-    private String profileName;
-
     private Instant loginTime;
 
     private Instant logoutTime;
@@ -46,6 +44,14 @@ public class LoginSession {
         this.effectiveDurationSeconds =
                 Math.min(Duration.between(loginTime, logoutTime).getSeconds(),
                     Duration.between(loginTime, inferredEndTime).getSeconds());
+        this.active = false;
+    }
+
+    public void sessionTimeout(){
+        this.inferredEndTime = lastRequest.plus(SESSION_TIMEOUT);
+        this.logoutTime = Instant.now();
+        this.effectiveDurationSeconds =
+                Duration.between(loginTime, inferredEndTime).getSeconds();
         this.active = false;
     }
 
@@ -83,14 +89,6 @@ public class LoginSession {
 
     public void setActive(boolean active) {
         this.active = active;
-    }
-
-    public String getProfileName() {
-        return profileName;
-    }
-
-    public void setProfileName(String profileName) {
-        this.profileName = profileName;
     }
 
     public Instant getLastRequest() {

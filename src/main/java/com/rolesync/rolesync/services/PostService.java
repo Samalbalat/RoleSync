@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,8 +18,10 @@ import com.rolesync.rolesync.model.CharacterSheet;
 import com.rolesync.rolesync.model.Post;
 import com.rolesync.rolesync.model.PostType;
 import com.rolesync.rolesync.model.Profile;
+import com.rolesync.rolesync.model.User;
 import com.rolesync.rolesync.repository.CharacterSheetRepository;
 import com.rolesync.rolesync.repository.PostRepository;
+import com.rolesync.rolesync.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -31,22 +32,23 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final CharacterSheetRepository characterRepository;
+    private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
     
     @Transactional
     public CampaignPostDTO createCampaignPost(PostCampaignPostsInDTO request, Profile profile,
-            CharacterSheet character, Campaign campaign, String relation) {
+            CharacterSheet character, Campaign campaign, String relation, User user) {
         Post post = new Post();
-        return new CampaignPostDTO(createPostFromRequest(request, post, profile, character, campaign, relation));
+        return new CampaignPostDTO(createPostFromRequest(request, post, profile, character, campaign, relation, user));
     }
     @Transactional
-    public Post createForumPost(PostForumPostsInDTO request,Profile profile) {
+    public Post createForumPost(PostForumPostsInDTO request,Profile profile, User user) {
         Post post = new Post();
-        return createPostFromRequest(request, post, profile);
+        return createPostFromRequest(request, post, profile, user);
     }
 
     private Post createPostFromRequest(PostCampaignPostsInDTO request, Post post, Profile profile,
-            CharacterSheet character, Campaign campaign, String relation) {
+            CharacterSheet character, Campaign campaign, String relation, User user) {
         post.setType(PostType.valueOf(request.getType()));
         post.setContent(request.getContent());
 
@@ -86,7 +88,7 @@ public class PostService {
         visibilityAssigner(post, request);
         
         postRepository.saveAndFlush(post);
-        eventPublisher.publishEvent(new PostCreatedEvent(profile));
+        eventPublisher.publishEvent(new PostCreatedEvent(userRepository.findByEmail(user != null ? user.getEmail() : null).orElse(null)));
         return post;
     }
     
@@ -105,7 +107,7 @@ public class PostService {
         }
     }
     
-    private Post createPostFromRequest(PostForumPostsInDTO request, Post post, Profile profile) {
+    private Post createPostFromRequest(PostForumPostsInDTO request, Post post, Profile profile, User user) {
         post.setType(PostType.valueOf(request.getType()));
         post.setTitle(request.getTitle());
         post.setContent(request.getContent());
@@ -132,7 +134,7 @@ public class PostService {
         post.setLocked(false);
         post.setTags(request.getTags() != null ? request.getTags() : List.of());
         postRepository.saveAndFlush(post);
-        eventPublisher.publishEvent(new PostCreatedEvent(profile));
+        eventPublisher.publishEvent(new PostCreatedEvent(userRepository.findByEmail(user != null ? user.getEmail() : null).orElse(null)));
         return post;
     }
 }
