@@ -1,7 +1,5 @@
 package com.rolesync.rolesync.controller;
 
-import com.google.genai.Client;
-import com.google.genai.types.GenerateContentResponse;
 import com.rolesync.rolesync.dto.reviewercontroller.CreateReviewDTO;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.ReviewTargetType;
