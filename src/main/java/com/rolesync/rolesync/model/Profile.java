@@ -22,7 +22,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @AllArgsConstructor
-@ToString(exclude = {"sheets","reviews","metrics"})
+@ToString(exclude = {"sheets","reviews"})
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Profile {
@@ -46,30 +46,25 @@ public class Profile {
     @OneToMany(mappedBy = "reviewer")
     private Set<Review> reviews;
 
-    @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL)
-    private ProfileMetrics metrics;
-
     public Profile(String username,
                    String profilename,
                    ProfileType profileType,
                    String description,
                    String image,
-                   Set<CharacterSheet> sheets,
-                   ProfileMetrics metrics) {
+                   Set<CharacterSheet> sheets) {
         this.username = username;
         this.profilename = profilename;
         this.profileType = profileType;
         this.description = description != null ? description : "";
         this.image = image;
         this.sheets = sheets;
-        this.metrics = metrics;
     }
 
     public Profile(String username,
                    String profilename,
                    ProfileType profileType,
                    String image) {
-        this(username, profilename, profileType, "", image, null, null);
+        this(username, profilename, profileType, "", image, null);
     }
 
     public static Profile of(String username,
@@ -77,16 +72,14 @@ public class Profile {
                              String profileType,
                              String description,
                              String image,
-                             Set<CharacterSheet> sheets,
-                             ProfileMetrics metrics) {
+                             Set<CharacterSheet> sheets) {
         return new Profile(
             username,
             profilename,
             ProfileType.valueOf(profileType),
             description,
             image,
-            sheets,
-            metrics
+            sheets
         );
     }
 }

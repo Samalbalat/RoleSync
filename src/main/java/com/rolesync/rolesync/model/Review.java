@@ -43,6 +43,8 @@ public class Review {
     @Check(constraints = "rating >= 1 AND rating <= 5")
     private Integer rating; // 1–5
 
+    private Double weight;
+
     @Column(columnDefinition = "TEXT")
     private String comment;
 

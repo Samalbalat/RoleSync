@@ -19,7 +19,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
 
     @Transactional
-    public ReviewDTO createReview(Profile author, CreateReviewDTO dto) {
+    public ReviewDTO createReview(Profile author, CreateReviewDTO dto, Double influenceWeight) {
 
         // Evitar duplicados
         reviewRepository.findByReviewerIdAndTargetTypeAndTargetId(
@@ -38,6 +38,7 @@ public class ReviewService {
                 .comment(dto.comment())
                 .createdAt(Instant.now())
                 .updatedAt(Instant.now())
+                .weight(influenceWeight)
                 .build();
 
         reviewRepository.save(review);

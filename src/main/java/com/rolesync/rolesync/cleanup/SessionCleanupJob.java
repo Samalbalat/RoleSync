@@ -10,15 +10,20 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import com.rolesync.rolesync.model.LoginSession;
 import com.rolesync.rolesync.repository.LoginSessionRepository;
+import com.rolesync.rolesync.repository.UserRepository;
+import com.rolesync.rolesync.services.UserMetricsService;
 
 @Component
 public class SessionCleanupJob {
 
         @Autowired
         LoginSessionRepository repository;
+        @Autowired
+        UserMetricsService userMetricsService;
+        @Autowired
+        UserRepository userRepository;
 
         private static final Duration TIMEOUT = Duration.ofMinutes(30);
-
         // Runs every 30 minutes
         @Scheduled(fixedRate = 30, timeUnit = TimeUnit.MINUTES)
         public void closeInactiveSessions() {
@@ -33,21 +38,8 @@ public class SessionCleanupJob {
                         if (Duration.between(
                                         session.getLastRequest(),
                                         now).compareTo(TIMEOUT) > 0) {
-
-                                Instant inferredEnd = session.getLastRequest()
-                                                .plus(TIMEOUT);
-
-                                session.setInferredEndTime(inferredEnd);
-
-                                session.setEffectiveDurationSeconds(
-                                                Duration.between(
-                                                                session.getLoginTime(),
-                                                                inferredEnd).getSeconds());
-
-                                session.setActive(false);
-                                session.setLogoutTime(now);
-
-                                repository.save(session);
+                                System.out.println("Closing session " + session.getId() + " for user " + session.getEmail());
+                                userMetricsService.onSessionTimeOut(userRepository.findByEmail(session.getEmail()).get());
                         }
                 }
         }

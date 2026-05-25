@@ -29,6 +29,7 @@ import com.rolesync.rolesync.model.Campaign;
 import com.rolesync.rolesync.model.CharacterSheet;
 import com.rolesync.rolesync.model.Post;
 import com.rolesync.rolesync.model.Profile;
+import com.rolesync.rolesync.model.User;
 import com.rolesync.rolesync.repository.CampaignRepository;
 import com.rolesync.rolesync.repository.CharacterSheetRepository;
 import com.rolesync.rolesync.repository.PostRepository;
@@ -291,7 +292,8 @@ public class ForumController {
                 return ResponseEntity.status(403).build();
             }
         }
-        CampaignPostDTO campaignPostDto = postService.createCampaignPost(request, profile, character, campaign, relation);
+        User user = utilsCalls.getUserFromUsername(authentication).orElse(null);
+        CampaignPostDTO campaignPostDto = postService.createCampaignPost(request, profile, character, campaign, relation, user);
         return ResponseEntity.ok().body(campaignPostDto);
     }
 
@@ -380,7 +382,7 @@ public class ForumController {
         }
         Profile profile = profileRepository.findByProfilename(profileName)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        Post responsePost = postService.createForumPost(request, profile);
+        Post responsePost = postService.createForumPost(request, profile,utilsCalls.getUserFromUsername(authentication).orElse(null));
         return ResponseEntity.ok().body(responsePost.getId());
     }
 

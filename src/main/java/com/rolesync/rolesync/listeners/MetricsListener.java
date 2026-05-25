@@ -5,7 +5,8 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.rolesync.rolesync.events.PostCreatedEvent;
-import com.rolesync.rolesync.services.ProfileMetricsService;
+import com.rolesync.rolesync.events.SessionClosedEvent;
+import com.rolesync.rolesync.services.UserMetricsService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,11 +14,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MetricsListener {
     
-    private final ProfileMetricsService service;
+    private final UserMetricsService service;
 
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handle(PostCreatedEvent event) {
         if (event == null || event.getAuthor() == null) return;
         service.onPostCreated(event.getAuthor());
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    public void handle(SessionClosedEvent event) {
+        if (event == null || event.getAuthor() == null) return;
+        service.onSessionClosed(event.getAuthor());
     }
 }

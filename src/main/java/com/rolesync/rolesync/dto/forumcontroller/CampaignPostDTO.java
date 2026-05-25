@@ -67,7 +67,10 @@ public class CampaignPostDTO {
 
         this.isPinned = post.isPinned();
         this.isLocked = post.isLocked();
-
-        this.visibleToCharacterIds = post.getVisibleToCharacterIds().stream().map(Long::valueOf).toList();
+        if (post.getVisibleToCharacterIds() != null) {
+        this.visibleToCharacterIds = post.getVisibleToCharacterIds().stream().toList();
+        } else {
+            this.visibleToCharacterIds = List.of();
+        }
     }
 }

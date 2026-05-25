@@ -23,6 +23,9 @@ public class User {
     private String password;
     private String timeZone;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private UserMetrics metrics;
+
     public User(String email, String password, String timeZone) {
         this.email = email;
         this.password = password;

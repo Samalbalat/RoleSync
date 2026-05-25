@@ -3,8 +3,6 @@ package com.rolesync.rolesync.dto.forumcontroller;
 import java.time.Instant;
 import java.util.List;
 
-import com.rolesync.rolesync.model.PostType;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

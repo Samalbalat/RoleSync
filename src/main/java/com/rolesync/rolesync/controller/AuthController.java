@@ -1,6 +1,6 @@
 package com.rolesync.rolesync.controller;
 
-import java.time.Instant;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -18,17 +18,20 @@ import org.springframework.web.bind.annotation.*;
 import com.rolesync.rolesync.dto.authcontroller.LoginRequest;
 import com.rolesync.rolesync.dto.authcontroller.ProfileMeResponse;
 import com.rolesync.rolesync.dto.authcontroller.SignupRequest;
+
 import com.rolesync.rolesync.model.LoginSession;
 import com.rolesync.rolesync.model.Profile;
-import com.rolesync.rolesync.model.ProfileMetrics;
+import com.rolesync.rolesync.model.UserMetrics;
 import com.rolesync.rolesync.model.ProfileType;
 import com.rolesync.rolesync.model.User;
 import com.rolesync.rolesync.repository.UserRepository;
 import com.rolesync.rolesync.repository.LoginSessionRepository;
-import com.rolesync.rolesync.repository.ProfileMetricsRepository;
+import com.rolesync.rolesync.repository.UserMetricsRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
 import com.rolesync.rolesync.security.jwt.JwtUtils;
 import com.rolesync.rolesync.security.service.UserDetailsImpl;
+import com.rolesync.rolesync.services.UserMetricsService;
+import com.rolesync.rolesync.utils.UtilsCalls;
 
 /**
  * This controller handles all the endpoints related to user authentication and
@@ -58,9 +61,13 @@ public class AuthController {
     @Autowired
     JwtUtils jwtUtils;
     @Autowired
-    ProfileMetricsRepository profileMetricsRepository;
+    UserMetricsRepository userMetricsRepository;
     @Autowired
     LoginSessionRepository loginSessionRepository;
+    @Autowired
+    UserMetricsService userMetricsService;
+    @Autowired
+    UtilsCalls utilsCalls;
 
     /**
      * Authenticate the user with the provided email and password.
@@ -99,6 +106,13 @@ public class AuthController {
             response.setEmail(userDetails.getUsername());
             return response;
         }).toList();
+        UserMetrics metrics = userMetricsRepository.findByUser(user)
+                .orElseThrow(() -> new IllegalStateException("Metrics not found"));
+        metrics.setSessionsCount(metrics.getSessionsCount() + 1);
+        userMetricsRepository.save(metrics);
+        if(loginSessionRepository.findFirstByEmailAndActiveTrue(user.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest().body("Error: User already has an active session.");
+        }
         LoginSession session = new LoginSession(user.getEmail());
         loginSessionRepository.save(session);
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
@@ -126,24 +140,15 @@ public class AuthController {
         }
         User user = new User(signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()), signUpRequest.getTimeZone());
-        ProfileMetrics metrics = new ProfileMetrics();
-
-        metrics.setPostsCount(0);
-        metrics.setRepliesCount(0);
-        metrics.setCampaignsCount(0);
-        metrics.setCredibilityScore(0f);
-        metrics.setLastUpdated(Instant.now());
         Profile profile = new Profile(signUpRequest.getEmail(),
                 signUpRequest.getProfilename(),
                 ProfileType.valueOf(signUpRequest.getRoleType().toUpperCase()),
                 "",
                 null,
-                null,
-                metrics);
-        metrics.setProfile(profile);
+                null);
         userRepository.save(user);
         profileRepository.save(profile);
-        profileMetricsRepository.save(metrics);
+        userMetricsService.onUserRegister(user);
         return ResponseEntity.ok("Usuario registrado exitosamente!");
     }
 
@@ -157,21 +162,17 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser(Authentication authentication) {
         if (authentication != null) {
-
-            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-            String email = userDetails.getUsername();
-
-            loginSessionRepository
-                    .findFirstByEmailAndActiveTrue(email)
-                    .ifPresent(session -> {
-                        session.closeSession();
-                        loginSessionRepository.save(session);
-                    });
+                User user = utilsCalls.getUserFromUsername(authentication).orElse(null);
+                if (user == null) {
+                    return ResponseEntity.badRequest().body("Error: User not found.");
+                }
+                try{
+                    userMetricsService.onSessionClosed(user);
+                } catch (IllegalStateException e) {
+                    return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+                }
         }
-
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
-
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body("Sesión cerrada.");
