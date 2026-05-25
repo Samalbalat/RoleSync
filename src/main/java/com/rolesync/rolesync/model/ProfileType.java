@@ -5,8 +5,6 @@ package com.rolesync.rolesync.model;
  * The available profile types are ADMIN, USER, TABLETOP, and WRITTEN.
  */
 public enum ProfileType {
-    ADMIN,
-    USER,
     TABLETOP,
     WRITTEN
 }

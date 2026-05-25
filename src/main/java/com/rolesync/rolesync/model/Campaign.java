@@ -28,7 +28,6 @@ public class Campaign {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // We store the owner name for easy access, but we don't want to rely on it for logic, we will always check the members list for permissions
     private String ownerName;
 
     // We store the members as an array of profile names for easy access, 

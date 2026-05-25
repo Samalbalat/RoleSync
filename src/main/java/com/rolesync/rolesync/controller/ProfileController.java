@@ -1,7 +1,6 @@
 package com.rolesync.rolesync.controller;
 
 import com.rolesync.rolesync.repository.UserRepository;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.rolesync.rolesync.dto.profilecontroller.ProfileInDTO;
 import com.rolesync.rolesync.dto.profilecontroller.ProfileOutDTO;
 import com.rolesync.rolesync.model.Profile;
-import com.rolesync.rolesync.model.UserMetrics;
 import com.rolesync.rolesync.model.ProfileType;
 import com.rolesync.rolesync.model.ReviewTargetType;
 import com.rolesync.rolesync.repository.UserMetricsRepository;
@@ -37,7 +35,7 @@ import com.rolesync.rolesync.utils.UtilsCalls;
 @RestController
 @RequestMapping("/rolesync/profile/{roleType}")
 public class ProfileController {
-    private final UserRepository userRepository;
+    @Autowired UserRepository userRepository;
     @Autowired ProfileRepository profileRepository;
     @Autowired JwtUtils jwtUtils;
     @Autowired UtilsCalls utilsCalls;

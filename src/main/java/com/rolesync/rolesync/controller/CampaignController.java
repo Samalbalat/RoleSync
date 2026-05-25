@@ -25,7 +25,6 @@ import com.rolesync.rolesync.dto.campaigncontroller.CampaignRequestInDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignRequestPutInDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.CampaignRequestsByIdOutDTO;
 import com.rolesync.rolesync.dto.campaigncontroller.OwnerProfileDTO;
-import com.rolesync.rolesync.dto.campaigncontroller.mappers.CampaignMapper;
 import com.rolesync.rolesync.dto.campaigncontroller.predicates.CampaignPredicateBuilder;
 import com.rolesync.rolesync.model.Campaign;
 import com.rolesync.rolesync.model.CampaignRequest;
@@ -306,12 +305,12 @@ public class CampaignController {
             @RequestBody CampaignRequestPutInDTO dto,
             @RequestHeader("X-Profile-Name") String profileName) {
         Campaign campaign = getAuthorizedCampaignOrThrow(campaignId, authentication, profileName);
-        Profile profile = profileRepository.findByProfilename(dto.getProfileName()).orElse(null);
-        ResponseEntity<?> viabilityCheck = checkChangeRequestStatusViability(campaign, profile, profileName);
-        if (viabilityCheck != null) {
+        Profile profileOfRequest = profileRepository.findByProfilename(dto.getProfileName()).orElse(null);
+        ResponseEntity<?> viabilityCheck = checkChangeRequestStatusViability(campaign, profileOfRequest, profileName);
+        if (viabilityCheck != null && dto.getStatus().equalsIgnoreCase("ACCEPT")) {
             return viabilityCheck;
         }
-        List<CampaignRequest> requestOpt = campaignRequestRepository.findAllByCampaignAndProfile(campaign, profile);
+        List<CampaignRequest> requestOpt = campaignRequestRepository.findAllByCampaignAndProfile(campaign, profileOfRequest);
         CampaignRequest pendingRequest = requestOpt.stream().filter(r -> r.getStatus() == CampaignRequestStatus.PENDING)
                 .findFirst().orElse(null);
         if (requestOpt.isEmpty()) {
@@ -326,6 +325,9 @@ public class CampaignController {
             campaign.setMembers(members);
             campaignRepository.save(campaign);
         }
+        if (pendingRequest == null) {
+            return ResponseEntity.badRequest().body("No pending request found for this profile in this campaign");
+        }
         pendingRequest.setStatus(CampaignRequestStatus.valueOf(dto.getStatus().toUpperCase()));
         campaignRequestRepository.save(pendingRequest);
         return ResponseEntity.ok("Campaign updated");
@@ -337,7 +339,14 @@ public class CampaignController {
             return ResponseEntity.status(403).body(ERR_UNAUTHORIZED_UPDATE_REQUEST);
         }
         if (profile == null) {
-            return ResponseEntity.badRequest().body("Profile not found");
+            return ResponseEntity.badRequest().body("Profile of request not found");
+        }
+        String requestProfileName = profile.getProfilename();
+        if (campaignOpt.getMembers() != null && campaignOpt.getMembers().contains(requestProfileName)) {
+            return ResponseEntity.badRequest().body("User is already a member of this campaign");
+        }
+        if (campaignOpt.getMembers().size() == campaignOpt.getMaxPlayers()) {
+            return ResponseEntity.badRequest().body("Campaign is already at max capacity");
         }
         return null;
     }
@@ -458,13 +467,17 @@ public class CampaignController {
         if (campaignOpt.isEmpty() || campaignOpt.get().getStatus() == CampaignStatus.DELETED) {
             return ResponseEntity.notFound().build();
         }
+        Campaign campaign = campaignOpt.get();
         Optional<CampaignRequest> existingRequest = campaignRequestRepository.findAll().stream()
-                .filter(r -> r.getCampaign().getId().equals(campaignOpt.get().getId())
+                .filter(r -> r.getCampaign().getId().equals(campaign.getId())
                         && r.getProfile().getProfilename().equals(profileName))
                 .findFirst();
         if (existingRequest.isPresent() && existingRequest.get().getStatus() == CampaignRequestStatus.PENDING) {
             return ResponseEntity.badRequest()
                     .body("There is already a pending request for this user in this campaign");
+        }
+        if (campaign.getMembers() != null && campaign.getMembers().size() == campaign.getMaxPlayers()) {
+            return ResponseEntity.badRequest().body("Campaign is already at max capacity");
         }
         return null;
     }

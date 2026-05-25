@@ -12,11 +12,9 @@ import com.rolesync.rolesync.model.Campaign;
 import com.rolesync.rolesync.model.CampaignStatus;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.ProfileType;
-import com.rolesync.rolesync.model.Review;
 import com.rolesync.rolesync.repository.CampaignRepository;
 import com.rolesync.rolesync.repository.CampaignRequestRepository;
 import com.rolesync.rolesync.repository.CharacterSheetRepository;
-import com.rolesync.rolesync.repository.LoginSessionRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
 import com.rolesync.rolesync.services.ReviewService;
 import com.rolesync.rolesync.utils.UtilsCalls;
@@ -46,7 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ActiveProfiles("test")
 @WebMvcTest(CampaignController.class)
-class CampaignControllerUnitTest {
+class CampaignControllerTest {
 
         @Autowired
         private MockMvc mockMvc;
@@ -310,6 +308,7 @@ class CampaignControllerUnitTest {
                 campaign.setStatus(CampaignStatus.OPEN);
                 campaign.setOwnerName("otherUser");
                 campaign.setMembers(List.of());
+                campaign.setMaxPlayers(1);
 
                 when(utilsCalls.checkAuthAndProfile(any(), eq("testProfile")))
                                 .thenReturn(true);

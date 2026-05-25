@@ -7,18 +7,15 @@ import com.rolesync.rolesync.dto.campaigncontroller.predicates.CampaignPredicate
 import com.rolesync.rolesync.model.Campaign;
 import com.rolesync.rolesync.model.CampaignRequest;
 import com.rolesync.rolesync.model.CampaignRequestStatus;
-import com.rolesync.rolesync.model.LoginSession;
 import com.rolesync.rolesync.model.Profile;
 
 import com.rolesync.rolesync.repository.CampaignRepository;
 import com.rolesync.rolesync.repository.CampaignRequestRepository;
 import com.rolesync.rolesync.repository.CharacterSheetRepository;
-import com.rolesync.rolesync.repository.LoginSessionRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
 import com.rolesync.rolesync.services.ReviewService;
 import com.rolesync.rolesync.utils.UtilsCalls;
 
-import ch.qos.logback.core.net.LoginAuthenticator;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -89,6 +86,7 @@ class CampaignControllerRequestsTest {
                 campaign.setId(1L);
                 campaign.setOwnerName("testProfile");
                 campaign.setMembers(new ArrayList<>());
+                campaign.setMaxPlayers(5);
 
                 CampaignRequestPutInDTO dto = new CampaignRequestPutInDTO();
                 dto.setProfileName("targetUser");
