@@ -14,7 +14,9 @@ public class LoginSession {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String email;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private Instant loginTime;
 
@@ -30,9 +32,9 @@ public class LoginSession {
 
     public LoginSession() {}
 
-    public LoginSession(String email) {
+    public LoginSession(User user) {
         this.lastRequest = Instant.now();
-        this.email = email;
+        this.user = user;
         this.loginTime = Instant.now();
         this.active = true;
     }
@@ -59,12 +61,12 @@ public class LoginSession {
         return id;
     }
 
-    public String getEmail() {
-        return email;
+    public User getUser() {
+        return user;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Instant getLoginTime() {

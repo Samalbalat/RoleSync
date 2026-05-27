@@ -98,7 +98,7 @@ public class AuthController {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
-        List<Profile> profiles = profileRepository.findAllByUsername(userDetails.getUsername());
+        List<Profile> profiles = profileRepository.findAllByUser(user);
         List<ProfileMeResponse> profileResponses = profiles.stream().map(profile -> {
             ProfileMeResponse response = new ProfileMeResponse();
             response.setProfileName(profile.getProfilename());
@@ -110,10 +110,10 @@ public class AuthController {
                 .orElseThrow(() -> new IllegalStateException("Metrics not found"));
         metrics.setSessionsCount(metrics.getSessionsCount() + 1);
         userMetricsRepository.save(metrics);
-        if(loginSessionRepository.findFirstByEmailAndActiveTrue(user.getEmail()).isPresent()) {
+        if(loginSessionRepository.findFirstByUserAndActiveTrue(user).isPresent()) {
             return ResponseEntity.badRequest().body("Error: User already has an active session.");
         }
-        LoginSession session = new LoginSession(user.getEmail());
+        LoginSession session = new LoginSession(user);
         loginSessionRepository.save(session);
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .body(profileResponses);
@@ -134,13 +134,15 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            System.out.println("Entrada a register user excep");
             return ResponseEntity.badRequest().body("Error: Email already in use");
         } else if (profileRepository.existsByProfilename(signUpRequest.getProfilename())) {
+            System.out.println("Entrada a register profile excep");
             return ResponseEntity.badRequest().body("Error: Profile name already in use");
         }
         User user = new User(signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()), signUpRequest.getTimeZone());
-        Profile profile = new Profile(signUpRequest.getEmail(),
+        Profile profile = new Profile(user,
                 signUpRequest.getProfilename(),
                 ProfileType.valueOf(signUpRequest.getRoleType().toUpperCase()),
                 "",

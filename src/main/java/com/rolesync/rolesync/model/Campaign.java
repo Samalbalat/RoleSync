@@ -13,6 +13,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,8 +29,10 @@ public class Campaign {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String ownerName;
+    
+    @ManyToOne
+    @JoinColumn(name="profile_id", nullable=true)
+    private Profile owner;
 
     // We store the members as an array of profile names for easy access, 
     // but we will always check the profiles service to get the actual profiles and their types when needed
@@ -43,18 +47,24 @@ public class Campaign {
     @OneToMany(mappedBy="campaign")
     private Set<CampaignRequest> requests;
 
+    @Column(nullable = false)
     private String name;
+
     private String image;
+
     private String description;
+
     private String system;
     
     @Column(name = "themes", columnDefinition = "text[]")
     @JdbcTypeCode(SqlTypes.ARRAY)
     private List<String> themes;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ProfileType campaignType;
-    
+
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private CampaignStatus status;
 

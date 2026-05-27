@@ -14,6 +14,8 @@ import com.rolesync.rolesync.repository.CampaignRequestRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
 import com.rolesync.rolesync.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
+
 @Component
 public class UtilsCalls {
 
@@ -27,12 +29,13 @@ public class UtilsCalls {
         return user;
     }
 
+    @Transactional
     public String getProfileRelationToCampaign(String profileName, Campaign campaign) {
         Optional<Profile> profileOpt = profileRepository.findByProfilename(profileName);
         if (profileOpt.isPresent() && campaign != null) {
             String profileNameRetrieved = profileOpt.get().getProfilename();
             Profile profile = profileOpt.get();
-            if (profileNameRetrieved.equals(campaign.getOwnerName())) {
+            if (profileNameRetrieved.equals(campaign.getOwner().getProfilename())) {
                 return "OWNER";
             } else if(campaign.getMembers()!=null && campaign.getMembers().contains(profileNameRetrieved)) {
                 return "MEMBER";
@@ -47,7 +50,7 @@ public class UtilsCalls {
         Optional<User> userOpt = getUserFromUsername(authentication);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            List<Profile> userProfiles = profileRepository.findAllByUsername(user.getEmail());
+            List<Profile> userProfiles = profileRepository.findAllByUser(user);
                 if (userProfiles.stream().anyMatch(p -> p.getProfilename().equals(profileName))) {
                 return true;
             }

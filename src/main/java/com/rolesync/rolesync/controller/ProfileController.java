@@ -20,6 +20,7 @@ import com.rolesync.rolesync.dto.profilecontroller.ProfileOutDTO;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.ProfileType;
 import com.rolesync.rolesync.model.ReviewTargetType;
+import com.rolesync.rolesync.model.User;
 import com.rolesync.rolesync.repository.UserMetricsRepository;
 import com.rolesync.rolesync.repository.ProfileRepository;
 import com.rolesync.rolesync.security.jwt.JwtUtils;
@@ -144,18 +145,18 @@ public class ProfileController {
         if(!utilsCalls.checkAuthAndProfile(authentication, profileName)){
             return ResponseEntity.status(403).body("Unauthorized to create a profile for the current user");
         }
-
-        List<Profile> userProfiles = profileRepository.findAllByUsername(authentication.getName());
+        User principal = utilsCalls.getUserFromUsername(authentication).get();
+        List<Profile> userProfiles = profileRepository.findAllByUser(principal);
         if (userProfiles.size()==2) {
             return ResponseEntity.status(403).body("User already has profiles for both role types");
         }else if(userProfiles.stream().anyMatch(p -> p.getProfileType().toString().equalsIgnoreCase(roleType) || p.getProfilename().equals(profilePostInDTO.getProfileName()))){
             return ResponseEntity.status(403).body("User already has a profile for this role type or profile name is already taken");
         }
-            String principal = authentication.getName();
+            
             System.out.println("Profile creation available for user: " + principal + " and roleType: " + roleType);
             
             Profile newProfile = new Profile();
-            newProfile.setUsername(principal);
+            newProfile.setUser(principal);
             newProfile.setProfileType(ProfileType.valueOf(roleType.toUpperCase()));
             newProfile.setProfilename(profilePostInDTO.getProfileName());
             newProfile.setImage(profilePostInDTO.getImage());

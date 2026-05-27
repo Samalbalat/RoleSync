@@ -84,7 +84,7 @@ class CampaignControllerRequestsTest {
 
                 Campaign campaign = new Campaign();
                 campaign.setId(1L);
-                campaign.setOwnerName("testProfile");
+                campaign.setOwner(owner("testProfile"));
                 campaign.setMembers(new ArrayList<>());
                 campaign.setMaxPlayers(5);
 
@@ -129,7 +129,7 @@ class CampaignControllerRequestsTest {
 
                 Campaign campaign = new Campaign();
                 campaign.setId(1L);
-                campaign.setOwnerName("testProfile");
+                campaign.setOwner(owner("testProfile"));
                 List<String> members = new ArrayList<>();
                 members.add("targetUser");
                 campaign.setMembers(members);
@@ -173,7 +173,7 @@ class CampaignControllerRequestsTest {
 
                 Campaign campaign = new Campaign();
                 campaign.setId(1L);
-                campaign.setOwnerName("testProfile");
+                campaign.setOwner(owner("testProfile"));;
                 List<String> members = new ArrayList<>();
                 members.add("targetUser");
                 campaign.setMembers(members);
@@ -218,7 +218,7 @@ class CampaignControllerRequestsTest {
                 Campaign campaign = new Campaign();
                 campaign.setId(1L);
                 campaign.setMembers(List.of("testProfile", "user2"));
-                campaign.setOwnerName("testProfile");
+                campaign.setOwner(owner("testProfile"));;
                 when(utilsCalls.checkAuthAndProfile(any(), eq("testProfile")))
                                 .thenReturn(true);
 
@@ -240,7 +240,7 @@ class CampaignControllerRequestsTest {
 
                 Campaign campaign = new Campaign();
                 campaign.setId(1L);
-                campaign.setOwnerName("testProfile");
+                campaign.setOwner(owner("testProfile"));;
 
                 when(utilsCalls.checkAuthAndProfile(any(), eq("testProfile")))
                                 .thenReturn(true);
@@ -263,7 +263,7 @@ class CampaignControllerRequestsTest {
 
                 Campaign campaign = new Campaign();
                 campaign.setId(1L);
-                campaign.setOwnerName("testProfile");
+                campaign.setOwner(owner("testProfile"));;
 
                 CampaignPutInDTO dto = mock(CampaignPutInDTO.class);
                 when(dto.getStatus()).thenReturn("FINISHED");
@@ -289,6 +289,13 @@ class CampaignControllerRequestsTest {
         private Profile profile(String name) {
                 Profile p = new Profile();
                 p.setId(99L);
+                p.setProfilename(name);
+                return p;
+        }
+
+        private Profile owner(String name) {
+                Profile p = new Profile();
+                p.setId(100L);
                 p.setProfilename(name);
                 return p;
         }

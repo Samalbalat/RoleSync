@@ -90,7 +90,7 @@ public class ReviewController {
                 if (!profileRepository.existsById(targetId)) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile with given ID does not exist");
                 }
-                if (profileRepository.findAllByUsername(reviewer.getUsername()).stream().anyMatch(p -> p.getId().equals(targetId))) {
+                if (profileRepository.findAllByUser(reviewer.getUser()).stream().anyMatch(p -> p.getId().equals(targetId))) {
                     throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot review your own profiles");
                 }
             }

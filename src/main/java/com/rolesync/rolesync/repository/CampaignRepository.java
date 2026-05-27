@@ -9,11 +9,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 import com.rolesync.rolesync.model.Campaign;
+import com.rolesync.rolesync.model.Profile;
 
 @Repository
 public interface CampaignRepository extends JpaRepository<Campaign, Long>, QuerydslPredicateExecutor<Campaign>{
 
-    List<Campaign> findByOwnerName(String owner);
+    List<Campaign> findByOwner(Profile owner);
 
     @Query(value = """
     SELECT *
