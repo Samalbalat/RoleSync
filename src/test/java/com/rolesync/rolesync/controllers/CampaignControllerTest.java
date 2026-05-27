@@ -78,6 +78,12 @@ class CampaignControllerTest {
                                 "test@test.com",
                                 "password");
         }
+        private Profile owner(String name){
+                Profile p = new Profile();
+                p.setId(100L);
+                p.setProfilename(name);
+                return p;
+        }
 
         // ---------- GET FILTERED ----------
         @Test
@@ -136,8 +142,11 @@ class CampaignControllerTest {
                 when(campaign.getName()).thenReturn("Campaign");
                 when(campaign.getImage()).thenReturn("img");
                 when(campaign.getSystem()).thenReturn("DND");
+                when(campaign.getOwner()).thenReturn(owner("testProfile"));
 
-                when(campaignRepository.findByOwnerName("testProfile"))
+                when(profileRepository.findByProfilename("testProfile")).thenReturn(Optional.of(owner("testProfile")));
+
+                when(campaignRepository.findByOwner(owner("testProfile")))
                                 .thenReturn(List.of(campaign));
 
                 when(campaignRepository.findByMember("testProfile"))
@@ -155,7 +164,7 @@ class CampaignControllerTest {
                                 .principal(authentication()))
                                 .andExpect(status().isOk());
 
-                verify(campaignRepository).findByOwnerName("testProfile");
+                verify(campaignRepository).findByOwner(owner("testProfile"));
                 verify(campaignRepository).findByMember("testProfile");
         }
 
@@ -249,7 +258,7 @@ class CampaignControllerTest {
                 when(campaign.getStatus()).thenReturn(CampaignStatus.OPEN);
                 when(campaign.getId()).thenReturn(1L);
                 when(campaign.getMembers()).thenReturn(List.of("testProfile"));
-                when(campaign.getOwnerName()).thenReturn("owner");
+                when(campaign.getOwner()).thenReturn(owner("owner"));
                 when(campaign.getCampaignType()).thenReturn(ProfileType.TABLETOP);
 
                 when(utilsCalls.checkAuthAndProfile(any(), eq("testProfile")))
@@ -279,7 +288,7 @@ class CampaignControllerTest {
         void shouldDeleteCampaign() throws Exception {
 
                 Campaign campaign = new Campaign();
-                campaign.setOwnerName("testProfile");
+                campaign.setOwner(owner("testProfile"));
 
                 when(utilsCalls.checkAuthAndProfile(any(), eq("testProfile")))
                                 .thenReturn(true);
@@ -306,10 +315,11 @@ class CampaignControllerTest {
                 Campaign campaign = new Campaign();
                 campaign.setId(1L);
                 campaign.setStatus(CampaignStatus.OPEN);
-                campaign.setOwnerName("otherUser");
+                campaign.setOwner(owner("otherUser"));
                 campaign.setMembers(List.of());
                 campaign.setMaxPlayers(1);
 
+                when(campaignRequestRepository.findLastRequestByProfileAndCampaign(any(),any())).thenReturn(Optional.empty());
                 when(utilsCalls.checkAuthAndProfile(any(), eq("testProfile")))
                                 .thenReturn(true);
 

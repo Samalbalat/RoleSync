@@ -1,5 +1,6 @@
 package com.rolesync.rolesync.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,7 +29,10 @@ public class CampaignRequest {
     @JoinColumn(name="campaign_id", nullable=true)
     private Campaign campaign;
     
+    @Column(nullable = false)
     private String message;
+    
+    @Column(nullable = false)
     private CampaignRequestStatus status;
 
 }

@@ -13,6 +13,8 @@ import com.rolesync.rolesync.repository.LoginSessionRepository;
 import com.rolesync.rolesync.repository.UserRepository;
 import com.rolesync.rolesync.services.UserMetricsService;
 
+import jakarta.transaction.Transactional;
+
 @Component
 public class SessionCleanupJob {
 
@@ -25,6 +27,7 @@ public class SessionCleanupJob {
 
         private static final Duration TIMEOUT = Duration.ofMinutes(30);
         // Runs every 30 minutes
+        @Transactional
         @Scheduled(fixedRate = 30, timeUnit = TimeUnit.MINUTES)
         public void closeInactiveSessions() {
                 System.out.println("Running session cleanup job at " + Instant.now());
@@ -38,8 +41,8 @@ public class SessionCleanupJob {
                         if (Duration.between(
                                         session.getLastRequest(),
                                         now).compareTo(TIMEOUT) > 0) {
-                                System.out.println("Closing session " + session.getId() + " for user " + session.getEmail());
-                                userMetricsService.onSessionTimeOut(userRepository.findByEmail(session.getEmail()).get());
+                                System.out.println("Closing session " + session.getId() + " for user " + session.getUser().getEmail());
+                                userMetricsService.onSessionTimeOut(session.getUser());
                         }
                 }
         }

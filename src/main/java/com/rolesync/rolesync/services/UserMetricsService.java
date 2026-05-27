@@ -97,7 +97,7 @@ public class UserMetricsService {
     public void onSessionClosed(User author) {
         UserMetrics metrics = repo.findByUser(author)
                 .orElseThrow(() -> new IllegalStateException("Metrics not found"));
-        LoginSession session = loginSessionRepo.findFirstByEmailAndActiveTrue(author.getEmail())
+        LoginSession session = loginSessionRepo.findFirstByUserAndActiveTrue(author)
                 .orElseThrow(() -> new IllegalStateException("No closed sessions found for user"));
         session.closeSession();
         metrics.setAvgSessionTimeSeconds(
@@ -114,7 +114,7 @@ public class UserMetricsService {
     public void onSessionTimeOut(User author) {
         UserMetrics metrics = repo.findByUser(author)
                 .orElseThrow(() -> new IllegalStateException("Metrics not found"));
-        LoginSession session = loginSessionRepo.findFirstByEmailAndActiveTrue(author.getEmail())
+        LoginSession session = loginSessionRepo.findFirstByUserAndActiveTrue(author)
                 .orElseThrow(() -> new IllegalStateException("No closed sessions found for user"));
         session.sessionTimeout();
         metrics.setAvgSessionTimeSeconds(
@@ -136,7 +136,7 @@ public class UserMetricsService {
             return 0.0;
         }
 
-        Long activeDays = loginSessionRepo.countDistinctLoginDays(metrics.getUser().getEmail());
+        Long activeDays = loginSessionRepo.countDistinctLoginDays(metrics.getUser());
 
         LocalDate firstDate = firstLogin.atZone(java.time.ZoneOffset.UTC).toLocalDate();
         LocalDate today = LocalDate.now(java.time.ZoneOffset.UTC);

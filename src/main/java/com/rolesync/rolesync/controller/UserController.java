@@ -59,11 +59,12 @@ public class UserController {
     public ResponseEntity<?> getUserInfo(Authentication authentication) {
         Optional<User> user = utilsCalls.getUserFromUsername(authentication);
         if (user.isPresent()) {
-            List<Profile> profiles = profileRepository.findAllByUsername(user.get().getEmail());
+            List<Profile> profiles = profileRepository.findAllByUser(user.get());
             UserInfoResponseDetailed response = new UserInfoResponseDetailed();
-            response.setId(user.get().getId());
-            response.setEmail(user.get().getEmail());
-            response.setTimeZone(user.get().getTimeZone());
+            User obtainedUser = user.get();
+            response.setId(obtainedUser.getId());
+            response.setEmail(obtainedUser.getEmail());
+            response.setTimeZone(obtainedUser.getTimeZone());
             List<SimpleProfileDTO> profileDTOs = profiles.stream().map(profile -> 
                 new SimpleProfileDTO(profile.getId(), profile.getProfilename(), profile.getImage(), profile.getProfileType().name())
             ).toList();

@@ -8,16 +8,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.rolesync.rolesync.model.LoginSession;
+import com.rolesync.rolesync.model.User;
 
 public interface LoginSessionRepository extends JpaRepository<LoginSession, Long> {
 
-    Optional<LoginSession> findFirstByEmailAndActiveTrue(String email);
+    Optional<LoginSession> findFirstByUserAndActiveTrue(User user);
     List<LoginSession> findByActiveTrue();
 
     @Query("""
         SELECT COUNT(DISTINCT FUNCTION('DATE', ls.loginTime))
         FROM LoginSession ls
-        WHERE ls.email = :email
+        WHERE ls.user = :user
     """)
-    Long countDistinctLoginDays(@Param("email") String email);
+    Long countDistinctLoginDays(@Param("user") User user);
 }

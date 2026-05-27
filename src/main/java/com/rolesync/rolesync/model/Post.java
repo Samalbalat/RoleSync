@@ -36,6 +36,7 @@ public class Post {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    
     @Column(name = "author_profile_id", nullable = false)
     private Long authorProfileId;
 

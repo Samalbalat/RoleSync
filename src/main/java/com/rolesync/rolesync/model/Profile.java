@@ -22,7 +22,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @AllArgsConstructor
-@ToString(exclude = {"sheets","reviews"})
+@ToString(exclude = {"sheets","reviews","campaigns"})
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Profile {
@@ -31,8 +31,13 @@ public class Profile {
     @EqualsAndHashCode.Include
     private Long id;
 
-    private String username;
+    @ManyToOne
+    @JoinColumn(name="user_id", nullable=true)
+    private User user;
+
+    @Column(nullable = false)
     private String profilename;
+
     private String description;
     
     @Enumerated(EnumType.STRING)
@@ -46,13 +51,16 @@ public class Profile {
     @OneToMany(mappedBy = "reviewer")
     private Set<Review> reviews;
 
-    public Profile(String username,
+    @OneToMany(mappedBy = "owner")
+    private Set<Campaign> campaigns;
+
+    public Profile(User user,
                    String profilename,
                    ProfileType profileType,
                    String description,
                    String image,
                    Set<CharacterSheet> sheets) {
-        this.username = username;
+        this.user = user;
         this.profilename = profilename;
         this.profileType = profileType;
         this.description = description != null ? description : "";
@@ -60,21 +68,21 @@ public class Profile {
         this.sheets = sheets;
     }
 
-    public Profile(String username,
+    public Profile(User user,
                    String profilename,
                    ProfileType profileType,
                    String image) {
-        this(username, profilename, profileType, "", image, null);
+        this(user, profilename, profileType, "", image, null);
     }
 
-    public static Profile of(String username,
+    public static Profile of(User user,
                              String profilename,
                              String profileType,
                              String description,
                              String image,
                              Set<CharacterSheet> sheets) {
         return new Profile(
-            username,
+            user,
             profilename,
             ProfileType.valueOf(profileType),
             description,

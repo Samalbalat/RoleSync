@@ -12,7 +12,9 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.rolesync.rolesync.model.LoginSession;
+import com.rolesync.rolesync.model.User;
 import com.rolesync.rolesync.repository.LoginSessionRepository;
+import com.rolesync.rolesync.repository.UserRepository;
 import com.rolesync.rolesync.security.service.UserDetailsServiceImpl;
 
 import java.io.IOException;
@@ -25,14 +27,16 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private UserDetailsServiceImpl userDetailsService;
     @Autowired
     private LoginSessionRepository loginSessionRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
             String jwt = jwtUtils.getJwtFromCookies(request);
-            String email = jwtUtils.getUserNameFromJwtToken(jwt);
-            Optional<LoginSession> activeSession = loginSessionRepository.findFirstByEmailAndActiveTrue(email);
+            User user = userRepository.findByEmail(jwtUtils.getUserNameFromJwtToken(jwt)).orElse(null);
+            Optional<LoginSession> activeSession = loginSessionRepository.findFirstByUserAndActiveTrue(user);
 
             if (activeSession.isEmpty()) {
 

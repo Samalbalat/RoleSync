@@ -192,7 +192,7 @@ class ReviewControllerUnitTest {
                 Profile toBeReviewed = new Profile();
                 toBeReviewed.setProfilename(PROFILE_NAME);
                 toBeReviewed.setId(1L);
-                when(profileRepository.findAllByUsername(any()))
+                when(profileRepository.findAllByUser(any()))
                                 .thenReturn(List.of(toBeReviewed));
         }
 
