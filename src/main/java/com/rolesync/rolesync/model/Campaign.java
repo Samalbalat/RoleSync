@@ -68,7 +68,9 @@ public class Campaign {
     @Enumerated(EnumType.STRING)
     private CampaignStatus status;
 
+    @Column(nullable = false)
     private Integer maxPlayers;
+    
     private String communication;
     private String language;
     private String dayWeek;
