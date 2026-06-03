@@ -23,6 +23,10 @@ jobs:
 
       - name: Run tests + coverage
         run: mvn clean verify
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
 
       - name: Show coverage file (debug)
         run: ls -R target/site/jacoco
