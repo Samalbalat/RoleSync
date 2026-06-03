@@ -204,7 +204,7 @@
 
                 <execution>
                     <id>report</id>
-                    <phase>test</phase>
+                    <phase>verify</phase>
 
                     <goals>
                         <goal>report</goal>
@@ -212,6 +212,12 @@
                 </execution>
 
             </executions>
+
+			<configuration>
+        	<excludes>
+            	<exclude>com/rolesync/rolesync/dto/**</exclude>
+        	</excludes>
+    		</configuration>
         </plugin>
     </plugins>
 </build>
