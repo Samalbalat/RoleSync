@@ -1,28 +1,19 @@
-name: Coverage
+name: Codacy Coverage Reporter
 
-on:
-  push:
-    branches:
-      - '**'
+on: ["push"]
 
 jobs:
-  coverage:
+  codacy-coverage-reporter:
     runs-on: ubuntu-latest
-
+    name: codacy-coverage-reporter
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v2
+      - name: Run codacy-coverage-reporter
+        uses: codacy/codacy-coverage-reporter-action@v1.3.0
         with:
-          distribution: temurin
-          java-version: 21
-
-      - name: Build and test
-        run: mvn clean verify
-
-      - name: Upload coverage to Codacy
-        run: bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r target/site/jacoco/jacoco.xml
-        env:
-          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          # or
+          # api-token: ${{ secrets.CODACY_API_TOKEN }}
+          coverage-reports: target/site/jacoco/jacoco.xml
+          # or a comma-separated list for multiple reports
+          # coverage-reports: <PATH_TO_REPORT>, <PATH_TO_REPORT>
