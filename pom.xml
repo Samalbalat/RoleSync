@@ -215,7 +215,7 @@
 
 			<configuration>
         	<excludes>
-            	<exclude>com/rolesync/rolesync/dto/**</exclude>
+            	<exclude>**/com/rolesync/rolesync/dto/**</exclude>
         	</excludes>
     		</configuration>
         </plugin>
