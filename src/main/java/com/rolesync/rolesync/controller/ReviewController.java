@@ -80,8 +80,8 @@ public class ReviewController {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Campaign with given ID does not exist");
                 }
                 campaignRepository.findById(targetId).ifPresent(campaign -> {
-                    if (utilsCalls.getProfileRelationToCampaign(reviewer.getProfilename(), campaign).equals("NONE") 
-                        || utilsCalls.getProfileRelationToCampaign(reviewer.getProfilename(), campaign).equals("PENDING")) {
+                    if (!utilsCalls.getProfileRelationToCampaign(reviewer.getProfilename(), campaign).equals("OWNER") 
+                        && !utilsCalls.getProfileRelationToCampaign(reviewer.getProfilename(), campaign).equals("MEMBER")) {
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only review campaigns you are related to");
                     }
                 });
