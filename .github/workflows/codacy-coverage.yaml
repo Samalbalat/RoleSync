@@ -1,17 +1,17 @@
-name: Codacy Coverage Reporter
+name: CI + Coverage + Codacy
 
 on:
   push:
     branches:
       - "**"
+  pull_request:
 
 jobs:
-  codacy-coverage-reporter:
+  test:
     runs-on: ubuntu-latest
-    environment: Backend
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Java
@@ -20,8 +20,11 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Run tests with coverage
+      - name: Run tests + coverage
         run: mvn clean verify
+
+      - name: Show coverage file (debug)
+        run: ls -R target/site/jacoco
 
       - name: Upload coverage to Codacy
         uses: codacy/codacy-coverage-reporter-action@v1.3.0
