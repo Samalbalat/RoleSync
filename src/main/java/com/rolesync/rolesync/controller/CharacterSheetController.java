@@ -161,7 +161,10 @@ public class CharacterSheetController {
         characterSheet.setOwner(profileOpt.get());
 
         if (dto.getCampaign_id() != null) {
-            assignCampingToPost(characterSheet, response, dto, profileName);
+            ResponseEntity<?> result = assignCampingToPost(characterSheet, response, dto, profileName);
+            if (result.getStatusCode().value() != 200) {
+                return result;
+            }
         } else {
             characterSheet.setCampaign(null);
         }

@@ -78,7 +78,8 @@ class CampaignControllerTest {
                                 "test@test.com",
                                 "password");
         }
-        private Profile owner(String name){
+
+        private Profile owner(String name) {
                 Profile p = new Profile();
                 p.setId(100L);
                 p.setProfilename(name);
@@ -145,10 +146,10 @@ class CampaignControllerTest {
                 when(campaign.getOwner()).thenReturn(owner("testProfile"));
 
                 when(profileRepository.findByProfilename("testProfile")).thenReturn(Optional.of(owner("testProfile")));
-
                 when(campaignRepository.findByOwner(owner("testProfile")))
                                 .thenReturn(List.of(campaign));
-
+                when(utilsCalls.checkAuthAndProfile(any(), eq("testProfile")))
+                                .thenReturn(true);
                 when(campaignRepository.findByMember("testProfile"))
                                 .thenReturn(List.of(campaign));
 
@@ -263,7 +264,7 @@ class CampaignControllerTest {
 
                 when(utilsCalls.checkAuthAndProfile(any(), eq("testProfile")))
                                 .thenReturn(true);
-                                
+
                 when(reviewService.getSummary(any(), anyLong()))
                                 .thenReturn(new ReviewSummaryDTO(0.0, 0L));
 
@@ -319,7 +320,8 @@ class CampaignControllerTest {
                 campaign.setMembers(List.of());
                 campaign.setMaxPlayers(1);
 
-                when(campaignRequestRepository.findLastRequestByProfileAndCampaign(any(),any())).thenReturn(Optional.empty());
+                when(campaignRequestRepository.findLastRequestByProfileAndCampaign(any(), any()))
+                                .thenReturn(Optional.empty());
                 when(utilsCalls.checkAuthAndProfile(any(), eq("testProfile")))
                                 .thenReturn(true);
 

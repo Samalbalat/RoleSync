@@ -113,7 +113,7 @@ public class ForumController {
             return ResponseEntity.status(403).build();
         }
         Post parentPost = postRepository.findById(id).orElse(null);
-        if (parentPost.getCampaign() != null) {
+        if (parentPost != null && parentPost.getCampaign() != null) {
             Campaign campaign = campaignRepository.findById(parentPost.getCampaign().getId()).orElse(null);
             String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
             if ("NONE".equals(relation) || "PENDING".equals(relation)) {
