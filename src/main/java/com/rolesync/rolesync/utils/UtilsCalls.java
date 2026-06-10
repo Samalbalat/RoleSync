@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import com.rolesync.rolesync.model.Campaign;
+import com.rolesync.rolesync.model.CampaignRequest;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.User;
 import com.rolesync.rolesync.repository.CampaignRequestRepository;
@@ -35,11 +36,12 @@ public class UtilsCalls {
         if (profileOpt.isPresent() && campaign != null) {
             String profileNameRetrieved = profileOpt.get().getProfilename();
             Profile profile = profileOpt.get();
+            List<CampaignRequest> campaignRequest = campaignRequestRepository.findAllByCampaignAndProfile(campaign, profile);
             if (profileNameRetrieved.equals(campaign.getOwner().getProfilename())) {
                 return "OWNER";
             } else if(campaign.getMembers()!=null && campaign.getMembers().contains(profileNameRetrieved)) {
                 return "MEMBER";
-            } else if(campaignRequestRepository.findAllByCampaignAndProfile(campaign, profile)!=null && !campaignRequestRepository.findAllByCampaignAndProfile(campaign, profile).isEmpty()) {
+            } else if(campaignRequest!=null && !campaignRequest.isEmpty()) {
                 return "PENDING";
             }
         }

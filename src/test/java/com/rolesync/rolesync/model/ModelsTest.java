@@ -36,28 +36,6 @@ class ModelsTest {
             Map.entry(char.class, 'a'),
             Map.entry(Instant.class, Instant.parse("2025-01-01T00:00:00Z")));
 
-    @Test
-    void loginSessionEmptyConstructorTest() {
-        LoginSession session = new LoginSession();
-        assertNotNull(session);
-    }
-
-    @Test
-    void closeSessionShouldNotThrowAndCanBeInvoked() {
-        LoginSession session = new LoginSession();
-        session.setLoginTime(Instant.now().minus(Duration.ofMinutes(10)));
-        session.setLastRequest(Instant.now().minus(Duration.ofMinutes(10)));
-        assertDoesNotThrow(() -> session.closeSession());
-    }
-
-    @Test
-    void sessionTimeoutShouldNotThrowAndCanBeInvoked() {
-        LoginSession session = new LoginSession();
-        session.setLoginTime(Instant.now().minus(Duration.ofMinutes(10)));
-        session.setLastRequest(Instant.now().minus(Duration.ofMinutes(10)));
-        assertDoesNotThrow(() -> session.sessionTimeout());
-    }
-
     private Object getDummyValue(Class<?> type) {
         Object value = DUMMY_VALUES.get(type);
 
@@ -86,24 +64,6 @@ class ModelsTest {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    @Test
-    void campaignRequestEmptyConstructorTest() {
-        CampaignRequest request = new CampaignRequest();
-        assertNotNull(request);
-    }
-
-    @Test
-    void characterSheetEmptyConstructorTest() {
-        CharacterSheet sheet = new CharacterSheet();
-        assertNotNull(sheet);
-    }
-
-    @Test
-    void postEmptyConstructorTest() {
-        Post post = new Post();
-        assertNotNull(post);
     }
 
     @Test
@@ -151,5 +111,112 @@ class ModelsTest {
                 }
             }
         }
+    }
+
+    // --------------------------------------------------
+    // LoginSession specific tests
+    // --------------------------------------------------
+
+    @Test
+    void loginSessionEmptyConstructorTest() {
+        LoginSession session = new LoginSession();
+        assertNotNull(session);
+    }
+
+    @Test
+    void closeSessionShouldNotThrowAndCanBeInvoked() {
+        LoginSession session = new LoginSession();
+        session.setLoginTime(Instant.now().minus(Duration.ofMinutes(10)));
+        session.setLastRequest(Instant.now().minus(Duration.ofMinutes(10)));
+        assertDoesNotThrow(() -> session.closeSession());
+    }
+
+    @Test
+    void sessionTimeoutShouldNotThrowAndCanBeInvoked() {
+        LoginSession session = new LoginSession();
+        session.setLoginTime(Instant.now().minus(Duration.ofMinutes(10)));
+        session.setLastRequest(Instant.now().minus(Duration.ofMinutes(10)));
+        assertDoesNotThrow(() -> session.sessionTimeout());
+    }
+
+    // --------------------------------------------------
+    // CampaignRequest, CharacterSheet and Post specific tests
+    // --------------------------------------------------
+
+    @Test
+    void campaignRequestEmptyConstructorTest() {
+        CampaignRequest request = new CampaignRequest();
+        assertNotNull(request);
+    }
+
+    @Test
+    void characterSheetEmptyConstructorTest() {
+        CharacterSheet sheet = new CharacterSheet();
+        assertNotNull(sheet);
+    }
+
+    @Test
+    void postEmptyConstructorTest() {
+        Post post = new Post();
+        assertNotNull(post);
+    }
+
+    @Test
+    void onCreateShouldSetCreatedAt() {
+        Post post = new Post();
+
+        post.onCreate();
+
+        assertNotNull(post.getCreatedAt());
+    }
+
+    @Test
+    void onUpdateShouldSetEditedAndUpdatedAt() {
+        Post post = new Post();
+
+        post.onUpdate();
+
+        assertTrue(post.isEdited());
+        assertNotNull(post.getUpdatedAt());
+    }
+
+    // --------------------------------------------------
+    // Profile specific tests
+    // -------------------------------------------------
+
+    @Test
+    void profileOfMethodTest() {
+        User user = new User();
+        String profilename = "testProfile";
+        String profileType = "TABLETOP";
+        String description = "A test profile";
+        String image = "{\"key\":\"value\"}";
+        Set<CharacterSheet> sheets = new HashSet<>();
+
+        Profile profile = Profile.of(user, profilename, profileType, description, image, sheets);
+
+        assertEquals(user, profile.getUser());
+        assertEquals(profilename, profile.getProfilename());
+        assertEquals(ProfileType.TABLETOP, profile.getProfileType());
+        assertEquals(description, profile.getDescription());
+        assertEquals(image, profile.getImage());
+        assertEquals(sheets, profile.getSheets());
+    }
+
+    @Test
+    void profileConstructorWithImageTest() {
+        User user = new User();
+        String profilename = "testProfile";
+        ProfileType profileType = ProfileType.TABLETOP;
+        String image = "{\"key\":\"value\"}";
+
+        Profile profile = new Profile(user, profilename, profileType, image);
+
+        assertEquals(user, profile.getUser());
+        assertEquals(profilename, profile.getProfilename());
+        assertEquals(profileType, profile.getProfileType());
+        assertEquals("", profile.getDescription());
+        assertEquals(image, profile.getImage());
+        assertNull(profile.getSheets());
     }
 }

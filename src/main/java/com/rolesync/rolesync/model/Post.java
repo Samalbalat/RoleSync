@@ -93,7 +93,11 @@ public class Post {
 
     @PreUpdate
     protected void onUpdate() {
-        this.updatedAt = Instant.now();
+        touchUpdatedAt();
         this.isEdited = true;
+    }
+
+    private void touchUpdatedAt() {
+    this.updatedAt = Instant.now();
     }
 }
