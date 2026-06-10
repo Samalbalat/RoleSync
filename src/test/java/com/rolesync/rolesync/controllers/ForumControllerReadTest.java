@@ -58,11 +58,9 @@ class ForumControllerReadTest {
         @InjectMocks
         ForumController controller;
 
-        private Profile profile;
-
         @BeforeEach
         void setup() {
-                profile = new Profile();
+                Profile profile = new Profile();
                 profile.setId(1L);
                 profile.setProfilename("testUser");
         }

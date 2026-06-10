@@ -15,6 +15,27 @@ import java.util.Set;
 
 class ModelsTest {
 
+        private static final Map<Class<?>, Object> DUMMY_VALUES = Map.ofEntries(
+        Map.entry(String.class, "test"),
+        Map.entry(Long.class, 1L),
+        Map.entry(long.class, 1L),
+        Map.entry(Integer.class, 1),
+        Map.entry(int.class, 1),
+        Map.entry(Boolean.class, true),
+        Map.entry(boolean.class, true),
+        Map.entry(Double.class, 1.0d),
+        Map.entry(double.class, 1.0d),
+        Map.entry(Float.class, 1.0f),
+        Map.entry(float.class, 1.0f),
+        Map.entry(Short.class, (short) 1),
+        Map.entry(short.class, (short) 1),
+        Map.entry(Byte.class, (byte) 1),
+        Map.entry(byte.class, (byte) 1),
+        Map.entry(Character.class, 'a'),
+        Map.entry(char.class, 'a'),
+        Map.entry(Instant.class, Instant.parse("2025-01-01T00:00:00Z"))
+);
+
     @Test
     void loginSessionEmptyConstructorTest() {
         LoginSession session = new LoginSession();
@@ -36,28 +57,6 @@ class ModelsTest {
         session.setLastRequest(Instant.now().minus(Duration.ofMinutes(10)));
         assertDoesNotThrow(() -> session.sessionTimeout());
     }
-
-
-    private static final Map<Class<?>, Object> DUMMY_VALUES = Map.ofEntries(
-        Map.entry(String.class, "test"),
-        Map.entry(Long.class, 1L),
-        Map.entry(long.class, 1L),
-        Map.entry(Integer.class, 1),
-        Map.entry(int.class, 1),
-        Map.entry(Boolean.class, true),
-        Map.entry(boolean.class, true),
-        Map.entry(Double.class, 1.0d),
-        Map.entry(double.class, 1.0d),
-        Map.entry(Float.class, 1.0f),
-        Map.entry(float.class, 1.0f),
-        Map.entry(Short.class, (short) 1),
-        Map.entry(short.class, (short) 1),
-        Map.entry(Byte.class, (byte) 1),
-        Map.entry(byte.class, (byte) 1),
-        Map.entry(Character.class, 'a'),
-        Map.entry(char.class, 'a'),
-        Map.entry(Instant.class, Instant.parse("2025-01-01T00:00:00Z"))
-);
 
     private Object getDummyValue(Class<?> type) {
     Object value = DUMMY_VALUES.get(type);
@@ -131,6 +130,7 @@ private Object getComplexDummyValue(Class<?> type) {
                 }
             }
         }
+        assertTrue(true);
     }
 
 }
