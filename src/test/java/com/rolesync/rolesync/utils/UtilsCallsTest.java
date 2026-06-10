@@ -58,7 +58,7 @@ class UtilsCallsTest {
     // -------------------------
 
     @Test
-    void getUserFromUsername_found() {
+    void getUserFromUsernameFound() {
         when(authentication.getName()).thenReturn("mail@test.com");
         when(userRepository.findByEmail("mail@test.com"))
                 .thenReturn(Optional.of(user));
@@ -70,7 +70,7 @@ class UtilsCallsTest {
     }
 
     @Test
-    void getUserFromUsername_notFound() {
+    void getUserFromUsernameNotFound() {
         when(authentication.getName()).thenReturn("mail@test.com");
         when(userRepository.findByEmail("mail@test.com"))
                 .thenReturn(Optional.empty());
@@ -85,7 +85,7 @@ class UtilsCallsTest {
     // -------------------------
 
     @Test
-    void getProfileRelation_owner() {
+    void getProfileRelationOwner() {
         when(profileRepository.findByProfilename("player1"))
                 .thenReturn(Optional.of(profile));
 
@@ -99,7 +99,7 @@ class UtilsCallsTest {
     }
 
     @Test
-    void getProfileRelation_member() {
+    void getProfileRelationMember() {
         when(profileRepository.findByProfilename("player1"))
                 .thenReturn(Optional.of(profile));
 
@@ -112,7 +112,7 @@ class UtilsCallsTest {
     }
 
     @Test
-    void getProfileRelation_pending() {
+    void getProfileRelationPending() {
         when(profileRepository.findByProfilename("player1"))
                 .thenReturn(Optional.of(profile));
 
@@ -130,7 +130,7 @@ class UtilsCallsTest {
     }
 
     @Test
-    void getProfileRelation_none_profileNotFound() {
+    void getProfileRelationNoneProfileNotFound() {
         when(profileRepository.findByProfilename("player1"))
                 .thenReturn(Optional.empty());
 
@@ -140,7 +140,7 @@ class UtilsCallsTest {
     }
 
     @Test
-    void getProfileRelation_none_campaignNull() {
+    void getProfileRelationNoneCampaignNull() {
         when(profileRepository.findByProfilename("player1"))
                 .thenReturn(Optional.of(profile));
 
@@ -150,7 +150,7 @@ class UtilsCallsTest {
     }
 
     @Test
-    void getProfileRelation_none_noConditionsMatch() {
+    void getProfileRelationNoneNoConditionsMatch() {
         when(profileRepository.findByProfilename("player1"))
                 .thenReturn(Optional.of(profile));
 
@@ -170,7 +170,7 @@ class UtilsCallsTest {
     // -------------------------
 
     @Test
-    void checkAuthAndProfile_true() {
+    void checkAuthAndProfileTrue() {
         when(authentication.getName()).thenReturn("mail@test.com");
         when(userRepository.findByEmail("mail@test.com"))
                 .thenReturn(Optional.of(user));
@@ -187,7 +187,7 @@ class UtilsCallsTest {
     }
 
     @Test
-    void checkAuthAndProfile_false_noUser() {
+    void checkAuthAndProfileFalseNoUser() {
         when(authentication.getName()).thenReturn("mail@test.com");
         when(userRepository.findByEmail("mail@test.com"))
                 .thenReturn(Optional.empty());
@@ -198,7 +198,7 @@ class UtilsCallsTest {
     }
 
     @Test
-    void checkAuthAndProfile_false_profileNotMatch() {
+    void checkAuthAndProfileFalseProfileNotMatch() {
         when(authentication.getName()).thenReturn("mail@test.com");
         when(userRepository.findByEmail("mail@test.com"))
                 .thenReturn(Optional.of(user));

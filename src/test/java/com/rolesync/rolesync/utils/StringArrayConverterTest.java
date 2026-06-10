@@ -9,18 +9,18 @@ class StringArrayConverterTest {
     private final StringArrayConverter converter = new StringArrayConverter();
 
     @Test
-    void convertToDatabaseColumn_shouldReturnNull_whenAttributeIsNull() {
+    void convertToDatabaseColumnShouldReturnNullwhenAttributeIsNull() {
         assertNull(converter.convertToDatabaseColumn(null));
     }
 
     @Test
-    void convertToDatabaseColumn_shouldReturnEmptyString_whenArrayIsEmpty() {
+    void convertToDatabaseColumnShouldReturnEmptyStringwhenArrayIsEmpty() {
         String result = converter.convertToDatabaseColumn(new String[]{});
         assertEquals("", result);
     }
 
     @Test
-    void convertToDatabaseColumn_shouldJoinElementsWithComma() {
+    void convertToDatabaseColumnShouldJoinElementsWithComma() {
         String[] input = {"a", "b", "c"};
         String result = converter.convertToDatabaseColumn(input);
 
@@ -28,27 +28,27 @@ class StringArrayConverterTest {
     }
 
     @Test
-    void convertToEntityAttribute_shouldReturnEmptyArray_whenDbDataIsNull() {
+    void convertToEntityAttributeShouldReturnEmptyArrayWhenDbDataIsNull() {
         String[] result = converter.convertToEntityAttribute(null);
         assertNotNull(result);
         assertEquals(0, result.length);
     }
 
     @Test
-    void convertToEntityAttribute_shouldReturnSingleEmptyElement_whenDbDataIsEmptyString() {
+    void convertToEntityAttributeShouldReturnSingleEmptyElementWhenDbDataIsEmptyString() {
         String[] result = converter.convertToEntityAttribute("");
         assertArrayEquals(new String[]{""}, result);
     }
 
     @Test
-    void convertToEntityAttribute_shouldSplitByComma() {
+    void convertToEntityAttributeShouldSplitByComma() {
         String[] result = converter.convertToEntityAttribute("a,b,c");
 
         assertArrayEquals(new String[]{"a", "b", "c"}, result);
     }
 
     @Test
-    void roundTrip_conversion_shouldBeConsistent() {
+    void roundTripConversionShouldBeConsistent() {
         String[] original = {"x", "y", "z"};
 
         String db = converter.convertToDatabaseColumn(original);

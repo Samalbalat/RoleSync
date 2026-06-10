@@ -43,7 +43,7 @@ class ReviewServiceTest {
     // createReview - success path
     // ----------------------------
     @Test
-    void createReview_shouldCreateAndMapReview() {
+    void createReviewShouldCreateAndMapReview() {
         CreateReviewDTO dto = mock(CreateReviewDTO.class);
         when(dto.targetType()).thenReturn(ReviewTargetType.CAMPAIGN);
         when(dto.targetId()).thenReturn(10L);
@@ -82,7 +82,7 @@ class ReviewServiceTest {
     // createReview - duplicate path
     // ----------------------------
     @Test
-    void createReview_shouldThrowIfDuplicateExists() {
+    void createReviewShouldThrowIfDuplicateExists() {
         CreateReviewDTO dto = mock(CreateReviewDTO.class);
         when(dto.targetType()).thenReturn(ReviewTargetType.CAMPAIGN);
         when(dto.targetId()).thenReturn(10L);
@@ -107,7 +107,7 @@ class ReviewServiceTest {
     // getReviews
     // ----------------------------
     @Test
-    void getReviews_shouldReturnMappedList() {
+    void getReviewsShouldReturnMappedList() {
         Review review = buildReview(1L);
 
         when(reviewRepository.findByTargetTypeAndTargetId(ReviewTargetType.CAMPAIGN, 99L))
@@ -131,7 +131,7 @@ class ReviewServiceTest {
     // getSummary
     // ----------------------------
     @Test
-    void getSummary_shouldRoundAndReturnValues() {
+    void getSummaryShouldRoundAndReturnValues() {
         ReviewSummaryDTO repoResponse = new ReviewSummaryDTO(4.236, 7L);
 
         when(reviewRepository.getSummary(ReviewTargetType.CAMPAIGN, 50L))

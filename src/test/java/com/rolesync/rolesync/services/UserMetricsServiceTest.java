@@ -48,7 +48,7 @@ class UserMetricsServiceTest {
     // onUserRegister
     // -----------------------------
     @Test
-    void onUserRegister_shouldCreateMetrics() {
+    void onUserRegisterShouldCreateMetrics() {
         service.onUserRegister(user);
 
         ArgumentCaptor<UserMetrics> captor = ArgumentCaptor.forClass(UserMetrics.class);
@@ -67,7 +67,7 @@ class UserMetricsServiceTest {
     // onPostCreated
     // -----------------------------
     @Test
-    void onPostCreated_shouldIncrementAndRecompute() {
+    void onPostCreatedShouldIncrementAndRecompute() {
         when(repo.findByUser(user)).thenReturn(Optional.of(metrics));
 
         service.onPostCreated(user);
@@ -81,7 +81,7 @@ class UserMetricsServiceTest {
     // recomputeScore success
     // -----------------------------
     @Test
-    void recomputeScore_shouldUpdateScore() {
+    void recomputeScoreShouldUpdateScore() {
         when(repo.findByUser(user)).thenReturn(Optional.of(metrics));
 
         service.recomputeScore(user);
@@ -94,7 +94,7 @@ class UserMetricsServiceTest {
     // recomputeScore missing metrics
     // -----------------------------
     @Test
-    void recomputeScore_shouldThrowWhenMissing() {
+    void recomputeScoreShouldThrowWhenMissing() {
         when(repo.findByUser(user)).thenReturn(Optional.empty());
 
         assertThrows(IllegalStateException.class,
@@ -105,7 +105,7 @@ class UserMetricsServiceTest {
     // recomputeAll
     // -----------------------------
     @Test
-    void recomputeAll_shouldProcessAll() {
+    void recomputeAllShouldProcessAll() {
         UserMetrics m1 = new UserMetrics();
         m1.setUser(user);
         m1.setPostsCount(1);
@@ -124,7 +124,7 @@ class UserMetricsServiceTest {
     // onSessionClosed success
     // -----------------------------
     @Test
-    void onSessionClosed_shouldCloseSessionAndUpdateMetrics() {
+    void onSessionClosedShouldCloseSessionAndUpdateMetrics() {
         LoginSession session = mock(LoginSession.class);
 
         when(repo.findByUser(user)).thenReturn(Optional.of(metrics));
@@ -148,7 +148,7 @@ class UserMetricsServiceTest {
     // onSessionClosed missing session
     // -----------------------------
     @Test
-    void onSessionClosed_shouldThrowWhenNoSession() {
+    void onSessionClosedShouldThrowWhenNoSession() {
         when(repo.findByUser(user)).thenReturn(Optional.of(metrics));
         when(loginSessionRepo.findFirstByUserAndActiveTrue(user))
                 .thenReturn(Optional.empty());
@@ -161,7 +161,7 @@ class UserMetricsServiceTest {
     // onSessionTimeOut success
     // -----------------------------
     @Test
-    void onSessionTimeOut_shouldTimeoutSessionAndSave() {
+    void onSessionTimeOutShouldTimeoutSessionAndSave() {
         LoginSession session = mock(LoginSession.class);
 
         when(repo.findByUser(user)).thenReturn(Optional.of(metrics));
@@ -185,7 +185,7 @@ class UserMetricsServiceTest {
     // onSessionTimeOut missing metrics
     // -----------------------------
     @Test
-    void onSessionTimeOut_shouldThrowWhenNoMetrics() {
+    void onSessionTimeOutShouldThrowWhenNoMetrics() {
         when(repo.findByUser(user)).thenReturn(Optional.empty());
 
         assertThrows(IllegalStateException.class,
@@ -196,7 +196,7 @@ class UserMetricsServiceTest {
     // loginDayRatio branch coverage via recomputeScore
     // -----------------------------
     @Test
-    void recomputeScore_shouldHandleLoginRatio() {
+    void recomputeScoreShouldHandleLoginRatio() {
         when(repo.findByUser(user)).thenReturn(Optional.of(metrics));
         when(loginSessionRepo.countDistinctLoginDays(user)).thenReturn(5L);
 
@@ -209,7 +209,7 @@ class UserMetricsServiceTest {
     // recomputeAll empty list
     // -----------------------------
     @Test
-    void recomputeAll_shouldHandleEmptyList() {
+    void recomputeAllShouldHandleEmptyList() {
         when(repo.findAll()).thenReturn(Collections.emptyList());
 
         service.recomputeAll();

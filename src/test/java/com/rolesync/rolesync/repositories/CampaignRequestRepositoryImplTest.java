@@ -38,7 +38,7 @@ class CampaignRequestRepositoryImplTest {
     }
 
     @Test
-    void countPendingRequestsByCampaignId_shouldReturnCount() {
+    void countPendingRequestsByCampaignIdShouldReturnCount() {
         Long campaignId = 10L;
 
         when(queryFactory.select(QCampaignRequest.campaignRequest.count()))
@@ -59,7 +59,7 @@ class CampaignRequestRepositoryImplTest {
     }
 
     @Test
-    void findLastRequestByProfileAndCampaign_shouldReturnOptionalValue() {
+    void findLastRequestByProfileAndCampaignShouldReturnOptionalValue() {
         Long profileId = 1L;
         Long campaignId = 2L;
 
@@ -86,7 +86,7 @@ class CampaignRequestRepositoryImplTest {
     }
 
     @Test
-    void findLastRequestByProfileAndCampaign_shouldReturnEmptyOptional() {
+    void findLastRequestByProfileAndCampaignShouldReturnEmptyOptional() {
         when(queryFactory.selectFrom(QCampaignRequest.campaignRequest))
                 .thenReturn(entityQuery);
 

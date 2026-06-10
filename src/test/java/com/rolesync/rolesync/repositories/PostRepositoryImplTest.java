@@ -67,7 +67,7 @@ class PostRepositoryImplTest {
     // findCampaignPosts
     // -------------------------
     @Test
-    void findCampaignPosts_basicFlow_withAccessingCharacter() {
+    void findCampaignPostsBasicFlowWithAccessingCharacter() {
         stubPostQueryChain();
 
         List<Post> result = repository.findCampaignPosts(
@@ -84,7 +84,7 @@ class PostRepositoryImplTest {
     }
 
     @Test
-    void findCampaignPosts_withoutCursor_andNoAccessCharacter() {
+    void findCampaignPostsWithoutCursorAndNoAccessCharacter() {
         stubPostQueryChain();
 
         List<Post> result = repository.findCampaignPosts(
@@ -101,7 +101,7 @@ class PostRepositoryImplTest {
     // findForumPosts
     // -------------------------
     @Test
-    void findForumPosts_returnsPosts() {
+    void findForumPostsReturnsPosts() {
         stubPostQueryChain();
 
         List<Post> result = repository.findForumPosts();
@@ -115,7 +115,7 @@ class PostRepositoryImplTest {
     // findPostReplies
     // -------------------------
     @Test
-    void findPostReplies_withCursor() {
+    void findPostRepliesWithCursor() {
         stubPostQueryChain();
 
         List<Post> result = repository.findPostReplies(1L, Instant.now(), 10);
@@ -125,7 +125,7 @@ class PostRepositoryImplTest {
     }
 
     @Test
-    void findPostReplies_withoutCursor() {
+    void findPostRepliesWithoutCursor() {
         stubPostQueryChain();
 
         List<Post> result = repository.findPostReplies(1L, null, 10);
@@ -138,7 +138,7 @@ class PostRepositoryImplTest {
     // findPostsByTags
     // -------------------------
     @Test
-    void findPostsByTags_withTags() {
+    void findPostsByTagsWithTags() {
         stubPostQueryChain();
 
         List<Post> result = repository.findPostsByTags(List.of("rpg", "fantasy"), 10, 0);
@@ -149,7 +149,7 @@ class PostRepositoryImplTest {
     }
 
     @Test
-    void findPostsByTags_emptyTags() {
+    void findPostsByTagsEmptyTags() {
         stubPostQueryChain();
 
         List<Post> result = repository.findPostsByTags(List.of(), 10, 0);
@@ -161,7 +161,7 @@ class PostRepositoryImplTest {
     // findPostsByAuthorId
     // -------------------------
     @Test
-    void findPostsByAuthorId_basic() {
+    void findPostsByAuthorIdBasic() {
         stubPostQueryChain();
 
         List<Post> result = repository.findPostsByAuthorId(42L, 10, 5);
@@ -175,7 +175,7 @@ class PostRepositoryImplTest {
     // countForumPostsByAuthorId
     // -------------------------
     @Test
-    void countForumPostsByAuthorId_returnsCount() {
+    void countForumPostsByAuthorIdReturnsCount() {
         stubLongQueryChain();
 
         Long result = repository.countForumPostsByAuthorId(42L);
@@ -188,7 +188,7 @@ class PostRepositoryImplTest {
     // countForumPostsByTags
     // -------------------------
     @Test
-    void countForumPostsByTags_withTags() {
+    void countForumPostsByTagsWithTags() {
         stubLongQueryChain();
 
         Long result = repository.countForumPostsByTags(List.of("rpg"));
@@ -198,7 +198,7 @@ class PostRepositoryImplTest {
     }
 
     @Test
-    void countForumPostsByTags_emptyTags() {
+    void countForumPostsByTagsEmptyTags() {
         stubLongQueryChain();
 
         Long result = repository.countForumPostsByTags(List.of());
