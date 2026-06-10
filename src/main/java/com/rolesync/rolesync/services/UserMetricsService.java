@@ -126,7 +126,6 @@ public class UserMetricsService {
         session.setActive(false);
         recomputeScore(author);
         loginSessionRepo.save(session);
-        repo.save(metrics);
     }
 
     private double getLoginDayRatio(UserMetrics metrics) {
