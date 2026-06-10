@@ -9,6 +9,8 @@ import {
 	UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import JoinCampaignModal from './JoinCampaignModal';
+import CreateTemplateModal from './CreateTemplateModal';
+import { useLocation } from 'react-router-dom';
 
 export default function CampaignActionCard({
 	campaign,
@@ -23,7 +25,8 @@ export default function CampaignActionCard({
 }) {
 	const relation = campaign.userRelation;
 	const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
-
+	const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+	const location = useLocation();
 	const canRequestJoin = () => {
 		if (isFull) return false;
 
@@ -76,7 +79,9 @@ export default function CampaignActionCard({
 								variant='gradient'
 								className='flex items-center justify-center gap-2'
 								onClick={() =>
-									navigate(`/character/templateBuilder?campaignId=${campaign.id}&templateId=${campaignTemplate.id}`)
+									navigate(`/character/templateBuilder?&templateId=${campaignTemplate.id}`, {
+										state: { from: location.pathname },
+									})
 								}
 							>
 								<DocumentCheckIcon className='h-5 w-5' />
@@ -89,7 +94,7 @@ export default function CampaignActionCard({
 								color='green'
 								variant='gradient'
 								className='flex items-center justify-center gap-2'
-								onClick={() => navigate(`/character/templateBuilder?campaignId=${campaign.id}`)}
+								onClick={() => setIsTemplateModalOpen(true)}
 							>
 								<DocumentPlusIcon className='h-5 w-5' />
 								{t('character.templateBuilder.createTemplate')}
@@ -128,7 +133,7 @@ export default function CampaignActionCard({
 								color='blue'
 								variant='outlined'
 								className='flex items-center justify-center gap-2 mt-2 bg-white'
-								onClick={() => navigate(`/character/edit/${campaign.characterId}`)}
+								onClick={() => navigate(`/character/edit/${campaign.characterId}`, { state: { from: location.pathname } })}
 							>
 								<PencilSquareIcon className='h-4 w-4' />
 								{t('character.editCharacter')}
@@ -212,6 +217,15 @@ export default function CampaignActionCard({
 				campaignId={campaign.id}
 				onSuccess={onRefreshData}
 				t={t}
+			/>
+
+			<CreateTemplateModal
+				isOpen={isTemplateModalOpen}
+				onClose={() => setIsTemplateModalOpen(false)}
+				campaignId={campaign.id}
+				navigate={navigate}
+				t={t}
+				location={location}
 			/>
 		</>
 	);

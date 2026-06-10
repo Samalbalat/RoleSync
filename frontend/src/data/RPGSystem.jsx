@@ -19,5 +19,7 @@ const RPG_SYSTEM_ENUM = {
 };
 
 export default function parseRpgSystem(system) {
-	return RPG_SYSTEM_ENUM[system] || system || '';
+	if (!system) return '';
+
+	return Object.hasOwn(RPG_SYSTEM_ENUM, system) ? RPG_SYSTEM_ENUM[system] : system;
 }

@@ -9,11 +9,16 @@ import {
 	Typography,
 	Avatar,
 	Spinner,
+	Tooltip,
+	IconButton,
 } from '@material-tailwind/react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useLocation } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { getTheme } from '../../utils/themeUtils';
 import CharacterService from '../../services/CharacterService';
-import toast from 'react-hot-toast';
+import { parseCharacterFields, getDisplayValue, buildAvatarFallback } from '../../utils/character/characterDetailUtils';
+import { PencilIcon } from '@heroicons/react/24/solid';
 
 // --- SUBCOMPONENTE DE CARGA ---
 const LoadingContent = ({ theme, t }) => (
@@ -24,16 +29,16 @@ const LoadingContent = ({ theme, t }) => (
 );
 
 // --- SUBCOMPONENTE DEL DIALOG HEADER ---
-const CharacterHeader = ({ character, theme, t }) => (
+const CharacterHeader = ({ character, theme, t, navigate, location, handleClose }) => (
 	<DialogHeader className={`flex items-center gap-4 border-b border-gray-200 ${theme.bgLight} p-4 rounded-t-lg`}>
 		<Avatar
-			src={character.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(character.name)}&background=random`}
+			src={character.characterImage || buildAvatarFallback(character.name)}
 			alt={character.name}
 			size='xl'
 			className={`border-2 ${theme.textPrimary} shadow-sm`}
 			onError={e => {
 				e.target.onerror = null;
-				e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(character.name)}&background=random`;
+				e.target.src = buildAvatarFallback(character.name);
 			}}
 		/>
 		<div>
@@ -41,42 +46,30 @@ const CharacterHeader = ({ character, theme, t }) => (
 				{character.name}
 			</Typography>
 			<Typography variant='small' color='blue-gray' className='font-normal'>
-				{t('campaign.campaign')}: {character.campaign?.name || t('home.playerCharacters.noCampaign')}
+				{t('campaign.campaign')}: {character.campaignName || t('home.playerCharacters.noCampaign')}
 			</Typography>
+		</div>
+		<div className='absolute top-2 right-2 z-10'>
+			<Tooltip content={t('common.edit', 'Editar plantilla')}>
+				<IconButton
+					variant='text'
+					color='blue-gray'
+					className='rounded-full bg-white/80 backdrop-blur-sm hover:bg-gray-100'
+					onClick={() => {
+						handleClose(); // Cerramos el modal primero
+						navigate(`/character/edit/${character.id}`, { state: { from: location.pathname } }); // Y luego navegamos
+					}}
+				>
+					<PencilIcon className='h-5 w-5' />
+				</IconButton>
+			</Tooltip>
 		</div>
 	</DialogHeader>
 );
 
 // --- SUBCOMPONENTE DEL BODY ---
 const CharacterBody = ({ character, theme, t }) => {
-	let history = null;
-	let description = null;
-	let standardAttributes = [];
-
-	// Ahora leemos el array 'schema' que nos devuelve el backend
-	const characterFields = character.schema || [];
-
-	characterFields.forEach(attr => {
-		const label = attr.label || attr.key;
-		const val = attr.value;
-		const labelLower = label.toLowerCase();
-
-		if (['historia', 'history'].includes(labelLower)) {
-			history = val;
-		} else if (['descripción', 'description', 'descripcion'].includes(labelLower)) {
-			description = val;
-		} else {
-			standardAttributes.push({ key: label, value: val });
-		}
-	});
-
-	const getDisplayValue = value => {
-		if (typeof value === 'boolean') {
-			return value ? t('common.yes') : t('common.no');
-		}
-		// Si el valor está vacío, mostramos un guion para que no quede el hueco en blanco
-		return value !== null && value !== undefined && value !== '' ? value : '-';
-	};
+	const { history, description, standardAttributes } = parseCharacterFields(character.schema);
 
 	return (
 		<DialogBody className='h-[25rem] overflow-y-auto'>
@@ -108,18 +101,16 @@ const CharacterBody = ({ character, theme, t }) => {
 						{standardAttributes.map((attr, index) => (
 							<div
 								key={index}
-								className='bg-gray-50 p-4 rounded-lg text-center shadow-sm border border-gray-100 flex flex-col justify-center'
+								className='bg-gray-50 p-4 rounded-lg text-center shadow-sm border border-gray-100 flex flex-col justify-center h-full'
 							>
-								<Typography
-									variant='small'
-									color='blue-gray'
-									className='font-bold uppercase text-xs opacity-70 mb-1 truncate px-2'
-									title={attr.key} // Por si el texto es muy largo, al pasar el ratón se ve completo
-								>
+								{/* --- CLAVE (Atributo) ---*/}
+								<Typography variant='h6' color={theme.primary} className='font-bold uppercase break-words px-2 mb-2'>
 									{attr.key}
 								</Typography>
-								<Typography variant='h5' color={theme.primary} className='truncate px-2' title={getDisplayValue(attr.value)}>
-									{getDisplayValue(attr.value)}
+
+								{/* --- VALOR ---*/}
+								<Typography variant='paragraph' color='blue-gray' className='font-medium break-all px-2'>
+									{getDisplayValue(attr.value, t)}
 								</Typography>
 							</div>
 						))}
@@ -143,6 +134,8 @@ const CharacterBody = ({ character, theme, t }) => {
 export default function CharacterDetailDialog({ open, handleClose, characterId }) {
 	const { t } = useTranslation('global');
 	const theme = getTheme();
+	const navigate = useNavigate();
+	const location = useLocation();
 	const [character, setCharacter] = useState(null);
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -162,14 +155,21 @@ export default function CharacterDetailDialog({ open, handleClose, characterId }
 	}, [open, characterId, handleClose, t]);
 
 	return (
-		<Dialog open={open} handler={handleClose} size='md' dismiss={{ enabled: true }} className='focus:outline-none'>
+		<Dialog open={open} handler={handleClose} size='lg' dismiss={{ enabled: true }} className='focus:outline-none'>
 			{isLoading || !character ? (
 				<div className='p-10'>
 					<LoadingContent theme={theme} t={t} />
 				</div>
 			) : (
 				<>
-					<CharacterHeader character={character} theme={theme} t={t} />
+					<CharacterHeader
+						character={character}
+						theme={theme}
+						t={t}
+						navigate={navigate}
+						location={location}
+						handleClose={handleClose}
+					/>
 					<CharacterBody character={character} theme={theme} t={t} />
 					<DialogFooter className='border-t border-gray-200'>
 						<Button variant='text' color='blue-gray' onClick={handleClose}>
@@ -197,6 +197,9 @@ CharacterHeader.propTypes = {
 	character: PropTypes.object.isRequired,
 	theme: PropTypes.object.isRequired,
 	t: PropTypes.func.isRequired,
+	navigate: PropTypes.func.isRequired,
+	location: PropTypes.object.isRequired,
+	handleClose: PropTypes.func.isRequired,
 };
 
 CharacterBody.propTypes = {

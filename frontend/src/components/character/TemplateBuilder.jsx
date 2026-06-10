@@ -13,23 +13,53 @@ import {
 } from '@material-tailwind/react';
 import { TrashIcon, PlusIcon, PencilIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { validateMinMax, validateRequired } from '../../utils/validators';
 import { getTheme } from '../../utils/themeUtils';
 import CharacterService from '../../services/CharacterService';
+import {
+	generateInternalKey,
+	validateField,
+	buildTemplatePayload,
+	mapBackendSchemaToFields,
+	rangeMin,
+	rangeMax,
+} from '../../utils/character/templateBuilderUtils';
+import { TEMPLATE_PRESETS } from '../../utils/character/templatePresets';
+import AccessDeniedView from '../layout/AccesDeniedView';
+
+// --- FUNCIONES AUXILIARES DE SOPORTE (Sacan la complejidad del componente) ---
+
+const isAccessDenied = (storedProfile, templateUsername) => {
+	const profileName = storedProfile?.name?.trim().toLowerCase();
+	const username = templateUsername?.trim().toLowerCase();
+	return !!(profileName && username && profileName !== username);
+};
+
+const handleTemplateError = (error, setAccessDenied, t) => {
+	if (error.response?.status === 404) {
+		setAccessDenied(true);
+	} else {
+		console.error('Error al cargar la plantilla:', error);
+		toast.error(t('character.templateBuilder.errorLoadCharacter'));
+	}
+};
 
 export default function TemplateBuilder() {
 	const { t } = useTranslation('global');
 	const navigate = useNavigate();
+	const location = useLocation();
+	const theme = getTheme();
+	const storedProfile = JSON.parse(localStorage.getItem('activeProfile'));
 
 	// --- PARÁMETROS DE LA URL ---
 	const [searchParams] = useSearchParams();
-	const campaignId = searchParams.get('campaignId');
 	const templateId = searchParams.get('templateId');
+	const cloneId = searchParams.get('cloneId');
+	const presetId = searchParams.get('preset');
 	const isEditMode = !!templateId;
 
-	const theme = getTheme();
+	const [campaignId, setCampaignId] = useState(searchParams.get('campaignId'));
 
 	// --- ESTADOS GENERALES ---
 	const [isLoading, setIsLoading] = useState(isEditMode);
@@ -37,6 +67,7 @@ export default function TemplateBuilder() {
 	const [fields, setFields] = useState([]);
 	const [editingIndex, setEditingIndex] = useState(null);
 	const [errors, setErrors] = useState({});
+	const [accessDenied, setAccessDenied] = useState(false);
 
 	const [currentField, setCurrentField] = useState({
 		label: '',
@@ -53,49 +84,71 @@ export default function TemplateBuilder() {
 		{ value: 'boolean', label: t('character.templateBuilder.checkboxDes') },
 	];
 
+	// --- EFFECT REFACTORIZADO (Complejidad reducida drásticamente) ---
 	useEffect(() => {
-		if (isEditMode) {
-			const fetchTemplateData = async () => {
-				try {
-					const data = await CharacterService.getTemplateById(templateId);
-					setTemplateName(data.name || '');
+		if (!isEditMode) return;
 
-					// Mapeamos los atributos del backend a nuestro formato del frontend
-					if (data.schema && data.schema.length > 0) {
-						const mappedFields = data.schema.map(attr => ({
-							key: attr.key,
-							label: attr.label,
-							type: attr.type,
-							// Si el backend te devuelve required, min y max, los usamos. Si no, valores por defecto.
-							required: attr.required || false,
-							min: attr.min ?? '',
-							max: attr.max ?? '',
-						}));
-						setFields(mappedFields);
+		const fetchTemplateData = async () => {
+			try {
+				const data = await CharacterService.getTemplateById(templateId);
+
+				if (isAccessDenied(storedProfile, data?.username)) {
+					setAccessDenied(true);
+				}
+
+				setTemplateName(data.name || '');
+
+				if (!searchParams.get('campaignId')) {
+					setCampaignId(data.campaignId);
+				}
+
+				setFields(Array.isArray(data?.schema) ? mapBackendSchemaToFields(data.schema) : []);
+			} catch (error) {
+				handleTemplateError(error, setAccessDenied, t);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		fetchTemplateData();
+	}, [templateId, isEditMode, t, searchParams]);
+
+	useEffect(() => {
+		if (cloneId && !isEditMode) {
+			const fetchCloneData = async () => {
+				setIsLoading(true);
+				try {
+					const data = await CharacterService.getTemplateById(cloneId);
+					setTemplateName(data.name ? `${data.name} (Copia)` : 'Plantilla Copiada');
+
+					if (Array.isArray(data?.schema)) {
+						setFields(mapBackendSchemaToFields(data.schema));
 					}
 				} catch (error) {
-					console.error('Error al cargar la plantilla:', error);
+					console.error('Error al cargar la plantilla a clonar:', error);
 					toast.error(t('character.templateBuilder.errorLoadCharacter'));
 				} finally {
 					setIsLoading(false);
 				}
 			};
 
-			fetchTemplateData();
+			fetchCloneData();
 		}
-	}, [templateId, isEditMode, t]);
+	}, [cloneId, isEditMode, t]);
 
-	const generateInternalKey = label => {
-		const cleanLabel = label
-			.toLowerCase()
-			.normalize('NFD')
-			.replaceAll(/[\u0300-\u036f]/g, '')
-			.replaceAll(/\s+/g, '_')
-			.replaceAll(/[^a-z0-9_]/g, '');
+	useEffect(() => {
+		if (!presetId || isEditMode) return;
 
-		const randomSuffix = Math.random().toString(36).substring(2, 6);
-		return `${cleanLabel}_${randomSuffix}`;
-	};
+		const presetEntry = Object.entries(TEMPLATE_PRESETS).find(([key]) => key === presetId);
+		if (!presetEntry) return;
+
+		const [, presetData] = presetEntry;
+		setTemplateName(presetData.name);
+
+		if (Array.isArray(presetData.schema)) {
+			setFields(mapBackendSchemaToFields(presetData.schema));
+		}
+	}, [presetId, isEditMode]);
 
 	const handleChange = (name, value) => {
 		const allowedKeys = ['label', 'type', 'required', 'min', 'max'];
@@ -109,16 +162,9 @@ export default function TemplateBuilder() {
 	};
 
 	const saveField = () => {
-		const labelError = validateRequired(currentField.label);
-		const minMaxError = validateMinMax(currentField.min, currentField.max);
-
-		if (labelError) {
-			setErrors({ label: labelError });
-			return;
-		}
-
-		if (minMaxError) {
-			setErrors({ minMax: minMaxError });
+		const validationErrors = validateField(currentField);
+		if (validationErrors) {
+			setErrors(validationErrors);
 			return;
 		}
 
@@ -143,7 +189,6 @@ export default function TemplateBuilder() {
 
 	const startEditing = index => {
 		const fieldToEdit = fields.find((_, idx) => idx === index);
-
 		if (fieldToEdit) {
 			setCurrentField(fieldToEdit);
 			setEditingIndex(index);
@@ -159,7 +204,6 @@ export default function TemplateBuilder() {
 	};
 	const isEditing = typeof editingIndex === 'number';
 
-	// --- MANEJADOR DE ENVÍO CONECTADO AL BACKEND ---
 	const handleSubmitTemplate = async e => {
 		e.preventDefault();
 
@@ -178,25 +222,15 @@ export default function TemplateBuilder() {
 			return;
 		}
 
-		const mappedAttributes = fields.map(field => ({
-			key: field.key,
-			label: field.label,
-			type: field.type,
-			required: field.required,
-			min: field.min,
-			max: field.max,
-		}));
-
-		const payload = {
-			name: templateName,
-			avatar_url: '',
-			campaign_id: Number(campaignId),
-			template_id: isEditMode ? Number(templateId) : null,
-			attributes: mappedAttributes,
-		};
+		const payload = buildTemplatePayload({
+			fields,
+			templateName,
+			campaignId,
+			templateId,
+			isEditMode,
+		});
 
 		try {
-			// --- DECISIÓN: ¿CREAR O ACTUALIZAR? ---
 			if (isEditMode) {
 				await CharacterService.updateTemplate(templateId, payload);
 				toast.success(t('character.templateBuilder.successUpdate'));
@@ -205,14 +239,19 @@ export default function TemplateBuilder() {
 				toast.success(t('character.templateBuilder.successSave'));
 			}
 
+			const returnUrl = location.state?.from || `/myTemplates`;
 			setTimeout(() => {
-				navigate(`/campaign/${campaignId}`);
+				navigate(returnUrl);
 			}, 1000);
 		} catch (error) {
 			console.error('Error al guardar la plantilla:', error);
 			toast.error(t('character.templateBuilder.errorSave'));
 		}
 	};
+
+	if (accessDenied) {
+		return <AccessDeniedView t={t} type={'character'} />;
+	}
 
 	if (isLoading) {
 		return (
@@ -224,8 +263,6 @@ export default function TemplateBuilder() {
 			</div>
 		);
 	}
-	const rangeMin = field => (field.min !== '' && field.min !== null ? field.min : '-');
-	const rangeMax = field => (field.max !== '' && field.max !== null ? field.max : '-');
 
 	return (
 		<div className='w-full max-w-4xl mx-auto p-4 space-y-6'>
@@ -241,10 +278,12 @@ export default function TemplateBuilder() {
 			<Card className='w-full shadow-sm border border-blue-gray-100'>
 				<CardBody>
 					<Input
+						id='templateName'
 						label={t('character.templateBuilder.templateName')}
 						value={templateName}
 						onChange={e => setTemplateName(e.target.value)}
 						required
+						aria-label={t('character.templateBuilder.templateName')}
 					/>
 				</CardBody>
 			</Card>
@@ -277,6 +316,7 @@ export default function TemplateBuilder() {
 								</div>
 								<div className='flex gap-2'>
 									<IconButton
+										aria-label='edit-field'
 										color='blue'
 										variant='text'
 										onClick={() => startEditing(index)}
@@ -284,7 +324,7 @@ export default function TemplateBuilder() {
 									>
 										<PencilIcon className='h-5 w-5' />
 									</IconButton>
-									<IconButton color='red' variant='text' onClick={() => removeField(index)}>
+									<IconButton aria-label='delete-field' color='red' variant='text' onClick={() => removeField(index)}>
 										<TrashIcon className='h-5 w-5' />
 									</IconButton>
 								</div>
@@ -294,7 +334,6 @@ export default function TemplateBuilder() {
 				</Card>
 			)}
 
-			{/* FORMULARIO PARA AÑADIR/EDITAR CAMPO */}
 			<Card className={`w-full shadow-md border-t-4 ${isEditing ? theme.border : 'border-t-transparent'}`}>
 				<CardBody className='flex flex-col gap-4'>
 					<div className='flex justify-between items-center'>
@@ -310,17 +349,23 @@ export default function TemplateBuilder() {
 						)}
 					</div>
 
-					{/* INPUT DEL NOMBRE CON MANEJO DE ERRORES */}
 					<div className='grid grid-cols-1 md:grid-cols-2 gap-4 items-center'>
 						<Input
+							id='fieldName'
 							label={t('character.templateBuilder.nameField')}
 							value={currentField.label}
 							onChange={e => handleChange('label', e.target.value)}
 							error={!!errors.label}
+							aria-label={t('character.templateBuilder.nameField')}
 						/>
 						{errors.label && (
 							<Typography variant='small' color='red' className='mt-1 flex items-center gap-1 font-normal'>
 								<span className='font-medium'>{t(errors.label)}</span>
+							</Typography>
+						)}
+						{errors.minMax && (
+							<Typography variant='small' color='red' className='mt-1 flex items-center gap-1 font-normal'>
+								<span className='font-medium'>{t(errors.minMax)}</span>
 							</Typography>
 						)}
 						<div className='w-full'>

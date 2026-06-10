@@ -18,7 +18,15 @@ import { CheckIcon, XMarkIcon, UserMinusIcon, ExclamationTriangleIcon } from '@h
 import CampaignService from '../../../services/CampaignService';
 import ProfileDetailModal from '../../profile/ProfileDetailModal';
 
-export default function CampaignMembersManager({ campaignId, t, themeColor, onMemberChange, maxPlayers, profileType }) {
+export default function CampaignMembersManager({
+	campaignId,
+	t,
+	themeColor,
+	onMemberChange,
+	maxPlayers,
+	profileType,
+	isFull,
+}) {
 	const [participants, setParticipants] = useState([]);
 	const [requests, setRequests] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -174,21 +182,23 @@ export default function CampaignMembersManager({ campaignId, t, themeColor, onMe
 										</div>
 									</div>
 									<div className='flex items-center gap-2 self-end sm:self-auto'>
-										<Tooltip content={t('common.accept')}>
-											<Button
-												size='sm'
-												color='green'
-												variant='text'
-												className='px-2'
-												disabled={actionLoading === req.profileName}
-												onClick={e => {
-													e.stopPropagation();
-													handleRequestAction(req.profileName, 'ACCEPT');
-												}}
-											>
-												<CheckIcon className='h-5 w-5 pointer-events-none' />
-											</Button>
-										</Tooltip>
+										{!isFull && (
+											<Tooltip content={t('common.accept')}>
+												<Button
+													size='sm'
+													color='green'
+													variant='text'
+													className='px-2'
+													disabled={actionLoading === req.profileName}
+													onClick={e => {
+														e.stopPropagation();
+														handleRequestAction(req.profileName, 'ACCEPT');
+													}}
+												>
+													<CheckIcon className='h-5 w-5 pointer-events-none' />
+												</Button>
+											</Tooltip>
+										)}
 										<Tooltip content={t('common.reject')}>
 											<Button
 												size='sm'

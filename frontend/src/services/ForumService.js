@@ -13,17 +13,12 @@ const ForumService = {
      * @param {string} tags - Tags separados por coma (opcional)
      */
     getGeneralThreads: async (page = 1, limit = 20, search = '', tags = '') => {
-        try {
-            const params = { page, limit };
-            if (search) params.search = search;
-            if (tags) params.tags = tags;
+        const params = { page, limit };
+        if (search) params.search = search;
+        if (tags) params.tags = tags;
 
-            const response = await api.get('/forums/posts', { params });
-            return response.data;
-        } catch (error) {
-            console.error('Error fetching general threads:', error);
-            throw error;
-        }
+        const response = await api.get('/forums/posts', { params });
+        return response.data;
     },
 
     /**
@@ -31,13 +26,8 @@ const ForumService = {
      * @param {number|string} postId 
      */
     getGeneralThreadDetail: async (postId) => {
-        try {
-            const response = await api.get(`/forums/posts/${postId}`);
-            return response.data;
-        } catch (error) {
-            console.error(`Error fetching thread detail for post ${postId}:`, error);
-            throw error;
-        }
+        const response = await api.get(`/forums/posts/${postId}`);
+        return response.data;
     },
 
     /**
@@ -45,13 +35,8 @@ const ForumService = {
      * @param {Object} threadData - { title, tags, content, mediaUrls }
      */
     createGeneralThread: async (threadData) => {
-        try {
-            const response = await api.post('/forums/posts', threadData);
-            return response.data;
-        } catch (error) {
-            console.error('Error creating general thread:', error);
-            throw error;
-        }
+        const response = await api.post('/forums/posts', threadData);
+        return response.data;
     },
 
     /**
@@ -60,15 +45,11 @@ const ForumService = {
      * @param {number} limit - Cantidad por página
      */
     getMyThreads: async (page = 1, limit = 20) => {
-        try {
-            const params = { page, limit };
-            // Según indicas, el endpoint es /forums/myPosts
-            const response = await api.get('/forums/myPosts', { params });
-            return response.data;
-        } catch (error) {
-            console.error('Error fetching my threads:', error);
-            throw error;
-        }
+        const params = { page, limit };
+        // Según indicas, el endpoint es /forums/myPosts
+        const response = await api.get('/forums/myPosts', { params });
+        return response.data;
+
     },
 
     /**
@@ -76,13 +57,9 @@ const ForumService = {
      * @param {Object} replyData - { type, title, parentPostId, content, mediaUrls, tags }
      */
     createGeneralReply: async (replyData) => {
-        try {
-            const response = await api.post('/forums/posts', replyData);
-            return response.data;
-        } catch (error) {
-            console.error('Error creating general reply:', error);
-            throw error;
-        }
+        const response = await api.post('/forums/posts', replyData);
+        return response.data;
+
     },
 
     // ==========================================
@@ -95,13 +72,8 @@ const ForumService = {
      * @param {Object} postData 
      */
     createPost: async (campaignId, postData) => {
-        try {
-            const response = await api.post(`/campaigns/${campaignId}/posts`, postData);
-            return response.data;
-        } catch (error) {
-            console.error(`Error creating post for campaign ${campaignId}:`, error);
-            throw error;
-        }
+        const response = await api.post(`/campaigns/${campaignId}/posts`, postData);
+        return response.data;
     },
 
     /**
@@ -111,16 +83,34 @@ const ForumService = {
      * @param {number} limit - Cantidad de posts a traer
      */
     getTimeline: async (campaignId, cursor = null, limit = 20) => {
-        try {
-            const params = { limit };
-            if (cursor) params.cursor = cursor;
+
+        const params = { limit };
+        if (cursor) params.cursor = cursor;
             
-            const response = await api.get(`/campaigns/${campaignId}/posts`, { params });
-            return response.data;
-        } catch (error) {
-            console.error(`Error fetching timeline for campaign ${campaignId}:`, error);
-            throw error;
-        }
+        const response = await api.get(`/campaigns/${campaignId}/posts`, { params });
+        return response.data;
+
+    },
+
+    /**
+     * Pinnear un post en la campaña
+     * @param {number|string} postId 
+     * @param {boolean} isPinned
+     */
+    pinPost: async (postId, isPinned) => {
+        const response = await api.put(`/post/${postId}/pin`, { isPinned });
+        return response.data;
+    },
+
+    /**
+     * Bloquear un post en la campaña
+     * @param {number|string} postId 
+     * @param {boolean} isLocked
+     */
+    lockPost: async (postId, isLocked) => {
+        const response = await api.put(`/post/${postId}/lock`, { isLocked });
+        return response.data;
+        
     },
 
     // ==========================================
@@ -135,16 +125,12 @@ const ForumService = {
      * @param {number} limit 
      */
     getReplies: async (postId, cursor = null, limit = 20) => {
-        try {
-            const params = { limit };
-            if (cursor) params.cursor = cursor;
+        const params = { limit };
+        if (cursor) params.cursor = cursor;
 
-            const response = await api.get(`/posts/${postId}/replies`, { params });
-            return response.data;
-        } catch (error) {
-            console.error(`Error fetching replies for post ${postId}:`, error);
-            throw error;
-        }
+        const response = await api.get(`/posts/${postId}/replies`, { params });
+        return response.data;
+        
     },
 
     /**
@@ -153,13 +139,8 @@ const ForumService = {
      * @param {Object} updateData 
      */
     updatePost: async (postId, updateData) => {
-        try {
-            const response = await api.put(`/posts/${postId}`, updateData);
-            return response.data;
-        } catch (error) {
-            console.error(`Error updating post ${postId}:`, error);
-            throw error;
-        }
+        const response = await api.put(`/posts/${postId}`, updateData);
+        return response.data;
     },
 
     /**
@@ -168,13 +149,9 @@ const ForumService = {
      * @param {Object} moderationData - { isPinned, isLocked }
      */
     moderatePost: async (postId, moderationData) => {
-        try {
-            const response = await api.patch(`/posts/${postId}/moderate`, moderationData);
-            return response.data;
-        } catch (error) {
-            console.error(`Error moderating post ${postId}:`, error);
-            throw error;
-        }
+        const response = await api.patch(`/posts/${postId}/moderate`, moderationData);
+        return response.data;
+        
     },
 
     /**
@@ -182,13 +159,8 @@ const ForumService = {
      * @param {number|string} postId 
      */
     deletePost: async (postId) => {
-        try {
-            const response = await api.delete(`/posts/${postId}`);
-            return response.data;
-        } catch (error) {
-            console.error(`Error deleting post ${postId}:`, error);
-            throw error;
-        }
+        const response = await api.delete(`/posts/${postId}`);
+        return response.data;
     }
 };
 

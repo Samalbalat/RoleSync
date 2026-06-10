@@ -19,7 +19,12 @@
       "subtitle": "Los héroes que has forjado en tus aventuras.",
       "emptyMessage": "Aún no has creado ningún personaje.",
       "createButton": "Crear Tu Primer Personaje",
-      "noCampaign": "Sin campaña"
+      "noCampaign": "Sin campaña",
+      "description": "Revisa y gestiona todos tus personajes creados."
+    },
+    "myTemplates": {
+      "title": "Mis Plantillas",
+      "description": "Aquí puedes gestionar tus plantillas base para crear personajes de tus campañas."
     }
   },
   "menu": {
@@ -61,7 +66,8 @@
     "other": "Otro",
     "loadMore": "Cargar mas",
     "previous": "Anterior",
-    "next": "Siguiente"
+    "next": "Siguiente",
+    "errorLoadingData": "Error al cargar las campañas"
   },
   "dayWeek": {
     "monday": "Lunes",
@@ -182,7 +188,9 @@
       "bio": "Bibliografia",
       "description_TABLETOP": "Crea un perfil de mesa para participar en campañas de rol tradicional. Este perfil se asociará a los personajes que crees personajes y campañas de mesa.",
       "description_WRITTEN": "Crea un perfil narrativo para participar en campañas de rol escritas. Este perfil se asociará a los personajes que crees personajes y campañas narrativas."
-    }
+    },
+    "reviews": "Reseñas",
+    "noTemplates": "No tienes plantillas creadas todavía."
   },
   "campaign": {
     "campaign": "Campaña",
@@ -248,7 +256,7 @@
     "join": {
       "title": "Solicitar Unirse a la Campaña",
       "description": "Envía un mensaje al Master para expresar tu interés en unirte a esta campaña. Esto les ayudará a entender tus motivaciones y decidir si eres un buen candidato para la aventura.",
-      "messageLabel": "Mensaje para el Master (opcional)",
+      "messageLabel": "Mensaje para el Master",
       "submit": "Enviar Solicitud",
       "error": "Hubo un error al enviar tu solicitud. Por favor, inténtalo de nuevo más tarde."
     },
@@ -279,7 +287,9 @@
     "status": {
       "status": "Estado de la Campaña",
       "open": "Abierto"
-    }
+    },
+    "reviews": "Reseñas",
+    "title": "Campaña"
   },
   "character": {
     "characters": "Personajes",
@@ -324,7 +334,19 @@
       "errorNoName": "Debes darle un nombre a la plantilla.",
       "loadigData": "Cargando datos de la plantilla...",
       "range": "| Rango: ",
-      "addLongField": "Añadir Atributo Largo"
+      "addLongField": "Añadir Atributo Largo",
+      "chooseStartingPoint": "Elige un punto de partida",
+      "fromScratch": "Desde Cero",
+      "fromScratchDesc": "Crea una plantilla con tus propios campos desde cero",
+      "copyMine": "Copiar mis plantillas",
+      "copyMineDesc": "Usa una plantilla de otra de tus campañas.",
+      "presetDnD": "Plantilla D&D 5e",
+      "presetDnDDesc": "Estructura base para Dungeons&Dragons.",
+      "errorLoadTemplates": "Error al cargar tus plantillas",
+      "selectTemplate": "Selecciona una plantilla",
+      "noTemplates": "No tienes plantillas creadas todavía.",
+      "presetCthulhu": "Plantilla Cthulhu 7ª Ed.",
+      "presetCthulhuDesc": "Estructura base para La Llamada de Cthulhu."
     },
     "form": {
       "title": "Crear Personaje",
@@ -339,20 +361,26 @@
       "personalAttributes": "Atributos Personalizados",
       "atributesDescription": "Añade estadísticas, trasfondo, inventario... (Ej: \"Fuerza\", \"Historia\").",
       "value": "Valor (Ej: 18, 'Elfo oscuro...')",
-      "submit": "Forjar Personaje"
+      "submit": "Forjar Personaje",
+      "submitEdit": "Guardar Cambios",
+      "editDescription": "Modifica los atributos de tu personaje y guarda los cambios.",
+      "editTitle": "Editar Personaje"
     },
     "message": {
       "loadingCharacter": "Cargando perfil del personaje...",
       "complete": "Completa la ficha según las reglas de esta campaña.",
       "errorLoading": "Error al cargar la plantilla de la campaña. Por favor, inténtalo de nuevo más tarde.",
       "errorCreating": "Error creando al personaje",
-      "successCreating": "¡Personaje {{name}} creado con éxito!"
+      "successCreating": "¡Personaje {{name}} creado con éxito!",
+      "errorUpdating": "Error al actualizar el personaje",
+      "successUpdating": "Personaje actualizado correctamente"
     },
     "list": {
       "withoutCharacters": "Aún no hay jugadores en esta campaña."
     },
     "editCharacter": "Editar Personaje",
-    "noAttributes": "Este personaje aún no tiene detalles."
+    "noAttributes": "Este personaje aún no tiene detalles.",
+    "accessDeniedMessage": "No tienes permiso para editar este personaje."
   },
   "status": {
     "open": "Abierta",
@@ -480,5 +508,25 @@
   "footer": {
     "copyright": "My Application. All rights reserved",
     "madeWithLove": "Made with ❤️ by Samu A.O. and Alex S.H."
+  },
+  "templates": {
+    "global": "Plantilla Global",
+    "fieldsCount": "campos en total",
+    "noFields": "Sin campos",
+    "fieldType": {
+      "shortText": "Texto Corto",
+      "longText": "Texto Largo",
+      "number": "Número",
+      "boolean": "Checkbox"
+    }
+  },
+  "myCampaigns": {
+    "description": "Gestiona las campañas que diriges y en las que participas."
+  },
+  "template": {
+    "accessDeniedMessage": "'No tienes permiso para editar esta plantilla.'"
+  },
+  "reviews": {
+    "noReviews": "Sin reseñas"
   }
 }

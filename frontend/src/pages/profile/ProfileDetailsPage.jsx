@@ -25,6 +25,7 @@ import {
 	IdentificationIcon,
 	GlobeAltIcon,
 	ArrowsRightLeftIcon,
+	StarIcon,
 } from '@heroicons/react/24/outline';
 import { getTheme } from '../../utils/themeUtils';
 import { EditProfileModal } from '../../components/profile/EditProfileModal';
@@ -32,6 +33,8 @@ import { ProfileCampaignList } from '../../components/profile/ProfileCampaignLis
 import { ProfileCharacterList } from '../../components/profile/ProfileCharacterList';
 import CharacterDetailDialog from '../../components/character/CharacterDetailDialog';
 import { CreateProfileModal } from '../../components/profile/CreateProfileModal';
+import ReviewList from '../../components/reviews/ReviewList';
+import StarRatingBadge from '../../components/reviews/StarRatingBadge';
 
 // --- UTILIDADES PARA AVATARES DINÁMICOS ---
 const getInitials = name => {
@@ -121,7 +124,6 @@ export function ProfileDetailsPage() {
 					characterService.getMyCharacters(),
 					profileService.getUserInfo(),
 				]);
-
 				setProfileData(pData);
 				setUserData(uData);
 				setCampaigns(cData || { asMaster: [], asPlayer: [] });
@@ -270,10 +272,19 @@ export function ProfileDetailsPage() {
 					/>
 
 					<div className='flex-1 text-center md:text-left mt-4 md:mt-8'>
-						<Typography variant='h3' color='blue-gray'>
-							{currentName}
-						</Typography>
-						<Typography variant='paragraph' className='font-normal text-blue-gray-500 max-w-2xl'>
+						<div className='flex flex-col md:flex-row items-center md:items-end gap-3 mb-2 justify-center md:justify-start'>
+							<Typography variant='h3' color='blue-gray'>
+								{currentName}
+							</Typography>
+
+							<StarRatingBadge
+								averageRating={profileData?.reviewSummary?.average || 0}
+								totalReviews={profileData?.reviewSummary?.count || 0}
+								size='md'
+							/>
+						</div>
+
+						<Typography variant='paragraph' className='font-normal text-blue-gray-500 max-w-2xl mx-auto md:mx-0'>
 							{profileData?.description || t('profile.noDescription')}
 						</Typography>
 					</div>
@@ -398,6 +409,11 @@ export function ProfileDetailsPage() {
 									<UserCircleIcon className='w-5 h-5' /> {t('character.characters')}
 								</div>
 							</Tab>
+							<Tab value='reviews' className='font-medium'>
+								<div className='flex items-center gap-2'>
+									<StarIcon className='w-5 h-5' /> {t('profile.reviews', 'Reseñas')}
+								</div>
+							</Tab>
 						</TabsHeader>
 						<TabsBody>
 							<TabPanel value='campaigns'>
@@ -410,6 +426,17 @@ export function ProfileDetailsPage() {
 
 							<TabPanel value='characters'>
 								<ProfileCharacterList characters={characters} onCharacterClick={handleOpenCharacter} />
+							</TabPanel>
+							<TabPanel value='reviews'>
+								<div className='pt-4'>
+									<ReviewList
+										targetId={profileData?.id || 0}
+										targetType='PROFILE'
+										canWrite={false} // En este caso, no permitimos escribir reseñas en el propio perfil
+										averageRating={profileData?.reviewSummary?.average || 0}
+										totalReviews={profileData?.reviewSummary?.count || 0}
+									/>
+								</div>
 							</TabPanel>
 						</TabsBody>
 					</Tabs>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardBody, Typography, Input, Button, IconButton, Textarea } from '@material-tailwind/react';
 import { PlusIcon, TrashIcon, CheckIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
@@ -7,11 +7,19 @@ import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { getTheme } from '../../utils/themeUtils';
 import CharacterService from '../../services/CharacterService';
+import { formatAttributes } from '../../utils/character/characterFormUtils';
 
 export default function FreeStyleCharacterForm() {
 	const navigate = useNavigate();
 	const theme = getTheme();
 	const { t } = useTranslation('global');
+	const timerRef = useRef(null);
+
+	useEffect(() => {
+		return () => {
+			if (timerRef.current) clearTimeout(timerRef.current);
+		};
+	}, []);
 
 	const {
 		register,
@@ -37,49 +45,36 @@ export default function FreeStyleCharacterForm() {
 		setAttributes(attributes.filter((_, index) => index !== indexToRemove));
 	};
 
+	const ALLOWED_ATTRIBUTE_FIELDS = new Set(['key', 'value']);
+
 	// Actualizar el nombre (key) o el valor (value) de un atributo
 	const handleAttributeChange = (index, field, newValue) => {
-		const updatedAttributes = [...attributes];
-		updatedAttributes[index][field] = newValue;
-		setAttributes(updatedAttributes);
+		if (!ALLOWED_ATTRIBUTE_FIELDS.has(field)) {
+			console.warn(`Campo de atributo no permitido: ${field}`);
+			return;
+		}
+
+		setAttributes(prev => prev.map((attr, i) => (i === index ? { ...attr, [field]: newValue } : attr)));
 	};
 
 	const onSubmit = async data => {
-		const formattedAttributes = attributes
-			.filter(attr => attr.key.trim() !== '')
-			.map(attr => {
-				const safeKey = attr.key
-					.trim()
-					.toLowerCase()
-					.replaceAll(/[^a-z0-9]/g, '');
-				const randomSuffix = Math.random().toString(36).substring(2, 6);
-
-				return {
-					key: `${safeKey}_${randomSuffix}`,
-					label: attr.key.trim(),
-					type: attr.type,
-					required: false,
-					min: 0,
-					max: 0,
-					value: attr.value || '',
-				};
-			});
-
 		const payload = {
 			name: data.name.trim(),
 			avatar_url: (data.avatarUrl || '').trim(),
 			campaign_id: null,
 			template_id: null,
-			attributes: formattedAttributes,
+			attributes: formatAttributes(attributes),
 		};
 
-		// 3. Llamada a la API
 		try {
 			await CharacterService.createCharacter(payload);
+
 			toast.success(t('character.message.successCreating', { name: payload.name }));
-			setTimeout(() => navigate('/characters'), 1500);
+
+			timerRef.current = setTimeout(() => navigate('/characters'), 1500);
 		} catch (error) {
 			console.error('Error al guardar el personaje:', error);
+
 			toast.error(t('character.message.errorCreating'));
 		}
 	};
