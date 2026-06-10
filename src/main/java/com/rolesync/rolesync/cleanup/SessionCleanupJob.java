@@ -26,6 +26,7 @@ public class SessionCleanupJob {
         UserRepository userRepository;
 
         private static final Duration TIMEOUT = Duration.ofMinutes(30);
+
         // Runs every 30 minutes
         @Transactional
         @Scheduled(fixedRate = 30, timeUnit = TimeUnit.MINUTES)
@@ -41,7 +42,8 @@ public class SessionCleanupJob {
                         if (Duration.between(
                                         session.getLastRequest(),
                                         now).compareTo(TIMEOUT) > 0) {
-                                System.out.println("Closing session " + session.getId() + " for user " + session.getUser().getEmail());
+                                System.out.println("Closing session " + session.getId() + " for user "
+                                                + session.getUser().getEmail());
                                 userMetricsService.onSessionTimeOut(session.getUser());
                         }
                 }

@@ -123,13 +123,13 @@ public class CampaignController {
     // ---------- MINE GET ----------
     @GetMapping("/me")
     @Transactional
-    public ResponseEntity<CampaignGetMeOutDTO> getMyCampaigns(Authentication authentication,
+    public ResponseEntity<?> getMyCampaigns(Authentication authentication,
             @RequestHeader("X-Profile-Name") String profileName) {
 
         CampaignGetMeOutDTO response = new CampaignGetMeOutDTO();
         Optional<Profile> owner = profileRepository.findByProfilename(profileName);
-        if (owner.isEmpty()) {
-            ResponseEntity.status(403).body(ERR_UNAUTHORIZED);
+        if (owner.isEmpty() || !utilsCalls.checkAuthAndProfile(authentication, profileName)) {
+            return ResponseEntity.status(403).body(ERR_UNAUTHORIZED);
         }
         // AS MASTER
         List<CampaignGetMeOutItemDTO> asMaster = campaignRepository.findByOwner(owner.get()).stream()

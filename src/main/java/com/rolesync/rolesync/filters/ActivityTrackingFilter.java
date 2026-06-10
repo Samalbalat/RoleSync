@@ -5,7 +5,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
 
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.Authentication;
@@ -15,7 +14,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.rolesync.rolesync.model.User;
 import com.rolesync.rolesync.repository.LoginSessionRepository;
-import com.rolesync.rolesync.security.service.UserDetailsImpl;
 import com.rolesync.rolesync.utils.UtilsCalls;
 
 import jakarta.servlet.FilterChain;
@@ -40,33 +38,31 @@ public class ActivityTrackingFilter
             FilterChain filterChain)
             throws ServletException, IOException {
 
-        Authentication auth =
-                SecurityContextHolder.getContext()
-                        .getAuthentication();
+        Authentication auth = SecurityContextHolder.getContext()
+                .getAuthentication();
 
-        if(auth != null
+        if (auth != null
                 && auth.isAuthenticated()) {
 
             Instant now = Instant.now();
 
             Optional<User> userOpt = utils.getUserFromUsername(auth);
 
-            if(userOpt.isPresent()){
+            if (userOpt.isPresent()) {
                 sessionRepository
-                    .findFirstByUserAndActiveTrue(userOpt.get())
-                    .ifPresent(session -> {
+                        .findFirstByUserAndActiveTrue(userOpt.get())
+                        .ifPresent(session -> {
 
-                        Instant lastRequest =
-                                session.getLastRequest();
+                            Instant lastRequest = session.getLastRequest();
 
-                        if(shouldUpdateLastRequest(lastRequest, now)) {
+                            if (shouldUpdateLastRequest(lastRequest, now)) {
 
-                            session.setLastRequest(now);
+                                session.setLastRequest(now);
 
-                            sessionRepository.save(session);
-                        }
-                    });
-                
+                                sessionRepository.save(session);
+                            }
+                        });
+
             }
         }
 
