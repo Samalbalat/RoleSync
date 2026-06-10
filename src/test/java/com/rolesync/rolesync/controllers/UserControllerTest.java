@@ -65,7 +65,7 @@ class UserControllerTest {
     // GET /me
     // --------------------------------------------------
     @Test
-    void shouldReturn200_getMe() {
+    void shouldReturn200GetMe() {
         Object principal = new Object();
 
         when(authentication.getPrincipal()).thenReturn(principal);
@@ -80,7 +80,7 @@ class UserControllerTest {
     // GET /user - not found
     // --------------------------------------------------
     @Test
-    void shouldReturn404_getUserInfo_notFound() {
+    void shouldReturn404GetUserInfoNotFound() {
         when(utilsCalls.getUserFromUsername(authentication))
                 .thenReturn(Optional.empty());
 
@@ -93,7 +93,7 @@ class UserControllerTest {
     // GET /user - success
     // --------------------------------------------------
     @Test
-    void shouldReturn200_getUserInfo_success() {
+    void shouldReturn200GetUserInfoSuccess() {
         when(utilsCalls.getUserFromUsername(authentication))
                 .thenReturn(Optional.of(user));
 
@@ -109,7 +109,7 @@ class UserControllerTest {
     // PUT /user - user not found
     // --------------------------------------------------
     @Test
-    void shouldReturn404_putUserInfo_notFound() {
+    void shouldReturn404PutUserInfoNotFound() {
         when(utilsCalls.getUserFromUsername(authentication))
                 .thenReturn(Optional.empty());
 
@@ -124,7 +124,7 @@ class UserControllerTest {
     // PUT /user - blank fields
     // --------------------------------------------------
     @Test
-    void shouldReturn400_putUserInfo_blankFields() {
+    void shouldReturn400PutUserInfoBlankFields() {
         when(utilsCalls.getUserFromUsername(authentication))
                 .thenReturn(Optional.of(user));
 
@@ -142,7 +142,7 @@ class UserControllerTest {
     // PUT /user - email conflict
     // --------------------------------------------------
     @Test
-    void shouldReturn403_putUserInfo_emailConflict() {
+    void shouldReturn403PutUserInfoEmailConflict() {
         when(utilsCalls.getUserFromUsername(authentication))
                 .thenReturn(Optional.of(user));
 
@@ -164,7 +164,7 @@ class UserControllerTest {
     // PUT /user - wrong old password
     // --------------------------------------------------
     @Test
-    void shouldReturn403_putUserInfo_wrongOldPassword() {
+    void shouldReturn403PutUserInfoWrongOldPassword() {
         when(utilsCalls.getUserFromUsername(authentication))
                 .thenReturn(Optional.of(user));
 
@@ -183,7 +183,7 @@ class UserControllerTest {
     // PUT /user - invalid password policy
     // --------------------------------------------------
     @Test
-    void shouldReturn400_putUserInfo_invalidPassword() {
+    void shouldReturn400PutUserInfoInvalidPassword() {
         when(utilsCalls.getUserFromUsername(authentication))
                 .thenReturn(Optional.of(user));
 
@@ -202,7 +202,7 @@ class UserControllerTest {
     // PUT /user - success
     // --------------------------------------------------
     @Test
-    void shouldReturn200_putUserInfo_success() {
+    void shouldReturn200PutUserInfoSuccess() {
         when(utilsCalls.getUserFromUsername(authentication))
                 .thenReturn(Optional.of(user));
 
