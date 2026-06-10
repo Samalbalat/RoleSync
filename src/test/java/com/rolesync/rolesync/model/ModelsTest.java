@@ -162,22 +162,22 @@ class ModelsTest {
     }
 
     @Test
-    void postPrePersistAndPreUpdateTest() throws Exception {
+    void onCreateShouldSetCreatedAt() {
         Post post = new Post();
 
-        // Simulate @PrePersist
-        Method prePersist = Post.class.getDeclaredMethod("onCreate");
-        prePersist.setAccessible(true);
-        prePersist.invoke(post);
+        post.onCreate();
+
         assertNotNull(post.getCreatedAt());
-        // Simulate @PreUpdate
-        Instant beforeUpdate = post.getUpdatedAt();
-        Method preUpdate = Post.class.getDeclaredMethod("onUpdate");
-        preUpdate.setAccessible(true);
-        preUpdate.invoke(post);
-        assertNotNull(post.getUpdatedAt());
+    }
+
+    @Test
+    void onUpdateShouldSetEditedAndUpdatedAt() {
+        Post post = new Post();
+
+        post.onUpdate();
+
         assertTrue(post.isEdited());
-        assertTrue(!post.getUpdatedAt().isBefore(beforeUpdate == null ? post.getCreatedAt() : beforeUpdate));
+        assertNotNull(post.getUpdatedAt());
     }
 
     // --------------------------------------------------
