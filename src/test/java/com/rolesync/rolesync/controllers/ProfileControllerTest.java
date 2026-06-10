@@ -67,7 +67,7 @@ class ProfileControllerTest {
     // GET PROFILE - FOUND
     // --------------------------------------------------
     @Test
-    void shouldReturn200_getProfile_found() {
+    void shouldReturn200GetProfileFound() {
         when(profileRepository.findByProfilename("testUser"))
                 .thenReturn(Optional.of(profile));
 
@@ -84,7 +84,7 @@ class ProfileControllerTest {
     // GET PROFILE - NOT FOUND
     // --------------------------------------------------
     @Test
-    void shouldReturn404_getProfile_notFound() {
+    void shouldReturn404GetProfileNotFound() {
         when(profileRepository.findByProfilename("missing"))
                 .thenReturn(Optional.empty());
 
@@ -98,7 +98,7 @@ class ProfileControllerTest {
     // GET PROFILE BY NAME - FOUND
     // --------------------------------------------------
     @Test
-    void shouldReturn200_getProfileByName_found() {
+    void shouldReturn200GetProfileByNameFound() {
         when(profileRepository.findByProfilename("other"))
                 .thenReturn(Optional.of(profile));
 
@@ -115,7 +115,7 @@ class ProfileControllerTest {
     // GET PROFILE BY NAME - NOT FOUND
     // --------------------------------------------------
     @Test
-    void shouldReturn404_getProfileByName_notFound() {
+    void shouldReturn404GetProfileByNameNotFound() {
         when(profileRepository.findByProfilename("other"))
                 .thenReturn(Optional.empty());
 
@@ -129,7 +129,7 @@ class ProfileControllerTest {
     // PUT PROFILE - AUTH FAIL
     // --------------------------------------------------
     @Test
-    void shouldReturn403_putProfile_authFail() {
+    void shouldReturn403PutProfileAuthFail() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(false);
 
@@ -146,7 +146,7 @@ class ProfileControllerTest {
     // PUT PROFILE - NAME CONFLICT
     // --------------------------------------------------
     @Test
-    void shouldReturn403_putProfile_nameConflict() {
+    void shouldReturn403PutProfileNameConflict() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -169,7 +169,7 @@ class ProfileControllerTest {
     // PUT PROFILE - NOT FOUND
     // --------------------------------------------------
     @Test
-    void shouldReturn404_putProfile_notFound() {
+    void shouldReturn404PutProfileNotFound() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -189,7 +189,7 @@ class ProfileControllerTest {
     // PUT PROFILE - SUCCESS
     // --------------------------------------------------
     @Test
-    void shouldReturn200_putProfile_success() {
+    void shouldReturn200PutProfileSuccess() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -215,7 +215,7 @@ class ProfileControllerTest {
     // POST PROFILE - AUTH FAIL
     // --------------------------------------------------
     @Test
-    void shouldReturn403_postProfile_authFail() {
+    void shouldReturn403PostProfileAuthFail() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(false);
 
@@ -231,7 +231,7 @@ class ProfileControllerTest {
     // POST PROFILE - 2 PROFILES LIMIT
     // --------------------------------------------------
     @Test
-    void shouldReturn403_postProfile_twoProfiles() {
+    void shouldReturn403PostProfileTwoProfiles() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -253,7 +253,7 @@ class ProfileControllerTest {
     // POST PROFILE - ROLE OR NAME CONFLICT
     // --------------------------------------------------
     @Test
-    void shouldReturn403_postProfile_conflict() {
+    void shouldReturn403PostProfileConflict() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -280,7 +280,7 @@ class ProfileControllerTest {
     // POST PROFILE - SUCCESS
     // --------------------------------------------------
     @Test
-    void shouldReturn201_postProfile_success() {
+    void shouldReturn201PostProfileSuccess() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 

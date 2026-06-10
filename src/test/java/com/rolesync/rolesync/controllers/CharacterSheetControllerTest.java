@@ -59,7 +59,7 @@ class CharacterSheetControllerTest {
         // --------------------------------------------------
 
         @Test
-        void shouldReturn403_whenAuthFails_onCreateCharacter() {
+        void shouldReturn403whenAuthFailsOnCreateCharacter() {
                 CharacterSheetInPostDTO dto = new CharacterSheetInPostDTO();
 
                 when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
@@ -75,7 +75,7 @@ class CharacterSheetControllerTest {
         // --------------------------------------------------
 
         @Test
-        void shouldReturn403_whenProfileNotFound_onCreate() {
+        void shouldReturn403WhenProfileNotFoundOnCreate() {
                 CharacterSheetInPostDTO dto = new CharacterSheetInPostDTO();
 
                 when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
@@ -93,7 +93,7 @@ class CharacterSheetControllerTest {
         // --------------------------------------------------
 
         @Test
-        void shouldCreateCharacter_successfully() {
+        void shouldCreateCharacterSuccessfully() {
                 CharacterSheetInPostDTO dto = new CharacterSheetInPostDTO();
                 dto.setName("Hero");
                 List<CharacterSchemaField> fields = List
@@ -123,7 +123,7 @@ class CharacterSheetControllerTest {
         // --------------------------------------------------
 
         @Test
-        void shouldReturn403_onGetMyCharacters_whenAuthFails() {
+        void shouldReturn403OnGetMyCharactersWhenAuthFails() {
                 when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                                 .thenReturn(false);
 
@@ -137,7 +137,7 @@ class CharacterSheetControllerTest {
         // --------------------------------------------------
 
         @Test
-        void shouldReturnCharacters_onGetMyCharacters() {
+        void shouldReturnCharactersOnGetMyCharacters() {
                 when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                                 .thenReturn(true);
                 when(profileRepository.findByProfilename("testUser"))
@@ -161,7 +161,7 @@ class CharacterSheetControllerTest {
         // --------------------------------------------------
 
         @Test
-        void shouldReturn404_whenCharacterNotFound_byId() {
+        void shouldReturn404WhenCharacterNotFoundById() {
                 when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                                 .thenReturn(true);
                 when(profileRepository.findByProfilename("testUser"))
@@ -179,7 +179,7 @@ class CharacterSheetControllerTest {
         // --------------------------------------------------
 
         @Test
-        void shouldReturn200_whenPublicCharacter() {
+        void shouldReturn200WhenPublicCharacter() {
                 CharacterSheet sheet = new CharacterSheet();
                 sheet.setId(1L);
                 sheet.setIsPublic(true);
@@ -202,7 +202,7 @@ class CharacterSheetControllerTest {
         // --------------------------------------------------
 
         @Test
-        void shouldReturn403_whenNotOwner_onUpdate() {
+        void shouldReturn403WhenNotOwnerOnUpdate() {
                 CharacterSheet sheet = new CharacterSheet();
                 Profile other = new Profile();
                 other.setId(2L);
@@ -229,7 +229,7 @@ class CharacterSheetControllerTest {
         // --------------------------------------------------
 
         @Test
-        void shouldUpdateCharacter_successfully() {
+        void shouldUpdateCharacterSuccessfully() {
                 CharacterSheet sheet = new CharacterSheet();
                 sheet.setOwner(profile);
                 sheet.setId(1L);
@@ -255,7 +255,7 @@ class CharacterSheetControllerTest {
         // --------------------------------------------------
 
         @Test
-        void shouldReturn404_whenCampaignNotFound() {
+        void shouldReturn404WhenCampaignNotFound() {
                 when(campaignRepository.findById(1L)).thenReturn(Optional.empty());
 
                 ResponseEntity<?> response = controller.getTemplatesFromCampaign(authentication, 1L, "testUser");
@@ -268,7 +268,7 @@ class CharacterSheetControllerTest {
         // --------------------------------------------------
 
         @Test
-        void shouldReturn403_whenNotMemberOfCampaign() {
+        void shouldReturn403WhenNotMemberOfCampaign() {
                 Campaign campaign = mock(Campaign.class);
                 Profile owner = new Profile();
                 owner.setId(1L);
@@ -287,7 +287,7 @@ class CharacterSheetControllerTest {
         }
 
         @Test
-        void shouldReturn200_whenCampaignMemberGetsCharacters() {
+        void shouldReturn200WhenCampaignMemberGetsCharacters() {
                 Campaign campaign = mock(Campaign.class);
 
                 Profile owner = new Profile();
@@ -311,7 +311,7 @@ class CharacterSheetControllerTest {
         }
 
         @Test
-        void shouldReturn200_whenOwnerGetsPrivateCharacter() {
+        void shouldReturn200WhenOwnerGetsPrivateCharacter() {
                 CharacterSheet sheet = new CharacterSheet();
                 sheet.setOwner(profile);
                 sheet.setIsPublic(false);
@@ -331,7 +331,7 @@ class CharacterSheetControllerTest {
         }
 
         @Test
-        void shouldReturn403_whenNonOwnerGetsPrivateTemplate() {
+        void shouldReturn403WhenNonOwnerGetsPrivateTemplate() {
                 Profile owner = new Profile();
                 owner.setProfilename("owner");
 
@@ -358,7 +358,7 @@ class CharacterSheetControllerTest {
         }
 
         @Test
-        void shouldReturn404_whenCampaignNotFound_onCreateCharacter() {
+        void shouldReturn404WhenCampaignNotFoundOnCreateCharacter() {
                 CharacterSheetInPostDTO dto = new CharacterSheetInPostDTO();
                 dto.setCampaign_id(1L);
 
@@ -375,7 +375,7 @@ class CharacterSheetControllerTest {
         }
 
         @Test
-        void shouldReturn403_whenNotMemberAndNotOwner_onCreateCharacterWithCampaign() {
+        void shouldReturn403WhenNotMemberAndNotOwnerOnCreateCharacterWithCampaign() {
                 CharacterSheetInPostDTO dto = new CharacterSheetInPostDTO();
                 dto.setCampaign_id(1L);
 
@@ -400,7 +400,7 @@ class CharacterSheetControllerTest {
         }
 
         @Test
-        void shouldAssignCampaign_whenOwnerCreatesCharacter() {
+        void shouldAssignCampaignWhenOwnerCreatesCharacter() {
                 CharacterSheetInPostDTO dto = new CharacterSheetInPostDTO();
                 dto.setCampaign_id(1L);
 
@@ -430,7 +430,7 @@ class CharacterSheetControllerTest {
         }
 
         @Test
-        void shouldAssignCampaign_whenMemberCreatesCharacter() {
+        void shouldAssignCampaignWhenMemberCreatesCharacter() {
                 CharacterSheetInPostDTO dto = new CharacterSheetInPostDTO();
                 dto.setCampaign_id(1L);
 
@@ -461,7 +461,7 @@ class CharacterSheetControllerTest {
         }
 
         @Test
-        void shouldReturnTemplates_withoutCampaignAndImage() {
+        void shouldReturnTemplateWithoutCampaignAndImage() {
                 CharacterSheet sheet = new CharacterSheet();
                 sheet.setId(1L);
                 sheet.setIsTemplate(true);
@@ -479,7 +479,7 @@ class CharacterSheetControllerTest {
         }
 
         @Test
-        void shouldReturnTemplates_withCampaignAndImage() {
+        void shouldReturnTemplatesWithCampaignAndImage() {
                 CharacterSheet sheet = new CharacterSheet();
                 sheet.setId(1L);
                 sheet.setIsTemplate(true);
@@ -501,7 +501,7 @@ class CharacterSheetControllerTest {
         }
 
         @Test
-        void shouldReturnCharacters_withCampaignAndImage() {
+        void shouldReturnCharactersWithCampaignAndImage() {
                 CharacterSheet sheet = new CharacterSheet();
                 sheet.setId(1L);
                 sheet.setIsTemplate(false);
@@ -514,10 +514,10 @@ class CharacterSheetControllerTest {
                 sheet.setCampaign(campaign);
                 sheet.setImage("img.png");
 
-                when(characterSheetRepository.findByIsTemplateAndIsPublic(true, true))
+                when(characterSheetRepository.findByIsTemplateAndIsPublic(false, true))
                                 .thenReturn(List.of(sheet));
 
-                ResponseEntity<?> response = controller.getTemplates();
+                ResponseEntity<?> response = controller.getCharacters();
 
                 assertEquals(200, response.getStatusCode().value());
         }

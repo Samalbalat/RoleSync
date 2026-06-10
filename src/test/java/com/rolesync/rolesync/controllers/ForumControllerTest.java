@@ -76,7 +76,7 @@ class ForumControllerTest {
     // --------------------------------------------------
 
     @Test
-    void shouldReturn403_whenAuthFails_getCampaignPosts() {
+    void shouldReturn403WhenAuthFailsGetCampaignPosts() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(false);
 
@@ -91,7 +91,7 @@ class ForumControllerTest {
     // --------------------------------------------------
 
     @Test
-    void shouldReturn403_whenNoRelationToCampaign() {
+    void shouldReturn403WhenNoRelationToCampaign() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -111,7 +111,7 @@ class ForumControllerTest {
     // --------------------------------------------------
 
     @Test
-    void shouldReturn200_campaignPosts_success() {
+    void shouldReturn200CampaignPostsSuccess() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -137,7 +137,7 @@ class ForumControllerTest {
     // --------------------------------------------------
 
     @Test
-    void shouldReturn403_whenAuthFails_getReplies() {
+    void shouldReturn403WhenAuthFailsGetReplies() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(false);
 
@@ -152,7 +152,7 @@ class ForumControllerTest {
     // --------------------------------------------------
 
     @Test
-    void shouldReturn403_whenCampaignRelationInvalid_onReplies() {
+    void shouldReturn403WhenCampaignRelationInvalidOnReplies() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -177,7 +177,7 @@ class ForumControllerTest {
     // --------------------------------------------------
 
     @Test
-    void shouldReturn200_replies_success() {
+    void shouldReturn200RepliesSuccess() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -199,7 +199,7 @@ class ForumControllerTest {
     // --------------------------------------------------
 
     @Test
-    void shouldReturn403_forumPosts_authFail() {
+    void shouldReturn403ForumPostsAuthFail() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(false);
 
@@ -214,7 +214,7 @@ class ForumControllerTest {
     // --------------------------------------------------
 
     @Test
-    void shouldReturn200_forumPosts_success() {
+    void shouldReturn200ForumPostsSuccess() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -233,7 +233,7 @@ class ForumControllerTest {
     // --------------------------------------------------
 
     @Test
-    void shouldReturn404_forumPost_notFound() {
+    void shouldReturn404ForumPostNotFound() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -250,7 +250,7 @@ class ForumControllerTest {
     // --------------------------------------------------
 
     @Test
-    void shouldReturn400_forumPost_isCampaignPost() {
+    void shouldReturn400ForumPostIsCampaignPost() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -270,7 +270,7 @@ class ForumControllerTest {
     // --------------------------------------------------
 
     @Test
-    void shouldReturn200_myPosts_success() {
+    void shouldReturn200MyPostsSuccess() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -295,7 +295,7 @@ class ForumControllerTest {
     // --------------------------------------------------
 
     @Test
-    void shouldReturn403_lock_post_notAllowed() {
+    void shouldReturn403LockPostNotAllowed() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -325,7 +325,7 @@ class ForumControllerTest {
     // --------------------------------------------------
 
     @Test
-    void shouldReturn200_lock_post_success() {
+    void shouldReturn200LockPostSuccess() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -356,7 +356,7 @@ class ForumControllerTest {
     // --------------------------------------------------
 
     @Test
-    void shouldReturn400_pin_nonCampaignPost() {
+    void shouldReturn400PinNonCampaignPost() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -379,7 +379,7 @@ class ForumControllerTest {
     // --------------------------------------------------
 
     @Test
-    void shouldReturn200_createForumPost_success() {
+    void shouldReturn200CreateForumPostSuccess() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -403,7 +403,7 @@ class ForumControllerTest {
     // --------------------------------------------------
 
     @Test
-    void shouldReturn403_character_notOwned() {
+    void shouldReturn403CharacterNotOwned() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -435,7 +435,7 @@ class ForumControllerTest {
     }
 
     @Test
-    void shouldReturn400_whenCharacterDoesNotExist() {
+    void shouldReturn400WhenCharacterDoesNotExist() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -454,7 +454,7 @@ class ForumControllerTest {
     }
 
     @Test
-    void shouldReturn403_whenCharacterNotOwnedByProfile() {
+    void shouldReturn403WhenCharacterNotOwnedByProfile() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -479,7 +479,7 @@ class ForumControllerTest {
     }
 
     @Test
-    void shouldReturn400_whenPinPost_isNotCampaignPost() {
+    void shouldReturn400WhenPinPostIsNotCampaignPost() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -501,7 +501,7 @@ class ForumControllerTest {
     }
 
     @Test
-    void shouldReturn403_whenPinPost_notOwnerNorCampaignOwner() {
+    void shouldReturn403WhenPinPostNotOwnerNorCampaignOwner() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -532,7 +532,7 @@ class ForumControllerTest {
     }
 
     @Test
-    void shouldReturn400_whenPinMissingValue() {
+    void shouldReturn400WhenPinMissingValue() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -560,7 +560,7 @@ class ForumControllerTest {
     }
 
     @Test
-    void shouldReturn400_whenPageOutOfBounds_myPosts() {
+    void shouldReturn400WhenPageOutOfBoundsMyPosts() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -580,7 +580,7 @@ class ForumControllerTest {
     }
 
     @Test
-    void shouldReturn200_myPosts_emptyList_mapping() {
+    void shouldReturn200MyPostsEmptyListMapping() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -604,7 +604,7 @@ class ForumControllerTest {
     }
 
     @Test
-    void shouldReturn200_whenCharacterValid_inCampaignSecurity() {
+    void shouldReturn200WhenCharacterValidInCampaignSecurity() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -632,7 +632,7 @@ class ForumControllerTest {
     }
 
     @Test
-    void shouldReturn200_replies_whenParentPostNotFound() {
+    void shouldReturn200RepliesWhenParentPostNotFound() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -648,7 +648,7 @@ class ForumControllerTest {
     }
 
     @Test
-    void shouldReturnHasMoreTrue_whenRepliesExceedLimit() {
+    void shouldReturnHasMoreTrueWhenRepliesExceedLimit() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -670,7 +670,7 @@ class ForumControllerTest {
     }
 
     @Test
-    void shouldReturn200_lock_campaignPost_asOwner() {
+    void shouldReturn200LockCampaignPostAsOwner() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -703,7 +703,7 @@ class ForumControllerTest {
     }
 
     @Test
-    void shouldReturn200_myPosts_multipleMapping() {
+    void shouldReturn200MyPostsMultipleMapping() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -756,7 +756,7 @@ class ForumControllerTest {
     }
 
     @Test
-    void shouldReturn200_campaignPosts_hasMoreBranch() {
+    void shouldReturn200CampaignPostsHasMoreBranch() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -782,7 +782,7 @@ class ForumControllerTest {
     }
 
     @Test
-    void shouldReturn200_replies_campaignBranch_allowed() {
+    void shouldReturn200RepliesCampaignBranchAllowed() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -807,7 +807,7 @@ class ForumControllerTest {
     }
 
     @Test
-    void shouldReturn200_forumPosts_fullMappingBranch() {
+    void shouldReturn200ForumPostsFullMappingBranch() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 
@@ -839,7 +839,7 @@ class ForumControllerTest {
     }
 
     @Test
-    void shouldReturn200_myPosts_emptyMappingBranch() {
+    void shouldReturn200MyPostsEmptyMappingBranch() {
         when(utilsCalls.checkAuthAndProfile(authentication, "testUser"))
                 .thenReturn(true);
 

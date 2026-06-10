@@ -7,8 +7,7 @@ import java.time.Instant;
 @Entity
 public class LoginSession {
 
-    private static final Duration SESSION_TIMEOUT =
-        Duration.ofMinutes(30);
+    private static final Duration SESSION_TIMEOUT = Duration.ofMinutes(30);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +29,8 @@ public class LoginSession {
 
     private boolean active;
 
-    public LoginSession() {}
+    public LoginSession() {
+    }
 
     public LoginSession(User user) {
         this.lastRequest = Instant.now();
@@ -42,19 +42,22 @@ public class LoginSession {
     public void closeSession() {
         this.logoutTime = Instant.now();
         this.inferredEndTime = lastRequest.plus(SESSION_TIMEOUT);
-        // El tiempo efectivo es el menor entre el tiempo real de sesión y el tiempo inferido por inactividad
-        this.effectiveDurationSeconds =
-                Math.min(Duration.between(loginTime, logoutTime).getSeconds(),
-                    Duration.between(loginTime, inferredEndTime).getSeconds());
+        // El tiempo efectivo es el menor entre el tiempo real de sesión y el tiempo
+        // inferido por inactividad
+        this.effectiveDurationSeconds = Math.min(Duration.between(loginTime, logoutTime).getSeconds(),
+                Duration.between(loginTime, inferredEndTime).getSeconds());
         this.active = false;
     }
 
-    public void sessionTimeout(){
+    public void sessionTimeout() {
         this.inferredEndTime = lastRequest.plus(SESSION_TIMEOUT);
         this.logoutTime = Instant.now();
-        this.effectiveDurationSeconds =
-                Duration.between(loginTime, inferredEndTime).getSeconds();
+        this.effectiveDurationSeconds = Duration.between(loginTime, inferredEndTime).getSeconds();
         this.active = false;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getId() {
@@ -117,7 +120,4 @@ public class LoginSession {
         this.effectiveDurationSeconds = effectiveDurationSeconds;
     }
 
-    
-
-    
 }
