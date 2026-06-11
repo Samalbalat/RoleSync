@@ -56,4 +56,4 @@ Necesitaras tener PostgreSQL instalado, Java 21, Maven y adecuar el archivo appl
 
 ## 🧪 Cómo probar
 
-Se puede testear mediante el uso de Bruno, Insomnia o Postman con llamadas a la dirección de localhost
+Se puede testear mediante el uso de Bruno, Insomnia o Postman con llamadas a la dirección de localhost.

@@ -134,10 +134,10 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            System.out.println("Entrada a register user excep");
+            System.out.println("Entrada a register user excep, ya se usa ese email");
             return ResponseEntity.badRequest().body("Error: Email already in use");
         } else if (profileRepository.existsByProfilename(signUpRequest.getProfilename())) {
-            System.out.println("Entrada a register profile excep");
+            System.out.println("Entrada a register profile excep, ya se usa ese nombre de perfil");
             return ResponseEntity.badRequest().body("Error: Profile name already in use");
         }
         User user = new User(signUpRequest.getEmail(),
