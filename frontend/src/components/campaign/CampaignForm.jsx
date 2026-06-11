@@ -143,6 +143,24 @@ export default function CampaignForm({ initialValues, onSubmit, loading, theme, 
 
 	const isWritten = campaignType === 'WRITTEN';
 
+	const baseOptions = [
+		<Option key='discord' value='Discord'>
+			Discord
+		</Option>,
+		<Option key='inperson' value='In-person'>
+			{t('communication.inPerson')}
+		</Option>,
+	];
+
+	const communicationOptions = isWritten
+		? [
+				<Option key='rolesync' value='RoleSync'>
+					RoleSync
+				</Option>,
+				...baseOptions,
+			]
+		: baseOptions;
+
 	return (
 		<Card className='p-6 w-full bg-white shadow-sm border border-gray-200'>
 			<form onSubmit={handleSubmit} className='flex flex-col gap-6'>
@@ -217,9 +235,7 @@ export default function CampaignForm({ initialValues, onSubmit, loading, theme, 
 						onChange={v => updateField('communication', v)}
 						color={theme.primary}
 					>
-						{isWritten && <Option value='RoleSync'>RoleSync</Option>}
-						<Option value='Discord'>Discord</Option>
-						<Option value='In-person'>{t('communication.inPerson')}</Option>
+						{communicationOptions}
 					</Select>
 				</div>
 
@@ -245,12 +261,52 @@ export default function CampaignForm({ initialValues, onSubmit, loading, theme, 
 							value={formData.system}
 							onChange={e => updateField('system', e.target.value)}
 							color={theme.primary}
+							error={!!errors.system}
 						/>
 						<Input
 							label={t('campaign.location')}
 							value={formData.location}
 							onChange={e => updateField('location', e.target.value)}
 							color={theme.primary}
+							error={!!errors.location}
+						/>
+						<Select
+							label={t('campaign.dayWeek')}
+							value={formData.dayWeek}
+							onChange={v => updateField('dayWeek', v)}
+							color={theme.primary}
+							error={!!errors.dayWeek}
+						>
+							<Option value='Lunes'>Lunes</Option>
+							<Option value='Martes'>Martes</Option>
+							<Option value='Miércoles'>Miércoles</Option>
+							<Option value='Jueves'>Jueves</Option>
+							<Option value='Viernes'>Viernes</Option>
+							<Option value='Sábado'>Sábado</Option>
+							<Option value='Domingo'>Domingo</Option>
+						</Select>
+
+						{/* Frecuencia */}
+						<Select
+							label={t('campaign.frequency')}
+							value={formData.frequency}
+							onChange={v => updateField('frequency', v)}
+							color={theme.primary}
+							error={!!errors.frequency}
+						>
+							<Option value='Semanal'>Semanal</Option>
+							<Option value='Quincenal'>Quincenal</Option>
+							<Option value='Mensual'>Mensual</Option>
+						</Select>
+
+						{/* Duración */}
+						<Input
+							label={t('campaign.duration')}
+							value={formData.duration}
+							onChange={e => updateField('duration', e.target.value)}
+							color={theme.primary}
+							error={!!errors.duration}
+							placeholder='Ej: 3 horas'
 						/>
 					</div>
 				)}

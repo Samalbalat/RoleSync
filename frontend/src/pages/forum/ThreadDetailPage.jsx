@@ -58,6 +58,7 @@ const ThreadDetailPage = () => {
 
 				// Obtenemos las respuestas (reutilizando el getReplies que ya tenías)
 				const repliesData = await ForumService.getReplies(id);
+				console.log('Replies data:', repliesData);
 				setReplies(Array.isArray(repliesData.data) ? repliesData.data : []);
 			} catch (error) {
 				console.error('Error fetching thread details:', error);
@@ -183,10 +184,10 @@ const ThreadDetailPage = () => {
 							<div className='flex flex-col items-center shrink-0 w-16'>
 								<Avatar
 									src={
-										reply.author?.profileImage ||
-										`https://ui-avatars.com/api/?name=${reply.author?.profileName || 'User'}&background=f3f4f6`
+										reply.authorProfileImage ||
+										`https://ui-avatars.com/api/?name=${reply.authorProfileName || 'User'}&background=f3f4f6`
 									}
-									alt={reply.author?.profileName || 'Usuario'}
+									alt={reply.authorProfileName || 'Usuario'}
 									size='sm'
 								/>
 							</div>
@@ -194,7 +195,7 @@ const ThreadDetailPage = () => {
 							<div className='flex-1'>
 								<div className='flex justify-between items-start mb-2'>
 									<Typography variant='small' color='blue-gray' className='font-bold'>
-										{reply.author?.profileName || 'Usuario Anónimo'}
+										{reply.authorProfileName || 'Usuario Anónimo'}
 									</Typography>
 									<Typography variant='small' className='text-gray-400 text-[10px]'>
 										{formatDate(reply.createdAt)} {reply.isEdited && '(editado)'}

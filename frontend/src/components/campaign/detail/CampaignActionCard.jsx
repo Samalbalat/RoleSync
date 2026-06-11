@@ -11,6 +11,7 @@ import {
 import JoinCampaignModal from './JoinCampaignModal';
 import CreateTemplateModal from './CreateTemplateModal';
 import { useLocation } from 'react-router-dom';
+import { NoSymbolIcon } from '@heroicons/react/24/solid';
 
 export default function CampaignActionCard({
 	campaign,
@@ -163,10 +164,12 @@ export default function CampaignActionCard({
 
 		// VISITANTE O PENDIENTE
 		const isPending = relation === 'PENDING';
+		const isKicked = relation === 'KICKED';
 		const isJoinAllowed = canRequestJoin();
 
 		const getButtonText = () => {
 			if (isPending) return t('campaign.detail.pending');
+			if (isKicked) return t('campaign.detail.kicked');
 			if (isFull) return t('campaign.detail.joinFull');
 
 			if (!isJoinAllowed) return t('campaign.detail.closed');
@@ -193,12 +196,13 @@ export default function CampaignActionCard({
 				<Button
 					fullWidth
 					size='lg'
-					color={isPending || !isJoinAllowed ? 'blue-gray' : themeColor.primary}
-					disabled={!isJoinAllowed || isPending}
+					color={isPending || isKicked || !isJoinAllowed ? 'blue-gray' : themeColor.primary}
+					disabled={!isJoinAllowed || isPending || isKicked}
 					className='flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all text-base'
 					onClick={() => setIsJoinModalOpen(true)}
 				>
 					{isPending && <ClockOutlineIcon className='h-5 w-5' />}
+					{isKicked && <NoSymbolIcon className='h-5 w-5' />}
 					{getButtonText()}
 				</Button>
 			</div>

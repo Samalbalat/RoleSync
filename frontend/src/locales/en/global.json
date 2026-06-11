@@ -242,7 +242,8 @@
       "contactGM": "Message the GM",
       "infoTitle": "Game Details",
       "pending": "Request Pending",
-      "closed": "Closed"
+      "closed": "Closed",
+      "kicked": "Expelled"
     },
     "join": {
       "title": "Request to Join Campaign",
