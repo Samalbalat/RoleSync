@@ -17,7 +17,7 @@ import lombok.ToString;
  */
 @Entity
 @Table(name = "profiles", uniqueConstraints = {
-    @UniqueConstraint(columnNames={"user", "profileType"}), @UniqueConstraint(columnNames = "profilename")
+    @UniqueConstraint(columnNames={"user_id", "profileType"}), @UniqueConstraint(columnNames = "profilename")
 })
 @Getter
 @Setter
