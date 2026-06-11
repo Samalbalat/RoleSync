@@ -22,6 +22,7 @@ const GeneralForumPage = () => {
 	const [activeSearch, setActiveSearch] = useState('');
 
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+	const [refreshTrigger, setRefreshTrigger] = useState(0);
 
 	// Efecto principal: Se dispara al cargar, al cambiar de página o de búsqueda confirmada
 	useEffect(() => {
@@ -39,7 +40,7 @@ const GeneralForumPage = () => {
 		};
 
 		fetchThreads();
-	}, [page, activeSearch, t]);
+	}, [page, activeSearch, refreshTrigger, t]);
 
 	const handleSearch = () => {
 		setPage(1); // Si buscamos algo nuevo, volvemos a la página 1
@@ -140,6 +141,7 @@ const GeneralForumPage = () => {
 				handleClose={() => setIsCreateModalOpen(false)}
 				onSuccess={() => {
 					setPage(1);
+					setRefreshTrigger(prev => prev + 1);
 				}}
 			/>
 		</div>

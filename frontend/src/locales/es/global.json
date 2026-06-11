@@ -251,7 +251,8 @@
       "contactGM": "Mensaje al Master",
       "infoTitle": "Detalles de la Partida",
       "pending": "Solicitud Pendiente",
-      "closed": "Cerrada"
+      "closed": "Cerrada",
+      "kicked": "Expulsado"
     },
     "join": {
       "title": "Solicitar Unirse a la Campaña",
