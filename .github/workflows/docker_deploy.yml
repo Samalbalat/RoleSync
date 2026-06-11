@@ -6,7 +6,7 @@ permissions:
 on:
   push:
     branches:
-      - main
+      - backend-main
       - backend-develop
 
 jobs:
