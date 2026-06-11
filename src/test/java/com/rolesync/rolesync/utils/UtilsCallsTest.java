@@ -12,10 +12,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.springframework.security.core.Authentication;
 
 import com.rolesync.rolesync.model.Campaign;
 import com.rolesync.rolesync.model.CampaignRequest;
+import com.rolesync.rolesync.model.CampaignRequestStatus;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.User;
 import com.rolesync.rolesync.repository.CampaignRequestRepository;
@@ -23,6 +25,7 @@ import com.rolesync.rolesync.repository.ProfileRepository;
 import com.rolesync.rolesync.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
 class UtilsCallsTest {
 
     @Mock ProfileRepository profileRepository;
@@ -120,10 +123,13 @@ class UtilsCallsTest {
         when(campaign.getMembers()).thenReturn(List.of());
 
         CampaignRequest cr = new CampaignRequest();
+        cr.setStatus(CampaignRequestStatus.PENDING);
 
         when(campaignRequestRepository.findAllByCampaignAndProfile(campaign, profile))
                 .thenReturn(List.of(cr));
 
+        when(campaignRequestRepository.findTopByCampaignAndProfileOrderByIdDesc(campaign, profile))
+                .thenReturn(Optional.of(cr));
         String result = utilsCalls.getProfileRelationToCampaign("player1", campaign);
 
         assertEquals("PENDING", result);

@@ -387,7 +387,7 @@ public class CampaignController {
                 campaign.getId()).orElse(null);
         if (request != null) {
             request.setStatus(CampaignRequestStatus.KICKED);
-            request.setMessage(request.getMessage() + " (Kicked from campaign)");
+            request.setMessage(dto.getMessage() != null ? dto.getMessage() + " (Kicked from campaign)" : " (Kicked from campaign)");
             campaignRequestRepository.save(request);
         }
         return ResponseEntity.ok("Member kicked");

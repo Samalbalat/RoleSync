@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.rolesync.rolesync.model.Campaign;
 import com.rolesync.rolesync.model.CampaignRequest;
+import com.rolesync.rolesync.model.CampaignRequestStatus;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.User;
 import com.rolesync.rolesync.repository.CampaignRequestRepository;
@@ -20,9 +21,12 @@ import jakarta.transaction.Transactional;
 @Component
 public class UtilsCalls {
 
-    @Autowired ProfileRepository profileRepository;
-    @Autowired UserRepository userRepository;
-    @Autowired CampaignRequestRepository campaignRequestRepository;
+    @Autowired
+    ProfileRepository profileRepository;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    CampaignRequestRepository campaignRequestRepository;
 
     public Optional<User> getUserFromUsername(Authentication authentication) {
         String username = authentication.getName();
@@ -36,13 +40,23 @@ public class UtilsCalls {
         if (profileOpt.isPresent() && campaign != null) {
             String profileNameRetrieved = profileOpt.get().getProfilename();
             Profile profile = profileOpt.get();
-            List<CampaignRequest> campaignRequest = campaignRequestRepository.findAllByCampaignAndProfile(campaign, profile);
+            Optional<CampaignRequest> campaignRequestOpt = campaignRequestRepository
+                    .findTopByCampaignAndProfileOrderByIdDesc(campaign, profile);
             if (profileNameRetrieved.equals(campaign.getOwner().getProfilename())) {
                 return "OWNER";
-            } else if(campaign.getMembers()!=null && campaign.getMembers().contains(profileNameRetrieved)) {
+            } else if (campaign.getMembers() != null && campaign.getMembers().contains(profileNameRetrieved)) {
                 return "MEMBER";
-            } else if(campaignRequest!=null && !campaignRequest.isEmpty()) {
-                return "PENDING";
+            } else if (campaignRequestOpt.isPresent()) {
+                switch (campaignRequestOpt.get().getStatus()) {
+                    case PENDING:
+                        return "PENDING";
+                    case KICKED:
+                        return "KICKED";
+                    case BLOCKED:
+                        return "BLOCKED";
+                    default:
+                        return "NONE";
+                }
             }
         }
         return "NONE";
@@ -53,7 +67,7 @@ public class UtilsCalls {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             List<Profile> userProfiles = profileRepository.findAllByUser(user);
-                if (userProfiles.stream().anyMatch(p -> p.getProfilename().equals(profileName))) {
+            if (userProfiles.stream().anyMatch(p -> p.getProfilename().equals(profileName))) {
                 return true;
             }
         }

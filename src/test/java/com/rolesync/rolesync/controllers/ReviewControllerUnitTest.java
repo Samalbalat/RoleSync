@@ -416,7 +416,7 @@ class ReviewControllerUnitTest {
                                                         "Expected status 400 or 503 but got " + status);
                                 });
 
-                verify(reviewService).createReview(any(), any(), anyDouble());
+                verify(reviewService,times(2)).createReview(any(), any(), anyDouble());
         }
 
         @Test

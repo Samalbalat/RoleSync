@@ -1,6 +1,7 @@
 package com.rolesync.rolesync.controller;
 
 import com.rolesync.rolesync.dto.reviewercontroller.CreateReviewDTO;
+import com.rolesync.rolesync.dto.reviewercontroller.ReviewDTO;
 import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.ReviewTargetType;
 import com.rolesync.rolesync.model.User;
@@ -50,7 +51,7 @@ public class ReviewController {
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
-            
+
         try {
             // Introducimos un factor de calidad de la reseña basado en IA para ajustar el
             // peso de su influencia en la credibilidad del usuario
@@ -58,16 +59,16 @@ public class ReviewController {
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN));
             Double userCredibility = userMetricsRepository
                     .findByUser(user).get().getCredibilityScore();
-            double aiScore = aiCommentAnalyzer.analyzeComment(dto.comment());
-            System.out.println("AI Score: " + aiScore);
-            System.out.println("User Credibility: " + userCredibility);
-            System.out.println("Final Score: " + (0.2 + 1.8 * (userCredibility + aiScore)));
-            // El peso final de la reseña se calcula como una combinación de la credibilidad
-            // del usuario y la calidad de la reseña según IA,
-            // con un mínimo de 0.2 para evitar que reseñas de usuarios nuevos o con baja
-            // credibilidad no tengan ningún impacto.
-            Double finalScore = 0.2 + 1.8 * (userCredibility + aiScore);
-            return ResponseEntity.ok(reviewService.createReview(reviewer, dto, finalScore));
+            try {
+                double aiScore = aiCommentAnalyzer.analyzeComment(dto.comment());
+                Double finalScore = 0.2 + 1.8 * (userCredibility + aiScore);
+                ReviewDTO result = reviewService.createReview(reviewer, dto, finalScore);
+                return ResponseEntity.ok(result);
+            } catch (IllegalStateException e) {
+                Double finalScore = 0.2 + 1.8 * (userCredibility / 0.7);
+                ReviewDTO result = reviewService.createReview(reviewer, dto, finalScore);
+                return ResponseEntity.ok(result);
+            }
         } catch (IllegalStateException e) {
             return ResponseEntity.status(400).body(e.getMessage());
         }
@@ -80,9 +81,11 @@ public class ReviewController {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Campaign with given ID does not exist");
                 }
                 campaignRepository.findById(targetId).ifPresent(campaign -> {
-                    if (!utilsCalls.getProfileRelationToCampaign(reviewer.getProfilename(), campaign).equals("OWNER") 
-                        && !utilsCalls.getProfileRelationToCampaign(reviewer.getProfilename(), campaign).equals("MEMBER")) {
-                        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only review campaigns you are related to");
+                    if (!utilsCalls.getProfileRelationToCampaign(reviewer.getProfilename(), campaign).equals("OWNER")
+                            && !utilsCalls.getProfileRelationToCampaign(reviewer.getProfilename(), campaign)
+                                    .equals("MEMBER")) {
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                                "You can only review campaigns you are related to");
                     }
                 });
             }
@@ -90,7 +93,8 @@ public class ReviewController {
                 if (!profileRepository.existsById(targetId)) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile with given ID does not exist");
                 }
-                if (profileRepository.findAllByUser(reviewer.getUser()).stream().anyMatch(p -> p.getId().equals(targetId))) {
+                if (profileRepository.findAllByUser(reviewer.getUser()).stream()
+                        .anyMatch(p -> p.getId().equals(targetId))) {
                     throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot review your own profiles");
                 }
             }
