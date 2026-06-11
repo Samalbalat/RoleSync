@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -116,7 +117,7 @@ public class ForumController {
         if (parentPost != null && parentPost.getCampaign() != null) {
             Campaign campaign = campaignRepository.findById(parentPost.getCampaign().getId()).orElse(null);
             String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
-            if ("NONE".equals(relation) || "PENDING".equals(relation)) {
+            if (!Set.of("OWNER", "MEMBER").contains(relation)) {
                 return ResponseEntity.status(403).build();
             }
         }
@@ -280,7 +281,7 @@ public class ForumController {
         Campaign campaign = campaignRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
-        if ("NONE".equals(relation) || "PENDING".equals(relation)) {
+        if (!Set.of("OWNER", "MEMBER").contains(relation)) {
             return ResponseEntity.status(403).build();
         }
         CharacterSheet character = null;
@@ -395,7 +396,7 @@ public class ForumController {
         }
         Campaign campaign = campaignRepository.findById(id).orElse(null);
         String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
-        if ("NONE".equals(relation) || "PENDING".equals(relation)) {
+        if (!Set.of("OWNER", "MEMBER").contains(relation)) {
             return ResponseEntity.status(403).body("Access denied");
         }
         if (characterId != null) {
