@@ -180,7 +180,7 @@ const PostCard = ({
 	const meta = usePostMetaData(post);
 	const formattedDate = formatPostDate(post.createdAt);
 	const cardStyles = getCardStyles(isTimelineView, isTabletop, meta.isDmAnnouncement, meta.isRegularOoc, meta.isSecret);
-	const blurInThread = !isTimelineView && meta.isRegularOoc && !isRevealed;
+	const blurInThread = isTimelineView && meta.isRegularOoc && !isRevealed;
 
 	return (
 		<div className={cardStyles} onClick={() => isTimelineView && !isTabletop && onClickThread?.(post)}>
