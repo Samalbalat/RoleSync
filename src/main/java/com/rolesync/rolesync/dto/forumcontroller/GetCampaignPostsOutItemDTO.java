@@ -18,6 +18,8 @@ public class GetCampaignPostsOutItemDTO {
     private String content;
 
     private Long authorProfileId;
+    private String authorProfileName;
+    private String authorProfileImage;
     private Long authorCharacterId;
     private String authorCharacterName;
     private String authorCharacterImage;

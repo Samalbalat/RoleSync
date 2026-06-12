@@ -40,7 +40,7 @@ public interface PostRepository
                     WHERE r.parent_post_id = p.id
                 ) AS replyCount
             FROM posts p
-            JOIN profiles pr ON pr.id = p.author_profile_id
+            JOIN profiles pr ON pr.id = p.profile_id
             WHERE p.campaign_id IS NULL
               AND p.type = 'THREAD_START'
               AND (

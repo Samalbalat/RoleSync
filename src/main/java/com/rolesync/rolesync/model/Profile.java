@@ -22,7 +22,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @AllArgsConstructor
-@ToString(exclude = {"sheets","reviews","campaigns"})
+@ToString(exclude = {"sheets","reviews","campaigns","posts"})
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Profile {
@@ -32,7 +32,7 @@ public class Profile {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable=true)
+    @JoinColumn(name="user_id", nullable=false)
     private User user;
 
     @Column(nullable = false)
@@ -47,6 +47,9 @@ public class Profile {
 
     @OneToMany(mappedBy = "owner")
     private Set<CharacterSheet> sheets;
+
+    @OneToMany(mappedBy = "author")
+    private Set<Post> posts;
 
     @OneToMany(mappedBy = "reviewer")
     private Set<Review> reviews;

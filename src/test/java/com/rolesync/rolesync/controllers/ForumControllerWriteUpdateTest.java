@@ -78,8 +78,10 @@ class ForumControllerWriteUpdateTest {
                 Profile p = new Profile();
                 p.setId(1L);
 
+                Profile owner = new Profile();
+                owner.setId(2L);
                 Post post = new Post();
-                post.setAuthorProfileId(2L); // different owner
+                post.setAuthor(owner); // different owner
                 post.setCampaign(null);
 
                 when(profileRepository.findByProfilename("testUser"))
@@ -109,7 +111,7 @@ class ForumControllerWriteUpdateTest {
                 p.setId(1L);
 
                 Post post = new Post();
-                post.setAuthorProfileId(1L);
+                post.setAuthor(p);
                 post.setCampaign(null);
 
                 when(profileRepository.findByProfilename("testUser"))
@@ -219,8 +221,10 @@ class ForumControllerWriteUpdateTest {
                 Profile p = new Profile();
                 p.setId(1L);
 
+                Profile owner = new Profile();
+                owner.setId(99L);
                 Post post = createMockPostWithCampaign(1L);
-                post.setAuthorProfileId(99L);
+                post.setAuthor(owner);
 
                 Campaign campaign = new Campaign();
                 campaign.setId(1L);
@@ -255,7 +259,7 @@ class ForumControllerWriteUpdateTest {
 
                 Post post = createMockPostWithCampaign(1L);
                 post.setCampaign(campaign);
-                post.setAuthorProfileId(1L);
+                post.setAuthor(p);
 
                 when(profileRepository.findByProfilename("testUser"))
                                 .thenReturn(Optional.of(p));
@@ -278,11 +282,14 @@ class ForumControllerWriteUpdateTest {
                 Profile p = new Profile();
                 p.setId(1L);
 
+                Profile owner = new Profile();
+                owner.setId(99L);
+
                 Campaign campaign = new Campaign();
                 campaign.setId(1L);
 
                 Post post = new Post();
-                post.setAuthorProfileId(99L);
+                post.setAuthor(owner);
                 post.setCampaign(campaign);
 
                 when(profileRepository.findByProfilename("testUser"))

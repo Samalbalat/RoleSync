@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 
 import com.rolesync.rolesync.model.Post;
+import com.rolesync.rolesync.model.Profile;
 
 public interface PostRepositoryCustom {
     List<Post> findCampaignPosts(Long campaignId, Instant cursor, int limit, Long accessingCharacterId);
@@ -14,9 +15,9 @@ public interface PostRepositoryCustom {
 
     List<Post> findPostsByTags(List<String> tags, long limit, long offset);
 
-    List<Post> findPostsByAuthorId(Long authorId, long limit, long offset);
+    List<Post> findPostsByAuthor(Profile author, long limit, long offset);
 
-    Long countForumPostsByAuthorId(Long authorId);
+    Long countForumPostsByAuthor(Profile author);
 
     Long countForumPostsByTags(List<String> tags);
 }

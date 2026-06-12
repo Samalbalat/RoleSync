@@ -116,6 +116,10 @@ class ForumControllerReadTest {
 
                 Post post = createMockPostWithCampaign(1L);
                 post.setCreatedAt(Instant.now());
+                Profile authorProfile = new Profile();
+                authorProfile.setId(1L);
+                authorProfile.setProfilename("testUser");
+                post.setAuthor(authorProfile);
 
                 when(postRepository.findCampaignPosts(anyLong(), any(), anyInt(), any()))
                                 .thenReturn(List.of(post));
@@ -177,10 +181,17 @@ class ForumControllerReadTest {
 
                 Post parent = new Post();
                 parent.setCampaign(null);
+                Profile authorProfile = new Profile();
+                authorProfile.setId(1L);
+                authorProfile.setProfilename("testUser");
+                parent.setAuthor(authorProfile);
+
+                Post reply = createMockPostWithCampaign(2L);
+                reply.setAuthor(authorProfile);
 
                 when(postRepository.findById(1L)).thenReturn(Optional.of(parent));
                 when(postRepository.findPostReplies(anyLong(), any(), anyInt()))
-                                .thenReturn(List.of(createMockPostWithCampaign(2L)));
+                                .thenReturn(List.of(reply));
 
                 ResponseEntity<?> res = controller.getPostReplies(
                                 1L, authentication, "testUser", 10, null);
@@ -274,8 +285,8 @@ class ForumControllerReadTest {
                 when(profileRepository.findByProfilename("testUser"))
                                 .thenReturn(Optional.of(p));
 
-                when(postRepository.countForumPostsByAuthorId(1L)).thenReturn(5L);
-                when(postRepository.findPostsByAuthorId(anyLong(), anyLong(), anyLong()))
+                when(postRepository.countForumPostsByAuthor(p)).thenReturn(5L);
+                when(postRepository.findPostsByAuthor(p, 10, 0))
                                 .thenReturn(List.of(createMockPostWithCampaign(1L)));
 
                 ResponseEntity<?> res = controller.getMyForumPosts(
@@ -339,7 +350,7 @@ class ForumControllerReadTest {
                 when(profileRepository.findByProfilename("testUser"))
                                 .thenReturn(Optional.of(p));
 
-                when(postRepository.countForumPostsByAuthorId(1L))
+                when(postRepository.countForumPostsByAuthor(p))
                                 .thenReturn(0L);
 
                 ResponseEntity<?> res = controller.getMyForumPosts(
@@ -360,6 +371,7 @@ class ForumControllerReadTest {
 
                 Profile owner = new Profile();
                 owner.setProfilename("testUser");
+                owner.setId(1L);
 
                 CharacterSheet cs = new CharacterSheet();
                 cs.setOwner(owner);
@@ -367,9 +379,11 @@ class ForumControllerReadTest {
                 when(characterRepository.findById(99L))
                                 .thenReturn(Optional.of(cs));
 
-                when(postRepository.findCampaignPosts(anyLong(), any(), anyInt(), any()))
-                                .thenReturn(List.of(createMockPostWithCampaign(1L)));
+                Post post = createMockPostWithCampaign(1L);
+                post.setAuthor(owner);
 
+                when(postRepository.findCampaignPosts(anyLong(), any(), anyInt(), any()))
+                                .thenReturn(List.of(post));
                 ResponseEntity<?> res = controller.getCampaignPosts(
                                 1L, authentication, "testUser", 10, null, 99L);
 
@@ -383,8 +397,14 @@ class ForumControllerReadTest {
 
                 when(postRepository.findById(1L)).thenReturn(Optional.empty());
 
+                Post post = createMockPostWithCampaign(1L);
+                Profile authorProfile = new Profile();
+                authorProfile.setId(1L);
+                authorProfile.setProfilename("testUser");
+                post.setAuthor(authorProfile);
+
                 when(postRepository.findPostReplies(anyLong(), any(), anyInt()))
-                                .thenReturn(List.of(createMockPostWithCampaign(1L)));
+                                .thenReturn(List.of(post));
 
                 ResponseEntity<?> res = controller.getPostReplies(
                                 1L, authentication, "testUser", 10, null);
@@ -399,11 +419,17 @@ class ForumControllerReadTest {
 
                 Post parent = new Post();
                 parent.setCampaign(null);
+                Profile authorProfile = new Profile();
+                authorProfile.setId(1L);
+                authorProfile.setProfilename("testUser");
+                parent.setAuthor(authorProfile);
 
                 when(postRepository.findById(1L)).thenReturn(Optional.of(parent));
 
                 Post p1 = createMockPostWithCampaign(1L);
+                p1.setAuthor(authorProfile);
                 Post p2 = createMockPostWithCampaign(2L);
+                p2.setAuthor(authorProfile);
 
                 when(postRepository.findPostReplies(anyLong(), any(), anyInt()))
                                 .thenReturn(List.of(p1, p2, new Post())); // > limit (2 > 2 edge fix needed)
@@ -427,10 +453,10 @@ class ForumControllerReadTest {
                 when(profileRepository.findByProfilename("testUser"))
                                 .thenReturn(Optional.of(p));
 
-                when(postRepository.countForumPostsByAuthorId(1L))
+                when(postRepository.countForumPostsByAuthor(p))
                                 .thenReturn(2L);
 
-                when(postRepository.findPostsByAuthorId(anyLong(), anyLong(), anyLong()))
+                when(postRepository.findPostsByAuthor(p, 10, 0))
                                 .thenReturn(List.of(createMockPostWithCampaign(1L)));
 
                 ResponseEntity<?> res = controller.getMyForumPosts(
@@ -477,11 +503,18 @@ class ForumControllerReadTest {
                 when(utilsCalls.getProfileRelationToCampaign("testUser", campaign))
                                 .thenReturn("MEMBER");
 
+                Profile authorProfile = new Profile();
+                authorProfile.setId(1L);
+                authorProfile.setProfilename("testUser");
+
                 Post post1 = createMockPostWithCampaign(1L);
                 post1.setCreatedAt(Instant.now());
 
+                post1.setAuthor(authorProfile);
+
                 Post post2 = createMockPostWithCampaign(2L);
                 post2.setCreatedAt(Instant.now().plusSeconds(10));
+                post2.setAuthor(authorProfile);
 
                 // IMPORTANT: size = limit + 1
                 when(postRepository.findCampaignPosts(anyLong(), any(), eq(1), any()))
@@ -499,6 +532,10 @@ class ForumControllerReadTest {
                                 .thenReturn(true);
 
                 Post parent = createMockPostWithCampaign(1L);
+                Profile authorProfile = new Profile();
+                authorProfile.setId(1L);
+                authorProfile.setProfilename("testUser");
+                parent.setAuthor(authorProfile);
 
                 Campaign campaign = new Campaign();
                 campaign.setId(1L);
@@ -509,8 +546,10 @@ class ForumControllerReadTest {
                 when(utilsCalls.getProfileRelationToCampaign(anyString(), any()))
                                 .thenReturn("MEMBER");
 
+                Post reply = createMockPostWithCampaign(2L);
+                reply.setAuthor(authorProfile);
                 when(postRepository.findPostReplies(anyLong(), any(), anyInt()))
-                                .thenReturn(List.of(createMockPostWithCampaign(2L)));
+                                .thenReturn(List.of(reply));
 
                 ResponseEntity<?> res = controller.getPostReplies(
                                 1L, authentication, "testUser", 10, null);
@@ -562,11 +601,11 @@ class ForumControllerReadTest {
                 when(profileRepository.findByProfilename("testUser"))
                                 .thenReturn(Optional.of(p));
 
-                when(postRepository.countForumPostsByAuthorId(1L))
+                when(postRepository.countForumPostsByAuthor(p))
                                 .thenReturn(1L);
 
                 // EMPTY LIST forces loop skip
-                when(postRepository.findPostsByAuthorId(anyLong(), anyLong(), anyLong()))
+                when(postRepository.findPostsByAuthor(p, 10, 0))
                                 .thenReturn(List.of());
 
                 ResponseEntity<?> res = controller.getMyForumPosts(

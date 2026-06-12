@@ -52,7 +52,7 @@ public class PostService {
         post.setType(PostType.valueOf(request.getType()));
         post.setContent(request.getContent());
 
-        post.setAuthorProfileId(profile.getId());
+        post.setAuthor(profile);
 
         if (character != null) { // if not explicitly OOC, treat as IC and require character info
             post.setAuthorCharacterId(character.getId());
@@ -112,7 +112,7 @@ public class PostService {
         post.setTitle(request.getTitle());
         post.setContent(request.getContent());
 
-        post.setAuthorProfileId(profile.getId());
+        post.setAuthor(profile);
 
         post.setParentPost(
                 request.getParentPostId() != null

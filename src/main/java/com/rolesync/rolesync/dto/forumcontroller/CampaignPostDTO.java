@@ -47,7 +47,7 @@ public class CampaignPostDTO {
         this.type = post.getType();
         this.content = post.getContent();
 
-        this.authorProfileId = post.getAuthorProfileId();
+        this.authorProfileId = post.getAuthor().getId();
         this.authorCharacterId = post.getAuthorCharacterId();
         this.authorCharacterName = post.getAuthorCharacterName();
         this.authorCharacterImage = post.getAuthorCharacterImage();

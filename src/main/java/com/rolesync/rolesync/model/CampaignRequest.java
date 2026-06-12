@@ -22,11 +22,11 @@ public class CampaignRequest {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="profile_id", nullable=true)
+    @JoinColumn(name="profile_id", nullable=false)
     private Profile profile;
 
     @ManyToOne
-    @JoinColumn(name="campaign_id", nullable=true)
+    @JoinColumn(name="campaign_id", nullable=false)
     private Campaign campaign;
     
     @Column(nullable = false)
