@@ -8,6 +8,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.rolesync.rolesync.model.Post;
 import com.rolesync.rolesync.model.PostType;
+import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.model.QPost;
 import com.rolesync.rolesync.repository.custominterfaces.PostRepositoryCustom;
 
@@ -110,12 +111,12 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<Post> findPostsByAuthorId(Long authorId, long limit, long offset) {
+    public List<Post> findPostsByAuthor(Profile author, long limit, long offset) {
         QPost post = QPost.post;
 
     BooleanBuilder builder = new BooleanBuilder();
 
-        builder.and(post.authorProfileId.eq(authorId));
+        builder.and(post.author.eq(author));
         builder.and(post.campaign.isNull()); // Only forum posts
 
     return queryFactory
@@ -128,12 +129,12 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public Long countForumPostsByAuthorId(Long authorId) {
+    public Long countForumPostsByAuthor(Profile author) {
         QPost post = QPost.post;
         
         BooleanBuilder builder = new BooleanBuilder();
 
-            builder.and(post.authorProfileId.eq(authorId));
+            builder.and(post.author.eq(author));
             builder.and(post.campaign.isNull()); // Only forum posts
 
             return queryFactory

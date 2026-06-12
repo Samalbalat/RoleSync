@@ -31,7 +31,7 @@ public class Campaign {
     private Long id;
     
     @ManyToOne
-    @JoinColumn(name="profile_id", nullable=true)
+    @JoinColumn(name="profile_id", nullable=false)
     private Profile owner;
 
     // We store the members as an array of profile names for easy access, 

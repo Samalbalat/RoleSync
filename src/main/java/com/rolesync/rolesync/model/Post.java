@@ -36,9 +36,9 @@ public class Post {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    
-    @Column(name = "author_profile_id", nullable = false)
-    private Long authorProfileId;
+    @ManyToOne
+    @JoinColumn(name="profile_id", nullable=false)
+    private Profile author;
 
     @Column(name = "author_character_id")
     private Long authorCharacterId;

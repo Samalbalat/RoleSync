@@ -15,7 +15,9 @@ public class GetCampaignPostsOutDTOMapper {
 
         dto.setContent(post.getContent());
 
-        dto.setAuthorProfileId(post.getAuthorProfileId());
+        dto.setAuthorProfileId(post.getAuthor().getId());
+        dto.setAuthorProfileImage(post.getAuthor().getImage());
+        dto.setAuthorProfileName(post.getAuthor().getProfilename());
         dto.setAuthorCharacterId(post.getAuthorCharacterId());
         dto.setAuthorCharacterName(post.getAuthorCharacterName());
         dto.setAuthorCharacterImage(post.getAuthorCharacterImage());

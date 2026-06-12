@@ -218,7 +218,7 @@ public class ForumController {
             return ResponseEntity.status(400).body("Post is not a forum post");
         }
         GetForumPostsOutItemDTO dto = GetForumPostsOutDTOMapper.toDTO(forumPost);
-        Profile authorProfile = profileRepository.findById(forumPost.getAuthorProfileId()).orElse(null);
+        Profile authorProfile = forumPost.getAuthor();
         if (authorProfile != null) {
             dto.setAuthor(new GetForumPostsOutItemAuthorDTO(authorProfile.getProfilename(), authorProfile.getImage()));
         }
@@ -242,7 +242,7 @@ public class ForumController {
         int effectiveLimit = Math.min((limit != null && limit > 0) ? limit : 20, 100); // Default to 20 if not provided
                                                                                        // or invalid
         int effectivePage = (page != null && page > 0) ? page : 1; // Default to 1 if not provided or invalid
-        Integer totalItems = postRepository.countForumPostsByAuthorId(profile.getId()).intValue();
+        Integer totalItems = postRepository.countForumPostsByAuthor(profile).intValue();
         Integer totalPages = (int) Math.ceil((double) totalItems / effectiveLimit);
 
         if (effectivePage > totalPages) {
@@ -250,7 +250,7 @@ public class ForumController {
         }
 
         // Fetch posts with pagination and optional filtering by tags
-        List<Post> forumPosts = postRepository.findPostsByAuthorId(profile.getId(), effectiveLimit,
+        List<Post> forumPosts = postRepository.findPostsByAuthor(profile, effectiveLimit,
                 (effectivePage - 1) * effectiveLimit);
 
         // Response mapping
@@ -315,14 +315,14 @@ public class ForumController {
         boolean canModify = false;
         if (post.getCampaign() == null) {
             // Forum post → only author
-            canModify = post.getAuthorProfileId().equals(profile.getId());
+            canModify = post.getAuthor().getId().equals(profile.getId());
         } else {
             Campaign campaign = campaignRepository.findById(post.getCampaign().getId())
                     .orElse(null);
             String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
             // Campaign post → owner OR author
             canModify = "OWNER".equals(relation) ||
-                        post.getAuthorProfileId().equals(profile.getId());
+                        post.getAuthor().getId().equals(profile.getId());
         }
         if (!canModify) {
             return ResponseEntity.status(403).body("Access denied");
@@ -355,7 +355,7 @@ public class ForumController {
         String relation = utilsCalls.getProfileRelationToCampaign(profileName, campaign);
         // Campaign post → owner OR author
         boolean canModify = "OWNER".equals(relation) ||
-                    post.getAuthorProfileId().equals(profile.getId());
+                    post.getAuthor().getId().equals(profile.getId());
             if (!canModify) {
                 return ResponseEntity.status(403).body("Access denied");
             }

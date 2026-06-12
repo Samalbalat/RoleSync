@@ -9,6 +9,7 @@ import java.util.List;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.rolesync.rolesync.model.Post;
+import com.rolesync.rolesync.model.Profile;
 import com.rolesync.rolesync.repository.implementations.PostRepositoryImpl;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -163,8 +164,9 @@ class PostRepositoryImplTest {
     @Test
     void findPostsByAuthorIdBasic() {
         stubPostQueryChain();
-
-        List<Post> result = repository.findPostsByAuthorId(42L, 10, 5);
+        Profile profile = new Profile();
+        profile.setId(42L);
+        List<Post> result = repository.findPostsByAuthor(profile, 10, 5);
 
         assertEquals(1, result.size());
         verify(postQuery).offset(5);
@@ -177,8 +179,9 @@ class PostRepositoryImplTest {
     @Test
     void countForumPostsByAuthorIdReturnsCount() {
         stubLongQueryChain();
-
-        Long result = repository.countForumPostsByAuthorId(42L);
+        Profile profile = new Profile();
+        profile.setId(42L);
+        Long result = repository.countForumPostsByAuthor(profile);
 
         assertEquals(10L, result);
         verify(longQuery).fetchOne();

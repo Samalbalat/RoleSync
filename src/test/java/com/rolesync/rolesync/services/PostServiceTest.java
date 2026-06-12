@@ -115,7 +115,7 @@ class PostServiceTest {
 
         assertEquals(PostType.THREAD_START, saved.getType());
         assertEquals("content", saved.getContent());
-        assertEquals(1L, saved.getAuthorProfileId());
+        assertEquals(1L, saved.getAuthor().getId());
         assertEquals(5L, saved.getAuthorCharacterId());
         assertEquals("Hero", saved.getAuthorCharacterName());
         assertEquals("img", saved.getAuthorCharacterImage());
